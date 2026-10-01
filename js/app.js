@@ -68,22 +68,12 @@ function initApp() {
 // ─────────────────────────────────────────────────────────────────────────────
 function gameRef(path = '') { return db.ref(`fullcount_games/${gameId}${path ? '/'+path : ''}`); }
 
-function listenToGame() {
-  if (gameListener) gameListener.off();
-  gameListener = gameRef();
-  gameListener.on('value', snap => {
-    const g = snap.val();
-    if (!g) { showError('Game not found.'); return; }
-    handleGameState(g);
-  });
-}
-
 function handleGameState(g) {
   switch(g.phase) {
-    case 'lobby':   renderLobbyWait(g); break;
-    case 'roster':  renderRosterSelect(g); break;
-    case 'play':    renderPlay(g); break;
-    case 'gameover':renderGameOver(g); break;
+    case 'lobby':    renderLobbyWait(g);   break;
+    case 'roster':   renderRosterSelect(g); break;
+    case 'play':     renderPlay(g);        break;
+    case 'gameover': renderGameOver(g);    break;
     default: renderPhaseLoading('Waiting...');
   }
 }
@@ -906,17 +896,6 @@ function renderPhaseLoading(msg) {
 function showError(msg) {
   const app = document.getElementById('app');
   if (app) app.innerHTML = `<div class="phase-screen error"><h2>⚠️ Error</h2><p>${msg}</p><a href="index.html">← Back to Lobby</a></div>`;
-}
-
-// Cache last game state for re-renders triggered by card clicks
-const _origHandleGameState = typeof handleGameState !== 'undefined' ? handleGameState : null;
-
-// Patch handleGameState to cache
-window._lastGameState = null;
-const _rawHandle = handleGameState;
-function handleGameState(g) {
-  window._lastGameState = g;
-  _rawHandle(g);
 }
 
 // Watch for both committed → trigger resolve (both clients listen, host acts)
