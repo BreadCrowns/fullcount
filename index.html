@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Count — Lobby</title>
+  <link rel="stylesheet" href="fullcount.css">
+  <style>
+    /* Lobby-only overrides */
+    body { display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; }
+  </style>
+</head>
+<body>
+  <div class="lobby-screen">
+    <div class="logo">⚾ FULL COUNT</div>
+    <div class="tagline">A CARD-BASED BASEBALL CONFRONTATION GAME</div>
+
+    <!-- CREATE GAME -->
+    <div class="lobby-section">
+      <h2>Create Game</h2>
+      <div class="form-group">
+        <label for="create-name">Your Name</label>
+        <input type="text" id="create-name" placeholder="Enter your name" maxlength="24">
+      </div>
+      <button class="btn-primary" onclick="createGame()">Create New Game</button>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <!-- JOIN GAME -->
+    <div class="lobby-section">
+      <h2>Join Game</h2>
+      <div class="form-group">
+        <label for="join-name">Your Name</label>
+        <input type="text" id="join-name" placeholder="Enter your name" maxlength="24">
+      </div>
+      <div class="form-group">
+        <label for="join-code">Room Code</label>
+        <input type="text" id="join-code" placeholder="6-letter code (e.g. ABC123)" maxlength="6" style="text-transform:uppercase; letter-spacing:4px; font-size:1.2rem;">
+      </div>
+      <button class="btn-primary" onclick="joinGame()">Join Game</button>
+    </div>
+
+    <p class="muted" style="margin-top:16px;font-size:0.75rem;">
+      Prototype v1 · <a href="README.md" style="color:#7a8fa8">Setup Guide</a>
+    </p>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // ── FIREBASE CONFIG — Update with your project values ────────────────────
+    const FIREBASE_CONFIG = {
+      apiKey:            "AIzaSyD4RyBNdQYcowbf65A2wKNT4iFYA086PO4",
+      authDomain:        "full-count-403e2.firebaseapp.com",
+      databaseURL:       "https://full-count-403e2-default-rtdb.firebaseio.com",
+      projectId:         "full-count-403e2",
+      storageBucket:     "full-count-403e2.firebasestorage.app",
+      messagingSenderId: "678683733304",
+      appId:             "1:678683733304:web:0cdc5c737f160ec0fce5cd"
+    };
+    // ─────────────────────────────────────────────────────────────────────────
+
+    let db;
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db = firebase.database();
+    } catch(e) {
+      if (e.code === 'app/duplicate-app') {
+        db = firebase.database();
+      } else {
+        console.error(e);
+        alert('Firebase not configured! Please update FIREBASE_CONFIG in index.html and game.html. See README.md.');
+      }
+    }
+
+    function makeUID()  { return Math.random().toString(36).substr(2,9); }
+    function makeCode() { return Math.random().toString(36).substr(2,6).toUpperCase(); }
+
+    async function createGame() {
+      const name = document.getElementById('create-name').value.trim();
+      if (!name) { alert('Please enter your name.'); return; }
+
+      const uid    = makeUID();
+      const gameId = makeCode();
+      const btn    = document.querySelector('.lobby-section .btn-primary');
+      btn.textContent = 'Creating…';
+      btn.disabled = true;
+
+      try {
+        await db.ref(`fullcount_games/${gameId}`).set({
+          phase: 'lobby',
+          host:  { uid, name },
+          guest: null,
+          rosters: { host:null, guest:null },
+          gameState: null,
+          currentPA: null,
+          createdAt: Date.now(),
+        });
+        window.location.href = `game.html?id=${gameId}&role=host&uid=${uid}`;
+      } catch(e) {
+        btn.textContent = 'Create New Game';
+        btn.disabled = false;
+        alert('Failed to create game. Check your Firebase config in README.md.');
+        console.error(e);
+      }
+    }
+
+    async function joinGame() {
+      const name = document.getElementById('join-name').value.trim();
+      const code = document.getElementById('join-code').value.trim().toUpperCase();
+      if (!name) { alert('Please enter your name.'); return; }
+      if (code.length < 4) { alert('Please enter the room code from your opponent.'); return; }
+
+      const uid = makeUID();
+      const btn = document.querySelectorAll('.btn-primary')[1];
+      btn.textContent = 'Joining…';
+      btn.disabled = true;
+
+      try {
+        const snap = await db.ref(`fullcount_games/${code}`).once('value');
+        if (!snap.exists()) { alert(`Game "${code}" not found. Double-check the code.`); btn.textContent='Join Game'; btn.disabled=false; return; }
+        const g = snap.val();
+        if (g.guest) { alert('Game is already full.'); btn.textContent='Join Game'; btn.disabled=false; return; }
+        if (g.phase !== 'lobby') { alert('Game has already started.'); btn.textContent='Join Game'; btn.disabled=false; return; }
+
+        await db.ref(`fullcount_games/${code}/guest`).set({ uid, name });
+        window.location.href = `game.html?id=${code}&role=guest&uid=${uid}`;
+      } catch(e) {
+        btn.textContent = 'Join Game';
+        btn.disabled = false;
+        alert('Failed to join. Check console for details.');
+        console.error(e);
+      }
+    }
+
+    // Allow Enter key to submit
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const focused = document.activeElement;
+        if (focused.id === 'create-name') createGame();
+        else if (focused.id === 'join-name' || focused.id === 'join-code') joinGame();
+      }
+    });
+  </script>
+</body>
+</html>
