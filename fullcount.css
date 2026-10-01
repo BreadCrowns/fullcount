@@ -302,15 +302,27 @@ body {
 .waiting-msg { color: var(--green); font-size: 0.9rem; font-weight: 600; padding: 8px 0; }
 
 /* ─── ZONE BOARD ─────────────────────────────────────────────────────────── */
+/* .zone-board must be flex:1 + min-height:0 so it fills available space     */
+/* without pushing the Lock In button below the overflow:hidden boundary.    */
+.zone-board {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .zones-container {
   display: flex;
   gap: 8px;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .zone-column {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -336,6 +348,8 @@ body {
 
 .zone-half {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding: 8px;
   display: flex;
   flex-direction: column;
