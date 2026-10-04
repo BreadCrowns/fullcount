@@ -882,61 +882,91 @@ function resolveAndAdvance() {
 // NEXT PA
 // ─────────────────────────────────────────────────────────────────────────────
 function nextPA() {
-  // Draw 1 card for each player
+  const btn = document.querySelector('.btn-next-batter');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Loading Next Batter…';
+  }
+
   gameRef().once('value', snap => {
-    const g = snap.val();
-    const gs = g.gameState;
+    try {
+      const g = snap.val();
+      if (!g) return;
+      const gs = g.gameState || {};
+      const pa = g.currentPA || {};
 
-    const updates = {};
-    ['host','guest'].forEach(role => {
-      let hand = [...(gs.hands[role] || [])];
-      let deck = [...(gs.decks[role] || [])];
-      let disc = [...(gs.discards[role] || [])];
+      const updates = {};
+      const discardsObj = gs.discards || {};
+      const handsObj    = gs.hands    || {};
+      const decksObj    = gs.decks    || {};
 
-      if (deck.length === 0) {
-        deck = shuffleArray(disc);
-        disc = [];
+      ['host','guest'].forEach(role => {
+        let hand = [...(handsObj[role] || [])];
+        let deck = [...(decksObj[role] || [])];
+        let disc = [...(discardsObj[role] || [])];
+
+        if (deck.length === 0 && disc.length > 0) {
+          deck = shuffleArray(disc);
+          disc = [];
+        }
+
+        if (deck.length > 0) {
+          hand.push(deck.shift());
+          if (hand.length > MAX_HAND) {
+            disc.push(hand.shift());
+          }
+        }
+
+        updates[`gameState/hands/${role}`]    = hand;
+        updates[`gameState/decks/${role}`]    = deck;
+        updates[`gameState/discards/${role}`] = disc;
+      });
+
+      // Also move placed cards to discard
+      ['host','guest'].forEach(role => {
+        const placed = [
+          ...(pa.placement?.[role]?.z1 || []),
+          ...(pa.placement?.[role]?.z2 || []),
+          ...(pa.placement?.[role]?.z3 || []),
+        ];
+        const currentDisc = [...(updates[`gameState/discards/${role}`] || discardsObj[role] || [])];
+        placed.forEach(id => currentDisc.push(id));
+        updates[`gameState/discards/${role}`] = currentDisc;
+      });
+
+      // Determine next inning/half state (already updated by host in resolveAndAdvance)
+      const isGameOver = g.phase === 'gameover';
+
+      if (!isGameOver) {
+        updates['currentPA/phase']             = 'placing';
+        updates['currentPA/committed/host']    = false;
+        updates['currentPA/committed/guest']   = false;
+        updates['currentPA/placement/host']    = { z1:[], z2:[], z3:[] };
+        updates['currentPA/placement/guest']   = { z1:[], z2:[], z3:[] };
+        updates['currentPA/resolution']        = null;
+        updates['currentPA/isFirstPAOfInning'] = false;
       }
 
-      if (deck.length > 0) {
-        hand.push(deck.shift());
-        if (hand.length > MAX_HAND) { disc.push(hand.shift()); } // discard oldest if over max
+      gameRef().update(updates).then(() => {
+        // Reset local placement
+        localPlacement = { z1:[], z2:[], z3:[] };
+        selectedCard   = null;
+      }).catch(err => {
+        console.error('nextPA update error:', err);
+        showError('Next batter error: ' + err.message);
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Next Batter →';
+        }
+      });
+    } catch(err) {
+      console.error('nextPA error:', err);
+      showError('Next batter error: ' + err.message);
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Next Batter →';
       }
-
-      updates[`gameState/hands/${role}`]    = hand;
-      updates[`gameState/decks/${role}`]    = deck;
-      updates[`gameState/discards/${role}`] = disc;
-    });
-
-    // Also move placed cards to discard
-    const pa = g.currentPA;
-    ['host','guest'].forEach(role => {
-      const placed = [...(pa.placement[role].z1||[]), ...(pa.placement[role].z2||[]), ...(pa.placement[role].z3||[])];
-      const disc = [...(updates[`gameState/discards/${role}`] || gs.discards[role] || [])];
-      placed.forEach(id => disc.push(id));
-      updates[`gameState/discards/${role}`] = disc;
-    });
-
-    // Determine next inning/half state (already updated by host in resolveAndAdvance)
-    const isGameOver = g.phase === 'gameover';
-
-    const newPA = {
-      phase:    'placing',
-      committed:{ host:false, guest:false },
-      placement:{ host:{z1:[],z2:[],z3:[]}, guest:{z1:[],z2:[],z3:[]} },
-      resolution: null,
-      isFirstPAOfInning: pa.resolution?.newHalf !== g.gameState?.half, // rough check
-    };
-
-    if (!isGameOver) {
-      updates['currentPA'] = newPA;
     }
-
-    gameRef().update(updates);
-
-    // Reset local placement
-    localPlacement = { z1:[], z2:[], z3:[] };
-    selectedCard   = null;
   });
 }
 
