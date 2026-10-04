@@ -573,3 +573,83 @@ function resolvePA(opts) {
 }
 
 function buildResult(r) { return r; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRACTICE BOT PLAY (1-PLAYER SOLOMODE)
+// Zero complex AI: lightweight rules for natural card placement into zones
+// ─────────────────────────────────────────────────────────────────────────────
+function executeBotPlay(gameState, botRole = 'guest') {
+  if (!gameState) return { botPlacement: { z1:[], z2:[], z3:[] }, botHand: [] };
+
+  const half = gameState.half || 'top';
+  // In Full Count: top half = guest bats, host pitches; bottom half = host bats, guest pitches
+  const botIsPitching = (botRole === 'host') ? (half === 'top') : (half === 'bottom');
+  const botHand = [...(gameState.hands?.[botRole] || [])];
+  const botPlacement = { z1: [], z2: [], z3: [] };
+
+  if (botHand.length === 0) {
+    return { botPlacement, botHand };
+  }
+
+  if (botIsPitching) {
+    // 1. Throw a pitch in Zone 1 (The Read)
+    let pitchIdx = botHand.findIndex(id => {
+      const c = getCard(id);
+      return c && c.type === 'pitcher' && c.zone === 'read';
+    });
+    if (pitchIdx === -1) {
+      pitchIdx = botHand.findIndex(id => {
+        const c = getCard(id);
+        return c && (c.type === 'pitcher' || c.type === 'universal');
+      });
+    }
+    if (pitchIdx > -1) {
+      const [cardId] = botHand.splice(pitchIdx, 1);
+      botPlacement.z1.push(cardId);
+    }
+
+    // 2. Play 1 supporting card (Zone 2 velocity or Zone 3 defense)
+    if (botHand.length > 0) {
+      let supIdx = botHand.findIndex(id => {
+        const c = getCard(id);
+        return c && (c.zone === 'contact' || c.zone === 'result' || c.type === 'universal');
+      });
+      if (supIdx === -1 && botHand.length > 0) supIdx = 0;
+      if (supIdx > -1) {
+        const [cardId] = botHand.splice(supIdx, 1);
+        const c = getCard(cardId);
+        const target = (c?.zone === 'contact') ? 'z2' : (c?.zone === 'result') ? 'z3' : 'z2';
+        botPlacement[target].push(cardId);
+      }
+    }
+  } else {
+    // Batter bot:
+    // 1. Swing card in Zone 2 (The Swing)
+    let swingIdx = botHand.findIndex(id => {
+      const c = getCard(id);
+      return c && (c.zone === 'contact' || c.type === 'universal');
+    });
+    if (swingIdx === -1 && botHand.length > 0) swingIdx = 0;
+    if (swingIdx > -1) {
+      const [cardId] = botHand.splice(swingIdx, 1);
+      botPlacement.z2.push(cardId);
+    }
+
+    // 2. Read or result card
+    if (botHand.length > 0) {
+      let secIdx = botHand.findIndex(id => {
+        const c = getCard(id);
+        return c && (c.zone === 'read' || c.zone === 'result' || c.type === 'universal');
+      });
+      if (secIdx === -1 && botHand.length > 0) secIdx = 0;
+      if (secIdx > -1) {
+        const [cardId] = botHand.splice(secIdx, 1);
+        const c = getCard(cardId);
+        const target = (c?.zone === 'read') ? 'z1' : (c?.zone === 'result') ? 'z3' : 'z1';
+        botPlacement[target].push(cardId);
+      }
+    }
+  }
+
+  return { botPlacement, botHand };
+}

@@ -117,6 +117,23 @@
       assert(paResult && paResult.outcome && paResult.outcome.type, `resolvePA returns valid outcome (${paResult?.outcome?.display})`);
       assert(Array.isArray(paResult.log) && paResult.log.length > 0, `resolvePA produces play-by-play log with ${paResult?.log?.length} entries`);
 
+      // 8. Practice Bot Placement Tests
+      const pitcherBotHand = ['P1', 'P13', 'P23']; // Fastball (read/z1), Extra Heat (contact/z2), Infield Shift (result/z3)
+      const botPitchState = { half: 'bottom', hands: { guest: [...pitcherBotHand] } }; // bottom = guest pitches
+      const botPitchPlay = executeBotPlay(botPitchState, 'guest');
+      assert(botPitchPlay.botPlacement.z1.includes('P1'), `Pitcher bot plays pitch card P1 in Zone 1`);
+      assert(botPitchPlay.botPlacement.z2.includes('P13') || botPitchPlay.botPlacement.z3.includes('P23'), `Pitcher bot plays supporting card in Z2 or Z3`);
+      assert(botPitchPlay.botHand.length < pitcherBotHand.length, `Pitcher bot removes played cards from hand (remaining: ${botPitchPlay.botHand.length})`);
+
+      const batterBotHand = ['B1', 'B13', 'B23']; // Guess Fastball (read/z1), Contact swing (contact/z2), Pull (result/z3)
+      const botBatState = { half: 'top', hands: { guest: [...batterBotHand] } }; // top = guest bats
+      const botBatPlay = executeBotPlay(botBatState, 'guest');
+      assert(botBatPlay.botPlacement.z2.includes('B13'), `Batter bot plays swing card B13 in Zone 2`);
+      assert(botBatPlay.botHand.length < batterBotHand.length, `Batter bot removes played cards from hand (remaining: ${botBatPlay.botHand.length})`);
+
+      const emptyBotPlay = executeBotPlay({ half: 'top', hands: { guest: [] } }, 'guest');
+      assert(emptyBotPlay.botPlacement.z1.length === 0 && emptyBotPlay.botPlacement.z2.length === 0, `Bot handles empty hand gracefully without error`);
+
       // Summary
       summaryEl.textContent = `Completed: ${passed} passed, ${failed} failed.`;
       summaryEl.className = failed === 0 ? 'summary pass' : 'summary fail';

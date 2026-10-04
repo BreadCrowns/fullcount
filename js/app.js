@@ -105,6 +105,29 @@ function renderLobbyWait(g) {
 // ROSTER SELECTION
 // ─────────────────────────────────────────────────────────────────────────────
 function renderRosterSelect(g) {
+  const isBot = Boolean(g.isSolo || g.guest?.isBot);
+
+  // Auto-initialize bot roster if playing solo
+  if (isBot && myRole === 'host' && !g.rosters?.guest?.ready) {
+    const balancedDeck = DECK_PRESETS.balanced || Object.values(DECK_PRESETS)[0];
+    const botDeckCards = shuffleArray([...balancedDeck.cards]);
+    const botHand = botDeckCards.splice(0, 5);
+    const updates = {
+      'rosters/guest': {
+        name: 'Practice Bot 🤖',
+        startingPitcher: 'PC01', // Marcus Cole (The Ace)
+        reliefPitcher:   'PC02', // Jackson Vance
+        lineup:          LINEUP_PRESETS.balanced.lineup,
+        deckPreset:      'balanced',
+        ready:           true,
+      },
+      'gameState/hands/guest':    botHand,
+      'gameState/decks/guest':    botDeckCards,
+      'gameState/discards/guest': [],
+    };
+    gameRef().update(updates);
+  }
+
   const myRoster = g.rosters?.[myRole];
   if (myRoster?.ready) {
     const oppRoster = g.rosters?.[opponentRole()];
@@ -121,9 +144,9 @@ function renderRosterSelect(g) {
     return;
   }
 
-  const pitcherOptions = Object.values(PITCHER_CHARACTERS).map(p => `
+  const pitcherOptions = Object.values(PITCHER_CHARACTERS).map((p, idx) => `
     <label class="card-option">
-      <input type="radio" name="starter" value="${p.id}">
+      <input type="radio" name="starter" value="${p.id}" ${idx === 0 ? 'checked' : ''}>
       <div class="player-card-mini" style="border-color:${p.color}">
         <div class="pc-name">${p.name}</div>
         <div class="pc-arch">${p.archetype}</div>
@@ -132,9 +155,9 @@ function renderRosterSelect(g) {
       </div>
     </label>`).join('');
 
-  const reliefOptions = Object.values(PITCHER_CHARACTERS).map(p => `
+  const reliefOptions = Object.values(PITCHER_CHARACTERS).map((p, idx) => `
     <label class="card-option">
-      <input type="radio" name="relief" value="${p.id}">
+      <input type="radio" name="relief" value="${p.id}" ${idx === 1 ? 'checked' : ''}>
       <div class="player-card-mini" style="border-color:${p.color}">
         <div class="pc-name">${p.name}</div>
         <div class="pc-arch">${p.archetype}</div>
@@ -143,9 +166,9 @@ function renderRosterSelect(g) {
       </div>
     </label>`).join('');
 
-  const lineupOptions = Object.entries(LINEUP_PRESETS).map(([key,lp]) => `
+  const lineupOptions = Object.entries(LINEUP_PRESETS).map(([key,lp], idx) => `
     <label class="card-option">
-      <input type="radio" name="lineup" value="${key}">
+      <input type="radio" name="lineup" value="${key}" ${idx === 0 ? 'checked' : ''}>
       <div class="preset-card">
         <div class="pc-name">${lp.name}</div>
         <div class="pc-desc">${lp.desc}</div>
@@ -153,9 +176,9 @@ function renderRosterSelect(g) {
       </div>
     </label>`).join('');
 
-  const deckOptions = Object.entries(DECK_PRESETS).map(([key,dp]) => `
+  const deckOptions = Object.entries(DECK_PRESETS).map(([key,dp], idx) => `
     <label class="card-option">
-      <input type="radio" name="deck" value="${key}">
+      <input type="radio" name="deck" value="${key}" ${idx === 0 ? 'checked' : ''}>
       <div class="preset-card">
         <div class="pc-name">${dp.name}</div>
         <div class="pc-desc">${dp.desc}</div>
@@ -303,6 +326,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
   const oppChar = iAmBatting ? pitcherChar : batterChar;
   const oppRoleTag = iAmBatting ? '⚾ PITCHING' : '🏏 BATTING';
 
+  const isBot = Boolean(g.isSolo || g.guest?.isBot);
   const myChar = iAmBatting ? batterChar : pitcherChar;
   const totalPlaced = ['z1','z2','z3'].reduce((s,z) => s + (localPlacement[z]||[]).length, 0);
 
@@ -326,8 +350,8 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
             <span>🎴</span>
             <span>${oppHand.length}</span>
           </div>
-          <div class="opp-status-pill ${oppCommitted ? 'ready' : 'waiting'}">
-            ${oppCommitted ? 'READY' : 'PLACING'}
+          <div class="opp-status-pill ${oppCommitted ? 'ready' : (isBot ? 'ready' : 'waiting')}">
+            ${oppCommitted ? 'READY' : (isBot ? 'BOT 🤖' : 'PLACING')}
           </div>
         </div>
       </header>
@@ -674,19 +698,39 @@ function commitPlacement() {
     if (idx > -1) newHand.splice(idx, 1);
   });
 
-  // Write placement and committed flag + updated hand to Firebase
-  gameRef(`currentPA/placement/${myRole}`).set(localPlacement);
-  gameRef(`currentPA/committed/${myRole}`).set(true);
-  gameRef(`gameState/hands/${myRole}`).set(newHand);
-
   localHand = newHand;
 
-  // Check if opponent is already committed → resolve
-  gameRef('currentPA').once('value', snap => {
-    const pa = snap.val();
-    if (pa.committed?.host && pa.committed?.guest) {
-      if (myRole === 'host') resolveAndAdvance();
+  gameRef().once('value', snap => {
+    const g = snap.val();
+    if (!g) return;
+
+    const updates = {
+      [`currentPA/placement/${myRole}`]: localPlacement,
+      [`currentPA/committed/${myRole}`]: true,
+      [`gameState/hands/${myRole}`]:     newHand,
+    };
+
+    const isBot = Boolean(g.isSolo || g.guest?.isBot);
+    let shouldResolve = false;
+
+    if (isBot && myRole === 'host') {
+      const botPlay = executeBotPlay(g.gameState, 'guest');
+      updates['currentPA/placement/guest'] = botPlay.botPlacement;
+      updates['currentPA/committed/guest'] = true;
+      updates['gameState/hands/guest']     = botPlay.botHand;
+      shouldResolve = true;
+    } else {
+      const oppRole = opponentRole();
+      if (g.currentPA?.committed?.[oppRole]) {
+        shouldResolve = true;
+      }
     }
+
+    gameRef().update(updates).then(() => {
+      if (shouldResolve && myRole === 'host') {
+        resolveAndAdvance();
+      }
+    });
   });
 }
 
@@ -782,6 +826,16 @@ function resolveAndAdvance() {
         }
         // If tied: continue to extra inning
       }
+    // Auto-substitute exhausted bot starting pitcher
+    const isBot = Boolean(g.isSolo || g.guest?.isBot);
+    if (isBot && pitchingRole === 'guest') {
+      const botPitcher = pitcherChar;
+      const pasFaced = newPitcherPAs.guest;
+      if (pasFaced >= (botPitcher.stamina?.exhaustedMin || 6) && gs.activePitcher?.guest === g.rosters?.guest?.startingPitcher) {
+        newPitcherPAs.guest = 0;
+        gs.activePitcher.guest = g.rosters.guest.reliefPitcher;
+        res.log.push(`Practice Bot brings in relief pitcher: ${getPitcher(g.rosters.guest.reliefPitcher)?.name}`);
+      }
     }
 
     const updates = {
@@ -793,6 +847,7 @@ function resolveAndAdvance() {
       'gameState/batterIndex':newBatterIndex,
       'gameState/pitcherPAs': newPitcherPAs,
       'gameState/lastPitchCall': newLastPitch,
+      'gameState/activePitcher': gs.activePitcher,
       'gameState/half':       newHalf,
       'gameState/inning':     newInning,
     };

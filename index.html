@@ -16,6 +16,21 @@
       <div class="logo">⚾ FULL COUNT</div>
       <div class="tagline">A CARD-BASED BASEBALL CONFRONTATION GAME</div>
 
+      <!-- SOLO PRACTICE (1-PLAYER) -->
+      <div class="lobby-section solo-section" style="border: 1px solid rgba(245, 158, 11, 0.4); background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);">
+        <h2 style="color: #fbbf24; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>⚡</span> Solo Practice Match
+        </h2>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin: 4px 0 14px; line-height: 1.4;">
+          Instant 1-player testing on mobile or desktop! Plays against an auto-bot with zero waiting.
+        </p>
+        <button id="btn-solo" class="btn-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35); font-weight: 700; letter-spacing: 0.5px;" onclick="createSoloGame()">
+          Play Solo vs Bot 🤖
+        </button>
+      </div>
+
+      <div class="divider">OR 2-PLAYER ONLINE</div>
+
       <!-- CREATE GAME -->
       <div class="lobby-section">
         <h2>Create Game</h2>
@@ -23,7 +38,7 @@
           <label for="create-name">Your Name</label>
           <input type="text" id="create-name" placeholder="Enter your name" maxlength="24">
         </div>
-        <button class="btn-primary" onclick="createGame()">Create New Game</button>
+        <button id="btn-create" class="btn-primary" onclick="createGame()">Create New Game</button>
       </div>
 
       <div class="divider">OR</div>
@@ -39,7 +54,7 @@
           <label for="join-code">Room Code</label>
           <input type="text" id="join-code" placeholder="6-letter code (e.g. ABC123)" maxlength="6" style="text-transform:uppercase; letter-spacing:4px; font-size:1.2rem;">
         </div>
-        <button class="btn-primary" onclick="joinGame()">Join Game</button>
+        <button id="btn-join" class="btn-primary" onclick="joinGame()">Join Game</button>
       </div>
 
       <p class="muted" style="margin-top:16px;font-size:0.75rem;">
@@ -81,15 +96,52 @@
     function makeUID()  { return Math.random().toString(36).substr(2,9); }
     function makeCode() { return Math.random().toString(36).substr(2,6).toUpperCase(); }
 
+    async function createSoloGame() {
+      const name = (document.getElementById('create-name')?.value || document.getElementById('join-name')?.value || '').trim() || 'Player 1';
+      const code = 'SOLO' + Math.floor(10 + Math.random() * 89);
+      const uid  = makeUID();
+      const botUid = 'bot_' + makeUID();
+
+      const btn = document.getElementById('btn-solo');
+      if (btn) {
+        btn.textContent = 'Launching…';
+        btn.disabled = true;
+      }
+
+      try {
+        await db.ref(`fullcount_games/${code}`).set({
+          code,
+          phase: 'roster',
+          host: { uid, name },
+          guest: { uid: botUid, name: 'Practice Bot 🤖', isBot: true },
+          isSolo: true,
+          rosters: { host: null, guest: null },
+          gameState: null,
+          currentPA: null,
+          createdAt: Date.now(),
+        });
+        window.location.href = `game.html?id=${code}&role=host&uid=${uid}`;
+      } catch(e) {
+        if (btn) {
+          btn.textContent = 'Play Solo vs Bot 🤖';
+          btn.disabled = false;
+        }
+        alert('Failed to launch solo match: ' + (e.message || e));
+        console.error(e);
+      }
+    }
+
     async function createGame() {
       const name = document.getElementById('create-name').value.trim();
       if (!name) { alert('Please enter your name.'); return; }
 
       const uid    = makeUID();
       const gameId = makeCode();
-      const btn    = document.querySelector('.lobby-section .btn-primary');
-      btn.textContent = 'Creating…';
-      btn.disabled = true;
+      const btn    = document.getElementById('btn-create');
+      if (btn) {
+        btn.textContent = 'Creating…';
+        btn.disabled = true;
+      }
 
       try {
         await db.ref(`fullcount_games/${gameId}`).set({
@@ -103,8 +155,10 @@
         });
         window.location.href = `game.html?id=${gameId}&role=host&uid=${uid}`;
       } catch(e) {
-        btn.textContent = 'Create New Game';
-        btn.disabled = false;
+        if (btn) {
+          btn.textContent = 'Create New Game';
+          btn.disabled = false;
+        }
         alert('Failed to create game. Check your Firebase config in README.md.');
         console.error(e);
       }
@@ -117,22 +171,26 @@
       if (code.length < 4) { alert('Please enter the room code from your opponent.'); return; }
 
       const uid = makeUID();
-      const btn = document.querySelectorAll('.btn-primary')[1];
-      btn.textContent = 'Joining…';
-      btn.disabled = true;
+      const btn = document.getElementById('btn-join');
+      if (btn) {
+        btn.textContent = 'Joining…';
+        btn.disabled = true;
+      }
 
       try {
         const snap = await db.ref(`fullcount_games/${code}`).once('value');
-        if (!snap.exists()) { alert(`Game "${code}" not found. Double-check the code.`); btn.textContent='Join Game'; btn.disabled=false; return; }
+        if (!snap.exists()) { alert(`Game "${code}" not found. Double-check the code.`); if(btn){btn.textContent='Join Game'; btn.disabled=false;} return; }
         const g = snap.val();
-        if (g.guest) { alert('Game is already full.'); btn.textContent='Join Game'; btn.disabled=false; return; }
-        if (g.phase !== 'lobby') { alert('Game has already started.'); btn.textContent='Join Game'; btn.disabled=false; return; }
+        if (g.guest) { alert('Game is already full.'); if(btn){btn.textContent='Join Game'; btn.disabled=false;} return; }
+        if (g.phase !== 'lobby') { alert('Game has already started.'); if(btn){btn.textContent='Join Game'; btn.disabled=false;} return; }
 
         await db.ref(`fullcount_games/${code}/guest`).set({ uid, name });
         window.location.href = `game.html?id=${code}&role=guest&uid=${uid}`;
       } catch(e) {
-        btn.textContent = 'Join Game';
-        btn.disabled = false;
+        if (btn) {
+          btn.textContent = 'Join Game';
+          btn.disabled = false;
+        }
         alert('Failed to join. Check console for details.');
         console.error(e);
       }
