@@ -690,6 +690,12 @@ function commitPlacement() {
   const total = ['z1','z2','z3'].reduce((s,z) => s + (localPlacement[z]||[]).length, 0);
   if (total === 0) { if (!confirm('Play with no cards this PA?')) return; }
 
+  const btn = document.getElementById('lock-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-label">LOCKING IN…</span>';
+  }
+
   // Remove placed cards from hand
   const placedAll = [...(localPlacement.z1||[]), ...(localPlacement.z2||[]), ...(localPlacement.z3||[])];
   const newHand = [...localHand];
@@ -730,6 +736,13 @@ function commitPlacement() {
       if (shouldResolve && myRole === 'host') {
         resolveAndAdvance();
       }
+    }).catch(err => {
+      console.error('commitPlacement update error:', err);
+      showError('Lock In failed: ' + err.message);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span class="btn-icon">🔒</span><span class="btn-label">LOCK IN</span><span class="btn-sub">${total}/${window._maxCardsThisPA || 4}</span>`;
+      }
     });
   });
 }
@@ -744,121 +757,124 @@ gameRef && (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 function resolveAndAdvance() {
   gameRef().once('value', snap => {
-    const g = snap.val();
-    if (!g || g.currentPA.resolution) return; // already resolved
-    if (!g.currentPA.committed?.host || !g.currentPA.committed?.guest) return;
+    try {
+      const g = snap.val();
+      if (!g || g.currentPA?.resolution) return; // already resolved
+      if (!g.currentPA?.committed?.host || !g.currentPA?.committed?.guest) return;
 
-    const gs   = g.gameState;
-    const pa   = g.currentPA;
-    const half = gs.half;
-    const pitchingRole = half === 'top' ? 'host'  : 'guest';
-    const battingRole  = half === 'top' ? 'guest' : 'host';
+      const gs   = g.gameState;
+      const pa   = g.currentPA;
+      const half = gs.half;
+      const pitchingRole = half === 'top' ? 'host'  : 'guest';
+      const battingRole  = half === 'top' ? 'guest' : 'host';
 
-    const pitcherChar  = getPitcher(gs.activePitcher[pitchingRole]);
-    const battingLineup= g.rosters[battingRole].lineup;
-    const bIdx         = gs.batterIndex[half] % 9;
-    const batterChar   = getBatter(battingLineup[bIdx]);
+      const pitcherChar  = getPitcher(gs.activePitcher?.[pitchingRole]);
+      const battingLineup= g.rosters?.[battingRole]?.lineup || [];
+      const bIdx         = (gs.batterIndex?.[half] || 0) % 9;
+      const batterChar   = getBatter(battingLineup[bIdx]);
 
-    const pitcherPlacement = pa.placement[pitchingRole];
-    const batterPlacement  = pa.placement[battingRole];
+      const pitcherPlacement = pa.placement?.[pitchingRole] || { z1:[], z2:[], z3:[] };
+      const batterPlacement  = pa.placement?.[battingRole] || { z1:[], z2:[], z3:[] };
 
-    const score = { batting: gs.score[half], pitching: gs.score[half==='top'?'bottom':'top'] };
+      const score = { batting: gs.score?.[half] || 0, pitching: gs.score?.[half==='top'?'bottom':'top'] || 0 };
 
-    const res = resolvePA({
-      pitcherPlacement,
-      batterPlacement,
-      pitcherChar,
-      batterChar,
-      pitcherPAsFaced:    gs.pitcherPAs[pitchingRole],
-      bases:              gs.bases,
-      isFirstPAOfInning:  pa.isFirstPAOfInning,
-      prevPitchCall:      gs.lastPitchCall[pitchingRole],
-      score,
-      outs:               gs.outs,
-      inning:             gs.inning,
-      totalInnings:       TOTAL_INNINGS,
-      pitcherWonZ1LastPA: gs.lastPitcherWonZ1?.[pitchingRole] || false,
-    });
+      const res = resolvePA({
+        pitcherPlacement,
+        batterPlacement,
+        pitcherChar,
+        batterChar,
+        pitcherPAsFaced:    gs.pitcherPAs?.[pitchingRole] || 0,
+        bases:              gs.bases || { first:false, second:false, third:false },
+        isFirstPAOfInning:  Boolean(pa.isFirstPAOfInning),
+        prevPitchCall:      gs.lastPitchCall?.[pitchingRole] || null,
+        score,
+        outs:               gs.outs || 0,
+        inning:             gs.inning || 1,
+        totalInnings:       TOTAL_INNINGS,
+        pitcherWonZ1LastPA: gs.lastPitcherWonZ1?.[pitchingRole] || false,
+      });
 
-    // Update game state based on outcome
-    const outcome = res.outcome;
-    let newOuts   = gs.outs + (outcome.outsAdded || 0);
-    let newBases  = outcome.newBases || gs.bases;
-    const newScore = { ...gs.score };
-    newScore[half] = (newScore[half] || 0) + (outcome.runsScored || 0);
+      // Update game state based on outcome
+      const outcome = res.outcome;
+      let newOuts   = (gs.outs || 0) + (outcome.outsAdded || 0);
+      let newBases  = outcome.newBases || gs.bases || { first:false, second:false, third:false };
+      const newScore = { ...(gs.score || { top:0, bottom:0 }) };
+      newScore[half] = (newScore[half] || 0) + (outcome.runsScored || 0);
 
-    // Hustle: runners advance +1 (adjust newBases)
-    if (outcome.type !== 'out' && outcome.type !== 'k' && outcome.type !== 'dp' &&
-        (batterPlacement.z3 || []).includes('B25') && outcome.runnersAdvance > 0) {
-      // Re-advance all runners one more base (simplified)
-      if (!newBases.third && newBases.second) { newBases = {...newBases, third:true, second:newBases.first, first:false}; }
-      if (!newBases.second && newBases.first) { newBases = {...newBases, second:true, first:false}; }
-    }
-
-    const newBatterIndex = { ...gs.batterIndex, [half]: gs.batterIndex[half] + 1 };
-    const newPitcherPAs  = { ...gs.pitcherPAs,  [pitchingRole]: gs.pitcherPAs[pitchingRole] + 1 };
-    const newLastPitch   = { ...gs.lastPitchCall, [pitchingRole]: res.primaryPitchCall };
-
-    let newInning = gs.inning;
-    let newHalf   = gs.half;
-    let nextPhase = 'play';
-    let isFirstPA = false;
-
-    if (newOuts >= 3) {
-      newOuts = 0;
-      newBases = { first:false, second:false, third:false };
-      isFirstPA = true;
-
-      if (gs.half === 'top') {
-        newHalf = 'bottom';
-      } else {
-        newHalf = 'top';
-        newInning = gs.inning + 1;
+      // Hustle: runners advance +1 (adjust newBases)
+      if (outcome.type !== 'out' && outcome.type !== 'k' && outcome.type !== 'dp' &&
+          (batterPlacement.z3 || []).includes('B25') && outcome.runnersAdvance > 0) {
+        if (!newBases.third && newBases.second) { newBases = {...newBases, third:true, second:newBases.first, first:false}; }
+        if (!newBases.second && newBases.first) { newBases = {...newBases, second:true, first:false}; }
       }
 
-      // Check game over
-      if (newInning > TOTAL_INNINGS) {
-        // Extra innings or game over
-        const topScore = newScore.top;
-        const botScore = newScore.bottom;
-        if (topScore !== botScore) {
-          nextPhase = 'gameover';
+      const newBatterIndex = { ...(gs.batterIndex || { top:0, bottom:0 }), [half]: (gs.batterIndex?.[half] || 0) + 1 };
+      const newPitcherPAs  = { ...(gs.pitcherPAs || { host:0, guest:0 }),  [pitchingRole]: (gs.pitcherPAs?.[pitchingRole] || 0) + 1 };
+      const newLastPitch   = { ...(gs.lastPitchCall || {}), [pitchingRole]: res.primaryPitchCall || 'none' };
+
+      let newInning = gs.inning || 1;
+      let newHalf   = gs.half || 'top';
+      let nextPhase = 'play';
+
+      if (newOuts >= 3) {
+        newOuts = 0;
+        newBases = { first:false, second:false, third:false };
+
+        if (gs.half === 'top') {
+          newHalf = 'bottom';
+        } else {
+          newHalf = 'top';
+          newInning = (gs.inning || 1) + 1;
         }
-        // If tied: continue to extra inning
+
+        // Check game over
+        if (newInning > TOTAL_INNINGS) {
+          const topScore = newScore.top || 0;
+          const botScore = newScore.bottom || 0;
+          if (topScore !== botScore) {
+            nextPhase = 'gameover';
+          }
+        }
       }
-    }
 
-    // Auto-substitute exhausted bot starting pitcher
-    const isBot = Boolean(g.isSolo || g.guest?.isBot);
-    if (isBot && pitchingRole === 'guest') {
-      const botPitcher = pitcherChar;
-      const pasFaced = newPitcherPAs.guest;
-      if (pasFaced >= (botPitcher.stamina?.exhaustedMin || 6) && gs.activePitcher?.guest === g.rosters?.guest?.startingPitcher) {
-        newPitcherPAs.guest = 0;
-        gs.activePitcher.guest = g.rosters.guest.reliefPitcher;
-        res.log.push(`Practice Bot brings in relief pitcher: ${getPitcher(g.rosters.guest.reliefPitcher)?.name}`);
+      // Auto-substitute exhausted bot starting pitcher
+      const isBot = Boolean(g.isSolo || g.guest?.isBot);
+      if (isBot && pitchingRole === 'guest') {
+        const botPitcher = pitcherChar;
+        const pasFaced = newPitcherPAs.guest;
+        if (pasFaced >= (botPitcher?.stamina?.exhaustedMin || 6) && gs.activePitcher?.guest === g.rosters?.guest?.startingPitcher) {
+          newPitcherPAs.guest = 0;
+          if (gs.activePitcher) gs.activePitcher.guest = g.rosters.guest.reliefPitcher;
+          res.log.push(`Practice Bot brings in relief pitcher: ${getPitcher(g.rosters.guest.reliefPitcher)?.name}`);
+        }
       }
+
+      const updates = {
+        'currentPA/resolution': res,
+        'currentPA/phase':      'resolved',
+        'gameState/outs':       newOuts,
+        'gameState/bases':      newBases,
+        'gameState/score':      newScore,
+        'gameState/batterIndex':newBatterIndex,
+        'gameState/pitcherPAs': newPitcherPAs,
+        'gameState/lastPitchCall': newLastPitch,
+        'gameState/activePitcher': gs.activePitcher || { host:'PC01', guest:'PC01' },
+        'gameState/half':       newHalf,
+        'gameState/inning':     newInning,
+      };
+
+      if (nextPhase === 'gameover') {
+        updates['phase'] = 'gameover';
+      }
+
+      gameRef().update(updates).catch(err => {
+        console.error('Firebase resolution update error:', err);
+        showError('Resolution save error: ' + err.message);
+      });
+    } catch(err) {
+      console.error('resolveAndAdvance error:', err);
+      showError('Resolution error: ' + err.message);
     }
-
-    const updates = {
-      'currentPA/resolution': res,
-      'currentPA/phase':      nextPhase === 'gameover' ? 'resolved' : 'resolved',
-      'gameState/outs':       newOuts,
-      'gameState/bases':      newBases,
-      'gameState/score':      newScore,
-      'gameState/batterIndex':newBatterIndex,
-      'gameState/pitcherPAs': newPitcherPAs,
-      'gameState/lastPitchCall': newLastPitch,
-      'gameState/activePitcher': gs.activePitcher,
-      'gameState/half':       newHalf,
-      'gameState/inning':     newInning,
-    };
-
-    if (nextPhase === 'gameover') {
-      updates['phase'] = 'gameover';
-    }
-
-    gameRef().update(updates);
   });
 }
 
