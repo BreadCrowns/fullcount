@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Full Count — Unit Tests</title>
+  <style>
+    body { font-family: monospace; background: #0f141c; color: #d0dbe5; padding: 24px; }
+    h1 { color: #f5a623; }
+    .pass { color: #4caf50; }
+    .fail { color: #f44336; font-weight: bold; }
+    .summary { margin-top: 20px; font-size: 1.2rem; border-top: 1px solid #334; padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Full Count — Unit Test Runner</h1>
+  <div id="results"></div>
+  <div id="summary" class="summary">Running tests...</div>
+
+  <!-- Scripts -->
+  <script src="../js/data.js"></script>
+  <script src="../js/resolution.js"></script>
+
+  <script>
+    const resultsEl = document.getElementById('results');
+    const summaryEl = document.getElementById('summary');
+    let passed = 0;
+    let failed = 0;
+
+    function assert(condition, message) {
+      const p = document.createElement('p');
+      if (condition) {
+        passed++;
+        p.className = 'pass';
+        p.textContent = `[PASS] ${message}`;
+      } else {
+        failed++;
+        p.className = 'fail';
+        p.textContent = `[FAIL] ${message}`;
+        console.error(`Assertion failed: ${message}`);
+      }
+      resultsEl.appendChild(p);
+    }
+
+    function runTests() {
+      // 1. Data Integrity Tests
+      const actionCardKeys = Object.keys(ACTION_CARDS || {});
+      const pitcherCharKeys = Object.keys(PITCHER_CHARACTERS || {});
+      const batterCharKeys = Object.keys(BATTER_CHARACTERS || {});
+      const deckPresetKeys = Object.keys(DECK_PRESETS || {});
+
+      assert(actionCardKeys.length === 70, `Action cards loaded (70 cards total, found ${actionCardKeys.length})`);
+      assert(pitcherCharKeys.length === 8, `8 Pitcher characters loaded (found ${pitcherCharKeys.length})`);
+      assert(batterCharKeys.length === 12, `12 Batter characters loaded (found ${batterCharKeys.length})`);
+      assert(deckPresetKeys.length === 3, `3 Preset decks loaded (found ${deckPresetKeys.length})`);
+
+      // 2. Zone Value and Penalty
+      const fourSeam = getCard('P1'); // Four-Seam Fastball: read (z1), value 10
+      assert(fourSeam && fourSeam.value === 10, `P1 card exists with value 10`);
+      assert(getZoneValue(fourSeam, 'z1') === 10, `P1 played in z1 (preferred) retains full value 10`);
+      assert(getZoneValue(fourSeam, 'z2') === 5, `P1 played outside preferred zone gets 50% penalty (floor(10*0.5) = 5)`);
+
+      const universalCard = Object.values(ACTION_CARDS).find(c => c.zone === 'any');
+      if (universalCard) {
+        assert(getZoneValue(universalCard, 'z1') === universalCard.value && getZoneValue(universalCard, 'z2') === universalCard.value,
+          `Universal card ${universalCard.id} retains full value in all zones`);
+      }
+
+      // 3. sumZone
+      const totalZ1 = sumZone(['P1', 'P2'], 'z1');
+      assert(totalZ1 === getZoneValue(getCard('P1'), 'z1') + getZoneValue(getCard('P2'), 'z1'), `sumZone correctly sums card values (${totalZ1})`);
+
+      // 4. Base Running Helpers
+      assert(countRunners({ first: true, second: false, third: true }) === 2, `countRunners returns 2 for 1st & 3rd`);
+      assert(countRunners({ first: false, second: false, third: false }) === 0, `countRunners returns 0 for empty bases`);
+
+      const baseHitRuns = runsOnHit({ first: true, second: true, third: true }, 1);
+      assert(baseHitRuns === 1, `Single with bases loaded scores 1 run`);
+
+      const doubleRuns = runsOnHit({ first: true, second: true, third: true }, 2);
+      assert(doubleRuns === 2, `Double with bases loaded scores 2 runs`);
+
+      const basesAfterSingle = advanceBases({ first: true, second: false, third: false }, 1);
+      assert(basesAfterSingle.first === true && basesAfterSingle.second === true && basesAfterSingle.third === false,
+        `Single with runner on 1st moves runners to 1st & 2nd`);
+
+      // 5. Zone 1 Counter
+      const guessFastball = getCard('B1'); // counters: ['fastball', 'cutter_fast']
+      const z1CounterRes = checkZ1Counter(['B1'], ['P1'], null); // P1 has pitchCall: 'fastball'
+      assert(z1CounterRes.counterFired === true, `Guess Fastball (B1) counters Four-Seam Fastball (P1) in Zone 1`);
+      assert(z1CounterRes.pitchCallMatched === 'fastball', `Matched pitchCall is fastball`);
+      assert(z1CounterRes.multiplier === 2.0, `Counter multiplier is 2.0 (got ${z1CounterRes.multiplier})`);
+
+      // 6. Pitcher Stamina Degradation
+      const acePitcher = PITCHER_CHARACTERS['PC01']; // Cole Vance
+      const freshMod = getStaminaMod(acePitcher, 0);
+      const tiredMod = getStaminaMod(acePitcher, 20);
+      assert(freshMod.z1 === 0 && freshMod.z2 === 0 && freshMod.z3 === 0, `Fresh pitcher stamina mod has no penalties`);
+      assert(tiredMod.z1 < 0 || tiredMod.z2 < 0, `Exhausted pitcher has stamina penalties (z1: ${tiredMod.z1}, z2: ${tiredMod.z2})`);
+
+      // 7. Full PA Resolution
+      const paResult = resolvePA({
+        pitcherPlacement: { z1: ['P1'], z2: ['P13'], z3: ['P23'] },
+        batterPlacement:  { z1: ['B1'], z2: ['B11'], z3: ['B21'] },
+        pitcherChar: PITCHER_CHARACTERS['PC01'],
+        batterChar:  BATTER_CHARACTERS['BC01'],
+        pitcherPAsFaced: 0,
+        bases: { first: false, second: false, third: false },
+        isFirstPAOfInning: true,
+        prevPitchCall: null,
+        score: { batting: 0, pitching: 0 },
+        outs: 0,
+        inning: 1,
+        totalInnings: 3,
+        pitcherWonZ1LastPA: false,
+      });
+
+      assert(paResult && paResult.outcome && paResult.outcome.type, `resolvePA returns valid outcome (${paResult?.outcome?.display})`);
+      assert(Array.isArray(paResult.log) && paResult.log.length > 0, `resolvePA produces play-by-play log with ${paResult?.log?.length} entries`);
+
+      // Summary
+      summaryEl.textContent = `Completed: ${passed} passed, ${failed} failed.`;
+      summaryEl.className = failed === 0 ? 'summary pass' : 'summary fail';
+      window.testResults = { passed, failed };
+    }
+
+    window.addEventListener('DOMContentLoaded', runTests);
+  </script>
+</body>
+</html>

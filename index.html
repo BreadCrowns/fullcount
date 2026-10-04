@@ -7,43 +7,45 @@
   <link rel="stylesheet" href="fullcount.css">
   <style>
     /* Lobby-only overrides */
-    body { display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; }
+    body { padding: 0; }
   </style>
 </head>
 <body>
-  <div class="lobby-screen">
-    <div class="logo">⚾ FULL COUNT</div>
-    <div class="tagline">A CARD-BASED BASEBALL CONFRONTATION GAME</div>
+  <div id="app">
+    <div class="lobby-screen">
+      <div class="logo">⚾ FULL COUNT</div>
+      <div class="tagline">A CARD-BASED BASEBALL CONFRONTATION GAME</div>
 
-    <!-- CREATE GAME -->
-    <div class="lobby-section">
-      <h2>Create Game</h2>
-      <div class="form-group">
-        <label for="create-name">Your Name</label>
-        <input type="text" id="create-name" placeholder="Enter your name" maxlength="24">
+      <!-- CREATE GAME -->
+      <div class="lobby-section">
+        <h2>Create Game</h2>
+        <div class="form-group">
+          <label for="create-name">Your Name</label>
+          <input type="text" id="create-name" placeholder="Enter your name" maxlength="24">
+        </div>
+        <button class="btn-primary" onclick="createGame()">Create New Game</button>
       </div>
-      <button class="btn-primary" onclick="createGame()">Create New Game</button>
+
+      <div class="divider">OR</div>
+
+      <!-- JOIN GAME -->
+      <div class="lobby-section">
+        <h2>Join Game</h2>
+        <div class="form-group">
+          <label for="join-name">Your Name</label>
+          <input type="text" id="join-name" placeholder="Enter your name" maxlength="24">
+        </div>
+        <div class="form-group">
+          <label for="join-code">Room Code</label>
+          <input type="text" id="join-code" placeholder="6-letter code (e.g. ABC123)" maxlength="6" style="text-transform:uppercase; letter-spacing:4px; font-size:1.2rem;">
+        </div>
+        <button class="btn-primary" onclick="joinGame()">Join Game</button>
+      </div>
+
+      <p class="muted" style="margin-top:16px;font-size:0.75rem;">
+        Prototype v1 · <a href="README.md" style="color:#7a8fa8">Setup Guide</a>
+      </p>
     </div>
-
-    <div class="divider">OR</div>
-
-    <!-- JOIN GAME -->
-    <div class="lobby-section">
-      <h2>Join Game</h2>
-      <div class="form-group">
-        <label for="join-name">Your Name</label>
-        <input type="text" id="join-name" placeholder="Enter your name" maxlength="24">
-      </div>
-      <div class="form-group">
-        <label for="join-code">Room Code</label>
-        <input type="text" id="join-code" placeholder="6-letter code (e.g. ABC123)" maxlength="6" style="text-transform:uppercase; letter-spacing:4px; font-size:1.2rem;">
-      </div>
-      <button class="btn-primary" onclick="joinGame()">Join Game</button>
-    </div>
-
-    <p class="muted" style="margin-top:16px;font-size:0.75rem;">
-      Prototype v1 · <a href="README.md" style="color:#7a8fa8">Setup Guide</a>
-    </p>
   </div>
 
   <!-- Firebase SDK -->

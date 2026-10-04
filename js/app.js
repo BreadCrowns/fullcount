@@ -295,74 +295,152 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
 
   // Determine max cards for this PA
   const maxCards = (batterChar?.id === 'BC09') ? 5 : PA_CARD_LIMIT;
+  window._maxCardsThisPA = maxCards;
+
+  const oppKey = opponentRole();
+  const oppName = g.rosters?.[oppKey]?.name || (oppKey === 'host' ? 'Host' : 'Guest');
+  const oppHand = gs.hands?.[oppKey] || [];
+  const oppChar = iAmBatting ? pitcherChar : batterChar;
+  const oppRoleTag = iAmBatting ? '⚾ PITCHING' : '🏏 BATTING';
+
+  const myChar = iAmBatting ? batterChar : pitcherChar;
+  const totalPlaced = ['z1','z2','z3'].reduce((s,z) => s + (localPlacement[z]||[]).length, 0);
+
+  const canSub = iAmPitching && !myCommitted && gs.activePitcher[pitchingRole] === g.rosters[pitchingRole].startingPitcher;
+  const reliefId = canSub ? g.rosters[pitchingRole].reliefPitcher : null;
 
   document.getElementById('app').innerHTML = `
     <div class="game-screen">
-      ${renderScoreHeader(gs, half, g.rosters)}
-
-      <div class="game-body">
-        <!-- Left: Active pitcher info -->
-        <div class="sidebar left">
-          ${renderPitcherPanel(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], iAmPitching, g.rosters[pitchingRole].reliefPitcher, gs.activePitcher[pitchingRole])}
-        </div>
-
-        <!-- Center: Zone board -->
-        <div class="center-panel">
-          <div class="pa-info">
-            ${iAmBatting ? `<span class="role-badge batting">🏏 You are BATTING</span>` : `<span class="role-badge pitching">⚾ You are PITCHING</span>`}
-            <span class="opponent-status">${oppCommitted ? '✅ Opponent locked in' : '⏳ Opponent placing…'}</span>
+      <!-- TOP HUD -->
+      <header class="game-hud">
+        ${renderScoreHeader(gs, half, g.rosters)}
+        <div class="opponent-bar">
+          <div class="opponent-profile" onclick="toggleMatchupModal(true)" title="View Matchup Details">
+            <div class="opp-avatar">${iAmBatting ? '⚾' : '🏏'}</div>
+            <div class="opp-meta">
+              <div class="opp-name">${oppName}</div>
+              <div class="opp-role-tag">${oppRoleTag} · ${oppChar?.name || ''}</div>
+            </div>
           </div>
-          <div class="zone-board" id="zone-board">
-            ${renderZoneBoard(pa, iAmBatting, myCommitted, 'placing')}
+          <div class="opp-hand-count" title="Opponent cards in hand">
+            <span>🎴</span>
+            <span>${oppHand.length}</span>
           </div>
-          ${!myCommitted ? `
-            <div class="placement-controls">
-              <div class="placement-count">Cards placed: <b id="card-count">0</b> / ${maxCards} &nbsp;|&nbsp; Zones: max ${ZONE_LIMIT} per zone</div>
-              <button class="btn-primary" onclick="commitPlacement()" id="lock-btn">🔒 Lock In</button>
-            </div>` : `<div class="waiting-msg">✅ You're locked in. Waiting for opponent…</div>`}
+          <div class="opp-status-pill ${oppCommitted ? 'ready' : 'waiting'}">
+            ${oppCommitted ? 'READY' : 'PLACING'}
+          </div>
+        </div>
+      </header>
+
+      <!-- CENTER MARVEL SNAP 3-ZONE BATTLEFIELD -->
+      <main class="battlefield">
+        ${renderZoneBoard(pa, iAmBatting, myCommitted, 'placing')}
+      </main>
+
+      <!-- BOTTOM PLAYER DOCK -->
+      <footer class="player-dock">
+        <div class="player-bar">
+          <div class="player-profile" onclick="toggleMatchupModal(true)" title="View Character Intel">
+            <div class="my-avatar">${iAmBatting ? '🏏' : '⚾'}</div>
+            <div class="my-details">
+              <span class="my-role-badge ${iAmBatting ? 'batting' : 'pitching'}">${iAmBatting ? 'YOU ARE BATTING' : 'YOU ARE PITCHING'}</span>
+              <span class="my-char-name">${myChar?.name || ''}</span>
+            </div>
+          </div>
+          <div class="dock-controls-row">
+            <span class="placed-indicator">Placed: <b id="card-count">${totalPlaced}</b>/${maxCards}</span>
+            ${canSub ? `<button class="btn-relief" onclick="substitutePitcher('${reliefId}')">Relief</button>` : ''}
+            <button class="btn-intel" onclick="toggleMatchupModal(true)">ℹ️ Intel</button>
+          </div>
         </div>
 
-        <!-- Right: Active batter info -->
-        <div class="sidebar right">
-          ${renderBatterPanel(batterChar, battingRole === myRole, score, gs, half)}
+        <!-- HAND + TURN ACTION BUTTON -->
+        <div class="hand-row">
+          ${renderHand(localHand, iAmBatting, iAmPitching, myCommitted)}
+          <div class="lock-in-action-area">
+            ${!myCommitted ? `
+              <button class="btn-snap-lock" id="lock-btn" onclick="commitPlacement()">
+                <span class="btn-icon">🔒</span>
+                <span class="btn-label">LOCK IN</span>
+                <span class="btn-sub">${totalPlaced}/${maxCards}</span>
+              </button>
+            ` : `
+              <div class="locked-indicator-badge">
+                <span class="lock-icon">✅</span>
+                <span class="lock-text">LOCKED IN</span>
+              </div>
+            `}
+          </div>
         </div>
-      </div>
+      </footer>
 
-      <!-- Hand -->
-      ${!myCommitted ? renderHand(localHand, iAmBatting, iAmPitching) : ''}
+      <!-- MATCHUP INTEL DRAWER -->
+      ${renderMatchupDrawer(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], iAmPitching, g.rosters[pitchingRole].reliefPitcher, gs.activePitcher[pitchingRole], batterChar, battingRole === myRole, score, gs, half)}
     </div>`;
 
   updateCardCount();
-  attachZoneClickHandlers(maxCards);
-
-  // Substitution button (pitching side)
-  if (iAmPitching && gs.activePitcher[pitchingRole] === g.rosters[pitchingRole].startingPitcher) {
-    const reliefId = g.rosters[pitchingRole].reliefPitcher;
-    document.querySelector('.sidebar.left')?.insertAdjacentHTML('beforeend', `
-      <button class="btn-secondary sub-btn" onclick="substitutePitcher('${reliefId}')">⬅️ Bring in ${getPitcher(reliefId)?.name}</button>`);
-  }
 }
 
 // ── REVEAL PHASE ─────────────────────────────────────────────────────────────
 function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingRole, half) {
   const res = pa.resolution;
   const staminaState = getPitcherStaminaState(pitcherChar, gs.pitcherPAs[pitchingRole]);
+  const score = { batting: gs.score[half], pitching: gs.score[half==='top'?'bottom':'top'] };
+
+  const oppKey = opponentRole();
+  const oppName = g.rosters?.[oppKey]?.name || (oppKey === 'host' ? 'Host' : 'Guest');
+  const oppChar = (battingRole === myRole) ? pitcherChar : batterChar;
+  const oppRoleTag = (battingRole === myRole) ? '⚾ PITCHING' : '🏏 BATTING';
+
+  const myChar = (battingRole === myRole) ? batterChar : pitcherChar;
+  const maxCards = (batterChar?.id === 'BC09') ? 5 : PA_CARD_LIMIT;
+  const totalPlaced = ['z1','z2','z3'].reduce((s,z) => s + (localPlacement[z]||[]).length, 0);
 
   document.getElementById('app').innerHTML = `
     <div class="game-screen">
-      ${renderScoreHeader(gs, half, g.rosters)}
-      <div class="game-body">
-        <div class="sidebar left">${renderPitcherPanel(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], false)}</div>
-        <div class="center-panel">
-          <div class="pa-info"><span class="role-badge reveal">🃏 REVEAL</span></div>
-          <div class="zone-board">
-            ${renderZoneBoard(pa, battingRole===myRole, true, 'reveal', res)}
+      <!-- TOP HUD -->
+      <header class="game-hud">
+        ${renderScoreHeader(gs, half, g.rosters)}
+        <div class="opponent-bar">
+          <div class="opponent-profile" onclick="toggleMatchupModal(true)">
+            <div class="opp-avatar">${battingRole === myRole ? '⚾' : '🏏'}</div>
+            <div class="opp-meta">
+              <div class="opp-name">${oppName}</div>
+              <div class="opp-role-tag">${oppRoleTag} · ${oppChar?.name || ''}</div>
+            </div>
           </div>
-          ${res ? renderOutcomeBanner(res) : '<p class="muted center">Resolving…</p>'}
-          ${res ? `<button class="btn-primary" onclick="nextPA()">Next Batter →</button>` : ''}
+          <div class="opp-status-pill ready">REVEAL</div>
         </div>
-        <div class="sidebar right">${renderBatterPanel(batterChar, battingRole===myRole, {batting:gs.score[half], pitching:gs.score[half==='top'?'bottom':'top']}, gs, half)}</div>
-      </div>
+      </header>
+
+      <!-- CENTER MARVEL SNAP 3-ZONE BATTLEFIELD (REVEALED) -->
+      <main class="battlefield">
+        ${renderZoneBoard(pa, battingRole === myRole, true, 'reveal', res)}
+      </main>
+
+      <!-- BOTTOM PLAYER DOCK -->
+      <footer class="player-dock">
+        <div class="player-bar">
+          <div class="player-profile" onclick="toggleMatchupModal(true)">
+            <div class="my-avatar">${battingRole === myRole ? '🏏' : '⚾'}</div>
+            <div class="my-details">
+              <span class="my-role-badge ${battingRole === myRole ? 'batting' : 'pitching'}">${battingRole === myRole ? 'YOU ARE BATTING' : 'YOU ARE PITCHING'}</span>
+              <span class="my-char-name">${myChar?.name || ''}</span>
+            </div>
+          </div>
+          <button class="btn-intel" onclick="toggleMatchupModal(true)">ℹ️ Intel</button>
+        </div>
+
+        <div class="hand-row">
+          ${renderHand(localHand, battingRole === myRole, pitchingRole === myRole, true)}
+        </div>
+      </footer>
+
+      <!-- OUTCOME MODAL OVERLAY (MARVEL SNAP DRAMATIC REVEAL) -->
+      ${res ? renderOutcomeOverlay(res) : ''}
+
+      <!-- MATCHUP INTEL DRAWER -->
+      ${renderMatchupDrawer(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], pitchingRole === myRole, g.rosters[pitchingRole].reliefPitcher, gs.activePitcher[pitchingRole], batterChar, battingRole === myRole, score, gs, half)}
     </div>`;
 }
 
@@ -372,94 +450,156 @@ function renderResolved(g, gs, pa, pitcherChar, batterChar, pitchingRole, battin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ZONE BOARD RENDERING
+// ZONE BOARD RENDERING (MARVEL SNAP 3 LOCATIONS DOWN THE MIDDLE)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res) {
   const myKey  = myRole;
   const oppKey = opponentRole();
   const zones  = ['z1','z2','z3'];
-  const labels = { z1:'ZONE 1 — THE READ', z2:'ZONE 2 — THE SWING', z3:'ZONE 3 — THE RESULT' };
   const revealed = phase === 'reveal' || phase === 'resolved';
+
+  const zoneMeta = {
+    z1: { tag:'Z1: READ',   icon:'🎯', title:'PITCH vs GUESS', summary:'Counters multiply batter value (1.5×–2.0×)' },
+    z2: { tag:'Z2: SWING',  icon:'💥', title:'HEAT vs CONTACT', summary:'Margin 15+ triggers K or Hard Contact' },
+    z3: { tag:'Z3: RESULT', icon:'🛡️', title:'SHIFT vs POWER',  summary:'Pitcher shifts counter swing directions' }
+  };
 
   return `<div class="zones-container">
     ${zones.map(z => {
       const myPlaced  = localPlacement[z] || [];
       const oppPlaced = pa.placement?.[oppKey]?.[z] || [];
-      let zClass = 'zone-column';
-      if (revealed && res?.[z]?.winner) {
-        zClass += res[z].winner === 'batter' ? ' zone-batter-win' : res[z].winner === 'pitcher' ? ' zone-pitcher-win' : '';
-      }
-      return `
-        <div class="${zClass}" data-zone="${z}">
-          <div class="zone-label">${labels[z]}</div>
+      const meta = zoneMeta[z];
 
-          <!-- OPPONENT SIDE -->
-          <div class="zone-half opponent-half">
-            <div class="half-label">${iAmBatting ? '⚾ Pitcher' : '🏏 Batter'}</div>
-            <div class="card-slots">
-              ${revealed
-                ? oppPlaced.map(id => renderActionCard(id, false, false, false, 'placed')).join('') || '<div class="slot-empty">—</div>'
-                : oppPlaced.length > 0
-                  ? oppPlaced.map(() => '<div class="card-slot hidden-card">?</div>').join('')
-                  : '<div class="slot-empty muted">Empty</div>'
-              }
-            </div>
-            ${revealed && res?.[z] ? `<div class="zone-total opp">${iAmBatting ? res[z].pitcherTotal : res[z].batterTotal}</div>` : ''}
+      let winClass = '';
+      let winBanner = '';
+      let oppScoreDisplay = '0';
+      let myScoreDisplay = String(sumZone(myPlaced, z));
+
+      if (revealed && res?.[z]) {
+        const zr = res[z];
+        const youWin = (iAmBatting && zr.winner === 'batter') || (!iAmBatting && zr.winner === 'pitcher');
+        const oppWin = (iAmBatting && zr.winner === 'pitcher') || (!iAmBatting && zr.winner === 'batter');
+        
+        if (zr.winner === 'tie') {
+          winClass = '';
+          winBanner = `<span class="loc-winner-banner tie">TIE</span>`;
+        } else if (youWin) {
+          winClass = 'winner-me';
+          winBanner = `<span class="loc-winner-banner win-me">WIN +${zr.margin}</span>`;
+        } else if (oppWin) {
+          winClass = 'winner-opp';
+          winBanner = `<span class="loc-winner-banner win-opp">LOSE -${zr.margin}</span>`;
+        }
+
+        oppScoreDisplay = String(iAmBatting ? zr.pitcherTotal : zr.batterTotal);
+        myScoreDisplay  = String(iAmBatting ? zr.batterTotal  : zr.pitcherTotal);
+      } else {
+        oppScoreDisplay = oppPlaced.length > 0 ? '?' : '0';
+      }
+
+      // Opponent cards (TOP)
+      const oppCardsHtml = revealed
+        ? (oppPlaced.map(id => renderMiniPlacedCard(id, z, false)).join('') || '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>')
+        : (oppPlaced.length > 0
+            ? oppPlaced.map(() => '<div class="hidden-opponent-card"><span class="mystery-mark">?</span></div>').join('')
+            : '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>');
+
+      // Player cards (BOTTOM)
+      const myCardsHtml = myPlaced.map((id, idx) => renderMiniPlacedCard(id, z, !myCommitted, idx)).join('');
+      const canDropHere = !myCommitted && myPlaced.length < ZONE_LIMIT;
+      const dropSlotHtml = canDropHere ? `
+        <div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="placeSelectedCard('${z}')">
+          <span style="font-size:1.1rem;font-weight:900;">+</span>
+        </div>` : '';
+
+      return `
+        <div class="zone-column zone-${z} ${winClass}" data-zone="${z}">
+          <!-- TOP: OPPONENT PLAYED CARDS -->
+          <div class="zone-slots opponent-slots">
+            ${oppCardsHtml}
           </div>
 
-          <div class="zone-divider">${revealed && res?.[z] ? zoneWinLabel(res[z], iAmBatting) : '  vs  '}</div>
-
-          <!-- MY SIDE -->
-          <div class="zone-half my-half">
-            <div class="half-label">${iAmBatting ? '🏏 Batter (You)' : '⚾ Pitcher (You)'}</div>
-            <div class="card-slots" id="slots-${z}">
-              ${myPlaced.map((id, idx) => `
-                <div class="card-slot filled" data-zone="${z}" data-index="${idx}" onclick="${!myCommitted ? `removeFromZone('${z}', ${idx})` : ''}">
-                  ${renderActionCard(id, false, false, !myCommitted, 'placed')}
-                </div>`).join('')}
-              ${!myCommitted && myPlaced.length < ZONE_LIMIT
-                ? `<div class="card-slot empty drop-target" data-zone="${z}" onclick="placeSelectedCard('${z}')"></div>`
-                : ''}
+          <!-- MIDDLE: MARVEL SNAP LOCATION CARD -->
+          <div class="location-card">
+            <div class="loc-power-badge opp ${winClass === 'winner-opp' ? 'winning' : ''}">
+              ${oppScoreDisplay}
             </div>
-            ${revealed && res?.[z] ? `<div class="zone-total mine">${iAmBatting ? res[z].batterTotal : res[z].pitcherTotal}</div>` : ''}
+
+            <div class="loc-center-emblem">
+              <div class="loc-zone-tag ${z}">${meta.tag}</div>
+              <div class="loc-icon">${meta.icon}</div>
+              <div class="loc-title">${meta.title}</div>
+              <div class="loc-summary">${meta.summary}</div>
+              ${winBanner}
+            </div>
+
+            <div class="loc-power-badge mine ${winClass === 'winner-me' ? 'winning' : ''}">
+              ${myScoreDisplay}
+            </div>
+          </div>
+
+          <!-- BOTTOM: PLAYER PLAYED CARDS -->
+          <div class="zone-slots my-slots" id="slots-${z}">
+            ${myCardsHtml}
+            ${dropSlotHtml}
           </div>
         </div>`;
     }).join('')}
   </div>`;
 }
 
-function zoneWinLabel(zr, iAmBatting) {
-  if (!zr.winner || zr.winner === 'tie') return '<span class="zone-tie">TIE</span>';
-  const youWin = (iAmBatting && zr.winner === 'batter') || (!iAmBatting && zr.winner === 'pitcher');
-  return youWin ? `<span class="zone-you-win">✅ ${zr.margin}</span>` : `<span class="zone-opp-win">❌ ${zr.margin}</span>`;
+function renderMiniPlacedCard(id, targetZone, canRemove, index) {
+  const card = getCard(id);
+  if (!card) return '';
+  const prefMap = { read:'z1', contact:'z2', result:'z3' };
+  const isPenalty = card.zone !== 'any' && prefMap[card.zone] !== targetZone;
+  const effectiveVal = getZoneValue(card, targetZone);
+
+  return `
+    <div class="placed-card" ${canRemove ? `onclick="removeFromZone('${targetZone}', ${index})"` : ''} title="${card.desc}">
+      <div class="zone-indicator ${card.zone}"></div>
+      <div class="card-info">
+        <span class="card-title">${card.name}</span>
+        ${isPenalty ? '<span class="card-penalty-note">50% PENALTY</span>' : ''}
+      </div>
+      <span class="power-badge">${effectiveVal}</span>
+      ${canRemove ? '<span class="remove-btn">✕</span>' : ''}
+    </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HAND RENDERING
+// HAND RENDERING (HORIZONTAL TACTILE TRAY)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderHand(handIds, iAmBatting, iAmPitching) {
-  if (!handIds || handIds.length === 0) return '<div class="hand-area"><p class="muted">Hand empty — draw coming next PA</p></div>';
+function renderHand(handIds, iAmBatting, iAmPitching, myCommitted) {
+  if (!handIds || handIds.length === 0) {
+    return '<div class="hand-cards-container"><p class="muted" style="margin:auto;font-size:0.75rem;">Hand empty — draw coming next PA</p></div>';
+  }
 
-  return `<div class="hand-area">
-    <div class="hand-label">YOUR HAND (click card → click zone slot)</div>
-    <div class="hand-cards">
+  return `
+    <div class="hand-cards-container">
       ${handIds.map((id, idx) => {
         const card = getCard(id);
         if (!card) return '';
         const inPlacement = isInPlacement(id);
-        const isActive = isCardActiveForRole(card, iAmBatting, iAmPitching) && !inPlacement;
+        const isActive = isCardActiveForRole(card, iAmBatting, iAmPitching) && !inPlacement && !myCommitted;
         const isSelected = selectedCard === id;
-        return `<div class="action-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''} ${inPlacement ? 'in-zone' : ''}"
-          onclick="${isActive && !inPlacement ? `selectCard('${id}', ${idx})` : ''}"
-          title="${card.desc}">
-          <div class="card-zone-tag ${card.zone}">${card.zone.toUpperCase()}</div>
-          <div class="card-name">${card.name}</div>
-          <div class="card-value">${card.zone === 'any' && card.value === 0 ? '✨' : card.value}</div>
-          <div class="card-type">${card.type.toUpperCase()}</div>
-        </div>`;
+        return `
+          <div class="hand-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''} ${inPlacement ? 'in-zone' : ''}"
+               onclick="${isActive ? `selectCard('${id}', ${idx})` : ''}"
+               title="${card.desc}">
+            <div class="hand-card-header">
+              <span class="hc-tag ${card.zone}">${card.zone === 'any' ? 'UNI' : card.zone.toUpperCase()}</span>
+              <span class="hc-val">${card.zone === 'any' && card.value === 0 ? '✨' : card.value}</span>
+            </div>
+            <div class="hc-name">${card.name}</div>
+            <div class="hc-desc">${card.desc}</div>
+          </div>`;
       }).join('')}
-    </div>
-  </div>`;
+    </div>`;
+}
+
+function attachZoneClickHandlers() {
+  // Handled inline via onclick attributes
 }
 
 function isCardActiveForRole(card, iAmBatting, iAmPitching) {
@@ -743,21 +883,33 @@ function substitutePitcher(reliefId) {
 // UI PANEL HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 function renderScoreHeader(gs, half, rosters) {
-  const inningLabel = half === 'top' ? `▲ Inning ${gs.inning}` : `▼ Inning ${gs.inning}`;
+  const inningLabel = half === 'top' ? `▲ INNING ${gs.inning}` : `▼ INNING ${gs.inning}`;
+  const awayName = rosters.guest?.name || 'VISITOR';
+  const homeName = rosters.host?.name || 'HOME';
   return `
     <div class="score-header">
-      <div class="score-block">
-        <div class="team-name">${rosters.guest?.name || 'Visitors'}</div>
-        <div class="score-num">${gs.score.top}</div>
+      <div class="score-team away">
+        <span class="team-label">${awayName}</span>
+        <span class="score-value">${gs.score.top}</span>
       </div>
-      <div class="inning-block">
-        <div class="inning-label">${inningLabel}</div>
-        <div class="outs-display">${renderOuts(gs.outs)}</div>
-        <div class="bases-display">${renderBases(gs.bases)}</div>
+      <div class="hud-center">
+        <div class="inning-badge">${inningLabel}</div>
+        <div class="hud-count-row">
+          <div class="diamond">
+            <div class="base second ${gs.bases.second ? 'occupied' : ''}">◆</div>
+            <div class="base-row">
+              <div class="base third ${gs.bases.third ? 'occupied' : ''}">◆</div>
+              <div class="base first ${gs.bases.first ? 'occupied' : ''}">◆</div>
+            </div>
+          </div>
+          <div class="outs-row">
+            ${[0,1,2].map(i => `<span class="out-dot ${i < gs.outs ? 'out-filled' : ''}">●</span>`).join('')}
+          </div>
+        </div>
       </div>
-      <div class="score-block">
-        <div class="team-name">${rosters.host?.name || 'Home'}</div>
-        <div class="score-num">${gs.score.bottom}</div>
+      <div class="score-team home">
+        <span class="score-value">${gs.score.bottom}</span>
+        <span class="team-label">${homeName}</span>
       </div>
     </div>`;
 }
@@ -776,22 +928,55 @@ function renderBases(bases) {
   </div>`;
 }
 
+let matchupModalOpen = false;
+function toggleMatchupModal(force) {
+  const modal = document.getElementById('matchup-modal');
+  if (!modal) return;
+  if (typeof force === 'boolean') {
+    matchupModalOpen = force;
+  } else {
+    matchupModalOpen = !matchupModalOpen;
+  }
+  if (matchupModalOpen) {
+    modal.classList.add('open');
+  } else {
+    modal.classList.remove('open');
+  }
+}
+window.toggleMatchupModal = toggleMatchupModal;
+
+function renderMatchupDrawer(pitcherChar, staminaState, pasFaced, isPitcherMe, reliefId, activeId, batterChar, isBatterMe, score, gs, half) {
+  return `
+    <div id="matchup-modal" class="matchup-modal-overlay ${matchupModalOpen ? 'open' : ''}" onclick="toggleMatchupModal(false)">
+      <div class="matchup-drawer" onclick="event.stopPropagation()">
+        <div class="drawer-header">
+          <span class="drawer-title">⚾ MATCHUP INTEL</span>
+          <button class="drawer-close" onclick="toggleMatchupModal(false)">✕</button>
+        </div>
+        <div class="drawer-content">
+          ${renderPitcherPanel(pitcherChar, staminaState, pasFaced, isPitcherMe, reliefId, activeId)}
+          ${renderBatterPanel(batterChar, isBatterMe, score, gs, half)}
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderPitcherPanel(pitcherChar, staminaState, pasFaced, isMe, reliefId, activeId) {
-  if (!pitcherChar) return '<div class="panel-empty">No pitcher</div>';
-  const stateColor = staminaState === 'fresh' ? '#4CAF50' : staminaState === 'tiring' ? '#FF9800' : '#f44336';
+  if (!pitcherChar) return '<div class="character-panel">No pitcher info</div>';
+  const stateColor = staminaState === 'fresh' ? '#2ed573' : staminaState === 'tiring' ? '#ff9f43' : '#ff4757';
   const maxPA = pitcherChar.stamina.tiringMax + 3;
   return `
-    <div class="character-panel pitcher-panel" style="border-color:${pitcherChar.color}">
-      <div class="cp-role">⚾ PITCHER ${isMe ? '(You)' : ''}</div>
+    <div class="character-panel pitcher-panel" style="border-top: 3px solid ${pitcherChar.color}">
+      <div class="cp-role">⚾ PITCHER ${isMe ? '(YOU)' : ''}</div>
       <div class="cp-name" style="color:${pitcherChar.color}">${pitcherChar.name}</div>
       <div class="cp-arch">${pitcherChar.archetype}</div>
       <div class="cp-zones-row">
-        <span>Z1 <b>${pitcherChar.zoneBonuses.z1>=0?'+':''}${pitcherChar.zoneBonuses.z1}</b></span>
-        <span>Z2 <b>${pitcherChar.zoneBonuses.z2>=0?'+':''}${pitcherChar.zoneBonuses.z2}</b></span>
-        <span>Z3 <b>${pitcherChar.zoneBonuses.z3>=0?'+':''}${pitcherChar.zoneBonuses.z3}</b></span>
+        <span>Z1 (Read): <b>${pitcherChar.zoneBonuses.z1>=0?'+':''}${pitcherChar.zoneBonuses.z1}</b></span>
+        <span>Z2 (Swing): <b>${pitcherChar.zoneBonuses.z2>=0?'+':''}${pitcherChar.zoneBonuses.z2}</b></span>
+        <span>Z3 (Result): <b>${pitcherChar.zoneBonuses.z3>=0?'+':''}${pitcherChar.zoneBonuses.z3}</b></span>
       </div>
       <div class="stamina-track">
-        <div class="stamina-label" style="color:${stateColor}">⏱ ${staminaState.toUpperCase()} (PA ${pasFaced})</div>
+        <div class="stamina-label" style="color:${stateColor}">⏱ Stamina: ${staminaState.toUpperCase()} (PA ${pasFaced})</div>
         <div class="stamina-boxes">
           ${Array.from({length:maxPA},(_, i) => {
             let cls = i < pitcherChar.stamina.freshMax ? 'fresh' : i < pitcherChar.stamina.tiringMax ? 'tiring' : 'gassed';
@@ -804,40 +989,45 @@ function renderPitcherPanel(pitcherChar, staminaState, pasFaced, isMe, reliefId,
 }
 
 function renderBatterPanel(batterChar, isMe, score, gs, half) {
-  if (!batterChar) return '<div class="panel-empty">No batter</div>';
+  if (!batterChar) return '<div class="character-panel">No batter info</div>';
   const isTrailing = score.batting < score.pitching;
   return `
-    <div class="character-panel batter-panel" style="border-color:${batterChar.color}">
-      <div class="cp-role">🏏 BATTER ${isMe ? '(You)' : ''}</div>
+    <div class="character-panel batter-panel" style="border-top: 3px solid ${batterChar.color}">
+      <div class="cp-role">🏏 BATTER ${isMe ? '(YOU)' : ''}</div>
       <div class="cp-name" style="color:${batterChar.color}">${batterChar.name}</div>
       <div class="cp-arch">${batterChar.archetype}</div>
       <div class="cp-zones-row">
-        <span>Z1 <b>${batterChar.zoneBonuses.z1>=0?'+':''}${batterChar.zoneBonuses.z1}</b></span>
-        <span>Z2 <b>${batterChar.zoneBonuses.z2>=0?'+':''}${batterChar.zoneBonuses.z2}</b></span>
-        <span>Z3 <b>${batterChar.zoneBonuses.z3>=0?'+':''}${batterChar.zoneBonuses.z3}</b></span>
+        <span>Z1 (Read): <b>${batterChar.zoneBonuses.z1>=0?'+':''}${batterChar.zoneBonuses.z1}</b></span>
+        <span>Z2 (Swing): <b>${batterChar.zoneBonuses.z2>=0?'+':''}${batterChar.zoneBonuses.z2}</b></span>
+        <span>Z3 (Result): <b>${batterChar.zoneBonuses.z3>=0?'+':''}${batterChar.zoneBonuses.z3}</b></span>
       </div>
-      ${isTrailing ? `<div class="trailing-badge">⚡ TRAILING</div>` : ''}
-      ${gs.bases.second || gs.bases.third ? `<div class="risp-badge">🏃 RISP</div>` : ''}
+      ${isTrailing ? `<div style="display:inline-block;background:rgba(255,71,87,0.2);color:#ff4757;font-size:0.65rem;font-weight:800;border-radius:3px;padding:1px 6px;margin-bottom:6px;">⚡ TRAILING</div>` : ''}
+      ${gs.bases.second || gs.bases.third ? `<div style="display:inline-block;background:rgba(46,213,115,0.2);color:#2ed573;font-size:0.65rem;font-weight:800;border-radius:3px;padding:1px 6px;margin-bottom:6px;">🏃 RISP</div>` : ''}
       <div class="cp-special">${batterChar.specialText}</div>
     </div>`;
 }
 
-function renderOutcomeBanner(res) {
+function renderOutcomeOverlay(res) {
   if (!res?.outcome) return '';
   const o = res.outcome;
-  const typeClass = { hr:'outcome-hr', triple:'outcome-hit', double:'outcome-hit', single:'outcome-hit', walk:'outcome-walk', k:'outcome-k', dp:'outcome-k', out:'outcome-out' }[o.type] || '';
   return `
-    <div class="outcome-banner ${typeClass}">
-      <div class="outcome-display">${o.display}</div>
-      ${o.runsScored > 0 ? `<div class="runs-scored">🏠 ${o.runsScored} run${o.runsScored!==1?'s':''} score!</div>` : ''}
-    </div>
-    <div class="resolution-detail">
-      ${res.z1?.winner ? `<div class="zone-result">Z1: ${res.z1.batterTotal} vs ${res.z1.pitcherTotal} → ${res.z1.winner.toUpperCase()}${res.z1.counterFired ? ` 🎯 Counter ×${res.z1.mult} (${res.z1.pitchCallMatched})` : ''}</div>` : ''}
-      ${res.z2?.winner ? `<div class="zone-result">Z2: ${res.z2.batterTotal} vs ${res.z2.pitcherTotal} → ${res.z2.winner.toUpperCase()}${res.z2.hardContact ? ' 🔥 Hard Contact!' : ''}</div>` : ''}
-      ${res.z3?.winner ? `<div class="zone-result">Z3: ${res.z3.batterTotal} vs ${res.z3.pitcherTotal} → ${res.z3.winner.toUpperCase()}</div>` : ''}
-      ${res.advantageSide !== 'neutral' ? `<div class="adv-score">Advantage: ${res.advantageSide.toUpperCase()} — Score: ${res.advantageScore}</div>` : ''}
-    </div>
-    <details class="log-details"><summary>Resolution Log</summary><pre>${(res.log||[]).join('\n')}</pre></details>`;
+    <div class="outcome-overlay">
+      <div class="outcome-card">
+        <div class="outcome-headline">${o.display}</div>
+        ${o.runsScored > 0 ? `<div class="outcome-runs">🏠 ${o.runsScored} RUN${o.runsScored > 1 ? 'S' : ''} SCORED!</div>` : '<div class="outcome-runs" style="color:var(--text-muted);font-size:0.9rem;">No runs scored</div>'}
+        <div class="outcome-zone-recap">
+          ${res.z1?.winner ? `<div>Z1 (Read): Batter ${res.z1.batterTotal} vs Pitcher ${res.z1.pitcherTotal} → <b>${res.z1.winner.toUpperCase()}</b>${res.z1.counterFired ? ` (Counter ×${res.z1.mult})` : ''}</div>` : ''}
+          ${res.z2?.winner ? `<div>Z2 (Swing): Batter ${res.z2.batterTotal} vs Pitcher ${res.z2.pitcherTotal} → <b>${res.z2.winner.toUpperCase()}</b>${res.z2.hardContact ? ' (Hard Contact!)' : ''}</div>` : ''}
+          ${res.z3?.winner ? `<div>Z3 (Result): Batter ${res.z3.batterTotal} vs Pitcher ${res.z3.pitcherTotal} → <b>${res.z3.winner.toUpperCase()}</b></div>` : ''}
+          ${res.advantageSide !== 'neutral' ? `<div class="outcome-adv-score">Advantage: ${res.advantageSide.toUpperCase()} (${res.advantageScore})</div>` : ''}
+        </div>
+        <button class="btn-primary btn-next-batter" onclick="nextPA()">Next Batter →</button>
+      </div>
+    </div>`;
+}
+
+function renderOutcomeBanner(res) {
+  return renderOutcomeOverlay(res);
 }
 
 function renderActionCard(id, isSelected, isInactive, canRemove, context) {
@@ -913,6 +1103,7 @@ function watchForBothCommitted() {
 // BOOTSTRAP
 // ─────────────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  if (window._isDevPreview) return;
   const params = new URLSearchParams(window.location.search);
   gameId = params.get('id');
   myRole = params.get('role');

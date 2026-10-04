@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Count — Marvel Snap Layout Preview</title>
+  <link rel="stylesheet" href="../fullcount.css">
+  <style>
+    /* Preview test controls overlay */
+    .test-switcher {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+      font-size: 0.75rem;
+    }
+    .test-switcher button {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .test-switcher button:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-switcher">
+    <button onclick="setPreviewState('placing')">Placing Phase</button>
+    <button onclick="setPreviewState('reveal')">Reveal Phase</button>
+    <button onclick="toggleMatchupModal(true)">Intel Drawer</button>
+  </div>
+
+  <div id="app">
+    <!-- Game Screen will be injected here -->
+  </div>
+
+  <!-- Dependencies -->
+  <script src="../js/data.js"></script>
+  <script src="../js/resolution.js"></script>
+
+  <!-- Mock Firebase for local preview without backend -->
+  <script>
+    window._isDevPreview = true;
+    window.gameRef = function() {
+      return {
+        update: function() {},
+        set: function() {},
+        once: function(e, cb) { cb({ val: function() { return window._lastGameState; } }); }
+      };
+    };
+  </script>
+  <script src="../js/app.js"></script>
+
+  <script>
+    // Create mock game state
+    const mockState = {
+      phase: 'play',
+      rosters: {
+        host: { name: 'Player 1 (Host)', startingPitcher: 'PC01', reliefPitcher: 'PC04', lineup: LINEUP_PRESETS.sluggers.lineup, deck: 'bigInning' },
+        guest: { name: 'Player 2 (Opponent)', startingPitcher: 'PC02', reliefPitcher: 'PC05', lineup: LINEUP_PRESETS.balanced.lineup, deck: 'grindItOut' }
+      },
+      gameState: {
+        inning: 1,
+        half: 'top', // guest is batting, host is pitching
+        score: { top: 2, bottom: 1 },
+        outs: 1,
+        bases: { first: true, second: true, third: false },
+        activePitcher: { host: 'PC01', guest: 'PC02' },
+        batterIndex: { top: 3, bottom: 2 },
+        pitcherPAs: { host: 4, guest: 3 },
+        hands: {
+          host: ['P1', 'P13', 'P15', 'P23', 'U1'],
+          guest: ['B1', 'B11', 'B21', 'B22', 'U3']
+        }
+      },
+      currentPA: {
+        phase: 'placing',
+        committed: { host: false, guest: false },
+        placement: {
+          host: { z1: ['P1'], z2: ['P13'], z3: [] },
+          guest: { z1: ['B1'], z2: ['B11'], z3: [] }
+        },
+        resolution: null
+      }
+    };
+
+    // Set local state
+    myRole = 'host'; // We are host (pitching)
+    window._lastGameState = mockState;
+    localPlacement = { z1: ['P1'], z2: ['P13'], z3: [] };
+
+    function setPreviewState(phase) {
+      if (phase === 'placing') {
+        mockState.currentPA.phase = 'placing';
+        mockState.currentPA.resolution = null;
+        mockState.currentPA.committed = { host: false, guest: true };
+      } else {
+        mockState.currentPA.phase = 'reveal';
+        mockState.currentPA.committed = { host: true, guest: true };
+        mockState.currentPA.resolution = {
+          z1: { winner: 'batter', margin: 6, batterTotal: 16, pitcherTotal: 10, counterFired: true, mult: 2.0, pitchCallMatched: 'fastball' },
+          z2: { winner: 'pitcher', margin: 5, batterTotal: 12, pitcherTotal: 17, hardContact: false },
+          z3: { winner: 'batter', margin: 8, batterTotal: 18, pitcherTotal: 10 },
+          advantageScore: 32,
+          advantageSide: 'batter',
+          outcome: { type: 'hr', display: '🚀 HOME RUN!', runsScored: 3, outsAdded: 0, newBases: { first: false, second: false, third: false } },
+          log: [
+            'Zone 1: Batter countered fastball with Guess Fastball (x2.0)! Batter wins +6.',
+            'Zone 2: Pitcher brought Extra Heat. Pitcher wins +5.',
+            'Zone 3: Batter launched with Power Surge. Batter wins +8.',
+            'Outcome: 3-run Home Run!'
+          ]
+        };
+      }
+      renderPlay(mockState);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setPreviewState('placing');
+    });
+  </script>
+</body>
+</html>
