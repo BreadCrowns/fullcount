@@ -109,8 +109,8 @@ function renderRosterSelect(g) {
 
   // Auto-initialize bot roster if playing solo
   if (isBot && myRole === 'host' && !g.rosters?.guest?.ready) {
-    const balancedDeck = DECK_PRESETS.balanced || Object.values(DECK_PRESETS)[0];
-    const botDeckCards = shuffleArray([...balancedDeck.cards]);
+    const botDeckPreset = DECK_PRESETS.grind || Object.values(DECK_PRESETS)[0];
+    const botDeckCards = shuffleArray([...botDeckPreset.cards]);
     const botHand = botDeckCards.splice(0, 5);
     const updates = {
       'rosters/guest': {
@@ -118,7 +118,7 @@ function renderRosterSelect(g) {
         startingPitcher: 'PC01', // Marcus Cole (The Ace)
         reliefPitcher:   'PC02', // Jackson Vance
         lineup:          LINEUP_PRESETS.balanced.lineup,
-        deckPreset:      'balanced',
+        deckPreset:      'grind',
         ready:           true,
       },
       'gameState/hands/guest':    botHand,
@@ -826,6 +826,8 @@ function resolveAndAdvance() {
         }
         // If tied: continue to extra inning
       }
+    }
+
     // Auto-substitute exhausted bot starting pitcher
     const isBot = Boolean(g.isSolo || g.guest?.isBot);
     if (isBot && pitchingRole === 'guest') {
@@ -1184,10 +1186,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   gameListener = db.ref(`fullcount_games/${gameId}`);
   gameListener.on('value', snap => {
-    const g = snap.val();
-    if (!g) { showError('Game not found.'); return; }
-    window._lastGameState = g;
-    handleGameState(g);
+    try {
+      const g = snap.val();
+      if (!g) { showError(`Game "${gameId}" not found. Double-check room code.`); return; }
+      window._lastGameState = g;
+      handleGameState(g);
+    } catch(err) {
+      console.error('Error handling game state:', err);
+      showError('Error loading game: ' + err.message);
+    }
+  }, err => {
+    console.error('Firebase on value error:', err);
+    showError('Firebase error: ' + err.message);
   });
 
   watchForBothCommitted();
