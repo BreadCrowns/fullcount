@@ -155,6 +155,285 @@
         const cardsWithLegacyProps = Object.values(ACTION_CARDS).filter(c => c.z3CounterOf || c.z3CounteredBy || c.self_z2_penalty || c.penalty);
         assert(cardsWithLegacyProps.length === 0, `All action cards are simplified with no legacy cross-zone penalty fields (found ${cardsWithLegacyProps.length})`);
 
+        // 11. Pitcher Repertoire Integrity
+        Object.values(PITCHER_CHARACTERS).forEach(p => {
+          assert(p.repertoire && typeof p.repertoire.fastball === 'number', `Pitcher ${p.name} has repertoire`);
+          const totalPitches = (p.repertoire.fastball || 0) + (p.repertoire.breaking || 0) + (p.repertoire.offspeed || 0);
+          assert(totalPitches === 9, `Pitcher ${p.name} has exactly 9 pitch charges (${totalPitches})`);
+        });
+
+        // 12. Sequential Beat 1 Tests
+        const b1Normal = resolveBeat1({
+          pitchCall: 'fastball',
+          batterGuess: 'breaking',
+          pitcherCardId: null,
+          batterCardId: null,
+          pitcherChar: PITCHER_CHARACTERS['PC01'], // z1: -1
+          batterChar: BATTER_CHARACTERS['BC01'],   // z1: +2
+        });
+        assert(b1Normal.winner === 'pitcher' && b1Normal.margin < 10, `Beat 1 normal resolves without knockout`);
+        assert(b1Normal.cascadeEffect.includes('momentum'), `Beat 1 winner earns momentum into Beat 2`);
+
+        // Beat 1 Instant Walk
+        const b1Walk = resolveBeat1({
+          pitchCall: 'fastball',
+          batterGuess: 'fastball',
+          pitcherCardId: null,
+          batterCardId: 'B1', // Guess Fastball, read/z1, value 8 -> doubled to 16
+          pitcherChar: PITCHER_CHARACTERS['PC01'], // 8 base - 1 = 7
+          batterChar: BATTER_CHARACTERS['BC02'],   // 16 + 2 = 18. margin = 11 >= 10
+        });
+        assert(b1Walk.cascadeEffect === 'walk', `Beat 1 margin >= 10 triggers instant walk (${b1Walk.margin})`);
+
+        // Beat 1 Instant Called Strike 3
+        const b1CalledK = resolveBeat1({
+          pitchCall: 'fastball',
+          batterGuess: 'offspeed',
+          pitcherCardId: 'P1', // 10 val in z1 -> total 8 + 10 - 1 = 17
+          batterCardId: null,  // 0 + 2 = 2. margin = 15 >= 10
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b1CalledK.cascadeEffect === 'called_k', `Beat 1 pitcher margin >= 10 triggers called strike 3 (${b1CalledK.margin})`);
+
+        // 13. Sequential Beat 2 Tests
+        const b2Normal = resolveBeat2({
+          z1Winner: 'pitcher',
+          pitcherCardId: 'P13', // contact/z2, value 8
+          batterCardId: 'B11',  // contact/z2, value 7
+          pitcherChar: PITCHER_CHARACTERS['PC01'], // z2: +5
+          batterChar: BATTER_CHARACTERS['BC01'],   // z2: +1
+        });
+        assert(b2Normal.cascadeEffect === 'solid_contact', `Beat 2 margin < 15 resolves as solid contact`);
+
+        // Beat 2 Strikeout Swinging
+        const b2SwingingK = resolveBeat2({
+          z1Winner: 'pitcher', // +3 momentum
+          pitcherCardId: 'P13', // 8 val + 3 mom + 5 bonus = 16
+          batterCardId: null,   // 0 + 1 bonus = 1. margin = 15 >= 15
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2SwingingK.cascadeEffect === 'k_swinging', `Beat 2 pitcher margin >= 15 triggers strikeout swinging (${b2SwingingK.margin})`);
+
+        // Beat 2 Hard Contact
+        const b2HardContact = resolveBeat2({
+          z1Winner: 'batter', // +3 momentum
+          pitcherCardId: null, // 0 + 5 bonus = 5
+          batterCardId: 'B11', // 7 val + 3 mom + 10 bonus = 20. margin = 15 >= 15
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: { ...BATTER_CHARACTERS['BC01'], zoneBonuses: { z1:0, z2:10, z3:0 } },
+        });
+        assert(b2HardContact.hardContact === true, `Beat 2 batter margin >= 15 triggers hard contact`);
+
+        // 14. Sequential Beat 3 & PA Resolution
+        const b3Res = resolveBeat3({
+          hardContact: true,
+          pitcherCardId: null,
+          batterCardId: 'B21', // result/z3, value 8 -> 16 with hard contact
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b3Res.batterTotal >= 16, `Hard contact doubles batter power in Beat 3 (${b3Res.batterTotal})`);
+
+        const seqPAResult = resolveSequentialPA({
+          beat1: b1Normal,
+          beat2: b2Normal,
+          beat3: b3Res,
+          bases: { first:false, second:false, third:false },
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+          score: { batting:0, pitching:0 },
+          outs: 0,
+          half: 'top'
+        });
+        assert(seqPAResult && seqPAResult.outcome && seqPAResult.outcome.display, `Sequential PA resolves full outcome (${seqPAResult?.outcome?.display})`);
+
+        // Instant Knockout PA outcomes
+        const walkPA = resolveSequentialPA({ beat1: b1Walk, half: 'top' });
+        assert(walkPA.outcome.type === 'walk', `Instant walk PA produces walk outcome`);
+
+        const calledKPA = resolveSequentialPA({ beat1: b1CalledK, half: 'top' });
+        assert(calledKPA.outcome.type === 'k', `Instant called strike PA produces K outcome`);
+
+        const swingKPA = resolveSequentialPA({ beat1: b1Normal, beat2: b2SwingingK, half: 'top' });
+        assert(swingKPA.outcome.type === 'k', `Instant swinging strikeout PA produces K outcome`);
+
+        // 15. Beat-Specific Solo Bot Decision Tests
+        const botState = {
+          half: 'top', // guest bats, host pitches
+          arsenalCharges: { host: { fastball: 4, breaking: 2, offspeed: 1 } },
+          hands: { guest: ['B1', 'B11', 'B21'] }
+        };
+        const botBeat1 = executeBotPlayBeat(botState, 'guest', 'beat1');
+        assert(botBeat1.batterGuess !== null, `Bot selects pitch guess for Beat 1 (${botBeat1.batterGuess})`);
+        assert(botBeat1.cardId === 'B1' || botBeat1.cardId === null, `Bot optionally selects Read card for Beat 1`);
+
+        const botBeat2 = executeBotPlayBeat(botState, 'guest', 'beat2');
+        assert(botBeat2.cardId === 'B11', `Bot selects Contact card for Beat 2`);
+
+        const botBeat3 = executeBotPlayBeat(botState, 'guest', 'beat3');
+        assert(botBeat3.cardId === 'B21', `Bot selects Result card for Beat 3`);
+
+        // 16. Full 3-Inning Sequential Game Simulation
+        const simState = {
+          inning: 1,
+          half: 'top',
+          outs: 0,
+          score: { top: 0, bottom: 0 },
+          bases: { first: false, second: false, third: false },
+          batterIndex: { top: 0, bottom: 0 },
+          activePitcher: { host: 'PC01', guest: 'PC02' },
+          pitcherPAs: { host: 0, guest: 0 },
+          lastPitchCall: { host: null, guest: null },
+          arsenalCharges: {
+            host: { ...PITCHER_CHARACTERS['PC01'].repertoire },
+            guest: { ...PITCHER_CHARACTERS['PC02'].repertoire }
+          },
+          hands: {
+            host: ['P1', 'P11', 'P21', 'P2', 'P12'],
+            guest: ['B1', 'B11', 'B21', 'B2', 'B12']
+          }
+        };
+
+        const rosters = {
+          host: { startingPitcher: 'PC01', reliefPitcher: 'PC07', lineup: LINEUP_PRESETS.sluggers.lineup, deckPreset: 'grind' },
+          guest: { startingPitcher: 'PC02', reliefPitcher: 'PC08', lineup: LINEUP_PRESETS.balanced.lineup, deckPreset: 'grind' }
+        };
+
+        let totalPAs = 0;
+        let gameEnded = false;
+
+        while (!gameEnded && totalPAs < 60) {
+          totalPAs++;
+          const half = simState.half;
+          const pitchingRole = half === 'top' ? 'host' : 'guest';
+          const battingRole = half === 'top' ? 'guest' : 'host';
+          const pitcherChar = PITCHER_CHARACTERS[simState.activePitcher[pitchingRole]];
+          const battingLineup = rosters[battingRole].lineup;
+          const bIdx = simState.batterIndex[half] % battingLineup.length;
+          const batterChar = BATTER_CHARACTERS[battingLineup[bIdx]] || BATTER_CHARACTERS['BC01'];
+
+          // Bot plays for both sides in simulation
+          const pitchDecision = executeBotPlayBeat(simState, pitchingRole, 'beat1');
+          const batDecision = executeBotPlayBeat(simState, battingRole, 'beat1');
+
+          // Decrement charge
+          const chosenPitch = pitchDecision.pitchCall || 'fastball';
+          if (simState.arsenalCharges[pitchingRole][chosenPitch] > 0) {
+            simState.arsenalCharges[pitchingRole][chosenPitch]--;
+          }
+
+          // Beat 1
+          const b1 = resolveBeat1({
+            pitchCall: chosenPitch,
+            batterGuess: batDecision.batterGuess || 'fastball',
+            pitcherCardId: pitchDecision.cardId,
+            batterCardId: batDecision.cardId,
+            pitcherChar,
+            batterChar,
+            pitcherPAsFaced: simState.pitcherPAs[pitchingRole],
+            isFirstPAOfInning: simState.outs === 0
+          });
+
+          let paResult = null;
+          if (b1.cascadeEffect === 'walk' || b1.cascadeEffect === 'called_k') {
+            paResult = resolveSequentialPA({
+              beat1: b1,
+              bases: simState.bases,
+              pitcherChar,
+              batterChar,
+              score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+              outs: simState.outs,
+              half
+            });
+          } else {
+            // Beat 2
+            const pB2 = executeBotPlayBeat(simState, pitchingRole, 'beat2');
+            const bB2 = executeBotPlayBeat(simState, battingRole, 'beat2');
+            const b2 = resolveBeat2({
+              z1Winner: b1.winner,
+              pitcherCardId: pB2.cardId,
+              batterCardId: bB2.cardId,
+              pitcherChar,
+              batterChar,
+              pitcherPAsFaced: simState.pitcherPAs[pitchingRole]
+            });
+
+            if (b2.cascadeEffect === 'k_swinging') {
+              paResult = resolveSequentialPA({
+                beat1: b1,
+                beat2: b2,
+                bases: simState.bases,
+                pitcherChar,
+                batterChar,
+                score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+                outs: simState.outs,
+                half
+              });
+            } else {
+              // Beat 3
+              const pB3 = executeBotPlayBeat(simState, pitchingRole, 'beat3');
+              const bB3 = executeBotPlayBeat(simState, battingRole, 'beat3');
+              const b3 = resolveBeat3({
+                hardContact: Boolean(b2.hardContact),
+                pitcherCardId: pB3.cardId,
+                batterCardId: bB3.cardId,
+                pitcherChar,
+                batterChar,
+                pitcherPAsFaced: simState.pitcherPAs[pitchingRole]
+              });
+
+              paResult = resolveSequentialPA({
+                beat1: b1,
+                beat2: b2,
+                beat3: b3,
+                bases: simState.bases,
+                pitcherChar,
+                batterChar,
+                score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+                outs: simState.outs,
+                half
+              });
+            }
+          }
+
+          // Apply PA outcome
+          const outcome = paResult.outcome;
+          simState.outs += outcome.outsAdded || 0;
+          simState.bases = outcome.newBases || simState.bases;
+          simState.score[half] += outcome.runsScored || 0;
+          simState.batterIndex[half]++;
+          simState.pitcherPAs[pitchingRole]++;
+          simState.lastPitchCall[pitchingRole] = paResult.primaryPitchCall;
+
+          // Inning transition check
+          if (simState.outs >= 3) {
+            simState.outs = 0;
+            simState.bases = { first: false, second: false, third: false };
+            if (simState.half === 'top') {
+              simState.half = 'bottom';
+            } else {
+              simState.half = 'top';
+              simState.inning++;
+            }
+
+            if (simState.inning > 3 && simState.score.top !== simState.score.bottom) {
+              gameEnded = true;
+            }
+          }
+
+          // Refill simulated hands if low
+          ['host', 'guest'].forEach(r => {
+            if (!simState.hands[r] || simState.hands[r].length < 3) {
+              simState.hands[r] = ['P1', 'P11', 'P21', 'B1', 'B11'];
+            }
+          });
+        }
+
+        assert(gameEnded, `Simulated full 3-inning game completed successfully in ${totalPAs} PAs (Final: Host ${simState.score.bottom}, Guest ${simState.score.top})`);
+        assert(totalPAs >= 18, `Simulation played at least 18 plate appearances (${totalPAs} PAs played)`);
+
       } catch (err) {
         assert(false, `Unexpected exception in test suite: ${err.message}`);
       }
