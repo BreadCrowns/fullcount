@@ -271,6 +271,33 @@
         });
         assert(b2Moon.outcomeType === 'homerun' && b2Moon.outcome.bonusRun === 1, `Moonshot (B27) adds +1 bonus run on Home Run`);
 
+        // Beat 1 Pitch Synergy Test (Breaking pitch + Breaking card P8 inside zone)
+        const b1Synergy = resolveBeat1({
+          pitchCall: 'breaking',
+          batterGuess: 'fastball',
+          pitcherCardId: 'P8', // Breaking synergy +2, value 6
+          batterCardId: null,
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b1Synergy.pitcherSynergyActive === true, `P8 triggers pitch synergy with Breaking pitch`);
+        assert(b1Synergy.pitcherTotal === 6 + 6 + 2, `Pitcher total includes +2 pitch synergy bonus (14)`);
+        assert(b1Synergy.winner === 'pitcher', `Total 14 is inside strike zone awarding pitcher advantage`);
+        assert(b1Synergy.pitcherAdvantagePerk === 'nasty_bite', `P8 attaches nasty_bite advantage perk when advantage is won`);
+
+        // Beat 2 Advantage Perk Test (hang_breaking adds +3 power)
+        const b2PerkTest = resolveBeat2({
+          beat1Winner: 'batter',
+          batterAdvantagePerk: 'hang_breaking',
+          pitcherCardId: 'P16', // value 2
+          batterCardId: 'B11',  // value 6
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        // 2 (pitcher) + 6 (batter) + 3 (perk) = 11 -> Home Run for BC01
+        assert(b2PerkTest.batterTotal === 9, `Batter total received +3 from hang_breaking perk (6 + 3 = 9)`);
+        assert(b2PerkTest.outcomeType === 'homerun', `Boosted total 11 reaches Home Run band`);
+
         // 14. Sequential 2-Beat PA Resolution
         const seqPAResult = resolveSequentialPA({
           beat1: b1Normal,

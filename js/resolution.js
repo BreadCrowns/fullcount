@@ -5,11 +5,15 @@
 // ZONE VALUE CALCULATION
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Returns the effective value of a card played in a target zone.
-// Playing outside preferred zone → 50% penalty. Universal → always full.
 function getZoneValue(card, targetZone) {
   if (!card) return 0;
-  if (card.zone === 'any') return card.value;
+  if (card.zone === 'any' || card.beat === 'any') return card.value;
+  if (card.beat === 'beat1') {
+    return targetZone === 'z1' ? card.value : Math.floor(card.value * 0.5);
+  }
+  if (card.beat === 'beat2') {
+    return (targetZone === 'z2' || targetZone === 'z3') ? card.value : Math.floor(card.value * 0.5);
+  }
   const prefMap = { read:'z1', contact:'z2', result:'z3' };
   return prefMap[card.zone] === targetZone ? card.value : Math.floor(card.value * 0.5);
 }
@@ -951,16 +955,26 @@ function resolveBeat1(opts) {
 
   const staminaMod = getStaminaMod(pitcherChar, pitcherPAsFaced);
   const pitchBase = (typeof PITCH_BASE_POWER !== 'undefined' && PITCH_BASE_POWER[pitchCall]) ? PITCH_BASE_POWER[pitchCall] : 8;
-  const pitcherCardVal = pitcherCardId ? (getCard(pitcherCardId)?.value || 0) : 0;
+  const pCard = pitcherCardId ? getCard(pitcherCardId) : null;
+  const bCard = batterCardId ? getCard(batterCardId) : null;
+  const pitcherCardVal = pCard ? (pCard.value || 0) : 0;
+
+  // Pitcher pitch synergy check (e.g. Breaking pitch + Breaking card)
+  let pitcherSynergyActive = false;
+  let pitcherSynergyBonus = 0;
+  if (pCard && pCard.synergyPitch && pCard.synergyPitch === pitchCall) {
+    pitcherSynergyActive = true;
+    pitcherSynergyBonus = pCard.synergyBonus || 2;
+  }
 
   // Counter / Read check
   const isKnuckleOrEephus = (pitchCall === 'knuckleball' || pitchCall === 'eephus');
   const counterFired = !isKnuckleOrEephus && (batterGuess === pitchCall);
 
-  let batterCardVal = batterCardId ? (getCard(batterCardId)?.value || 0) : 0;
+  let batterCardVal = bCard ? (bCard.value || 0) : 0;
   if (counterFired) {
     if (batterCardId) {
-      batterCardVal = Math.round(batterCardVal * 2.0);
+      batterCardVal = Math.round(batterCardVal * (bCard.counterMult || 2.0));
     } else {
       batterCardVal += 3; // Unassisted correct guess gives +3 read
     }
@@ -972,7 +986,7 @@ function resolveBeat1(opts) {
   }
 
   // Combined sum of Pitcher + Batter
-  const total = Math.max(0, pitchBase + pitcherCardVal + batterCardVal + (staminaMod.z1 || 0));
+  const total = Math.max(0, pitchBase + pitcherCardVal + pitcherSynergyBonus + batterCardVal + (staminaMod.z1 || 0));
 
   const sz = pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 };
 
@@ -1003,16 +1017,24 @@ function resolveBeat1(opts) {
 
   const margin = Math.abs(total - sz.bullseye);
 
+  // Active perks carried into Beat 2
+  const pitcherAdvantagePerk = (winner === 'pitcher' && pCard?.advantagePerk) ? pCard.advantagePerk : null;
+  const batterAdvantagePerk = (winner === 'batter' && bCard?.advantagePerk) ? bCard.advantagePerk : null;
+
   return {
     winner,
     total,
     margin,
     rawMargin: winner === 'batter' ? margin : -margin,
-    pitcherTotal: pitchBase + pitcherCardVal,
+    pitcherTotal: pitchBase + pitcherCardVal + pitcherSynergyBonus,
+    pitcherSynergyActive,
+    pitcherSynergyBonus,
+    pitcherAdvantagePerk,
+    batterAdvantagePerk,
     batterTotal: batterCardVal,
     counterFired,
-    multiplier: counterFired ? 2.0 : 1.0,
-    mult: counterFired ? 2.0 : 1.0,
+    multiplier: counterFired ? (bCard?.counterMult || 2.0) : 1.0,
+    mult: counterFired ? (bCard?.counterMult || 2.0) : 1.0,
     pitchCallMatched: counterFired ? pitchCall : null,
     pitchCall,
     batterGuess,
@@ -1039,12 +1061,44 @@ function resolveBeat2(opts) {
     bases = { first:false, second:false, third:false },
     outs = 0,
     score = { batting:0, pitching:0 },
+    pitcherAdvantagePerk = null,
+    batterAdvantagePerk = null,
   } = opts;
 
   const pCard = getCard(pitcherCardId);
   const bCard = getCard(batterCardId);
-  const pVal = pCard ? (pCard.value || 0) : 0;
-  const bVal = bCard ? (bCard.value || 0) : 0;
+  let pVal = pCard ? (pCard.value || 0) : 0;
+  let bVal = bCard ? (bCard.value || 0) : 0;
+
+  // ── Apply Beat 1 Advantage Perks carried over ──────────────────────────────
+  const perkLogs = [];
+
+  // Pitcher perks:
+  if (pitcherAdvantagePerk === 'high_heat') {
+    bVal = Math.max(0, bVal - 2);
+    perkLogs.push('🔥 High Heat: Batter loses -2 power in Beat 2');
+  } else if (pitcherAdvantagePerk === 'fooled_timing') {
+    bVal = Math.max(0, bVal - 3);
+    perkLogs.push('⏱️ Fooled Timing: Batter loses -3 power in Beat 2');
+  } else if (pitcherAdvantagePerk === 'nasty_bite') {
+    pVal += 2;
+    perkLogs.push('🌀 Nasty Bite: Pitcher exerts +2 launch control in Beat 2');
+  }
+
+  // Batter perks:
+  if (batterAdvantagePerk === 'hang_breaking') {
+    bVal += 3;
+    perkLogs.push('💥 Hanging Hook: Batter gains +3 launch power in Beat 2');
+  } else if (batterAdvantagePerk === 'ambush_first') {
+    bVal += 2;
+    perkLogs.push('⚡ Ambush: Batter gains +2 launch power in Beat 2');
+  }
+
+  // Highlight Card: B21 Power Surge
+  if (bCard?.outcomeEffect === 'power_surge' && beat1Winner === 'batter') {
+    bVal += 3;
+    perkLogs.push('⚡ Power Surge: Batter won Reaction Advantage (+3 bonus power)');
+  }
 
   // Combined sum
   let total = pVal + bVal;
@@ -1058,15 +1112,39 @@ function resolveBeat2(opts) {
     { min:18, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
   ];
 
-  const spectrum = (batterChar?.battedBallSpectrum && batterChar.battedBallSpectrum.length > 0)
+  const rawSpectrum = (batterChar?.battedBallSpectrum && batterChar.battedBallSpectrum.length > 0)
     ? batterChar.battedBallSpectrum
     : defaultSpectrum;
+
+  // Clone spectrum so modifications don't mutate character templates
+  const spectrum = rawSpectrum.map(b => ({ ...b }));
+
+  // Perk: Sinker Depth (P7) expands groundout band by +2
+  if (pitcherAdvantagePerk === 'sinker_depth') {
+    const goBand = spectrum.find(b => b.outcome === 'groundout');
+    if (goBand) {
+      goBand.max += 2;
+      const nextBand = spectrum.find(b => b.min <= goBand.max && b.outcome !== 'groundout');
+      if (nextBand) nextBand.min = goBand.max + 1;
+      perkLogs.push('⚾ Sinker Depth: Expanded Groundout band by +2');
+    }
+  }
+
+  // Perk: Sit Fastball (B1, B6, B7, B10) widens Home Run band by +2
+  if (batterAdvantagePerk === 'sit_fastball') {
+    const hrBand = spectrum.find(b => b.outcome === 'homerun');
+    if (hrBand) {
+      hrBand.min = Math.max(8, hrBand.min - 1);
+      hrBand.max = hrBand.max + 1;
+      perkLogs.push('🎯 Sit Fastball: Widened Home Run band');
+    }
+  }
 
   // Find matching band on the spectrum
   let matchedBand = spectrum.find(b => total >= b.min && total <= b.max) || spectrum[spectrum.length - 1];
   let outcomeType = matchedBand.outcome;
   let outcomeDisplay = matchedBand.label;
-  let specialEffectTriggered = null;
+  let specialEffectTriggered = perkLogs.length > 0 ? perkLogs.join(' · ') : null;
   let isFoulBall = false;
   let bonusRun = 0;
 
@@ -1107,21 +1185,28 @@ function resolveBeat2(opts) {
     specialEffectTriggered = 'Nasty wipeout pitch fools the batter!';
   }
 
-  // 5. Bunt Against Shift (B13): Converts Groundout under 8 into Infield Single
+  // 5. High Cheese (P13, P15, P20, P22, P28): Converts Flyout over 16 into Strikeout
+  if (pCard?.outcomeEffect === 'high_cheese' && total > 16 && (outcomeType === 'flyout' || outcomeType === 'out')) {
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ STRIKEOUT SWINGING! (High Cheese)';
+    specialEffectTriggered = 'Blown away high in the zone!';
+  }
+
+  // 6. Bunt Against Shift (B13): Converts Groundout under 8 into Infield Single
   if (bCard?.outcomeEffect === 'bunt_shift' && total < 8 && outcomeType === 'groundout') {
     outcomeType = 'single';
     outcomeDisplay = '⚡ Infield Bunt Single!';
     specialEffectTriggered = 'Dropped down a beautiful bunt against the shift!';
   }
 
-  // 6. Spoil It (B19): Fouls off an Out or Strikeout (resets Beat 2)
+  // 7. Spoil It (B19): Fouls off an Out or Strikeout (resets Beat 2)
   if (bCard?.outcomeEffect === 'spoil_it' && (outcomeType === 'groundout' || outcomeType === 'flyout' || outcomeType === 'k')) {
     isFoulBall = true;
     outcomeDisplay = '⚾ FOUL BALL! (Spoiled Pitch)';
     specialEffectTriggered = 'Battled and fouled off the pitch!';
   }
 
-  // 7. Gap Power (B26): Upgrades Single -> Double, Double -> Triple
+  // 8. Gap Power (B26): Upgrades Single -> Double, Double -> Triple
   if (bCard?.outcomeEffect === 'gap_power') {
     if (outcomeType === 'single') {
       outcomeType = 'double';
@@ -1134,11 +1219,18 @@ function resolveBeat2(opts) {
     }
   }
 
-  // 8. Moonshot (B27): Bonus run if Home Run hits
+  // 9. Moonshot (B27): Bonus run if Home Run hits
   if (bCard?.outcomeEffect === 'moonshot' && outcomeType === 'homerun') {
     bonusRun = 1;
     outcomeDisplay = '💥 MOONSHOT HOME RUN (+1 BONUS RUN)!';
     specialEffectTriggered = 'Towering moonshot clears the stadium for a bonus run!';
+  }
+
+  // 10. Spit Offspeed Perk: Converts Flyout into Walk
+  if (batterAdvantagePerk === 'spit_offspeed' && (outcomeType === 'flyout' || outcomeType === 'out')) {
+    outcomeType = 'walk';
+    outcomeDisplay = '🚶 WALK! (Spit on Offspeed)';
+    specialEffectTriggered = 'Laid off the pitch out of the zone for Ball Four!';
   }
 
   // ── Calculate Base Running & Outs ──────────────────────────────────────────
@@ -1160,6 +1252,10 @@ function resolveBeat2(opts) {
   } else if (outcomeType === 'k' || outcomeType === 'groundout' || outcomeType === 'flyout' || outcomeType === 'out') {
     outsAdded = 1;
     runsScored = 0;
+  } else if (outcomeType === 'walk') {
+    runsScored = (bases.first && bases.second && bases.third) ? 1 : 0;
+    newBases = advanceBases(bases, 1);
+    outsAdded = 0;
   } else if (outcomeType === 'single') {
     runsScored = runsOnHit(bases, 1);
     newBases = advanceBases(bases, 1);
@@ -1175,7 +1271,7 @@ function resolveBeat2(opts) {
   }
 
   const isHit = ['single','double','triple','homerun'].includes(outcomeType);
-  const winner = (runsScored > 0 || isHit) ? 'batter' : (isFoulBall ? 'tie' : 'pitcher');
+  const winner = (runsScored > 0 || isHit || outcomeType === 'walk') ? 'batter' : (isFoulBall ? 'tie' : 'pitcher');
 
   const outcome = {
     type: outcomeType,

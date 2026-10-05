@@ -709,6 +709,154 @@ function renderResolved(g, gs, pa, pitcherChar, batterChar, pitchingRole, battin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// STRIKE ZONE GAUGE HELPER (BEAT 1)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderStrikeZoneGauge(pitcherChar, needleVal, isPitcher = true, cardObj = null, pitchCall = null) {
+  const sz = pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 };
+  const GAUGE_MAX = 24;
+
+  const lowUnits  = Math.max(1, sz.low);
+  const zoneUnits = Math.max(1, sz.high - sz.low + 1);
+  const highUnits = Math.max(1, sz.wildBust - sz.high - 1);
+  const bustUnits = Math.max(1, GAUGE_MAX - sz.wildBust + 1);
+  const totalUnits = lowUnits + zoneUnits + highUnits + bustUnits;
+
+  const lowPct  = (lowUnits / totalUnits) * 100;
+  const zonePct = (zoneUnits / totalUnits) * 100;
+  const highPct = (highUnits / totalUnits) * 100;
+  const bustPct = (bustUnits / totalUnits) * 100;
+
+  // Bullseye pin location
+  const bullseyePct = Math.min(95, Math.max(5, (sz.bullseye / GAUGE_MAX) * 100));
+
+  let needleHtml = '';
+  let statusBadgeHtml = '';
+
+  if (needleVal !== null && needleVal !== undefined) {
+    const needlePct = Math.min(100, Math.max(0, (needleVal / GAUGE_MAX) * 100));
+    needleHtml = `
+      <div class="sz-gauge-needle" style="left: ${needlePct}%;" data-val="${needleVal}">
+        <div class="sz-needle-flag">${needleVal}</div>
+      </div>`;
+
+    if (needleVal === sz.bullseye) {
+      statusBadgeHtml = `<div class="sz-status-pill bullseye">🎯 BULLSEYE (${needleVal})! Paints the Black &bull; Instant Called Strike 3</div>`;
+    } else if (needleVal >= sz.wildBust) {
+      statusBadgeHtml = `<div class="sz-status-pill bust">⚠️ WILD PITCH BUST (${needleVal} &ge; ${sz.wildBust})! Instant Walk</div>`;
+    } else if (needleVal >= sz.low && needleVal <= sz.high) {
+      statusBadgeHtml = `<div class="sz-status-pill in-zone">✅ IN STRIKE ZONE (${needleVal}) &bull; Pitcher Advantage</div>`;
+    } else if (needleVal < sz.low) {
+      statusBadgeHtml = `<div class="sz-status-pill low">⚾ LOW BALL (${needleVal} &lt; ${sz.low}) &bull; Batter Advantage</div>`;
+    } else {
+      statusBadgeHtml = `<div class="sz-status-pill high">⚠️ HIGH BALL (${needleVal} &gt; ${sz.high}) &bull; Batter Advantage</div>`;
+    }
+  } else {
+    statusBadgeHtml = isPitcher
+      ? `<div class="sz-status-pill prompt">🎯 Dial in: Fastball (+8), Breaking (+6), or Offspeed (+4) + Card to hit Zone (${sz.low}&ndash;${sz.high})</div>`
+      : `<div class="sz-status-pill prompt">🎯 Anticipate the pitch type to trigger &times;2.0 Counter &amp; steal Advantage!</div>`;
+  }
+
+  return `
+    <div class="strike-zone-gauge">
+      <div class="sz-gauge-header">
+        <span class="sz-gauge-title">🎯 Strike Zone Target</span>
+        <span class="sz-gauge-spec">${pitcherChar?.name || 'Pitcher'} &bull; Zone ${sz.low}&ndash;${sz.high} &bull; Bullseye ${sz.bullseye}</span>
+      </div>
+      <div class="sz-gauge-track">
+        <div class="sz-band low" style="width: ${lowPct}%;" title="Low Ball (0-${sz.low - 1})">
+          <span>LOW (0&ndash;${sz.low - 1})</span>
+        </div>
+        <div class="sz-band in-zone" style="width: ${zonePct}%;" title="Strike Zone (${sz.low}-${sz.high}) &mdash; Pitcher Advantage">
+          <span>STRIKE ZONE (${sz.low}&ndash;${sz.high})</span>
+        </div>
+        <div class="sz-band high" style="width: ${highPct}%;" title="High Ball (${sz.high + 1}-${sz.wildBust - 1})">
+          <span>HIGH</span>
+        </div>
+        <div class="sz-band bust" style="width: ${bustPct}%;" title="Wild Pitch Bust (&ge;${sz.wildBust}) &mdash; Overthrow Walk">
+          <span>WILD (&ge;${sz.wildBust})</span>
+        </div>
+        <div class="sz-bullseye-pin" style="left: ${bullseyePct}%;" title="🎯 Bullseye at ${sz.bullseye}! Instant Called Strike 3">
+          <div class="sz-pin-icon">🎯</div>
+          <div class="sz-pin-num">${sz.bullseye}</div>
+        </div>
+        ${needleHtml}
+      </div>
+      <div class="sz-status-row">
+        ${statusBadgeHtml}
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PITCH SELECTOR DECK (BEAT 1 PITCHER TILES WITH PIP COUNTERS)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderPitchSelectorDeck(charges, localPitchChoice, cardObj) {
+  const pitches = [
+    { key: 'fastball', name: 'Fastball', icon: '🔥', base: 8, max: 5 },
+    { key: 'breaking', name: 'Breaking', icon: '🌀', base: 6, max: 4 },
+    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', base: 4, max: 3 }
+  ];
+
+  return `
+    <div class="pitch-selector-deck">
+      ${pitches.map(p => {
+        const count = charges[p.key] ?? 0;
+        const isSelected = (localPitchChoice === p.key);
+        const isDisabled = count <= 0;
+        const hasSynergy = Boolean(cardObj && cardObj.synergyPitch === p.key);
+
+        let pips = '';
+        for (let i = 0; i < p.max; i++) {
+          pips += `<span class="pt-pip ${i < count ? 'filled' : 'empty'}"></span>`;
+        }
+
+        return `
+          <button class="pitch-tile ${isSelected ? 'selected' : ''} ${hasSynergy ? 'has-synergy' : ''} ${isDisabled ? 'disabled' : ''}"
+                  onclick="selectPitchCall('${p.key}')"
+                  ${isDisabled ? 'disabled' : ''}>
+            <div class="pt-header">
+              <span class="pt-icon">${p.icon}</span>
+              <span class="pt-base">+${p.base}</span>
+            </div>
+            <div class="pt-name">${p.name}</div>
+            <div class="pt-pips" title="${count} / ${p.max} charges remaining">${pips}</div>
+            ${hasSynergy ? `<div class="pt-synergy-tag">✨ SYNERGY +2</div>` : ''}
+          </button>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GUESS SELECTOR DECK (BEAT 1 BATTER TILES WITH COUNTER TAGS)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderGuessSelectorDeck(localGuessChoice, cardObj) {
+  const guesses = [
+    { key: 'fastball', name: 'Fastball', icon: '🔥', base: 8 },
+    { key: 'breaking', name: 'Breaking', icon: '🌀', base: 6 },
+    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', base: 4 }
+  ];
+
+  return `
+    <div class="guess-selector-deck">
+      ${guesses.map(g => {
+        const isSelected = (localGuessChoice === g.key);
+        const countersThis = Boolean(cardObj && cardObj.counters && cardObj.counters.some(c => c.toLowerCase().includes(g.key)));
+
+        return `
+          <button class="guess-tile ${isSelected ? 'selected' : ''} ${countersThis ? 'counters-this' : ''}"
+                  onclick="selectBatterGuess('${g.key}')">
+            <div class="gt-header">
+              <span class="gt-icon">${g.icon}</span>
+              <span class="gt-base">Base ${g.base}</span>
+            </div>
+            <div class="gt-name">${g.name}</div>
+            ${countersThis ? `<div class="gt-counter-tag">⚡ &times;2.0 ARMED</div>` : ''}
+          </button>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // LAUNCH ANGLE GAUGE HELPER
 // ─────────────────────────────────────────────────────────────────────────────
 function renderLaunchAngleGauge(batterChar, needleVal) {
@@ -948,7 +1096,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
   const myRoleLabel  = iAmBatting ? '🏏 Hitter (You)' : '⚾ Pitcher (You)';
 
   return `
-    ${repertoireBar}
+    ${activeZoneKey === 'z2' ? repertoireBar : ''}
     ${beatStepBar}
     ${centerAdvantageBar}
     ${beat1RecapHtml}
@@ -984,13 +1132,12 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           if (z === 'z1') {
             const pCall = (zRes.pitchCall || '').toUpperCase();
             const bGuess = (zRes.batterGuess || '').toUpperCase();
+            const pCardObj = zRes.pitcherCards?.[0] ? getCard(zRes.pitcherCards[0]) : null;
             centerCustomHtml = `
               <div class="loc-beat-result-strip">
                 <span class="loc-pitch-spec">⚾ ${pCall} vs 🎯 ${bGuess}</span>
               </div>
-              <div class="strike-zone-info" style="font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:2px;">
-                Total: <b>${zRes.total}</b> (Zone: ${pitcherChar?.strikeZone?.low || 8}–${pitcherChar?.strikeZone?.high || 14})
-              </div>`;
+              ${renderStrikeZoneGauge(pitcherChar, zRes.total, !iAmBatting, pCardObj, zRes.pitchCall)}`;
 
             if (zRes.counterFired) {
               cascadeHighlightHtml = `<div class="loc-cascade-note counter">🎯 Counter &times;${zRes.multiplier || zRes.mult || 2}</div>`;
@@ -1031,134 +1178,25 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             zoneAdvantageHtml = `<div class="loc-adv-chip placing">ACTIVE BEAT</div>`;
 
             if (z === 'z1') {
-              const szLow = pitcherChar?.strikeZone?.low || 8;
-              const szHigh = pitcherChar?.strikeZone?.high || 14;
-              const szBullseye = pitcherChar?.strikeZone?.bullseye || 11;
-              const szWildBust = pitcherChar?.strikeZone?.wildBust || 20;
-
-              const szInfo = `<div class="strike-zone-info" style="font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:2px;">
-                🎯 Target: <b>${szLow}–${szHigh}</b> | Bullseye: <b>${szBullseye}</b> | Bust: <b>&gt;${szWildBust}</b>
-              </div>`;
+              const cardObj = localBeatCard ? getCard(localBeatCard) : null;
+              const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
               if (!iAmBatting) {
-                // Pitcher controls with live dial-in calculator
-                const basePower = localPitchChoice ? (PITCH_BASE_POWER[localPitchChoice] || 0) : 0;
-                const cardVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
-                const cardObj = localBeatCard ? getCard(localBeatCard) : null;
-                const totalPower = basePower + cardVal;
-
-                let dialInStatusHtml = '';
-                if (localPitchChoice) {
-                  let statusText = '';
-                  let statusClass = '';
-                  if (totalPower === szBullseye) {
-                    statusText = `🎯 BULLSEYE (${totalPower})! Instant Called Strike 3`;
-                    statusClass = 'bullseye';
-                  } else if (totalPower >= szWildBust) {
-                    statusText = `⚠️ WILD PITCH BUST (${totalPower} ≥ ${szWildBust})! Instant Walk`;
-                    statusClass = 'bust';
-                  } else if (totalPower >= szLow && totalPower <= szHigh) {
-                    statusText = `✅ Inside Strike Zone (${totalPower} in ${szLow}–${szHigh})`;
-                    statusClass = 'in-zone';
-                  } else if (totalPower < szLow) {
-                    statusText = `⚾ Low / Ball (${totalPower} < ${szLow}) — Add a card to reach ${szLow}!`;
-                    statusClass = 'low-ball';
-                  } else {
-                    statusText = `⚠️ High Out of Zone (${totalPower} > ${szHigh})`;
-                    statusClass = 'high-ball';
-                  }
-
-                  dialInStatusHtml = `
-                    <div class="dial-in-calculator ${statusClass}">
-                      <div class="dial-calc-equation">
-                        <span class="calc-pitch">${localPitchChoice.toUpperCase()} <b>(+${basePower})</b></span>
-                        <span class="calc-op">+</span>
-                        <span class="calc-card">${cardObj ? `${cardObj.name} <b>(+${cardVal})</b>` : 'No Card <b>(+0)</b>'}</span>
-                        <span class="calc-eq">=</span>
-                        <span class="calc-total"><b>${totalPower}</b></span>
-                      </div>
-                      <div class="dial-calc-badge">${statusText}</div>
-                    </div>`;
-                } else {
-                  dialInStatusHtml = `
-                    <div class="dial-in-calculator prompt">
-                      <span class="dial-calc-prompt">👆 Select a pitch above to see its base strength &amp; dial in your strike zone!</span>
-                    </div>`;
-                }
+                // Pitcher controls with live graphical strike zone gauge + tactile deck
+                const curPitch = localPitchChoice || 'fastball';
+                const basePower = PITCH_BASE_POWER[curPitch] || 8;
+                const hasSynergy = Boolean(cardObj && cardObj.synergyPitch === curPitch);
+                const synergyBonus = hasSynergy ? (cardObj.synergyBonus || 2) : 0;
+                const totalPower = localPitchChoice ? (basePower + cardVal + synergyBonus) : null;
 
                 centerCustomHtml = `
-                  <div class="beat-choice-container">
-                    <div class="beat-choice-title">Pick Pitch &amp; Base Strength:</div>
-                    <div class="beat-btn-row">
-                      <button class="pitch-choice-btn ${localPitchChoice === 'fastball' ? 'selected' : ''}"
-                              onclick="selectPitchCall('fastball')"
-                              ${charges.fastball <= 0 && (charges.breaking > 0 || charges.offspeed > 0) ? 'disabled' : ''}>
-                        <span class="pitch-btn-main">🔥 Fastball <b>(+8)</b></span>
-                        <span class="pitch-btn-sub">${charges.fastball ?? 0} left</span>
-                      </button>
-                      <button class="pitch-choice-btn ${localPitchChoice === 'breaking' ? 'selected' : ''}"
-                              onclick="selectPitchCall('breaking')"
-                              ${charges.breaking <= 0 ? 'disabled' : ''}>
-                        <span class="pitch-btn-main">🌀 Breaking <b>(+6)</b></span>
-                        <span class="pitch-btn-sub">${charges.breaking ?? 0} left</span>
-                      </button>
-                      <button class="pitch-choice-btn ${localPitchChoice === 'offspeed' ? 'selected' : ''}"
-                              onclick="selectPitchCall('offspeed')"
-                              ${charges.offspeed <= 0 ? 'disabled' : ''}>
-                        <span class="pitch-btn-main">⏱️ Offspeed <b>(+4)</b></span>
-                        <span class="pitch-btn-sub">${charges.offspeed ?? 0} left</span>
-                      </button>
-                    </div>
-                    ${dialInStatusHtml}
-                    ${szInfo}
-                  </div>`;
+                  ${renderStrikeZoneGauge(pitcherChar, totalPower, true, cardObj, curPitch)}
+                  ${renderPitchSelectorDeck(charges, localPitchChoice, cardObj)}`;
               } else {
-                // Batter controls with counter preview
-                const guessCardVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
-                const guessCardObj = localBeatCard ? getCard(localBeatCard) : null;
-                let batterDialInHtml = '';
-                if (localGuessChoice) {
-                  const gBase = PITCH_BASE_POWER[localGuessChoice] || 0;
-                  const doubledVal = guessCardVal * 2;
-                  batterDialInHtml = `
-                    <div class="dial-in-calculator in-zone">
-                      <div class="dial-calc-equation">
-                        <span class="calc-pitch">Anticipating: <b>${localGuessChoice.toUpperCase()}</b> (Base +${gBase})</span>
-                        <span class="calc-sep">|</span>
-                        <span class="calc-card">${guessCardObj ? `${guessCardObj.name} <b>(+${guessCardVal})</b>` : 'No Card (+0)'}</span>
-                      </div>
-                      <div class="dial-calc-badge">${guessCardObj ? `🎯 Guess correct DOUBLES card power: <b>+${doubledVal}</b> &times;2.0 Counter!` : '💡 Play a card to double its power on a correct guess!'}</div>
-                    </div>`;
-                } else {
-                  batterDialInHtml = `
-                    <div class="dial-in-calculator prompt">
-                      <span class="dial-calc-prompt">👆 Guess the pitch above to counter &amp; steal Reaction Advantage!</span>
-                    </div>`;
-                }
-
+                // Batter controls with strike zone target + guess selector deck
                 centerCustomHtml = `
-                  <div class="beat-choice-container">
-                    <div class="beat-choice-title">Guess Pitch &amp; Read:</div>
-                    <div class="beat-btn-row">
-                      <button class="guess-choice-btn ${localGuessChoice === 'fastball' ? 'selected' : ''}"
-                              onclick="selectBatterGuess('fastball')">
-                        <span class="pitch-btn-main">🔥 Fastball</span>
-                        <span class="pitch-btn-sub">Base 8</span>
-                      </button>
-                      <button class="guess-choice-btn ${localGuessChoice === 'breaking' ? 'selected' : ''}"
-                              onclick="selectBatterGuess('breaking')">
-                        <span class="pitch-btn-main">🌀 Breaking</span>
-                        <span class="pitch-btn-sub">Base 6</span>
-                      </button>
-                      <button class="guess-choice-btn ${localGuessChoice === 'offspeed' ? 'selected' : ''}"
-                              onclick="selectBatterGuess('offspeed')">
-                        <span class="pitch-btn-main">⏱️ Offspeed</span>
-                        <span class="pitch-btn-sub">Base 4</span>
-                      </button>
-                    </div>
-                    ${batterDialInHtml}
-                    ${szInfo}
-                  </div>`;
+                  ${renderStrikeZoneGauge(pitcherChar, null, false, cardObj, null)}
+                  ${renderGuessSelectorDeck(localGuessChoice, cardObj)}`;
               }
 
               if (localBeatCard) {
@@ -1273,9 +1311,6 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
               <div class="loc-center-emblem">
                 <div class="loc-zone-tag ${z}">${meta.tag}</div>
-                <div class="loc-icon">${meta.icon}</div>
-                <div class="loc-title">${meta.title}</div>
-                <div class="loc-summary">${meta.summary}</div>
                 <div class="loc-advantage-strip">
                   ${zoneAdvantageHtml}
                 </div>
@@ -1426,6 +1461,24 @@ function showCardMagnifier(cardId) {
               <p class="mag-full-desc">${card.desc}</p>
             </div>
 
+            ${card.powerBadge ? `
+              <div class="mag-badge-box">
+                <div class="mag-box-label">CARD SPECIALTY</div>
+                <div class="card-power-chip">${card.powerBadge}</div>
+              </div>` : ''}
+
+            ${card.synergyPitch ? `
+              <div class="mag-synergy-box">
+                <div class="mag-box-label">✨ PITCH SYNERGY</div>
+                <div class="mag-synergy-text">Pairs with <b>${card.synergyPitch.toUpperCase()}</b> for +${card.synergyBonus || 2} power in Beat 1!</div>
+              </div>` : ''}
+
+            ${card.advantagePerk ? `
+              <div class="mag-perk-box">
+                <div class="mag-box-label">⚡ BEAT 2 CARRYOVER PERK</div>
+                <div class="mag-perk-text">Winning Beat 1 activates: <b>${card.advantagePerk.replace('_', ' ').toUpperCase()}</b> in Beat 2!</div>
+              </div>` : ''}
+
             ${effectHtml}
 
             <div class="mag-strategy-box">
@@ -1478,6 +1531,7 @@ function renderMiniPlacedCard(id, targetZone, canRemove, index) {
       <div class="zone-indicator ${card.zone}"></div>
       <div class="card-info">
         <span class="card-title">${card.name}</span>
+        ${card.powerBadge ? `<span class="card-power-chip mini">${card.powerBadge}</span>` : ''}
         ${card.outcomeEffect ? `<span class="outcome-effect-badge" style="font-size:0.5rem;padding:0 3px;">${formatOutcomeEffect(card.outcomeEffect)}</span>` : ''}
       </div>
       <span class="power-badge">+${effectiveVal}</span>
@@ -1532,6 +1586,7 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
               <span class="hc-val">${card.zone === 'any' && card.value === 0 ? '✨' : '+' + card.value}</span>
             </div>
             <div class="hc-name">${card.name}</div>
+            ${card.powerBadge ? `<div class="card-power-chip">${card.powerBadge}</div>` : ''}
             <div class="hc-desc">${card.desc}</div>
             ${card.outcomeEffect ? `<div class="outcome-effect-badge">${formatOutcomeEffect(card.outcomeEffect)}</div>` : ''}
             ${dynamicOutcomeHtml}
@@ -1848,7 +1903,9 @@ function resolveBeatStep(beat) {
           pitcherPAsFaced,
           bases,
           outs,
-          score
+          score,
+          pitcherAdvantagePerk: beat1Result.pitcherAdvantagePerk,
+          batterAdvantagePerk: beat1Result.batterAdvantagePerk,
         });
 
         // Spoil It: fouls off an out, resetting Beat 2
