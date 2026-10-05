@@ -444,10 +444,12 @@
             }
           }
 
-          // Refill simulated hands if low
+          // Refill simulated hands if low or role switched
           ['host', 'guest'].forEach(r => {
-            if (!simState.hands[r] || simState.hands[r].length < 3) {
-              simState.hands[r] = ['P13', 'P14', 'P26', 'P27', 'B11', 'B12', 'B19', 'B26'];
+            const isPitcher = (r === pitchingRole);
+            const deck = isPitcher ? DECK_PRESETS.grind.pitcherCards : DECK_PRESETS.grind.batterCards;
+            if (!simState.hands[r] || simState.hands[r].length < 3 || simState.hands[r].some(id => getCard(id)?.type !== 'universal' && getCard(id)?.type !== (isPitcher ? 'pitcher' : 'batter'))) {
+              simState.hands[r] = [...deck];
             }
           });
         }

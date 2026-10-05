@@ -679,6 +679,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
   const res = pa.resolution;
   const staminaState = getPitcherStaminaState(pitcherChar, gs.pitcherPAs[pitchingRole]);
   const score = { batting: gs.score[half], pitching: gs.score[half==='top'?'bottom':'top'] };
+  const currentBeat = pa?.beat || 'beat2';
 
   const oppKey = opponentRole();
   const oppName = g.rosters?.[oppKey]?.name || (oppKey === 'host' ? 'Host' : 'Guest');

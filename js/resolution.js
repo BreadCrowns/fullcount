@@ -1378,11 +1378,20 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
           // Bot is Pitcher: look for groundout (< 8) or flyout (> 16)
           let bestIdx = 0;
           let foundSafe = false;
+          let minOutDist = 999;
           botHand.forEach((id, idx) => {
             const sum = oppVal + (getCard(id)?.value || 0);
-            if ((sum < 8 || sum > 16) && !foundSafe) {
-              bestIdx = idx;
-              foundSafe = true;
+            if (sum < 8 || sum > 16) {
+              if (!foundSafe) {
+                bestIdx = idx;
+                foundSafe = true;
+              }
+            } else if (!foundSafe) {
+              const dist = Math.min(Math.abs(sum - 7), Math.abs(sum - 17));
+              if (dist < minOutDist) {
+                minOutDist = dist;
+                bestIdx = idx;
+              }
             }
           });
           [cardId] = botHand.splice(bestIdx, 1);
