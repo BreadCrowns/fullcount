@@ -102,6 +102,114 @@ function renderLobbyWait(g) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// DECK & PLAYABLE HAND MANAGEMENT
+// Guarantees player always holds a full hand of 5 role-appropriate playable cards
+// ─────────────────────────────────────────────────────────────────────────────
+function getPlayerRoleType(role, half) {
+  // top half: guest bats, host pitches
+  // bottom half: host bats, guest pitches
+  const isPitching = (role === 'host' && half === 'top') || (role === 'guest' && half === 'bottom');
+  return isPitching ? 'pitcher' : 'batter';
+}
+
+function ensurePlayerDeckAndHand(gs, rosters, role) {
+  if (!gs || !rosters) return;
+  const half = gs.half || 'top';
+  const roleType = getPlayerRoleType(role, half); // 'pitcher' or 'batter'
+  const presetKey = rosters[role]?.deckPreset || 'grind';
+  const preset = DECK_PRESETS[presetKey] || DECK_PRESETS.grind;
+
+  // Initialize role-specific deck & discard collections if missing
+  if (!gs.pitcherDecks)    gs.pitcherDecks    = { host: [], guest: [] };
+  if (!gs.batterDecks)     gs.batterDecks     = { host: [], guest: [] };
+  if (!gs.pitcherDiscards) gs.pitcherDiscards = { host: [], guest: [] };
+  if (!gs.batterDiscards)  gs.batterDiscards  = { host: [], guest: [] };
+  if (!gs.hands)           gs.hands           = { host: [], guest: [] };
+
+  // Seed pitcher deck from preset if both deck & discards are empty
+  if ((!gs.pitcherDecks[role] || gs.pitcherDecks[role].length === 0) &&
+      (!gs.pitcherDiscards[role] || gs.pitcherDiscards[role].length === 0)) {
+    const pList = preset.pitcherCards ? [...preset.pitcherCards] : preset.cards.filter(id => getCard(id)?.type !== 'batter');
+    gs.pitcherDecks[role] = shuffleArray(pList);
+    gs.pitcherDiscards[role] = [];
+  }
+
+  // Seed batter deck from preset if both deck & discards are empty
+  if ((!gs.batterDecks[role] || gs.batterDecks[role].length === 0) &&
+      (!gs.batterDiscards[role] || gs.batterDiscards[role].length === 0)) {
+    const bList = preset.batterCards ? [...preset.batterCards] : preset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+    gs.batterDecks[role] = shuffleArray(bList);
+    gs.batterDiscards[role] = [];
+  }
+
+  let hand  = [...(gs.hands[role] || [])];
+  let pDeck = [...(gs.pitcherDecks[role] || [])];
+  let pDisc = [...(gs.pitcherDiscards[role] || [])];
+  let bDeck = [...(gs.batterDecks[role] || [])];
+  let bDisc = [...(gs.batterDiscards[role] || [])];
+
+  // Purge any dead cards from hand that do not belong to current active role
+  const cleanedHand = [];
+  hand.forEach(id => {
+    const c = getCard(id);
+    if (!c) return;
+    if (roleType === 'pitcher') {
+      if (c.type === 'batter') {
+        bDisc.push(id);
+      } else {
+        cleanedHand.push(id);
+      }
+    } else {
+      if (c.type === 'pitcher') {
+        pDisc.push(id);
+      } else {
+        cleanedHand.push(id);
+      }
+    }
+  });
+  hand = cleanedHand;
+
+  // Replenish hand up to 5 cards using role-specific draw pile & recycle discards
+  const TARGET_HAND_SIZE = 5;
+  if (roleType === 'pitcher') {
+    while (hand.length < TARGET_HAND_SIZE) {
+      if (pDeck.length === 0) {
+        if (pDisc.length === 0) {
+          const pList = preset.pitcherCards ? [...preset.pitcherCards] : preset.cards.filter(id => getCard(id)?.type !== 'batter');
+          pDisc = [...pList];
+        }
+        pDeck = shuffleArray(pDisc);
+        pDisc = [];
+      }
+      if (pDeck.length === 0) break;
+      hand.push(pDeck.shift());
+    }
+  } else {
+    while (hand.length < TARGET_HAND_SIZE) {
+      if (bDeck.length === 0) {
+        if (bDisc.length === 0) {
+          const bList = preset.batterCards ? [...preset.batterCards] : preset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+          bDisc = [...bList];
+        }
+        bDeck = shuffleArray(bDisc);
+        bDisc = [];
+      }
+      if (bDeck.length === 0) break;
+      hand.push(bDeck.shift());
+    }
+  }
+
+  gs.hands[role] = hand;
+  gs.pitcherDecks[role] = pDeck;
+  gs.pitcherDiscards[role] = pDisc;
+  gs.batterDecks[role] = bDeck;
+  gs.batterDiscards[role] = bDisc;
+  if (!gs.decks) gs.decks = {};
+  gs.decks[role] = (roleType === 'pitcher') ? pDeck : bDeck;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ROSTER SELECTION
 // ─────────────────────────────────────────────────────────────────────────────
 function renderRosterSelect(g) {
@@ -110,8 +218,13 @@ function renderRosterSelect(g) {
   // Auto-initialize bot roster if playing solo
   if (isBot && myRole === 'host' && !g.rosters?.guest?.ready) {
     const botDeckPreset = DECK_PRESETS.grind || Object.values(DECK_PRESETS)[0];
-    const botDeckCards = shuffleArray([...botDeckPreset.cards]);
-    const botHand = botDeckCards.splice(0, 5);
+    const botPList = botDeckPreset.pitcherCards ? [...botDeckPreset.pitcherCards] : botDeckPreset.cards.filter(id => getCard(id)?.type !== 'batter');
+    const botBList = botDeckPreset.batterCards ? [...botDeckPreset.batterCards] : botDeckPreset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+    const botBDeck = shuffleArray(botBList);
+    const botPDeck = shuffleArray(botPList);
+    // Guest starts batting in 'top' half, so draw 5 batter cards
+    const botHand = botBDeck.splice(0, 5);
+
     const updates = {
       'rosters/guest': {
         name: 'Practice Bot 🤖',
@@ -121,9 +234,13 @@ function renderRosterSelect(g) {
         deckPreset:      'grind',
         ready:           true,
       },
-      'gameState/hands/guest':    botHand,
-      'gameState/decks/guest':    botDeckCards,
-      'gameState/discards/guest': [],
+      'gameState/hands/guest':           botHand,
+      'gameState/batterDecks/guest':     botBDeck,
+      'gameState/batterDiscards/guest':  [],
+      'gameState/pitcherDecks/guest':    botPDeck,
+      'gameState/pitcherDiscards/guest': [],
+      'gameState/decks/guest':           botBDeck,
+      'gameState/discards/guest':        [],
     };
     gameRef().update(updates);
   }
@@ -229,8 +346,19 @@ function submitRoster() {
     return;
   }
 
-  const deckCards = shuffleArray([...DECK_PRESETS[deck].cards]);
-  const hand = deckCards.splice(0, 5);
+  const preset = DECK_PRESETS[deck] || DECK_PRESETS.grind;
+  const pList = preset.pitcherCards ? [...preset.pitcherCards] : preset.cards.filter(id => getCard(id)?.type !== 'batter');
+  const bList = preset.batterCards ? [...preset.batterCards] : preset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+  const pDeck = shuffleArray(pList);
+  const bDeck = shuffleArray(bList);
+
+  // In top of 1st: host pitches (starts with 5 pitcher cards), guest bats (starts with 5 batter cards)
+  let hand = [];
+  if (myRole === 'host') {
+    hand = pDeck.splice(0, 5);
+  } else {
+    hand = bDeck.splice(0, 5);
+  }
 
   gameRef(`rosters/${myRole}`).set({
     startingPitcher: starter,
@@ -242,7 +370,11 @@ function submitRoster() {
 
   // Store initial deck/hand state on game
   gameRef(`gameState/hands/${myRole}`).set(hand);
-  gameRef(`gameState/decks/${myRole}`).set(deckCards);
+  gameRef(`gameState/pitcherDecks/${myRole}`).set(pDeck);
+  gameRef(`gameState/batterDecks/${myRole}`).set(bDeck);
+  gameRef(`gameState/pitcherDiscards/${myRole}`).set([]);
+  gameRef(`gameState/batterDiscards/${myRole}`).set([]);
+  gameRef(`gameState/decks/${myRole}`).set(myRole === 'host' ? pDeck : bDeck);
   gameRef(`gameState/discards/${myRole}`).set([]);
 }
 
@@ -260,10 +392,17 @@ function startGame(g) {
     activePitcher:{ host: g.rosters.host.startingPitcher, guest: g.rosters.guest.startingPitcher },
     pitcherPAs:   { host:0, guest:0 },
     lastPitchCall:{ host:null, guest:null },
-    hands: g.gameState?.hands || { host:[], guest:[] },
-    decks: g.gameState?.decks || { host:[], guest:[] },
-    discards: { host:[], guest:[] },
+    hands:           g.gameState?.hands || { host:[], guest:[] },
+    decks:           g.gameState?.decks || { host:[], guest:[] },
+    discards:        { host:[], guest:[] },
+    pitcherDecks:    g.gameState?.pitcherDecks || { host:[], guest:[] },
+    batterDecks:     g.gameState?.batterDecks || { host:[], guest:[] },
+    pitcherDiscards: g.gameState?.pitcherDiscards || { host:[], guest:[] },
+    batterDiscards:  g.gameState?.batterDiscards || { host:[], guest:[] },
   };
+
+  ensurePlayerDeckAndHand(initialState, g.rosters, 'host');
+  ensurePlayerDeckAndHand(initialState, g.rosters, 'guest');
 
   const paState = {
     phase:     'placing',
@@ -299,8 +438,33 @@ function renderPlay(g) {
   const currentBatterIndex = gs.batterIndex[half] % 9;
   const currentBatterChar  = getBatter(battingLineup[currentBatterIndex]);
 
+  // Safety check: ensure hands are full (5 cards) and role-compatible
+  const myRoleType = iAmBatting ? 'batter' : 'pitcher';
+  const rawHand = gs.hands?.[myRole] || [];
+  const needsRefill = rawHand.length < 5 || rawHand.some(id => {
+    const c = getCard(id);
+    return c && c.type !== 'universal' && c.type !== myRoleType;
+  });
+
+  if (needsRefill) {
+    if (myRole === 'host') {
+      ensurePlayerDeckAndHand(gs, g.rosters, 'host');
+      ensurePlayerDeckAndHand(gs, g.rosters, 'guest');
+      gameRef('gameState').update({
+        hands:           gs.hands,
+        pitcherDecks:    gs.pitcherDecks,
+        batterDecks:     gs.batterDecks,
+        pitcherDiscards: gs.pitcherDiscards,
+        batterDiscards:  gs.batterDiscards,
+      });
+    } else {
+      ensurePlayerDeckAndHand(gs, g.rosters, myRole);
+      gameRef(`gameState/hands/${myRole}`).set(gs.hands[myRole]);
+    }
+  }
+
   // Sync local hand from Firebase
-  localHand = gs.hands[myRole] || [];
+  localHand = gs.hands?.[myRole] || [];
 
   switch(pa.phase) {
     case 'placing':  renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
@@ -358,7 +522,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
 
       <!-- CENTER MARVEL SNAP 3-ZONE BATTLEFIELD -->
       <main class="battlefield">
-        ${renderZoneBoard(pa, iAmBatting, myCommitted, 'placing')}
+        ${renderZoneBoard(pa, iAmBatting, myCommitted, 'placing', null, pitcherChar, batterChar)}
       </main>
 
       <!-- BOTTOM PLAYER DOCK -->
@@ -439,7 +603,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
 
       <!-- CENTER MARVEL SNAP 3-ZONE BATTLEFIELD (REVEALED) -->
       <main class="battlefield">
-        ${renderZoneBoard(pa, battingRole === myRole, true, 'reveal', res)}
+        ${renderZoneBoard(pa, battingRole === myRole, true, 'reveal', res, pitcherChar, batterChar)}
       </main>
 
       <!-- BOTTOM PLAYER DOCK -->
@@ -474,9 +638,9 @@ function renderResolved(g, gs, pa, pitcherChar, batterChar, pitchingRole, battin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ZONE BOARD RENDERING (MARVEL SNAP 3 LOCATIONS DOWN THE MIDDLE)
+// ZONE BOARD RENDERING (MARVEL SNAP 3 LOCATIONS + CENTER ADVANTAGE HUD)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res) {
+function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, batterChar) {
   const myKey  = myRole;
   const oppKey = opponentRole();
   const zones  = ['z1','z2','z3'];
@@ -485,91 +649,199 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res) {
   const zoneMeta = {
     z1: { tag:'Z1: READ',   icon:'🎯', title:'PITCH vs GUESS', summary:'Counters multiply batter value (1.5×–2.0×)' },
     z2: { tag:'Z2: SWING',  icon:'💥', title:'HEAT vs CONTACT', summary:'Margin 15+ triggers K or Hard Contact' },
-    z3: { tag:'Z3: RESULT', icon:'🛡️', title:'SHIFT vs POWER',  summary:'Pitcher shifts counter swing directions' }
+    z3: { tag:'Z3: RESULT', icon:'🛡️', title:'SHIFT vs POWER',  summary:'Max launch angle & ball flight' }
   };
 
-  return `<div class="zones-container">
-    ${zones.map(z => {
-      const myPlaced  = localPlacement[z] || [];
-      const oppPlaced = pa.placement?.[oppKey]?.[z] || [];
-      const meta = zoneMeta[z];
+  // Active character names
+  const batterName  = batterChar?.name || (iAmBatting ? 'You' : 'Opponent');
+  const pitcherName = pitcherChar?.name || (!iAmBatting ? 'You' : 'Opponent');
 
-      let winClass = '';
-      let winBanner = '';
-      let oppScoreDisplay = '0';
-      let myScoreDisplay = String(sumZone(myPlaced, z));
+  // Center Battlefield Advantage Metrics
+  let hitterTotal = 0;
+  let pitcherTotal = 0;
+  let hitterZonesWon = 0;
+  let pitcherZonesWon = 0;
+  let advantageSide = 'neutral';
+  let advantageMargin = 0;
+  let centerStatusTitle = '';
+  let centerStatusSub = '';
 
-      if (revealed && res?.[z]) {
-        const zr = res[z];
-        const youWin = (iAmBatting && zr.winner === 'batter') || (!iAmBatting && zr.winner === 'pitcher');
-        const oppWin = (iAmBatting && zr.winner === 'pitcher') || (!iAmBatting && zr.winner === 'batter');
-        
-        if (zr.winner === 'tie') {
-          winClass = '';
-          winBanner = `<span class="loc-winner-banner tie">TIE</span>`;
-        } else if (youWin) {
-          winClass = 'winner-me';
-          winBanner = `<span class="loc-winner-banner win-me">WIN +${zr.margin}</span>`;
-        } else if (oppWin) {
-          winClass = 'winner-opp';
-          winBanner = `<span class="loc-winner-banner win-opp">LOSE -${zr.margin}</span>`;
+  if (revealed && res) {
+    advantageSide = res.advantageSide || 'neutral';
+    advantageMargin = res.advantageScore || 0;
+    hitterZonesWon = res.zonesWon?.batter || 0;
+    pitcherZonesWon = res.zonesWon?.pitcher || 0;
+
+    hitterTotal = (res.z1?.batterTotal || 0) + (res.z2?.batterTotal || 0) + (res.z3?.batterTotal || 0);
+    pitcherTotal = (res.z1?.pitcherTotal || 0) + (res.z2?.pitcherTotal || 0) + (res.z3?.pitcherTotal || 0);
+
+    if (advantageSide === 'batter') {
+      centerStatusTitle = '🏏 HITTER ADVANTAGE';
+      centerStatusSub = `+${advantageMargin} pts · Won ${hitterZonesWon} of 3 Zones`;
+    } else if (advantageSide === 'pitcher') {
+      centerStatusTitle = '⚾ PITCHER ADVANTAGE';
+      centerStatusSub = `+${advantageMargin} pts · Won ${pitcherZonesWon} of 3 Zones`;
+    } else {
+      centerStatusTitle = '⚖️ EVEN BATTLE';
+      centerStatusSub = `Tied Zones · Neutral Odds`;
+    }
+  } else {
+    // Placing phase: calculate placed power for user side
+    const myTotalVal = ['z1','z2','z3'].reduce((sum, z) => sum + sumZone(localPlacement[z] || [], z), 0);
+    const oppPlacedCount = ['z1','z2','z3'].reduce((sum, z) => sum + (pa.placement?.[oppKey]?.[z] || []).length, 0);
+
+    if (iAmBatting) {
+      hitterTotal = myTotalVal;
+      pitcherTotal = oppPlacedCount > 0 ? `? (${oppPlacedCount})` : '0';
+    } else {
+      pitcherTotal = myTotalVal;
+      hitterTotal = oppPlacedCount > 0 ? `? (${oppPlacedCount})` : '0';
+    }
+
+    centerStatusTitle = '⚔️ 2 OF 3 ZONES TO WIN';
+    centerStatusSub = 'Read · Swing · Result';
+  }
+
+  const centerAdvantageBar = `
+    <div class="center-advantage-hud">
+      <div class="hud-adv-team hitter ${revealed && advantageSide === 'batter' ? 'winner' : ''}">
+        <span class="hud-adv-icon">🏏</span>
+        <div class="hud-adv-meta">
+          <div class="hud-adv-role">HITTER${iAmBatting ? ' (YOU)' : ''}</div>
+          <div class="hud-adv-name">${batterName}</div>
+        </div>
+        <div class="hud-adv-score">
+          <div class="hud-score-num">${hitterTotal}</div>
+          <div class="hud-score-sub">${revealed ? `${hitterZonesWon} won` : 'power'}</div>
+        </div>
+      </div>
+
+      <div class="hud-adv-center ${revealed ? 'revealed' : ''} adv-${advantageSide}">
+        <div class="hud-adv-status-tag">${centerStatusTitle}</div>
+        <div class="hud-adv-status-sub">${centerStatusSub}</div>
+      </div>
+
+      <div class="hud-adv-team pitcher ${revealed && advantageSide === 'pitcher' ? 'winner' : ''}">
+        <div class="hud-adv-score">
+          <div class="hud-score-num">${pitcherTotal}</div>
+          <div class="hud-score-sub">${revealed ? `${pitcherZonesWon} won` : 'power'}</div>
+        </div>
+        <div class="hud-adv-meta">
+          <div class="hud-adv-role">PITCHER${!iAmBatting ? ' (YOU)' : ''}</div>
+          <div class="hud-adv-name">${pitcherName}</div>
+        </div>
+        <span class="hud-adv-icon">⚾</span>
+      </div>
+    </div>`;
+
+  return `
+    ${centerAdvantageBar}
+    <div class="zones-container">
+      ${zones.map(z => {
+        const myPlaced  = localPlacement[z] || [];
+        const oppPlaced = pa.placement?.[oppKey]?.[z] || [];
+        const meta = zoneMeta[z];
+
+        let winClass = '';
+        let oppScoreDisplay = '0';
+        let myScoreDisplay = String(sumZone(myPlaced, z));
+        let zoneAdvantageHtml = '';
+        let cascadeHighlightHtml = '';
+
+        if (revealed && res?.[z]) {
+          const zr = res[z];
+          const youWin = (iAmBatting && zr.winner === 'batter') || (!iAmBatting && zr.winner === 'pitcher');
+          const oppWin = (iAmBatting && zr.winner === 'pitcher') || (!iAmBatting && zr.winner === 'batter');
+          
+          if (zr.winner === 'tie') {
+            winClass = '';
+            zoneAdvantageHtml = `<div class="loc-adv-chip tie">⚖️ TIED</div>`;
+          } else if (zr.winner === 'batter') {
+            winClass = youWin ? 'winner-me' : 'winner-opp';
+            zoneAdvantageHtml = `<div class="loc-adv-chip batter">🏏 Hitter +${zr.margin}</div>`;
+          } else if (zr.winner === 'pitcher') {
+            winClass = youWin ? 'winner-me' : 'winner-opp';
+            zoneAdvantageHtml = `<div class="loc-adv-chip pitcher">⚾ Pitcher +${zr.margin}</div>`;
+          }
+
+          if (z === 'z1' && zr.counterFired) {
+            cascadeHighlightHtml = `<div class="loc-cascade-note counter">🎯 Counter &times;${zr.mult}</div>`;
+          } else if (z === 'z2') {
+            if (zr.hardContact) {
+              cascadeHighlightHtml = `<div class="loc-cascade-note hard">🔥 Hard Contact (&times;2 Z3)</div>`;
+            } else if (zr.cascadeEffect === 'k_swinging') {
+              cascadeHighlightHtml = `<div class="loc-cascade-note k">⚡ Strikeout</div>`;
+            }
+          }
+
+          oppScoreDisplay = String(iAmBatting ? zr.pitcherTotal : zr.batterTotal);
+          myScoreDisplay  = String(iAmBatting ? zr.batterTotal  : zr.pitcherTotal);
+        } else {
+          oppScoreDisplay = oppPlaced.length > 0 ? '?' : '0';
+          if (myPlaced.length > 0) {
+            zoneAdvantageHtml = `<div class="loc-adv-chip placing">${myPlaced.length} placed</div>`;
+          } else {
+            zoneAdvantageHtml = `<div class="loc-adv-chip empty">—</div>`;
+          }
         }
 
-        oppScoreDisplay = String(iAmBatting ? zr.pitcherTotal : zr.batterTotal);
-        myScoreDisplay  = String(iAmBatting ? zr.batterTotal  : zr.pitcherTotal);
-      } else {
-        oppScoreDisplay = oppPlaced.length > 0 ? '?' : '0';
-      }
+        // Opponent cards (TOP)
+        const oppCardsHtml = revealed
+          ? (oppPlaced.map(id => renderMiniPlacedCard(id, z, false)).join('') || '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>')
+          : (oppPlaced.length > 0
+              ? oppPlaced.map(() => '<div class="hidden-opponent-card"><span class="mystery-mark">?</span></div>').join('')
+              : '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>');
 
-      // Opponent cards (TOP)
-      const oppCardsHtml = revealed
-        ? (oppPlaced.map(id => renderMiniPlacedCard(id, z, false)).join('') || '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>')
-        : (oppPlaced.length > 0
-            ? oppPlaced.map(() => '<div class="hidden-opponent-card"><span class="mystery-mark">?</span></div>').join('')
-            : '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>');
+        // Player cards (BOTTOM)
+        const myCardsHtml = myPlaced.map((id, idx) => renderMiniPlacedCard(id, z, !myCommitted, idx)).join('');
+        const canDropHere = !myCommitted && myPlaced.length < ZONE_LIMIT;
+        const dropSlotHtml = canDropHere ? `
+          <div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="placeSelectedCard('${z}')">
+            <span style="font-size:1.1rem;font-weight:900;">+</span>
+          </div>` : '';
 
-      // Player cards (BOTTOM)
-      const myCardsHtml = myPlaced.map((id, idx) => renderMiniPlacedCard(id, z, !myCommitted, idx)).join('');
-      const canDropHere = !myCommitted && myPlaced.length < ZONE_LIMIT;
-      const dropSlotHtml = canDropHere ? `
-        <div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="placeSelectedCard('${z}')">
-          <span style="font-size:1.1rem;font-weight:900;">+</span>
-        </div>` : '';
+        const oppRoleLabel = iAmBatting ? '⚾ Pitcher' : '🏏 Hitter';
+        const myRoleLabel  = iAmBatting ? '🏏 Hitter (You)' : '⚾ Pitcher (You)';
 
-      return `
-        <div class="zone-column zone-${z} ${winClass}" data-zone="${z}">
-          <!-- TOP: OPPONENT PLAYED CARDS -->
-          <div class="zone-slots opponent-slots">
-            ${oppCardsHtml}
-          </div>
-
-          <!-- MIDDLE: MARVEL SNAP LOCATION CARD -->
-          <div class="location-card">
-            <div class="loc-power-badge opp ${winClass === 'winner-opp' ? 'winning' : ''}">
-              ${oppScoreDisplay}
+        return `
+          <div class="zone-column zone-${z} ${winClass}" data-zone="${z}">
+            <!-- TOP: OPPONENT PLAYED CARDS -->
+            <div class="zone-slots opponent-slots">
+              ${oppCardsHtml}
             </div>
 
-            <div class="loc-center-emblem">
-              <div class="loc-zone-tag ${z}">${meta.tag}</div>
-              <div class="loc-icon">${meta.icon}</div>
-              <div class="loc-title">${meta.title}</div>
-              <div class="loc-summary">${meta.summary}</div>
-              ${winBanner}
+            <!-- MIDDLE: MARVEL SNAP LOCATION CARD -->
+            <div class="location-card">
+              <div class="loc-power-badge opp ${winClass === 'winner-opp' ? 'winning' : ''}">
+                <span class="loc-badge-role">${oppRoleLabel}</span>
+                <span class="loc-badge-val">${oppScoreDisplay}</span>
+              </div>
+
+              <div class="loc-center-emblem">
+                <div class="loc-zone-tag ${z}">${meta.tag}</div>
+                <div class="loc-icon">${meta.icon}</div>
+                <div class="loc-title">${meta.title}</div>
+                <div class="loc-summary">${meta.summary}</div>
+                <div class="loc-advantage-strip">
+                  ${zoneAdvantageHtml}
+                </div>
+                ${cascadeHighlightHtml}
+              </div>
+
+              <div class="loc-power-badge mine ${winClass === 'winner-me' ? 'winning' : ''}">
+                <span class="loc-badge-role">${myRoleLabel}</span>
+                <span class="loc-badge-val">${myScoreDisplay}</span>
+              </div>
             </div>
 
-            <div class="loc-power-badge mine ${winClass === 'winner-me' ? 'winning' : ''}">
-              ${myScoreDisplay}
+            <!-- BOTTOM: PLAYER PLAYED CARDS -->
+            <div class="zone-slots my-slots" id="slots-${z}">
+              ${myCardsHtml}
+              ${dropSlotHtml}
             </div>
-          </div>
-
-          <!-- BOTTOM: PLAYER PLAYED CARDS -->
-          <div class="zone-slots my-slots" id="slots-${z}">
-            ${myCardsHtml}
-            ${dropSlotHtml}
-          </div>
-        </div>`;
-    }).join('')}
-  </div>`;
+          </div>`;
+      }).join('')}
+    </div>`;
 }
 
 function renderMiniPlacedCard(id, targetZone, canRemove, index) {
@@ -894,48 +1166,63 @@ function nextPA() {
       if (!g) return;
       const gs = g.gameState || {};
       const pa = g.currentPA || {};
+      const rosters = g.rosters || {};
 
-      const updates = {};
-      const discardsObj = gs.discards || {};
-      const handsObj    = gs.hands    || {};
-      const decksObj    = gs.decks    || {};
+      // 1. Recycle placed cards from current PA into the respective discard collections
+      if (!gs.pitcherDiscards) gs.pitcherDiscards = { host: [], guest: [] };
+      if (!gs.batterDiscards)  gs.batterDiscards  = { host: [], guest: [] };
 
-      ['host','guest'].forEach(role => {
-        let hand = [...(handsObj[role] || [])];
-        let deck = [...(decksObj[role] || [])];
-        let disc = [...(discardsObj[role] || [])];
-
-        if (deck.length === 0 && disc.length > 0) {
-          deck = shuffleArray(disc);
-          disc = [];
-        }
-
-        if (deck.length > 0) {
-          hand.push(deck.shift());
-          if (hand.length > MAX_HAND) {
-            disc.push(hand.shift());
-          }
-        }
-
-        updates[`gameState/hands/${role}`]    = hand;
-        updates[`gameState/decks/${role}`]    = deck;
-        updates[`gameState/discards/${role}`] = disc;
-      });
-
-      // Also move placed cards to discard
       ['host','guest'].forEach(role => {
         const placed = [
           ...(pa.placement?.[role]?.z1 || []),
           ...(pa.placement?.[role]?.z2 || []),
           ...(pa.placement?.[role]?.z3 || []),
         ];
-        const currentDisc = [...(updates[`gameState/discards/${role}`] || discardsObj[role] || [])];
-        placed.forEach(id => currentDisc.push(id));
-        updates[`gameState/discards/${role}`] = currentDisc;
+        placed.forEach(id => {
+          const c = getCard(id);
+          if (!c) return;
+          if (c.type === 'pitcher') {
+            gs.pitcherDiscards[role].push(id);
+          } else if (c.type === 'batter') {
+            gs.batterDiscards[role].push(id);
+          } else {
+            // Universal card: put into whichever deck the player was drawing from
+            const wasPitching = (role === 'host' && (pa.resolution?.half || gs.half) === 'top') ||
+                                (role === 'guest' && (pa.resolution?.half || gs.half) === 'bottom');
+            if (wasPitching) {
+              gs.pitcherDiscards[role].push(id);
+            } else {
+              gs.batterDiscards[role].push(id);
+            }
+          }
+        });
+
+        // Also purge placed cards from hands if lingering
+        let hand = [...(gs.hands?.[role] || [])];
+        placed.forEach(id => {
+          const idx = hand.indexOf(id);
+          if (idx > -1) hand.splice(idx, 1);
+        });
+        if (!gs.hands) gs.hands = {};
+        gs.hands[role] = hand;
       });
+
+      // 2. Refill both players' hands up to 5 role-playable cards for the upcoming PA
+      ensurePlayerDeckAndHand(gs, rosters, 'host');
+      ensurePlayerDeckAndHand(gs, rosters, 'guest');
 
       // Determine next inning/half state (already updated by host in resolveAndAdvance)
       const isGameOver = g.phase === 'gameover';
+
+      const updates = {
+        'gameState/hands':           gs.hands,
+        'gameState/pitcherDecks':    gs.pitcherDecks,
+        'gameState/batterDecks':     gs.batterDecks,
+        'gameState/pitcherDiscards': gs.pitcherDiscards,
+        'gameState/batterDiscards':  gs.batterDiscards,
+        'gameState/decks/host':      gs.pitcherDecks.host || [],
+        'gameState/decks/guest':     gs.pitcherDecks.guest || [],
+      };
 
       if (!isGameOver) {
         updates['currentPA/phase']             = 'placing';

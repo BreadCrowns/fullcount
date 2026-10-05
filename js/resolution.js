@@ -640,60 +640,9 @@ function resolvePA(opts) {
   // Stamina modifier — Zone 2
   pitcherZ2Action += staminaMod.z2;
 
-  // Change of Speed (P17): reduce batter Z2 by 4
-  if ((pitcherPlacement.z2 || []).includes('P17')) {
-    batterZ2Action = Math.max(0, batterZ2Action - 4);
-    log.push('Change of Speed: batter Z2 −4');
-  }
-
-  // Upper Deck (B27): batter's own Z2 −4
-  if ((batterPlacement.z3 || []).includes('B27')) {
-    batterZ2Action = Math.max(0, batterZ2Action - 4);
-    log.push('Upper Deck: batter Z2 −4');
-  }
-
-  // Sequence Breaker (P19): +6 if different pitch than last PA
-  if ((pitcherPlacement.z2 || []).includes('P19') && prevPitchCall && prevPitchCall !== primaryPitchCall) {
-    pitcherZ2Action += 6;
-    log.push('Sequence Breaker: +6 (different pitch)');
-  }
-
-  // High Cheese (P15): +3 if pitch is fastball variant
-  if ((pitcherPlacement.z2 || []).includes('P15') && isFastballVariant(primaryPitchCall)) {
-    pitcherZ2Action += 3;
-    log.push('High Cheese: +3 (fastball variant)');
-  }
-
-  // Bury It (P20): +4 if pitch is breaking ball
-  if ((pitcherPlacement.z2 || []).includes('P20') && isBreakingBall(primaryPitchCall)) {
-    pitcherZ2Action += 4;
-    log.push('Bury It: +4 (breaking ball)');
-  }
-
-  // Late Contact (B17): +4 if pitch was off-speed
-  if ((batterPlacement.z2 || []).includes('B17') && isOffSpeedPitch(primaryPitchCall)) {
-    batterZ2Action += 4;
-    log.push('Late Contact: +4 (off-speed pitch)');
-  }
-
-  // Uncountered Changeup (Slow) bonus — P7: +5 to pitcher Z2 if not countered
-  if ((pitcherPlacement.z1 || []).includes('P7') && !counterResult.counterFired) {
-    pitcherZ2Action += 5;
-    log.push('Changeup (Slow) uncountered: pitcher Z2 +5');
-  }
-
   // Player card Z2 bonuses
   const pitcherZ2Bonus = pitcherChar.zoneBonuses.z2 + smokeBonus;
   let   batterZ2Bonus  = batterChar.zoneBonuses.z2 + readAffinityBonus.z2;
-
-  // Clutch bonus: Captain (BC09) trailing +3
-  if (batterChar.id === 'BC09' && score.batting < score.pitching) {
-    batterZ2Bonus += 3;
-  }
-
-  // Ice Peterson final inning close — double zone bonuses (simplified: +z2 bonus again)
-  const isPetersonClutch = batterChar.id === 'BC06' && inning >= totalInnings && Math.abs(score.batting - score.pitching) <= 1;
-  if (isPetersonClutch) batterZ2Bonus += batterChar.zoneBonuses.z2;
 
   const pitcherZ2Total = pitcherZ2Action + pitcherZ2Bonus;
   const batterZ2Total  = batterZ2Action  + batterZ2Bonus;
@@ -746,10 +695,6 @@ function resolvePA(opts) {
   let pitcherZ3Action = sumZone(pitcherPlacement.z3, 'z3');
   let batterZ3Action  = sumZone(batterPlacement.z3,  'z3');
 
-  // Paint the Corners (P14) / Spotting (P21): +4 to pitcher Z3
-  if ((pitcherPlacement.z2 || []).includes('P14')) { pitcherZ3Action += 4; log.push('Paint the Corners: pitcher Z3 +4'); }
-  if ((pitcherPlacement.z2 || []).includes('P21')) { pitcherZ3Action += 4; log.push('Spotting: pitcher Z3 +4'); }
-
   // Pitch affinity — Zone 3
   for (const aff of (pitcherChar.pitchAffinity || [])) {
     if (aff.zone === 'z3' && pitchTypeCards.some(c => c.pitchCall === aff.pitchCall)) {
@@ -761,47 +706,15 @@ function resolvePA(opts) {
   // Stamina modifier — Zone 3
   pitcherZ3Action += staminaMod.z3;
 
-  // Batter Z2 specials that affect Z3
-  if ((batterPlacement.z2 || []).includes('B12')) { batterZ3Action = Math.max(0, batterZ3Action - 3); log.push('Contact Swing: batter Z3 −3'); }
-  if ((batterPlacement.z2 || []).includes('B14')) { batterZ3Action += 5; log.push('Full Extension: batter Z3 +5'); }
-  if ((batterPlacement.z2 || []).includes('B18') && z2Winner === 'batter') { batterZ3Action += 6; log.push('Barrel It: batter Z3 +6 (won Z2)'); }
-
   // Hard Contact: double batter Z3 action total
-  if (hardContact) { batterZ3Action *= 2; log.push('Hard Contact: batter Z3 ×2'); }
-
-  // Zone 3 defense counters
-  const z3Penalty = checkZ3Counters(batterPlacement.z3, pitcherPlacement.z3, pitcherPlacement.z2);
-  if (z3Penalty < 0) { batterZ3Action += z3Penalty; log.push(`Z3 counters: batter Z3 ${z3Penalty}`); }
-
-  // Inside-Out Swing (B19): reduces shift penalties on batter Z3 by 6
-  if ((batterPlacement.z2 || []).includes('B19')) {
-    // Re-add 6 for each shift card (P23, P28) that was applied (they were already subtracted above)
-    const shiftCards = (pitcherPlacement.z3 || []).filter(id => ['P23','P28'].includes(id));
-    shiftCards.forEach(() => { batterZ3Action = Math.min(batterZ3Action + 6, batterZ3Action + 6); }); // clamp isn't needed here
-    if (shiftCards.length > 0) log.push(`Inside-Out Swing: recovers 6 per shift card (${shiftCards.length})`);
+  if (hardContact) {
+    batterZ3Action *= 2;
+    log.push('Hard Contact: batter Z3 Action doubled (×2)');
   }
 
   // Player card Z3 bonuses
   const pitcherZ3Bonus = pitcherChar.zoneBonuses.z3 + smokeBonus;
   let   batterZ3Bonus  = batterChar.zoneBonuses.z3 + readAffinityBonus.z3;
-
-  // Clutch bonuses
-  const hasRISP = bases.second || bases.third;
-  const hasRunnerOnBase = bases.first || bases.second || bases.third;
-  if (batterChar.id === 'BC01' && hasRISP)         { batterZ3Bonus += 5; log.push('The Bear RISP: +5 Z3'); }
-  if (batterChar.id === 'BC08' && hasRISP)         { batterZ3Bonus += 5; log.push('Jackson runner on base: +5 Z3'); }
-  if (batterChar.id === 'BC12' && hasRISP)         { batterZ3Bonus += 7; log.push('The Bricks RISP: +7 Z3'); }
-  if (batterChar.id === 'BC09' && score.batting < score.pitching) { batterZ3Bonus += 3; log.push('The Captain trailing: +3 Z3'); }
-  if (isPetersonClutch) { batterZ3Bonus += batterChar.zoneBonuses.z3; log.push('Ice Peterson clutch: Z3 bonuses doubled'); }
-  if (batterChar.id === 'BC05' && bases.second)    { batterZ3Bonus += 5; log.push('El Rayo runner on 2nd: +5 Z3'); }
-
-  // Clutch card (B30): double value when trailing
-  const clutchVal = (batterPlacement.z3 || []).filter(id => id === 'B30').length;
-  if (clutchVal > 0 && score.batting < score.pitching) {
-    const cardV = getZoneValue(getCard('B30'), 'z3');
-    batterZ3Action += cardV * clutchVal; // already counted once in sumZone; add another time
-    log.push(`Clutch card: double value while trailing (+${cardV * clutchVal})`);
-  }
 
   const pitcherZ3Total = pitcherZ3Action + pitcherZ3Bonus;
   const batterZ3Total  = batterZ3Action  + batterZ3Bonus;
@@ -881,7 +794,7 @@ function resolvePA(opts) {
         pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
         margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
         pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
-        hardContactActive: hardContact, z3Penalty
+        hardContactActive: hardContact, z3Penalty: 0
       },
       zonesWon: { batter: 3, pitcher: 0 },
       trigger: 'hr', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
@@ -941,7 +854,7 @@ function resolvePA(opts) {
         pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
         margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
         pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
-        hardContactActive: false, z3Penalty
+        hardContactActive: false, z3Penalty: 0
       },
       zonesWon: { batter: 0, pitcher: 3 },
       trigger: 'dp_or_k', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
@@ -1004,7 +917,7 @@ function resolvePA(opts) {
       pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
       margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
       pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
-      hardContactActive: hardContact, z3Penalty
+      hardContactActive: hardContact, z3Penalty: 0
     },
     zonesWon: { batter: batterWins, pitcher: pitcherWins },
     trigger: null, advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
