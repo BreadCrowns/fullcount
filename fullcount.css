@@ -2225,15 +2225,40 @@ body {
   color: var(--text);
   font-size: 0.68rem;
   font-weight: 800;
-  padding: 6px 4px;
+  padding: 4px 4px;
   cursor: pointer;
   text-align: center;
   transition: all 0.15s ease;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 1px;
   white-space: nowrap;
+}
+
+.pitch-btn-main {
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.pitch-btn-main b {
+  color: var(--gold-bright);
+}
+.pitch-choice-btn.selected .pitch-btn-main b {
+  color: #0b0f17;
+}
+
+.pitch-btn-sub {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.pitch-choice-btn.selected .pitch-btn-sub,
+.guess-choice-btn.selected .pitch-btn-sub {
+  color: rgba(11, 15, 23, 0.8);
 }
 
 .pitch-choice-btn:hover:not(:disabled), .guess-choice-btn:hover:not(:disabled) {
@@ -2253,6 +2278,116 @@ body {
   opacity: 0.3;
   cursor: not-allowed;
   border-style: dashed;
+}
+
+/* ── Dial-In Calculator HUD (Beat 1) ────────────────────────────────────────── */
+.dial-in-calculator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(13, 20, 34, 0.85);
+  border: 1px solid var(--border-light);
+  margin: 3px 0 2px 0;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.dial-in-calculator.prompt {
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dial-calc-prompt {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.dial-calc-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.dial-calc-equation b {
+  color: var(--gold-bright);
+}
+
+.calc-op, .calc-eq, .calc-sep {
+  color: var(--text-dim);
+  font-weight: 900;
+  font-size: 0.7rem;
+}
+
+.calc-total b {
+  font-size: 0.85rem;
+  font-family: monospace;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dial-calc-badge {
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.dial-in-calculator.bullseye {
+  border-color: var(--gold);
+  background: rgba(245, 176, 39, 0.16);
+  box-shadow: 0 0 10px rgba(245, 176, 39, 0.35);
+}
+
+.dial-in-calculator.bullseye .dial-calc-badge {
+  color: var(--gold-bright);
+  background: rgba(245, 176, 39, 0.25);
+}
+
+.dial-in-calculator.in-zone {
+  border-color: rgba(46, 213, 115, 0.5);
+  background: rgba(46, 213, 115, 0.08);
+}
+
+.dial-in-calculator.in-zone .dial-calc-badge {
+  color: #2ed573;
+}
+
+.dial-in-calculator.bust {
+  border-color: var(--red);
+  background: rgba(255, 71, 87, 0.15);
+}
+
+.dial-in-calculator.bust .dial-calc-badge {
+  color: #ff6b6b;
+}
+
+.dial-in-calculator.low-ball {
+  border-color: rgba(245, 176, 39, 0.3);
+}
+
+.dial-in-calculator.low-ball .dial-calc-badge {
+  color: var(--gold);
+}
+
+.dial-in-calculator.high-ball {
+  border-color: rgba(238, 82, 83, 0.3);
+}
+
+.dial-in-calculator.high-ball .dial-calc-badge {
+  color: #ffa8a8;
 }
 
 /* Beat Outcome Badges in Zones */

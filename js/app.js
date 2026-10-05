@@ -1031,53 +1031,132 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             zoneAdvantageHtml = `<div class="loc-adv-chip placing">ACTIVE BEAT</div>`;
 
             if (z === 'z1') {
+              const szLow = pitcherChar?.strikeZone?.low || 8;
+              const szHigh = pitcherChar?.strikeZone?.high || 14;
+              const szBullseye = pitcherChar?.strikeZone?.bullseye || 11;
+              const szWildBust = pitcherChar?.strikeZone?.wildBust || 20;
+
               const szInfo = `<div class="strike-zone-info" style="font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:2px;">
-                🎯 Target: <b>${pitcherChar?.strikeZone?.low || 8}–${pitcherChar?.strikeZone?.high || 14}</b> | Bullseye: <b>${pitcherChar?.strikeZone?.bullseye || 11}</b> | Bust: <b>&gt;${pitcherChar?.strikeZone?.wildBust || 20}</b>
+                🎯 Target: <b>${szLow}–${szHigh}</b> | Bullseye: <b>${szBullseye}</b> | Bust: <b>&gt;${szWildBust}</b>
               </div>`;
 
               if (!iAmBatting) {
-                // Pitcher controls
+                // Pitcher controls with live dial-in calculator
+                const basePower = localPitchChoice ? (PITCH_BASE_POWER[localPitchChoice] || 0) : 0;
+                const cardVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
+                const cardObj = localBeatCard ? getCard(localBeatCard) : null;
+                const totalPower = basePower + cardVal;
+
+                let dialInStatusHtml = '';
+                if (localPitchChoice) {
+                  let statusText = '';
+                  let statusClass = '';
+                  if (totalPower === szBullseye) {
+                    statusText = `🎯 BULLSEYE (${totalPower})! Instant Called Strike 3`;
+                    statusClass = 'bullseye';
+                  } else if (totalPower >= szWildBust) {
+                    statusText = `⚠️ WILD PITCH BUST (${totalPower} ≥ ${szWildBust})! Instant Walk`;
+                    statusClass = 'bust';
+                  } else if (totalPower >= szLow && totalPower <= szHigh) {
+                    statusText = `✅ Inside Strike Zone (${totalPower} in ${szLow}–${szHigh})`;
+                    statusClass = 'in-zone';
+                  } else if (totalPower < szLow) {
+                    statusText = `⚾ Low / Ball (${totalPower} < ${szLow}) — Add a card to reach ${szLow}!`;
+                    statusClass = 'low-ball';
+                  } else {
+                    statusText = `⚠️ High Out of Zone (${totalPower} > ${szHigh})`;
+                    statusClass = 'high-ball';
+                  }
+
+                  dialInStatusHtml = `
+                    <div class="dial-in-calculator ${statusClass}">
+                      <div class="dial-calc-equation">
+                        <span class="calc-pitch">${localPitchChoice.toUpperCase()} <b>(+${basePower})</b></span>
+                        <span class="calc-op">+</span>
+                        <span class="calc-card">${cardObj ? `${cardObj.name} <b>(+${cardVal})</b>` : 'No Card <b>(+0)</b>'}</span>
+                        <span class="calc-eq">=</span>
+                        <span class="calc-total"><b>${totalPower}</b></span>
+                      </div>
+                      <div class="dial-calc-badge">${statusText}</div>
+                    </div>`;
+                } else {
+                  dialInStatusHtml = `
+                    <div class="dial-in-calculator prompt">
+                      <span class="dial-calc-prompt">👆 Select a pitch above to see its base strength &amp; dial in your strike zone!</span>
+                    </div>`;
+                }
+
                 centerCustomHtml = `
                   <div class="beat-choice-container">
-                    <div class="beat-choice-title">Pick Pitch:</div>
+                    <div class="beat-choice-title">Pick Pitch &amp; Base Strength:</div>
                     <div class="beat-btn-row">
                       <button class="pitch-choice-btn ${localPitchChoice === 'fastball' ? 'selected' : ''}"
                               onclick="selectPitchCall('fastball')"
                               ${charges.fastball <= 0 && (charges.breaking > 0 || charges.offspeed > 0) ? 'disabled' : ''}>
-                        🔥 Fastball (${charges.fastball ?? 0})
+                        <span class="pitch-btn-main">🔥 Fastball <b>(+8)</b></span>
+                        <span class="pitch-btn-sub">${charges.fastball ?? 0} left</span>
                       </button>
                       <button class="pitch-choice-btn ${localPitchChoice === 'breaking' ? 'selected' : ''}"
                               onclick="selectPitchCall('breaking')"
                               ${charges.breaking <= 0 ? 'disabled' : ''}>
-                        🌀 Breaking (${charges.breaking ?? 0})
+                        <span class="pitch-btn-main">🌀 Breaking <b>(+6)</b></span>
+                        <span class="pitch-btn-sub">${charges.breaking ?? 0} left</span>
                       </button>
                       <button class="pitch-choice-btn ${localPitchChoice === 'offspeed' ? 'selected' : ''}"
                               onclick="selectPitchCall('offspeed')"
                               ${charges.offspeed <= 0 ? 'disabled' : ''}>
-                        ⏱️ Offspeed (${charges.offspeed ?? 0})
+                        <span class="pitch-btn-main">⏱️ Offspeed <b>(+4)</b></span>
+                        <span class="pitch-btn-sub">${charges.offspeed ?? 0} left</span>
                       </button>
                     </div>
+                    ${dialInStatusHtml}
                     ${szInfo}
                   </div>`;
               } else {
-                // Batter controls
+                // Batter controls with counter preview
+                const guessCardVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
+                const guessCardObj = localBeatCard ? getCard(localBeatCard) : null;
+                let batterDialInHtml = '';
+                if (localGuessChoice) {
+                  const gBase = PITCH_BASE_POWER[localGuessChoice] || 0;
+                  const doubledVal = guessCardVal * 2;
+                  batterDialInHtml = `
+                    <div class="dial-in-calculator in-zone">
+                      <div class="dial-calc-equation">
+                        <span class="calc-pitch">Anticipating: <b>${localGuessChoice.toUpperCase()}</b> (Base +${gBase})</span>
+                        <span class="calc-sep">|</span>
+                        <span class="calc-card">${guessCardObj ? `${guessCardObj.name} <b>(+${guessCardVal})</b>` : 'No Card (+0)'}</span>
+                      </div>
+                      <div class="dial-calc-badge">${guessCardObj ? `🎯 Guess correct DOUBLES card power: <b>+${doubledVal}</b> &times;2.0 Counter!` : '💡 Play a card to double its power on a correct guess!'}</div>
+                    </div>`;
+                } else {
+                  batterDialInHtml = `
+                    <div class="dial-in-calculator prompt">
+                      <span class="dial-calc-prompt">👆 Guess the pitch above to counter &amp; steal Reaction Advantage!</span>
+                    </div>`;
+                }
+
                 centerCustomHtml = `
                   <div class="beat-choice-container">
-                    <div class="beat-choice-title">Guess Pitch:</div>
+                    <div class="beat-choice-title">Guess Pitch &amp; Read:</div>
                     <div class="beat-btn-row">
                       <button class="guess-choice-btn ${localGuessChoice === 'fastball' ? 'selected' : ''}"
                               onclick="selectBatterGuess('fastball')">
-                        🔥 Fastball
+                        <span class="pitch-btn-main">🔥 Fastball</span>
+                        <span class="pitch-btn-sub">Base 8</span>
                       </button>
                       <button class="guess-choice-btn ${localGuessChoice === 'breaking' ? 'selected' : ''}"
                               onclick="selectBatterGuess('breaking')">
-                        🌀 Breaking
+                        <span class="pitch-btn-main">🌀 Breaking</span>
+                        <span class="pitch-btn-sub">Base 6</span>
                       </button>
                       <button class="guess-choice-btn ${localGuessChoice === 'offspeed' ? 'selected' : ''}"
                               onclick="selectBatterGuess('offspeed')">
-                        ⏱️ Offspeed
+                        <span class="pitch-btn-main">⏱️ Offspeed</span>
+                        <span class="pitch-btn-sub">Base 4</span>
                       </button>
                     </div>
+                    ${batterDialInHtml}
                     ${szInfo}
                   </div>`;
               }
