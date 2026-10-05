@@ -461,7 +461,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
       </footer>
 
       <!-- OUTCOME MODAL OVERLAY (MARVEL SNAP DRAMATIC REVEAL) -->
-      ${res ? renderOutcomeOverlay(res) : ''}
+      ${res ? renderOutcomeOverlay(res, battingRole === myRole) : ''}
 
       <!-- MATCHUP INTEL DRAWER -->
       ${renderMatchupDrawer(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], pitchingRole === myRole, g.rosters[pitchingRole].reliefPitcher, gs.activePitcher[pitchingRole], batterChar, battingRole === myRole, score, gs, half)}
@@ -1110,21 +1110,250 @@ function renderBatterPanel(batterChar, isMe, score, gs, half) {
     </div>`;
 }
 
-function renderOutcomeOverlay(res) {
+// ─────────────────────────────────────────────────────────────────────────────
+// DETAILED AT-BAT RESOLUTION OVERLAY & CASCADE TIMELINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+function toggleOverlayPeek() {
+  const overlay = document.getElementById('outcome-overlay');
+  if (overlay) {
+    overlay.classList.toggle('peek-mode');
+  }
+}
+window.toggleOverlayPeek = toggleOverlayPeek;
+
+function renderCascadeCardChip(id, targetZone) {
+  const card = getCard(id);
+  if (!card) return '';
+  const prefMap = { read: 'z1', contact: 'z2', result: 'z3' };
+  const isPenalty = card.zone !== 'any' && prefMap[card.zone] !== targetZone;
+  const effectiveVal = getZoneValue(card, targetZone);
+  return `<span class="cascade-card-chip ${isPenalty ? 'penalty' : ''}" title="${card.desc || ''}">
+    <span class="chip-name">${card.name}</span>
+    <span class="chip-val">${effectiveVal}</span>
+    ${isPenalty ? '<span class="chip-pen">(-50%)</span>' : ''}
+  </span>`;
+}
+
+function renderZoneCascadeStep(res, zKey, title, icon, isBatting) {
+  const z = res[zKey];
+  if (!z) return '';
+  const winner = z.winner || 'tie';
+  const youWon = (isBatting && winner === 'batter') || (!isBatting && winner === 'pitcher');
+  const oppWon = (isBatting && winner === 'pitcher') || (!isBatting && winner === 'batter');
+  const winBadge = winner === 'tie'
+    ? '<span class="step-badge tie">TIE</span>'
+    : (youWon ? `<span class="step-badge win">YOU WIN +${z.margin || 0}</span>` : `<span class="step-badge lose">OPPONENT +${z.margin || 0}</span>`);
+
+  const pCards = (z.pitcherCards || []).map(id => renderCascadeCardChip(id, zKey)).join('') || '<span class="no-cards-tag">—</span>';
+  const bCards = (z.batterCards || []).map(id => renderCascadeCardChip(id, zKey)).join('') || '<span class="no-cards-tag">—</span>';
+
+  let extraHtml = '';
+  let cascadeHtml = '';
+
+  if (zKey === 'z1') {
+    if (z.counterFired) {
+      extraHtml += `<div class="cascade-callout counter">🎯 <b>PITCH GUESS COUNTERED!</b> Batter read <b>${(z.pitchCallMatched || '').toUpperCase()}</b> &rarr; Action power multiplied by <b>&times;${z.mult}</b>!</div>`;
+    } else {
+      extraHtml += `<div class="cascade-callout neutral">No pitch guess counter matched in Zone 1.</div>`;
+    }
+
+    if (z.cascadeEffect === 'walk') {
+      cascadeHtml = `<div class="cascade-trigger-alert walk">🟡 <b>INSTANT WALK TRIGGERED!</b> Batter won Zone 1 by ${z.margin} &ge; 10. Plate appearance concludes immediately!</div>`;
+    } else if (z.cascadeEffect === 'called_k') {
+      cascadeHtml = `<div class="cascade-trigger-alert k">⚫ <b>INSTANT CALLED STRIKE 3!</b> Pitcher won Zone 1 by ${z.margin} &ge; 10. Plate appearance concludes immediately!</div>`;
+    } else if (winner !== 'tie') {
+      cascadeHtml = `<div class="cascade-effect-banner">⬇️ <b>MOMENTUM CASCADE:</b> <b>+3 points</b> awarded to <b>${winner.toUpperCase()}</b> in Zone 2!</div>`;
+    } else {
+      cascadeHtml = `<div class="cascade-effect-banner neutral">⬇️ Zone 1 tied &mdash; no momentum bonus into Zone 2.</div>`;
+    }
+  } else if (zKey === 'z2') {
+    if (z.z1Inheritance && z.z1Inheritance !== 'tie' && z.z1Inheritance !== 'none') {
+      extraHtml += `<div class="cascade-callout bonus">⚡ <b>+3 Momentum from Zone 1</b> active for ${z.z1Inheritance.toUpperCase()}</div>`;
+    }
+
+    if (z.cascadeEffect === 'k_swinging') {
+      cascadeHtml = `<div class="cascade-trigger-alert k">⚡ <b>INSTANT STRIKEOUT SWINGING!</b> Pitcher won Zone 2 by ${z.margin} &ge; 15. Plate appearance concludes immediately!</div>`;
+    } else if (z.hardContact) {
+      cascadeHtml = `<div class="cascade-trigger-alert hard-contact">🔥 <b>HARD CONTACT ACHIEVED!</b> Batter won Zone 2 by ${z.margin} &ge; 15 &rarr; Batter Zone 3 Action power is <b>DOUBLED (&times;2)</b>!</div>`;
+    } else {
+      cascadeHtml = `<div class="cascade-effect-banner neutral">⬇️ Solid contact made &mdash; standard power carried into Zone 3.</div>`;
+    }
+  } else if (zKey === 'z3') {
+    if (z.hardContactActive) {
+      extraHtml += `<div class="cascade-callout hard-contact">🔥 <b>Hard Contact Active:</b> Batter action points doubled (&times;2)!</div>`;
+    }
+    if (z.z3Penalty && z.z3Penalty < 0) {
+      extraHtml += `<div class="cascade-callout penalty">🛡️ <b>Defensive Shift:</b> Subtracted ${Math.abs(z.z3Penalty)} pts from batter power</div>`;
+    }
+    cascadeHtml = `<div class="cascade-effect-banner">🏁 Zone 3 resolved for <b>${winner.toUpperCase()}</b>. Proceeding to Advantage Tally &amp; Outcome Roll.</div>`;
+  }
+
+  return `
+    <div class="cascade-step-card step-${zKey}">
+      <div class="step-header">
+        <div class="step-title">
+          <span class="step-icon">${icon}</span>
+          <span class="step-name">${title}</span>
+        </div>
+        ${winBadge}
+      </div>
+
+      <div class="step-matchup-row">
+        <div class="step-team batter">
+          <div class="team-label">🏏 Batter (${res.batterCharName || 'Batter'})</div>
+          <div class="team-cards">${bCards}</div>
+          <div class="team-score">Zone Total: <b>${z.batterTotal}</b></div>
+        </div>
+        <div class="step-vs">VS</div>
+        <div class="step-team pitcher">
+          <div class="team-label">⚾ Pitcher (${res.pitcherCharName || 'Pitcher'})</div>
+          <div class="team-cards">${pCards}</div>
+          <div class="team-score">Zone Total: <b>${z.pitcherTotal}</b></div>
+        </div>
+      </div>
+
+      ${extraHtml}
+      ${cascadeHtml}
+    </div>`;
+}
+
+function renderRngSection(res, isBatting) {
+  const o = res.outcome || {};
+  const rng = o.rng || {};
+  const adv = res.advantageSide || 'neutral';
+  const score = res.advantageScore || 0;
+  const zonesWon = res.zonesWon || {};
+
+  const isSweep = res.trigger === 'hr' || res.trigger === 'dp_or_k';
+  const isKnockout = res.trigger === 'walk' || res.trigger === 'called_k' || res.trigger === 'k_swinging';
+
+  let oddsHtml = '';
+  if (rng.odds && rng.odds.length > 0) {
+    oddsHtml = `
+      <div class="rng-odds-container">
+        <div class="odds-title">🎲 OUTCOME ODDS FOR THIS ADVANTAGE TIER (${rng.tier || ''}):</div>
+        <div class="odds-pills">
+          ${rng.odds.map(odd => {
+            const isSelected = (o.display || '').toLowerCase().includes(odd.label.toLowerCase()) || 
+                               (odd.label.toLowerCase().includes('home run') && o.type === 'hr') ||
+                               (odd.label.toLowerCase().includes('strikeout') && o.type === 'k') ||
+                               (odd.label.toLowerCase().includes('double') && o.type === 'double') ||
+                               (odd.label.toLowerCase().includes('single') && o.type === 'single') ||
+                               (odd.label.toLowerCase().includes('triple') && o.type === 'triple');
+            return `<div class="odds-pill ${isSelected ? 'selected' : ''}">
+              <span class="odds-label">${odd.label}</span>
+              <span class="odds-pct">${odd.pct}%</span>
+              ${odd.range ? `<span class="odds-range">${odd.range}</span>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  let rollResultHtml = '';
+  if (rng.rollPct !== null && rng.rollPct !== undefined && !isKnockout && !isSweep) {
+    rollResultHtml = `
+      <div class="rng-roll-box">
+        <span class="roll-dice-icon">🎲</span>
+        <div class="roll-meta">
+          <div class="roll-value">RNG Dice Roll: <b>${rng.rollPct}%</b></div>
+          <div class="roll-result-text">Selected: <b class="chosen-outcome">${o.display}</b></div>
+        </div>
+      </div>`;
+  } else if (isSweep) {
+    rollResultHtml = `
+      <div class="rng-roll-box sweep">
+        <span class="roll-dice-icon">⭐</span>
+        <div class="roll-meta">
+          <div class="roll-value"><b>3-Zone Dominant Sweep!</b> (Score &ge; 30)</div>
+          <div class="roll-result-text">Guaranteed: <b class="chosen-outcome">${o.display}</b> (No RNG roll required)</div>
+        </div>
+      </div>`;
+  } else if (isKnockout) {
+    rollResultHtml = `
+      <div class="rng-roll-box knockout">
+        <span class="roll-dice-icon">⚡</span>
+        <div class="roll-meta">
+          <div class="roll-value"><b>Zone Knockout Triggered!</b></div>
+          <div class="roll-result-text">Guaranteed: <b class="chosen-outcome">${o.display}</b> (No RNG roll required)</div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="cascade-step-card step-rng">
+      <div class="step-header">
+        <div class="step-title">
+          <span class="step-icon">⚖️</span>
+          <span class="step-name">Zone Majority &amp; Final Resolution</span>
+        </div>
+        <span class="step-badge adv-${adv}">${adv.toUpperCase()} ADVANTAGE</span>
+      </div>
+
+      <div class="adv-summary-bar">
+        <div class="adv-tally">
+          Zones Won: 🏏 Batter <b>${zonesWon.batter ?? '—'}</b> &middot; ⚾ Pitcher <b>${zonesWon.pitcher ?? '—'}</b>
+        </div>
+        <div class="adv-score-tag">
+          Advantage Power: <b>${score} pts</b>
+        </div>
+      </div>
+
+      ${oddsHtml}
+      ${rollResultHtml}
+    </div>`;
+}
+
+function renderOutcomeOverlay(res, isBatting = false) {
   if (!res?.outcome) return '';
   const o = res.outcome;
+
+  const runsText = o.runsScored > 0
+    ? `<div class="outcome-runs">🏠 <b>${o.runsScored} RUN${o.runsScored > 1 ? 'S' : ''} SCORED!</b></div>`
+    : `<div class="outcome-runs muted">No runs scored &middot; Outs added: ${o.outsAdded}</div>`;
+
   return `
-    <div class="outcome-overlay">
+    <div class="outcome-overlay" id="outcome-overlay">
+      <!-- PEEK DOCK BAR (ONLY VISIBLE IN PEEK MODE) -->
+      <div class="outcome-peek-bar">
+        <button class="btn-peek-restore" onclick="toggleOverlayPeek()">📊 Show Zone Cascade</button>
+        <button class="btn-primary btn-next-batter" onclick="nextPA()">Next Batter &rarr;</button>
+      </div>
+
+      <!-- MAIN EXPANDED OUTCOME CARD OVER MAIN BOARD -->
       <div class="outcome-card">
-        <div class="outcome-headline">${o.display}</div>
-        ${o.runsScored > 0 ? `<div class="outcome-runs">🏠 ${o.runsScored} RUN${o.runsScored > 1 ? 'S' : ''} SCORED!</div>` : '<div class="outcome-runs" style="color:var(--text-muted);font-size:0.9rem;">No runs scored</div>'}
-        <div class="outcome-zone-recap">
-          ${res.z1?.winner ? `<div>Z1 (Read): Batter ${res.z1.batterTotal} vs Pitcher ${res.z1.pitcherTotal} → <b>${res.z1.winner.toUpperCase()}</b>${res.z1.counterFired ? ` (Counter ×${res.z1.mult})` : ''}</div>` : ''}
-          ${res.z2?.winner ? `<div>Z2 (Swing): Batter ${res.z2.batterTotal} vs Pitcher ${res.z2.pitcherTotal} → <b>${res.z2.winner.toUpperCase()}</b>${res.z2.hardContact ? ' (Hard Contact!)' : ''}</div>` : ''}
-          ${res.z3?.winner ? `<div>Z3 (Result): Batter ${res.z3.batterTotal} vs Pitcher ${res.z3.pitcherTotal} → <b>${res.z3.winner.toUpperCase()}</b></div>` : ''}
-          ${res.advantageSide !== 'neutral' ? `<div class="outcome-adv-score">Advantage: ${res.advantageSide.toUpperCase()} (${res.advantageScore})</div>` : ''}
+        <div class="outcome-card-topbar">
+          <span class="at-bat-tag">⚾ AT-BAT RESOLUTION</span>
+          <button class="btn-peek-board" onclick="toggleOverlayPeek()" title="Temporarily hide overlay to view raw board cards">
+            👁️ Peek Board
+          </button>
         </div>
-        <button class="btn-primary btn-next-batter" onclick="nextPA()">Next Batter →</button>
+
+        <div class="outcome-headline">${o.display}</div>
+        ${runsText}
+
+        <!-- SEQUENTIAL ZONE CASCADE TIMELINE -->
+        <div class="cascade-flow-container">
+          ${renderZoneCascadeStep(res, 'z1', 'Zone 1: Pitch &amp; Read', '🎯', isBatting)}
+          ${renderZoneCascadeStep(res, 'z2', 'Zone 2: Contact &amp; Swing', '💥', isBatting)}
+          ${renderZoneCascadeStep(res, 'z3', 'Zone 3: Result &amp; Defense', '🛡️', isBatting)}
+          ${renderRngSection(res, isBatting)}
+        </div>
+
+        <!-- FULL RAW LOG DETAILS -->
+        ${res.log && res.log.length > 0 ? `
+          <details class="outcome-calc-details">
+            <summary>📜 Play-by-Play Calculation Log (${res.log.length} events)</summary>
+            <pre>${res.log.join('\n')}</pre>
+          </details>
+        ` : ''}
+
+        <!-- ACTION FOOTER -->
+        <div class="outcome-actions-footer">
+          <button class="btn-primary btn-next-batter" onclick="nextPA()">Next Batter &rarr;</button>
+          <button class="btn-peek-secondary" onclick="toggleOverlayPeek()">👁️ Inspect Board Underneath</button>
+        </div>
       </div>
     </div>`;
 }

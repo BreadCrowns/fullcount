@@ -158,55 +158,295 @@ function advanceBases(bases, spaces) {
 
 function getOutcome(advantageScore, side, bases) {
   const r = Math.random();
+  const rollPct = Math.round(r * 100);
 
   if (side === 'neutral' || advantageScore < 1) {
-    return { type:'out', display:'Groundout', runsScored:0, outsAdded:1, newBases:{ ...bases, first:false } };
+    return {
+      type: 'out',
+      display: 'Groundout',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases, first: false },
+      rng: {
+        rollPct: 0,
+        tier: 'Neutral Advantage (Score < 1)',
+        odds: [{ label: 'Groundout', pct: 100, range: '0–100%' }]
+      }
+    };
   }
 
   if (side === 'batter') {
     if (advantageScore >= 50) {
-      return { type:'hr', display:'🚀 HOME RUN!', runsScored:1+countRunners(bases), outsAdded:0, newBases:{first:false,second:false,third:false} };
+      return {
+        type: 'hr',
+        display: '🚀 HOME RUN!',
+        runsScored: 1 + countRunners(bases),
+        outsAdded: 0,
+        newBases: { first: false, second: false, third: false },
+        rng: {
+          rollPct,
+          tier: 'Batter Advantage 50+ (Maximum Power)',
+          odds: [{ label: 'Home Run 🚀', pct: 100, range: '0–100%' }]
+        }
+      };
     }
     if (advantageScore >= 40) {
-      if (r < 0.55) return { type:'hr', display:'💥 HOME RUN!', runsScored:1+countRunners(bases), outsAdded:0, newBases:{first:false,second:false,third:false} };
-      return { type:'triple', display:'🔥 TRIPLE!', runsScored:runsOnHit(bases,3), outsAdded:0, newBases:advanceBases(bases,3) };
+      const odds = [
+        { label: 'Home Run 💥', pct: 55, range: '0–54%' },
+        { label: 'Triple 🔥', pct: 45, range: '55–99%' }
+      ];
+      if (r < 0.55) {
+        return {
+          type: 'hr',
+          display: '💥 HOME RUN!',
+          runsScored: 1 + countRunners(bases),
+          outsAdded: 0,
+          newBases: { first: false, second: false, third: false },
+          rng: { rollPct, tier: 'Batter Advantage 40–49 (Elite Contact)', odds }
+        };
+      }
+      return {
+        type: 'triple',
+        display: '🔥 TRIPLE!',
+        runsScored: runsOnHit(bases, 3),
+        outsAdded: 0,
+        newBases: advanceBases(bases, 3),
+        rng: { rollPct, tier: 'Batter Advantage 40–49 (Elite Contact)', odds }
+      };
     }
     if (advantageScore >= 30) {
-      if (r < 0.15) return { type:'hr', display:'⚾ HOME RUN!', runsScored:1+countRunners(bases), outsAdded:0, newBases:{first:false,second:false,third:false} };
-      if (r < 0.50) return { type:'triple', display:'🔥 TRIPLE!', runsScored:runsOnHit(bases,3), outsAdded:0, newBases:advanceBases(bases,3) };
-      return { type:'double', display:'Double!', runsScored:runsOnHit(bases,2), outsAdded:0, newBases:advanceBases(bases,2) };
+      const odds = [
+        { label: 'Home Run ⚾', pct: 15, range: '0–14%' },
+        { label: 'Triple 🔥', pct: 35, range: '15–49%' },
+        { label: 'Double ⚡', pct: 50, range: '50–99%' }
+      ];
+      if (r < 0.15) {
+        return {
+          type: 'hr',
+          display: '⚾ HOME RUN!',
+          runsScored: 1 + countRunners(bases),
+          outsAdded: 0,
+          newBases: { first: false, second: false, third: false },
+          rng: { rollPct, tier: 'Batter Advantage 30–39 (Extra-Base Power)', odds }
+        };
+      }
+      if (r < 0.50) {
+        return {
+          type: 'triple',
+          display: '🔥 TRIPLE!',
+          runsScored: runsOnHit(bases, 3),
+          outsAdded: 0,
+          newBases: advanceBases(bases, 3),
+          rng: { rollPct, tier: 'Batter Advantage 30–39 (Extra-Base Power)', odds }
+        };
+      }
+      return {
+        type: 'double',
+        display: 'Double!',
+        runsScored: runsOnHit(bases, 2),
+        outsAdded: 0,
+        newBases: advanceBases(bases, 2),
+        rng: { rollPct, tier: 'Batter Advantage 30–39 (Extra-Base Power)', odds }
+      };
     }
     if (advantageScore >= 20) {
-      if (r < 0.40) return { type:'double', display:'Double!', runsScored:runsOnHit(bases,2), outsAdded:0, newBases:advanceBases(bases,2) };
-      if (r < 0.75) return { type:'single', display:'Single!', runsScored:runsOnHit(bases,1), outsAdded:0, newBases:advanceBases(bases,1) };
-      return { type:'out', display:'Hard hit — out at 1st', runsScored:0, outsAdded:1, newBases:{...bases} };
+      const odds = [
+        { label: 'Double ⚡', pct: 40, range: '0–39%' },
+        { label: 'Single', pct: 35, range: '40–74%' },
+        { label: 'Hard Out', pct: 25, range: '75–99%' }
+      ];
+      if (r < 0.40) {
+        return {
+          type: 'double',
+          display: 'Double!',
+          runsScored: runsOnHit(bases, 2),
+          outsAdded: 0,
+          newBases: advanceBases(bases, 2),
+          rng: { rollPct, tier: 'Batter Advantage 20–29 (Solid Hit)', odds }
+        };
+      }
+      if (r < 0.75) {
+        return {
+          type: 'single',
+          display: 'Single!',
+          runsScored: runsOnHit(bases, 1),
+          outsAdded: 0,
+          newBases: advanceBases(bases, 1),
+          rng: { rollPct, tier: 'Batter Advantage 20–29 (Solid Hit)', odds }
+        };
+      }
+      return {
+        type: 'out',
+        display: 'Hard hit — out at 1st',
+        runsScored: 0,
+        outsAdded: 1,
+        newBases: { ...bases },
+        rng: { rollPct, tier: 'Batter Advantage 20–29 (Solid Hit)', odds }
+      };
     }
     if (advantageScore >= 10) {
-      if (r < 0.50) return { type:'single', display:'Single!', runsScored:runsOnHit(bases,1), outsAdded:0, newBases:advanceBases(bases,1) };
-      if (r < 0.80) return { type:'out', display:'Flyout', runsScored:0, outsAdded:1, newBases:{...bases} };
       const rbi = bases.second || bases.third;
-      return { type:'single', display: rbi ? 'RBI Single!' : 'Single!', runsScored:runsOnHit(bases,1), outsAdded:0, newBases:advanceBases(bases,1) };
+      const odds = [
+        { label: 'Single', pct: 50, range: '0–49%' },
+        { label: 'Flyout', pct: 30, range: '50–79%' },
+        { label: rbi ? 'RBI Single' : 'Single', pct: 20, range: '80–99%' }
+      ];
+      if (r < 0.50) {
+        return {
+          type: 'single',
+          display: 'Single!',
+          runsScored: runsOnHit(bases, 1),
+          outsAdded: 0,
+          newBases: advanceBases(bases, 1),
+          rng: { rollPct, tier: 'Batter Advantage 10–19 (Contact Chance)', odds }
+        };
+      }
+      if (r < 0.80) {
+        return {
+          type: 'out',
+          display: 'Flyout',
+          runsScored: 0,
+          outsAdded: 1,
+          newBases: { ...bases },
+          rng: { rollPct, tier: 'Batter Advantage 10–19 (Contact Chance)', odds }
+        };
+      }
+      return {
+        type: 'single',
+        display: rbi ? 'RBI Single!' : 'Single!',
+        runsScored: runsOnHit(bases, 1),
+        outsAdded: 0,
+        newBases: advanceBases(bases, 1),
+        rng: { rollPct, tier: 'Batter Advantage 10–19 (Contact Chance)', odds }
+      };
     }
     // 1–9
-    if (r < 0.30) return { type:'single', display:'Infield Single!', runsScored:0, outsAdded:0, newBases:advanceBases(bases,1) };
-    return { type:'out', display:'Weak Groundout', runsScored:0, outsAdded:1, newBases:{...bases} };
+    const odds = [
+      { label: 'Infield Single', pct: 30, range: '0–29%' },
+      { label: 'Weak Groundout', pct: 70, range: '30–99%' }
+    ];
+    if (r < 0.30) {
+      return {
+        type: 'single',
+        display: 'Infield Single!',
+        runsScored: 0,
+        outsAdded: 0,
+        newBases: advanceBases(bases, 1),
+        rng: { rollPct, tier: 'Batter Advantage 1–9 (Weak Advantage)', odds }
+      };
+    }
+    return {
+      type: 'out',
+      display: 'Weak Groundout',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: { rollPct, tier: 'Batter Advantage 1–9 (Weak Advantage)', odds }
+    };
   }
 
   // Pitcher advantage
-  if (advantageScore >= 50) return { type:'k', display:'⚡ STRIKEOUT! (Dominant)', runsScored:0, outsAdded:1, newBases:{...bases} };
-  if (advantageScore >= 40) return { type:'k', display:'⚡ STRIKEOUT! Punchout!',  runsScored:0, outsAdded:1, newBases:{...bases} };
-  if (advantageScore >= 30) return { type:'k', display:'⚡ STRIKEOUT!',             runsScored:0, outsAdded:1, newBases:{...bases} };
+  if (advantageScore >= 50) {
+    return {
+      type: 'k',
+      display: '⚡ STRIKEOUT! (Dominant)',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: { rollPct, tier: 'Pitcher Advantage 50+ (Absolute Dominance)', odds: [{ label: 'Strikeout ⚡', pct: 100, range: '0–100%' }] }
+    };
+  }
+  if (advantageScore >= 40) {
+    return {
+      type: 'k',
+      display: '⚡ STRIKEOUT! Punchout!',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: { rollPct, tier: 'Pitcher Advantage 40–49 (Elite Strikeout)', odds: [{ label: 'Strikeout ⚡', pct: 100, range: '0–100%' }] }
+    };
+  }
+  if (advantageScore >= 30) {
+    return {
+      type: 'k',
+      display: '⚡ STRIKEOUT!',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: { rollPct, tier: 'Pitcher Advantage 30–39 (High Strikeout)', odds: [{ label: 'Strikeout ⚡', pct: 100, range: '0–100%' }] }
+    };
+  }
   if (advantageScore >= 20) {
-    if (r < 0.60) return { type:'k',   display:'Strikeout', runsScored:0, outsAdded:1, newBases:{...bases} };
-    return              { type:'out', display:'Groundout',  runsScored:0, outsAdded:1, newBases:{...bases} };
+    const odds = [
+      { label: 'Strikeout ⚡', pct: 60, range: '0–59%' },
+      { label: 'Groundout', pct: 40, range: '60–99%' }
+    ];
+    if (r < 0.60) {
+      return {
+        type: 'k',
+        display: 'Strikeout',
+        runsScored: 0,
+        outsAdded: 1,
+        newBases: { ...bases },
+        rng: { rollPct, tier: 'Pitcher Advantage 20–29 (Put-Away Count)', odds }
+      };
+    }
+    return {
+      type: 'out',
+      display: 'Groundout',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: { rollPct, tier: 'Pitcher Advantage 20–29 (Put-Away Count)', odds }
+    };
   }
   if (advantageScore >= 10) {
-    if (r < 0.75) return { type:'out',    display:'Groundout / Flyout', runsScored:0, outsAdded:1, newBases:{...bases} };
-    return              { type:'single', display:'Weak Single',         runsScored:0, outsAdded:0, newBases:advanceBases(bases,1) };
+    const odds = [
+      { label: 'Groundout / Flyout', pct: 75, range: '0–74%' },
+      { label: 'Weak Single', pct: 25, range: '75–99%' }
+    ];
+    if (r < 0.75) {
+      return {
+        type: 'out',
+        display: 'Groundout / Flyout',
+        runsScored: 0,
+        outsAdded: 1,
+        newBases: { ...bases },
+        rng: { rollPct, tier: 'Pitcher Advantage 10–19 (Pitcher In-Play)', odds }
+      };
+    }
+    return {
+      type: 'single',
+      display: 'Weak Single',
+      runsScored: 0,
+      outsAdded: 0,
+      newBases: advanceBases(bases, 1),
+      rng: { rollPct, tier: 'Pitcher Advantage 10–19 (Pitcher In-Play)', odds }
+    };
   }
   // 1–9
-  if (r < 0.10) return { type:'single', display:'Bloop Single', runsScored:0, outsAdded:0, newBases:advanceBases(bases,1) };
-  return               { type:'out',    display:'Groundout',     runsScored:0, outsAdded:1, newBases:{...bases} };
+  const odds = [
+    { label: 'Groundout', pct: 90, range: '0–89%' },
+    { label: 'Bloop Single', pct: 10, range: '90–99%' }
+  ];
+  if (r < 0.10) {
+    return {
+      type: 'single',
+      display: 'Bloop Single',
+      runsScored: 0,
+      outsAdded: 0,
+      newBases: advanceBases(bases, 1),
+      rng: { rollPct, tier: 'Pitcher Advantage 1–9 (Low Pitcher Edge)', odds }
+    };
+  }
+  return {
+    type: 'out',
+    display: 'Groundout',
+    runsScored: 0,
+    outsAdded: 1,
+    newBases: { ...bases },
+    rng: { rollPct, tier: 'Pitcher Advantage 1–9 (Low Pitcher Edge)', odds }
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -317,14 +557,66 @@ function resolvePA(opts) {
     log.push('Patient Eye: walk probability +10% (flavour)');
 
   if (z1Margin >= walkThreshold) {
-    const outcome = { type:'walk', display:'🟡 WALK — Ball four!', runsScored:0, outsAdded:0, newBases:advanceBases(bases,1) };
+    const outcome = {
+      type: 'walk',
+      display: '🟡 WALK — Ball four!',
+      runsScored: 0,
+      outsAdded: 0,
+      newBases: advanceBases(bases, 1),
+      rng: {
+        rollPct: 0,
+        tier: `Zone 1 Knockout: Batter Margin ${Math.round(z1Margin)} ≥ ${walkThreshold}`,
+        odds: [{ label: 'Walk 🟡', pct: 100, range: 'Instant' }],
+        isTrigger: true
+      }
+    };
     log.push(`TRIGGER: Walk (margin ${Math.round(z1Margin)} ≥ ${walkThreshold})`);
-    return buildResult({ z1:{pitcherTotal:Math.round(pitcherZ1Total),batterTotal:Math.round(batterZ1Total),margin:Math.round(Math.abs(z1Margin)),winner:z1Winner,counterFired:counterResult.counterFired,counterCardId:counterResult.counterCardId,pitchCallMatched:counterResult.pitchCallMatched,mult:counterResult.multiplier}, z2:{}, z3:{}, trigger:'walk', advantageSide:'batter', advantageScore:0, outcome, log, staminaState, primaryPitchCall });
+    return buildResult({
+      z1: {
+        pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+        margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+        pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+        counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+        pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+        cascadeEffect: 'walk'
+      },
+      z2: { pitcherTotal: 0, batterTotal: 0, margin: 0, winner: 'none', pitcherCards: [], batterCards: [], cascadeEffect: 'Skipped (Walk)' },
+      z3: { pitcherTotal: 0, batterTotal: 0, margin: 0, winner: 'none', pitcherCards: [], batterCards: [], cascadeEffect: 'Skipped (Walk)' },
+      zonesWon: { batter: 1, pitcher: 0 },
+      trigger: 'walk', advantageSide: 'batter', advantageScore: Math.round(batterZ1Total), outcome, log, staminaState, primaryPitchCall,
+      pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
+    });
   }
   if (-z1Margin >= 10) {
-    const outcome = { type:'k', display:'⚫ Called Strike 3!', runsScored:0, outsAdded:1, newBases:{...bases} };
+    const outcome = {
+      type: 'k',
+      display: '⚫ Called Strike 3!',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: {
+        rollPct: 0,
+        tier: `Zone 1 Knockout: Pitcher Margin ${Math.round(-z1Margin)} ≥ 10`,
+        odds: [{ label: 'Called Strike 3 ⚫', pct: 100, range: 'Instant' }],
+        isTrigger: true
+      }
+    };
     log.push(`TRIGGER: Called Strike 3 (pitcher margin ${Math.round(-z1Margin)} ≥ 10)`);
-    return buildResult({ z1:{pitcherTotal:Math.round(pitcherZ1Total),batterTotal:Math.round(batterZ1Total),margin:Math.round(Math.abs(z1Margin)),winner:z1Winner,counterFired:counterResult.counterFired,counterCardId:counterResult.counterCardId,pitchCallMatched:counterResult.pitchCallMatched,mult:counterResult.multiplier}, z2:{}, z3:{}, trigger:'called_k', advantageSide:'pitcher', advantageScore:0, outcome, log, staminaState, primaryPitchCall });
+    return buildResult({
+      z1: {
+        pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+        margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+        pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+        counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+        pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+        cascadeEffect: 'called_k'
+      },
+      z2: { pitcherTotal: 0, batterTotal: 0, margin: 0, winner: 'none', pitcherCards: [], batterCards: [], cascadeEffect: 'Skipped (Called K)' },
+      z3: { pitcherTotal: 0, batterTotal: 0, margin: 0, winner: 'none', pitcherCards: [], batterCards: [], cascadeEffect: 'Skipped (Called K)' },
+      zonesWon: { batter: 0, pitcher: 1 },
+      trigger: 'called_k', advantageSide: 'pitcher', advantageScore: Math.round(pitcherZ1Total), outcome, log, staminaState, primaryPitchCall,
+      pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
+    });
   }
 
   // ── ZONE 2 ─────────────────────────────────────────────────────────────────
@@ -414,9 +706,40 @@ function resolvePA(opts) {
   // Strikeout Swinging trigger
   const kImmune = (batterPlacement.z2 || []).some(id => ['B13','B16'].includes(id)) || batterChar.id === 'BC02';
   if (-z2Margin >= 15 && !kImmune) {
-    const outcome = { type:'k', display:'⚡ STRIKEOUT SWINGING!', runsScored:0, outsAdded:1, newBases:{...bases} };
+    const outcome = {
+      type: 'k',
+      display: '⚡ STRIKEOUT SWINGING!',
+      runsScored: 0,
+      outsAdded: 1,
+      newBases: { ...bases },
+      rng: {
+        rollPct: 0,
+        tier: `Zone 2 Knockout: Pitcher Margin ${Math.round(-z2Margin)} ≥ 15`,
+        odds: [{ label: 'Strikeout Swinging ⚡', pct: 100, range: 'Instant' }],
+        isTrigger: true
+      }
+    };
     log.push('TRIGGER: Strikeout Swinging (pitcher margin ≥ 15)');
-    return buildResult({ z1:{pitcherTotal:Math.round(pitcherZ1Total),batterTotal:Math.round(batterZ1Total),margin:Math.round(Math.abs(z1Margin)),winner:z1Winner,counterFired:counterResult.counterFired,counterCardId:counterResult.counterCardId,pitchCallMatched:counterResult.pitchCallMatched,mult:counterResult.multiplier}, z2:{pitcherTotal:Math.round(pitcherZ2Total),batterTotal:Math.round(batterZ2Total),margin:Math.round(Math.abs(z2Margin)),winner:z2Winner,hardContact}, z3:{}, trigger:'k_swinging', advantageSide:'pitcher', advantageScore:0, outcome, log, staminaState, primaryPitchCall });
+    return buildResult({
+      z1: {
+        pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+        margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+        pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+        counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+        pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+        cascadeEffect: z1Winner !== 'tie' ? `+3 momentum into Zone 2 for ${z1Winner}` : 'None'
+      },
+      z2: {
+        pitcherTotal: Math.round(pitcherZ2Total), batterTotal: Math.round(batterZ2Total),
+        margin: Math.round(Math.abs(z2Margin)), winner: z2Winner,
+        pitcherCards: [...(pitcherPlacement.z2 || [])], batterCards: [...(batterPlacement.z2 || [])],
+        hardContact, cascadeEffect: 'k_swinging'
+      },
+      z3: { pitcherTotal: 0, batterTotal: 0, margin: 0, winner: 'none', pitcherCards: [], batterCards: [], cascadeEffect: 'Skipped (Strikeout)' },
+      zonesWon: { batter: z1Winner === 'batter' ? 1 : 0, pitcher: (z1Winner === 'pitcher' ? 1 : 0) + 1 },
+      trigger: 'k_swinging', advantageSide: 'pitcher', advantageScore: Math.round(pitcherZ1Total + pitcherZ2Total), outcome, log, staminaState, primaryPitchCall,
+      pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
+    });
   }
 
   // ── ZONE 3 ─────────────────────────────────────────────────────────────────
@@ -522,22 +845,108 @@ function resolvePA(opts) {
 
   // ── ZONE 3 SPECIAL TRIGGERS ─────────────────────────────────────────────────
   if (advantageSide === 'batter' && batterWins === 3 && advantageScore >= 30) {
-    const outcome = { type:'hr', display:'🚀💥 HOME RUN! SLAMMED!', runsScored:1+countRunners(bases), outsAdded:0, newBases:{first:false,second:false,third:false} };
+    const outcome = {
+      type: 'hr',
+      display: '🚀💥 HOME RUN! SLAMMED!',
+      runsScored: 1 + countRunners(bases),
+      outsAdded: 0,
+      newBases: { first: false, second: false, third: false },
+      rng: {
+        rollPct: 0,
+        tier: `Dominant Sweep: Win All 3 Zones & Advantage Score ${advantageScore} ≥ 30`,
+        odds: [{ label: 'Home Run 🚀💥', pct: 100, range: 'Instant' }],
+        isTrigger: true
+      }
+    };
     log.push('TRIGGER: Home Run (win all 3 zones, score ≥ 30)');
     // Jackson: HR counts as 2 runs
     if (batterChar.id === 'BC08') { outcome.runsScored += 1; outcome.display += ' (Tape Measure — 2 runs!)'; }
-    return buildResult({ z1:{pitcherTotal:Math.round(pitcherZ1Total),batterTotal:Math.round(batterZ1Total),margin:Math.round(Math.abs(z1Margin)),winner:z1Winner,counterFired:counterResult.counterFired,counterCardId:counterResult.counterCardId,pitchCallMatched:counterResult.pitchCallMatched,mult:counterResult.multiplier}, z2:{pitcherTotal:Math.round(pitcherZ2Total),batterTotal:Math.round(batterZ2Total),margin:Math.round(Math.abs(z2Margin)),winner:z2Winner,hardContact}, z3:{pitcherTotal:Math.round(pitcherZ3Total),batterTotal:Math.round(batterZ3Total),margin:Math.round(Math.abs(z3Margin)),winner:z3Winner}, trigger:'hr', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall });
+    return buildResult({
+      z1: {
+        pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+        margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+        pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+        counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+        pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+        cascadeEffect: '+3 momentum into Zone 2 for batter'
+      },
+      z2: {
+        pitcherTotal: Math.round(pitcherZ2Total), batterTotal: Math.round(batterZ2Total),
+        margin: Math.round(Math.abs(z2Margin)), winner: z2Winner,
+        pitcherCards: [...(pitcherPlacement.z2 || [])], batterCards: [...(batterPlacement.z2 || [])],
+        hardContact,
+        cascadeEffect: hardContact ? '🔥 Hard Contact! Doubles (×2) Zone 3 Action' : 'Solid contact'
+      },
+      z3: {
+        pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
+        margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
+        pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
+        hardContactActive: hardContact, z3Penalty
+      },
+      zonesWon: { batter: 3, pitcher: 0 },
+      trigger: 'hr', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
+      pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
+    });
   }
 
   if (advantageSide === 'pitcher' && pitcherWins === 3 && advantageScore >= 30) {
     let outcome;
     if (bases.first) {
-      outcome = { type:'dp', display:'🔄 DOUBLE PLAY!', runsScored:0, outsAdded:2, newBases:{...bases, first:false, second:bases.first} };
+      outcome = {
+        type: 'dp',
+        display: '🔄 DOUBLE PLAY!',
+        runsScored: 0,
+        outsAdded: 2,
+        newBases: { ...bases, first: false, second: bases.first },
+        rng: {
+          rollPct: 0,
+          tier: `Dominant Sweep: Pitcher Win All 3 Zones & Score ${advantageScore} ≥ 30`,
+          odds: [{ label: 'Double Play 🔄', pct: 100, range: 'Instant' }],
+          isTrigger: true
+        }
+      };
     } else {
-      outcome = { type:'k', display:'⚫⚡ STRIKEOUT LOOKING!', runsScored:0, outsAdded:1, newBases:{...bases} };
+      outcome = {
+        type: 'k',
+        display: '⚫⚡ STRIKEOUT LOOKING!',
+        runsScored: 0,
+        outsAdded: 1,
+        newBases: { ...bases },
+        rng: {
+          rollPct: 0,
+          tier: `Dominant Sweep: Pitcher Win All 3 Zones & Score ${advantageScore} ≥ 30`,
+          odds: [{ label: 'Strikeout Looking ⚫⚡', pct: 100, range: 'Instant' }],
+          isTrigger: true
+        }
+      };
     }
     log.push('TRIGGER: Dominant pitcher (win all 3 zones, score ≥ 30)');
-    return buildResult({ z1:{pitcherTotal:Math.round(pitcherZ1Total),batterTotal:Math.round(batterZ1Total),margin:Math.round(Math.abs(z1Margin)),winner:z1Winner,counterFired:counterResult.counterFired,counterCardId:counterResult.counterCardId,pitchCallMatched:counterResult.pitchCallMatched,mult:counterResult.multiplier}, z2:{pitcherTotal:Math.round(pitcherZ2Total),batterTotal:Math.round(batterZ2Total),margin:Math.round(Math.abs(z2Margin)),winner:z2Winner,hardContact}, z3:{pitcherTotal:Math.round(pitcherZ3Total),batterTotal:Math.round(batterZ3Total),margin:Math.round(Math.abs(z3Margin)),winner:z3Winner}, trigger:'dp_or_k', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall });
+    return buildResult({
+      z1: {
+        pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+        margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+        pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+        counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+        pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+        cascadeEffect: '+3 momentum into Zone 2 for pitcher'
+      },
+      z2: {
+        pitcherTotal: Math.round(pitcherZ2Total), batterTotal: Math.round(batterZ2Total),
+        margin: Math.round(Math.abs(z2Margin)), winner: z2Winner,
+        pitcherCards: [...(pitcherPlacement.z2 || [])], batterCards: [...(batterPlacement.z2 || [])],
+        hardContact: false,
+        cascadeEffect: 'Pitcher suppressed contact'
+      },
+      z3: {
+        pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
+        margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
+        pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
+        hardContactActive: false, z3Penalty
+      },
+      zonesWon: { batter: 0, pitcher: 3 },
+      trigger: 'dp_or_k', advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
+      pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
+    });
   }
 
   // ── GENERAL OUTCOME ─────────────────────────────────────────────────────────
@@ -545,7 +954,18 @@ function resolvePA(opts) {
 
   // Double Play Depth (P27): groundout with runner on 1st → DP
   if (outcome.type === 'out' && (pitcherPlacement.z3 || []).includes('P27') && bases.first) {
-    outcome = { type:'dp', display:'🔄 Double Play! (Double Play Depth)', runsScored:0, outsAdded:2, newBases:{...bases, first:false} };
+    outcome = {
+      type: 'dp',
+      display: '🔄 Double Play! (Double Play Depth)',
+      runsScored: 0,
+      outsAdded: 2,
+      newBases: { ...bases, first: false },
+      rng: {
+        rollPct: outcome.rng?.rollPct || 0,
+        tier: outcome.rng?.tier || 'In-Play Out',
+        odds: [{ label: 'Double Play 🔄', pct: 100, range: 'Modified by Double Play Depth' }]
+      }
+    };
     log.push('Double Play Depth: groundout → Double Play');
   }
 
@@ -565,10 +985,30 @@ function resolvePA(opts) {
   log.push(`OUTCOME: ${outcome.display} (runs: ${outcome.runsScored}, outs: ${outcome.outsAdded})`);
 
   return buildResult({
-    z1:{ pitcherTotal:Math.round(pitcherZ1Total), batterTotal:Math.round(batterZ1Total), margin:Math.round(Math.abs(z1Margin)), winner:z1Winner, counterFired:counterResult.counterFired, counterCardId:counterResult.counterCardId, pitchCallMatched:counterResult.pitchCallMatched, mult:counterResult.multiplier },
-    z2:{ pitcherTotal:Math.round(pitcherZ2Total), batterTotal:Math.round(batterZ2Total), margin:Math.round(Math.abs(z2Margin)), winner:z2Winner, hardContact },
-    z3:{ pitcherTotal:Math.round(pitcherZ3Total), batterTotal:Math.round(batterZ3Total), margin:Math.round(Math.abs(z3Margin)), winner:z3Winner },
+    z1: {
+      pitcherTotal: Math.round(pitcherZ1Total), batterTotal: Math.round(batterZ1Total),
+      margin: Math.round(Math.abs(z1Margin)), winner: z1Winner,
+      pitcherCards: [...(pitcherPlacement.z1 || [])], batterCards: [...(batterPlacement.z1 || [])],
+      counterFired: counterResult.counterFired, counterCardId: counterResult.counterCardId,
+      pitchCallMatched: counterResult.pitchCallMatched, mult: counterResult.multiplier,
+      cascadeEffect: z1Winner !== 'tie' ? `+3 momentum into Zone 2 for ${z1Winner}` : 'None'
+    },
+    z2: {
+      pitcherTotal: Math.round(pitcherZ2Total), batterTotal: Math.round(batterZ2Total),
+      margin: Math.round(Math.abs(z2Margin)), winner: z2Winner,
+      pitcherCards: [...(pitcherPlacement.z2 || [])], batterCards: [...(batterPlacement.z2 || [])],
+      hardContact,
+      cascadeEffect: hardContact ? '🔥 Hard Contact! Doubles (×2) Zone 3 Action' : 'Solid contact'
+    },
+    z3: {
+      pitcherTotal: Math.round(pitcherZ3Total), batterTotal: Math.round(batterZ3Total),
+      margin: Math.round(Math.abs(z3Margin)), winner: z3Winner,
+      pitcherCards: [...(pitcherPlacement.z3 || [])], batterCards: [...(batterPlacement.z3 || [])],
+      hardContactActive: hardContact, z3Penalty
+    },
+    zonesWon: { batter: batterWins, pitcher: pitcherWins },
     trigger: null, advantageSide, advantageScore, outcome, log, staminaState, primaryPitchCall,
+    pitcherCharName: pitcherChar?.name || 'Pitcher', batterCharName: batterChar?.name || 'Batter'
   });
 }
 

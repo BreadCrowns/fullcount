@@ -116,6 +116,10 @@
 
       assert(paResult && paResult.outcome && paResult.outcome.type, `resolvePA returns valid outcome (${paResult?.outcome?.display})`);
       assert(Array.isArray(paResult.log) && paResult.log.length > 0, `resolvePA produces play-by-play log with ${paResult?.log?.length} entries`);
+      assert(paResult.outcome.rng && typeof paResult.outcome.rng.tier === 'string', `resolvePA provides RNG tier breakdown (${paResult.outcome.rng.tier})`);
+      assert(Array.isArray(paResult.z1.pitcherCards) && Array.isArray(paResult.z1.batterCards), `resolvePA records cards in Zone 1`);
+      assert(paResult.z2.cascadeEffect !== undefined, `resolvePA records cascade effect from Zone 2 (${paResult.z2.cascadeEffect})`);
+      assert(paResult.zonesWon && typeof paResult.zonesWon.batter === 'number', `resolvePA records zone tally (batter: ${paResult.zonesWon.batter}, pitcher: ${paResult.zonesWon.pitcher})`);
 
       // 8. Practice Bot Placement Tests
       const pitcherBotHand = ['P1', 'P13', 'P23']; // Fastball (read/z1), Extra Heat (contact/z2), Infield Shift (result/z3)
