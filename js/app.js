@@ -248,122 +248,82 @@ function ensurePlayerDeckAndHand(gs, rosters, role) {
 // ROSTER SELECTION
 // ─────────────────────────────────────────────────────────────────────────────
 function renderRosterSelect(g) {
-  const isBot = Boolean(g.isSolo || g.guest?.isBot);
-
-  // Auto-initialize bot roster if playing solo
-  if (isBot && myRole === 'host' && !g.rosters?.guest?.ready) {
-    const botDeckPreset = DECK_PRESETS.grind || Object.values(DECK_PRESETS)[0];
-    const botPList = botDeckPreset.pitcherCards ? [...botDeckPreset.pitcherCards] : botDeckPreset.cards.filter(id => getCard(id)?.type !== 'batter');
-    const botBList = botDeckPreset.batterCards ? [...botDeckPreset.batterCards] : botDeckPreset.cards.filter(id => getCard(id)?.type !== 'pitcher');
-    const botBDeck = shuffleArray(botBList);
-    const botPDeck = shuffleArray(botPList);
-    // Guest starts batting in 'top' half, so draw 5 batter cards
-    const botHand = botBDeck.splice(0, 5);
-
-    const updates = {
-      'rosters/guest': {
-        name: 'Practice Bot 🤖',
-        startingPitcher: 'PC01', // Marcus Cole (The Ace)
-        reliefPitcher:   'PC02', // Jackson Vance
-        lineup:          LINEUP_PRESETS.balanced.lineup,
-        deckPreset:      'grind',
-        ready:           true,
-      },
-      'gameState/hands/guest':           botHand,
-      'gameState/batterDecks/guest':     botBDeck,
-      'gameState/batterDiscards/guest':  [],
-      'gameState/pitcherDecks/guest':    botPDeck,
-      'gameState/pitcherDiscards/guest': [],
-      'gameState/decks/guest':           botBDeck,
-      'gameState/discards/guest':        [],
-    };
-    gameRef().update(updates);
-  }
-
-  const myRoster = g.rosters?.[myRole];
-  if (myRoster?.ready) {
-    const oppRoster = g.rosters?.[opponentRole()];
-    if (oppRoster?.ready) {
-      // Both ready — host starts game
-      if (myRole === 'host') startGame(g);
-    } else {
-      document.getElementById('app').innerHTML = `
-        <div class="phase-screen">
-          <h2>Roster locked in! ✅</h2>
-          <p>Waiting for opponent to finish their selection…</p>
-        </div>`;
-    }
-    return;
-  }
-
-  const pitcherOptions = Object.values(PITCHER_CHARACTERS).map((p, idx) => `
-    <label class="card-option">
-      <input type="radio" name="starter" value="${p.id}" ${idx === 0 ? 'checked' : ''}>
-      <div class="player-card-mini" style="border-color:${p.color}">
-        <div class="pc-name">${p.name}</div>
-        <div class="pc-arch">${p.archetype}</div>
-        <div class="pc-zones">Z1: <b>${p.zoneBonuses.z1>=0?'+':''}${p.zoneBonuses.z1}</b> &nbsp; Z2: <b>${p.zoneBonuses.z2>=0?'+':''}${p.zoneBonuses.z2}</b> &nbsp; Z3: <b>${p.zoneBonuses.z3>=0?'+':''}${p.zoneBonuses.z3}</b></div>
-        <div class="pc-stamina">⏱ Fresh: 0–${p.stamina.freshMax} PA</div>
-      </div>
-    </label>`).join('');
-
-  const reliefOptions = Object.values(PITCHER_CHARACTERS).map((p, idx) => `
-    <label class="card-option">
-      <input type="radio" name="relief" value="${p.id}" ${idx === 1 ? 'checked' : ''}>
-      <div class="player-card-mini" style="border-color:${p.color}">
-        <div class="pc-name">${p.name}</div>
-        <div class="pc-arch">${p.archetype}</div>
-        <div class="pc-zones">Z1: <b>${p.zoneBonuses.z1>=0?'+':''}${p.zoneBonuses.z1}</b> &nbsp; Z2: <b>${p.zoneBonuses.z2>=0?'+':''}${p.zoneBonuses.z2}</b> &nbsp; Z3: <b>${p.zoneBonuses.z3>=0?'+':''}${p.zoneBonuses.z3}</b></div>
-        <div class="pc-stamina">⏱ Fresh: 0–${p.stamina.freshMax} PA</div>
-      </div>
-    </label>`).join('');
-
-  const lineupOptions = Object.entries(LINEUP_PRESETS).map(([key,lp], idx) => `
-    <label class="card-option">
-      <input type="radio" name="lineup" value="${key}" ${idx === 0 ? 'checked' : ''}>
-      <div class="preset-card">
-        <div class="pc-name">${lp.name}</div>
-        <div class="pc-desc">${lp.desc}</div>
-        <div class="lineup-mini">${lp.lineup.map(id => `<span class="batter-chip" style="border-color:${getBatter(id)?.color||'#888'}">${getBatter(id)?.name.replace(/"/g,'').split(' ')[0] || id}</span>`).join(' ')}</div>
-      </div>
-    </label>`).join('');
-
-  const deckOptions = Object.entries(DECK_PRESETS).map(([key,dp], idx) => `
-    <label class="card-option">
-      <input type="radio" name="deck" value="${key}" ${idx === 0 ? 'checked' : ''}>
-      <div class="preset-card">
-        <div class="pc-name">${dp.name}</div>
-        <div class="pc-desc">${dp.desc}</div>
-      </div>
-    </label>`).join('');
-
   document.getElementById('app').innerHTML = `
-    <div class="roster-screen">
+    <div class="phase-screen">
       <div class="logo-small">⚾ FULL COUNT</div>
-      <h2>Build Your Team</h2>
-
-      <section>
-        <h3>Starting Pitcher</h3>
-        <div class="card-option-grid">${pitcherOptions}</div>
-      </section>
-
-      <section>
-        <h3>Relief Pitcher</h3>
-        <div class="card-option-grid">${reliefOptions}</div>
-      </section>
-
-      <section>
-        <h3>Batting Lineup</h3>
-        <div class="card-option-grid">${lineupOptions}</div>
-      </section>
-
-      <section>
-        <h3>Action Deck</h3>
-        <div class="card-option-grid">${deckOptions}</div>
-      </section>
-
-      <button class="btn-primary" onclick="submitRoster()">Lock In Roster ✅</button>
+      <h2 style="color:var(--gold-bright);">⚡ Skipping Team Building...</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">Auto-assigning default pitchers and lineups to jump straight into gameplay!</p>
     </div>`;
+
+  if (myRole === 'host' && !window._autoStartingGame) {
+    window._autoStartingGame = true;
+    autoAssignRostersAndStart(g);
+  }
+}
+
+function autoAssignRostersAndStart(g) {
+  const hostPreset = DECK_PRESETS.grind;
+  const guestPreset = DECK_PRESETS.grind;
+
+  const hostPList = hostPreset.pitcherCards ? [...hostPreset.pitcherCards] : hostPreset.cards.filter(id => getCard(id)?.type !== 'batter');
+  const hostBList = hostPreset.batterCards ? [...hostPreset.batterCards] : hostPreset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+  const hostPDeck = shuffleArray(hostPList);
+  const hostBDeck = shuffleArray(hostBList);
+  // Host pitches in top of 1st, so starts with 5 pitcher cards
+  const hostHand = hostPDeck.splice(0, 5);
+
+  const guestPList = guestPreset.pitcherCards ? [...guestPreset.pitcherCards] : guestPreset.cards.filter(id => getCard(id)?.type !== 'batter');
+  const guestBList = guestPreset.batterCards ? [...guestPreset.batterCards] : guestPreset.cards.filter(id => getCard(id)?.type !== 'pitcher');
+  const guestPDeck = shuffleArray(guestPList);
+  const guestBDeck = shuffleArray(guestBList);
+  // Guest bats in top of 1st, so starts with 5 batter cards
+  const guestHand = guestBDeck.splice(0, 5);
+
+  const updates = {
+    'rosters/host': {
+      name: g.host?.name || 'Player 1 (Host)',
+      startingPitcher: 'PC01', // "Big Jake" Harmon (Power Pitcher)
+      reliefPitcher:   'PC07', // "Setup Man" Kowalski
+      lineup:          LINEUP_PRESETS.sluggers.lineup,
+      deckPreset:      'grind',
+      ready:           true,
+    },
+    'rosters/guest': {
+      name: g.guest?.name || (g.isSolo || g.guest?.isBot ? 'Practice Bot 🤖' : 'Player 2 (Guest)'),
+      startingPitcher: 'PC02', // "El Arte" Medina (Control Artist)
+      reliefPitcher:   'PC08', // "The Wizard" Chen
+      lineup:          LINEUP_PRESETS.balanced.lineup,
+      deckPreset:      'grind',
+      ready:           true,
+    },
+    'gameState/hands/host':           hostHand,
+    'gameState/pitcherDecks/host':    hostPDeck,
+    'gameState/batterDecks/host':     hostBDeck,
+    'gameState/pitcherDiscards/host': [],
+    'gameState/batterDiscards/host':  [],
+    'gameState/decks/host':           hostPDeck,
+    'gameState/discards/host':        [],
+
+    'gameState/hands/guest':           guestHand,
+    'gameState/pitcherDecks/guest':    guestPDeck,
+    'gameState/batterDecks/guest':     guestBDeck,
+    'gameState/pitcherDiscards/guest': [],
+    'gameState/batterDiscards/guest':  [],
+    'gameState/decks/guest':           guestBDeck,
+    'gameState/discards/guest':        [],
+  };
+
+  gameRef().update(updates).then(() => {
+    gameRef().once('value', snap => {
+      const liveG = snap.val();
+      if (liveG && liveG.phase === 'roster') {
+        startGame(liveG);
+      }
+    });
+  }).catch(err => {
+    console.error('autoAssignRostersAndStart error:', err);
+    window._autoStartingGame = false;
+  });
 }
 
 function submitRoster() {
@@ -1201,19 +1161,175 @@ function formatOutcomeEffect(effect) {
   }
 }
 
+function getCardBeatLabel(card) {
+  if (!card) return 'UNI';
+  if (card.zone === 'read') return 'BEAT 1';
+  if (card.zone === 'contact' || card.zone === 'result') return 'BEAT 2';
+  return 'UNI';
+}
+window.getCardBeatLabel = getCardBeatLabel;
+
+let _holdTimer = null;
+let _holdCardId = null;
+let _isHolding = false;
+let _holdStartX = 0;
+let _holdStartY = 0;
+
+function startCardHold(cardId, e) {
+  _holdCardId = cardId;
+  _isHolding = false;
+  if (e && e.clientX !== undefined) {
+    _holdStartX = e.clientX;
+    _holdStartY = e.clientY;
+  }
+  clearTimeout(_holdTimer);
+  _holdTimer = setTimeout(() => {
+    _isHolding = true;
+    if (navigator.vibrate) navigator.vibrate(35);
+    showCardMagnifier(cardId);
+  }, 350);
+}
+window.startCardHold = startCardHold;
+
+function cancelCardHold(e) {
+  clearTimeout(_holdTimer);
+}
+window.cancelCardHold = cancelCardHold;
+
+function onCardPointerMove(e) {
+  if (e && _holdStartX && _holdStartY) {
+    const dx = Math.abs(e.clientX - _holdStartX);
+    const dy = Math.abs(e.clientY - _holdStartY);
+    if (dx > 10 || dy > 10) {
+      clearTimeout(_holdTimer);
+    }
+  }
+}
+window.onCardPointerMove = onCardPointerMove;
+
+function handleCardClick(cardId, idx, e) {
+  if (_isHolding) {
+    _isHolding = false;
+    return;
+  }
+  clearTimeout(_holdTimer);
+  selectCard(cardId, idx);
+}
+window.handleCardClick = handleCardClick;
+
+function showCardMagnifier(cardId) {
+  const card = getCard(cardId);
+  if (!card) return;
+
+  const beatLabel = getCardBeatLabel(card);
+  const beatClass = beatLabel === 'BEAT 1' ? 'beat1' : (beatLabel === 'BEAT 2' ? 'beat2' : 'universal');
+  const roleLabel = card.type === 'pitcher' ? '⚾ PITCHER' : (card.type === 'batter' ? '🏏 BATTER' : '✨ UNIVERSAL');
+
+  let tipText = '';
+  if (card.zone === 'read') {
+    tipText = '<b>Beat 1 Strategy:</b> Play alongside your pitch call or guess to push your total power toward the Strike Zone target. Aim for Bullseye to strike out the batter!';
+  } else if (card.zone === 'contact' || card.zone === 'result') {
+    tipText = '<b>Beat 2 Strategy:</b> In Beat 2, your card is added to your opponent\'s card to determine launch angle. Center values produce Hits and Home Runs; low values induce Groundouts; high values induce Flyouts.';
+  } else {
+    tipText = '<b>Universal Strategy:</b> Can be played in either Beat 1 (The Pitch) or Beat 2 (The Batted Ball) with zero penalties.';
+  }
+
+  let effectHtml = '';
+  if (card.outcomeEffect) {
+    effectHtml = `
+      <div class="mag-effect-box">
+        <div class="mag-effect-tag">⚡ SIGNATURE HIGHLIGHT EFFECT</div>
+        <div class="mag-effect-text">${formatOutcomeEffect(card.outcomeEffect)}</div>
+      </div>`;
+  }
+
+  const liveGS = window._lastGameState?.gameState;
+  const half = liveGS?.half || 'top';
+  const isBatting = (myRole === 'host') ? (half === 'bottom') : (half === 'top');
+  const isPitching = !isBatting;
+  const canPlay = isCardActiveForRole(card, isBatting, isPitching);
+
+  const modalHtml = `
+    <div class="card-inspector-overlay" id="card-inspector-overlay" onclick="closeCardMagnifier(event)">
+      <div class="card-inspector-modal" onclick="event.stopPropagation()">
+        <button class="btn-close-inspector" onclick="closeCardMagnifier(event)" aria-label="Close">&times;</button>
+        
+        <div class="magnified-card ${card.type} ${beatClass}">
+          <div class="mag-top-strip">
+            <span class="mag-role-pill ${card.type}">${roleLabel}</span>
+            <span class="mag-beat-pill ${beatClass}">${beatLabel}</span>
+          </div>
+
+          <div class="mag-card-body">
+            <div class="mag-name-row">
+              <h2 class="mag-card-name">${card.name}</h2>
+              <div class="mag-val-badge">
+                <span class="mag-val-plus">+</span>
+                <span class="mag-val-number">${card.value}</span>
+                <span class="mag-val-sub">POWER</span>
+              </div>
+            </div>
+
+            <div class="mag-desc-box">
+              <div class="mag-box-label">CARD EFFECT &amp; DETAILS</div>
+              <p class="mag-full-desc">${card.desc}</p>
+            </div>
+
+            ${effectHtml}
+
+            <div class="mag-strategy-box">
+              <div class="mag-box-label">COACH'S INTEL</div>
+              <p class="mag-tip-text">${tipText}</p>
+            </div>
+          </div>
+
+          <div class="mag-actions-row">
+            ${canPlay ? `
+              <button class="btn-primary mag-play-btn" onclick="playInspectedCard('${card.id}')">
+                Play This Card
+              </button>
+            ` : ''}
+            <button class="btn-secondary mag-close-btn" onclick="closeCardMagnifier(event)">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const existing = document.getElementById('card-inspector-overlay');
+  if (existing) existing.remove();
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+window.showCardMagnifier = showCardMagnifier;
+
+function closeCardMagnifier(e) {
+  if (e) e.stopPropagation();
+  const el = document.getElementById('card-inspector-overlay');
+  if (el) el.remove();
+}
+window.closeCardMagnifier = closeCardMagnifier;
+
+function playInspectedCard(cardId) {
+  closeCardMagnifier();
+  selectCard(cardId);
+}
+window.playInspectedCard = playInspectedCard;
+
 function renderMiniPlacedCard(id, targetZone, canRemove, index) {
   const card = getCard(id);
   if (!card) return '';
   const effectiveVal = card.value || 0;
 
   return `
-    <div class="placed-card" ${canRemove ? `onclick="removeBeatCard()"` : ''} title="${card.desc}">
+    <div class="placed-card" onclick="${canRemove ? 'removeBeatCard()' : `showCardMagnifier('${id}')`}" title="${canRemove ? 'Click to remove' : 'Click to inspect'}">
       <div class="zone-indicator ${card.zone}"></div>
       <div class="card-info">
         <span class="card-title">${card.name}</span>
         ${card.outcomeEffect ? `<span class="outcome-effect-badge" style="font-size:0.5rem;padding:0 3px;">${formatOutcomeEffect(card.outcomeEffect)}</span>` : ''}
       </div>
-      <span class="power-badge">${effectiveVal}</span>
+      <span class="power-badge">+${effectiveVal}</span>
       ${canRemove ? '<span class="remove-btn">✕</span>' : ''}
     </div>`;
 }
@@ -1237,6 +1353,8 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
         const inPlacement = isInPlacement(id);
         const isActive = isCardActiveForRole(card, iAmBatting, iAmPitching) && !inPlacement && !myCommitted;
         const isSelected = (selectedCard === id) || (localBeatCard === id);
+        const beatTag = getCardBeatLabel(card);
+        const beatTagClass = beatTag === 'BEAT 1' ? 'beat1' : (beatTag === 'BEAT 2' ? 'beat2' : 'any');
 
         let dynamicOutcomeHtml = '';
         if (currentBeat === 'beat2' && oppFirstVal !== null && spectrum.length > 0) {
@@ -1250,11 +1368,17 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
 
         return `
           <div class="hand-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''} ${inPlacement ? 'in-zone' : ''}"
-               onclick="${isActive ? `selectCard('${id}', ${idx})` : ''}"
-               title="${card.desc}">
+               onpointerdown="startCardHold('${id}', event)"
+               onpointermove="onCardPointerMove(event)"
+               onpointerup="cancelCardHold(event)"
+               onpointerleave="cancelCardHold(event)"
+               oncontextmenu="event.preventDefault(); showCardMagnifier('${id}')"
+               onclick="${isActive ? `handleCardClick('${id}', ${idx}, event)` : `showCardMagnifier('${id}')`}"
+               title="Hold down to inspect full card view">
+            <button class="hc-inspect-btn" onclick="event.stopPropagation(); showCardMagnifier('${id}')" title="Inspect Card Details">🔍</button>
             <div class="hand-card-header">
-              <span class="hc-tag ${card.zone}">${card.zone === 'any' ? 'UNI' : card.zone.toUpperCase()}</span>
-              <span class="hc-val">${card.zone === 'any' && card.value === 0 ? '✨' : card.value}</span>
+              <span class="hc-tag ${beatTagClass}">${beatTag}</span>
+              <span class="hc-val">${card.zone === 'any' && card.value === 0 ? '✨' : '+' + card.value}</span>
             </div>
             <div class="hc-name">${card.name}</div>
             <div class="hc-desc">${card.desc}</div>
