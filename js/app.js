@@ -437,6 +437,13 @@ function renderPlay(g) {
   const pa   = g.currentPA;
   const half = (pa.phase === 'resolved' && pa.resolution?.half) ? pa.resolution.half : (gs.half || 'top');
 
+  // Reset zone inspection override on beat or PA transition
+  const beatTrackingKey = `${pa?.beat}_${pa?.phase}_${gs?.half}_${gs?.batterIndex?.[half] ?? 0}`;
+  if (window._lastBeatTrackingKey !== beatTrackingKey) {
+    window.selectedViewZone = null;
+    window._lastBeatTrackingKey = beatTrackingKey;
+  }
+
   // Who is batting / pitching
   const battingRole  = half === 'top' ? 'guest' : 'host';
   const pitchingRole = half === 'top' ? 'host'  : 'guest';
@@ -745,12 +752,18 @@ function renderLaunchAngleGauge(batterChar, needleVal) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ZONE BOARD RENDERING (2-ZONE FLOW + REACTION ADVANTAGE)
+// ZONE BOARD RENDERING (SINGLE ZONE FLOW + REACTION ADVANTAGE)
 // ─────────────────────────────────────────────────────────────────────────────
+function setViewZone(zoneKey) {
+  window.selectedViewZone = zoneKey;
+  if (window._lastGameState) {
+    handleGameState(window._lastGameState);
+  }
+}
+
 function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, batterChar, gs) {
   const myKey  = myRole;
   const oppKey = opponentRole();
-  const zones  = ['z1','z2'];
   const revealed = phase === 'reveal' || phase === 'resolved';
 
   const zoneMeta = {
@@ -763,6 +776,27 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
   const battingRole  = half === 'top' ? 'guest' : 'host';
   const charges = gs?.arsenalCharges?.[pitchingRole] || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
   const currentBeat = pa?.beat || 'beat1';
+
+  // Check if at-bat concluded on Beat 1 via walk or called strike 3 knockout
+  const isKnockout = Boolean(
+    (res?.z1?.cascadeEffect === 'walk' || res?.z1?.cascadeEffect === 'called_k') ||
+    (pa?.beatResults?.beat1?.cascadeEffect === 'walk' || pa?.beatResults?.beat1?.cascadeEffect === 'called_k')
+  );
+
+  // Single-zone display logic: Zone 1 for the Pitch, Zone 2 for the Outcome
+  let activeZoneKey = 'z1';
+  if (revealed) {
+    activeZoneKey = isKnockout ? 'z1' : 'z2';
+  } else {
+    activeZoneKey = (currentBeat === 'beat1') ? 'z1' : 'z2';
+  }
+
+  // Allow manual toggle via setViewZone if user clicked a step
+  if (window.selectedViewZone === 'z1' || window.selectedViewZone === 'z2') {
+    activeZoneKey = window.selectedViewZone;
+  }
+
+  const zones = [activeZoneKey];
 
   // Active character names
   const batterName  = batterChar?.name || (iAmBatting ? 'You' : 'Opponent');
@@ -797,16 +831,53 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
   const beatStepBar = `
     <div class="beat-step-tracker">
-      <div class="beat-step ${!revealed && currentBeat === 'beat1' ? 'active' : b1Done ? 'done' : ''}">
+      <div class="beat-step ${activeZoneKey === 'z1' ? 'active' : b1Done ? 'done' : ''}"
+           onclick="setViewZone('z1')"
+           title="View Beat 1: Pitch & Read"
+           style="cursor:pointer;">
         <span class="step-num">${b1Done ? '✓' : '1'}</span>
-        <span class="step-label">Pitch &amp; Read</span>
+        <span class="step-label">Beat 1: Pitch &amp; Read</span>
       </div>
       <div class="beat-step-arrow">&rarr;</div>
-      <div class="beat-step ${!revealed && currentBeat === 'beat2' ? 'active' : b2Done ? 'done' : ''}">
+      <div class="beat-step ${activeZoneKey === 'z2' ? 'active' : b2Done ? 'done' : ''}"
+           ${(b1Done || currentBeat === 'beat2' || revealed) ? 'onclick="setViewZone(\'z2\')" style="cursor:pointer;"' : 'style="opacity:0.5;cursor:not-allowed;"'}
+           title="${(b1Done || currentBeat === 'beat2' || revealed) ? 'View Beat 2: Batted Ball & Outcome' : 'Locked until Beat 1 finishes'}">
         <span class="step-num">${b2Done ? '✓' : '2'}</span>
-        <span class="step-label">Batted Ball &amp; Outcome</span>
+        <span class="step-label">Beat 2: Batted Ball &amp; Outcome</span>
       </div>
     </div>`;
+
+  // Beat 1 Recap Banner (displayed above Zone 2 or when viewing history)
+  let beat1RecapHtml = '';
+  const b1Data = res?.z1 || pa?.beatResults?.beat1;
+  if (activeZoneKey === 'z2' && b1Data) {
+    const pCall = (b1Data.pitchCall || 'fastball').toUpperCase();
+    const bGuess = (b1Data.batterGuess || 'fastball').toUpperCase();
+    const guessedRight = (b1Data.pitchCall === b1Data.batterGuess);
+    const b1Winner = b1Data.winner || 'tie';
+    const b1WinnerLabel = (b1Winner === 'pitcher')
+      ? '⚾ Pitcher Reaction Advantage'
+      : (b1Winner === 'batter')
+        ? '🏏 Batter Reaction Advantage'
+        : '⚖️ Even Battle';
+    const b1WinnerClass = (b1Winner === 'pitcher') ? 'pitcher-adv' : (b1Winner === 'batter') ? 'batter-adv' : 'tie-adv';
+
+    beat1RecapHtml = `
+      <div class="beat1-recap-banner">
+        <div class="b1-recap-badge">BEAT 1 RECAP</div>
+        <div class="b1-recap-info">
+          <span class="b1-recap-matchup">Pitch: <b>${pCall}</b> vs Guess: <b>${bGuess}</b> ${guessedRight ? '🎯' : ''}</span>
+          <span class="b1-recap-winner ${b1WinnerClass}">${b1WinnerLabel}</span>
+        </div>
+        <button class="b1-inspect-btn" onclick="setViewZone('z1')" title="Inspect Beat 1 full board">🔍 Details</button>
+      </div>`;
+  } else if (activeZoneKey === 'z1' && (b1Done || revealed) && !isKnockout && (currentBeat === 'beat2' || revealed)) {
+    beat1RecapHtml = `
+      <div class="beat1-recap-banner return">
+        <span class="b1-inspect-note">👁️ Viewing Beat 1 Pitch &amp; Read</span>
+        <button class="b1-inspect-btn return" onclick="setViewZone('z2')">Return to Outcome ➔</button>
+      </div>`;
+  }
 
   // 3. Center Battlefield Advantage Metrics
   let hitterTotal = 0;
@@ -880,6 +951,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     ${repertoireBar}
     ${beatStepBar}
     ${centerAdvantageBar}
+    ${beat1RecapHtml}
     <div class="zones-container">
       ${zones.map(z => {
         const meta = zoneMeta[z];
