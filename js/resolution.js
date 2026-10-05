@@ -929,7 +929,14 @@ function resolvePA(opts) {
 // SEQUENTIAL 3-BEAT RESOLUTION
 // ─────────────────────────────────────────────────────────────────────────────
 
-// BEAT 1: The Pitch & The Read
+// ─────────────────────────────────────────────────────────────────────────────
+// 2-BEAT SEQUENTIAL RESOLUTION SYSTEM
+// Zone 1: The Pitch & Advantage (Pitcher establishes Strike Zone spectrum)
+// Zone 2: The Batted Ball & Outcome (Hitter establishes Batted Ball spectrum)
+// Initiative: Loser of Beat 1 reveals first; Winner counters with open eyes!
+// ─────────────────────────────────────────────────────────────────────────────
+
+// BEAT 1: The Pitch & Advantage
 function resolveBeat1(opts) {
   const {
     pitchCall = 'fastball',
@@ -944,55 +951,75 @@ function resolveBeat1(opts) {
 
   const staminaMod = getStaminaMod(pitcherChar, pitcherPAsFaced);
   const pitchBase = (typeof PITCH_BASE_POWER !== 'undefined' && PITCH_BASE_POWER[pitchCall]) ? PITCH_BASE_POWER[pitchCall] : 8;
-  const pitcherCardVal = pitcherCardId ? getZoneValue(getCard(pitcherCardId), 'z1') : 0;
-  const pitcherZ1Bonus = (pitcherChar?.zoneBonuses?.z1 || 0) + (staminaMod.z1 || 0);
-  const pitcherZ1Total = Math.max(0, pitchBase + pitcherCardVal + pitcherZ1Bonus);
+  const pitcherCardVal = pitcherCardId ? (getCard(pitcherCardId)?.value || 0) : 0;
 
-  // Counter check
+  // Counter / Read check
   const isKnuckleOrEephus = (pitchCall === 'knuckleball' || pitchCall === 'eephus');
   const counterFired = !isKnuckleOrEephus && (batterGuess === pitchCall);
-  let multiplier = 1.0;
+
+  let batterCardVal = batterCardId ? (getCard(batterCardId)?.value || 0) : 0;
   if (counterFired) {
-    multiplier = (pitcherChar?.id === 'PC02') ? 1.75 : 2.0;
+    if (batterCardId) {
+      batterCardVal = Math.round(batterCardVal * 2.0);
+    } else {
+      batterCardVal += 3; // Unassisted correct guess gives +3 read
+    }
   }
 
-  let batterCardVal = batterCardId ? getZoneValue(getCard(batterCardId), 'z1') : 0;
-  let batterActionTotal = Math.round(batterCardVal * multiplier);
-
-  // First pitch ambush (B8) if played in Z1
+  // First pitch ambush (B8)
   if (isFirstPAOfInning && batterCardId === 'B8') {
-    batterActionTotal += 3;
+    batterCardVal += 3;
   }
 
-  const batterZ1Bonus = batterChar?.zoneBonuses?.z1 || 0;
-  const batterZ1Total = Math.max(0, batterActionTotal + batterZ1Bonus);
+  // Combined sum of Pitcher + Batter
+  const total = Math.max(0, pitchBase + pitcherCardVal + batterCardVal + (staminaMod.z1 || 0));
 
-  const z1Margin = batterZ1Total - pitcherZ1Total;
-  const winner = z1Margin > 0 ? 'batter' : z1Margin < 0 ? 'pitcher' : 'tie';
-  const absMargin = Math.abs(z1Margin);
+  const sz = pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 };
 
   let cascadeEffect = 'none';
-  if (winner === 'batter' && absMargin >= 10) {
+  let winner = 'pitcher';
+  let isKnockout = false;
+
+  // 1. Knockout Check
+  if (total >= sz.wildBust) {
+    // Pitcher Wild / Overthrow BUST -> Instant Walk
     cascadeEffect = 'walk';
-  } else if (winner === 'pitcher' && absMargin >= 10) {
+    winner = 'batter';
+    isKnockout = true;
+  } else if (total === sz.bullseye) {
+    // Pitcher Paints the Black Bullseye -> Instant Called Strike 3
     cascadeEffect = 'called_k';
-  } else if (winner !== 'tie') {
-    cascadeEffect = `+3 momentum into Beat 2 for ${winner}`;
+    winner = 'pitcher';
+    isKnockout = true;
+  } else if (total >= sz.low && total <= sz.high) {
+    // In the Strike Zone -> Pitcher Advantage (Pitcher gains Initiative in Beat 2)
+    winner = 'pitcher';
+    cascadeEffect = 'pitcher_advantage';
+  } else {
+    // Ball Out of Zone -> Batter Advantage (Batter gains Initiative in Beat 2)
+    winner = 'batter';
+    cascadeEffect = 'batter_advantage';
   }
+
+  const margin = Math.abs(total - sz.bullseye);
 
   return {
     winner,
-    margin: absMargin,
-    rawMargin: z1Margin,
-    batterTotal: Math.round(batterZ1Total),
-    pitcherTotal: Math.round(pitcherZ1Total),
+    total,
+    margin,
+    rawMargin: winner === 'batter' ? margin : -margin,
+    pitcherTotal: pitchBase + pitcherCardVal,
+    batterTotal: batterCardVal,
     counterFired,
-    multiplier,
-    mult: multiplier,
+    multiplier: counterFired ? 2.0 : 1.0,
+    mult: counterFired ? 2.0 : 1.0,
     pitchCallMatched: counterFired ? pitchCall : null,
     pitchCall,
     batterGuess,
     cascadeEffect,
+    isKnockout,
+    strikeZone: sz,
+    sz,
     pitcherCardId,
     batterCardId,
     pitcherCards: pitcherCardId ? [pitcherCardId] : [],
@@ -1000,102 +1027,201 @@ function resolveBeat1(opts) {
   };
 }
 
-// BEAT 2: The Swing & Contact
+// BEAT 2: The Batted Ball & Outcome
 function resolveBeat2(opts) {
   const {
-    z1Winner = 'tie',
+    z1Winner = 'pitcher',
+    beat1Winner = z1Winner,
     pitcherCardId = null,
     batterCardId = null,
     pitcherChar = PITCHER_CHARACTERS['PC01'],
     batterChar = BATTER_CHARACTERS['BC01'],
-    pitcherPAsFaced = 0,
+    bases = { first:false, second:false, third:false },
+    outs = 0,
+    score = { batting:0, pitching:0 },
   } = opts;
 
-  const staminaMod = getStaminaMod(pitcherChar, pitcherPAsFaced);
-  const pitcherMomentum = z1Winner === 'pitcher' ? 3 : 0;
-  const batterMomentum  = z1Winner === 'batter'  ? 3 : 0;
+  const pCard = getCard(pitcherCardId);
+  const bCard = getCard(batterCardId);
+  const pVal = pCard ? (pCard.value || 0) : 0;
+  const bVal = bCard ? (bCard.value || 0) : 0;
 
-  const pitcherCardVal = pitcherCardId ? getZoneValue(getCard(pitcherCardId), 'z2') : 0;
-  const pitcherZ2Total = Math.max(0, pitcherCardVal + pitcherMomentum + (pitcherChar?.zoneBonuses?.z2 || 0) + (staminaMod.z2 || 0));
+  // Combined sum
+  let total = pVal + bVal;
 
-  const batterCardVal = batterCardId ? getZoneValue(getCard(batterCardId), 'z2') : 0;
-  const batterZ2Total = Math.max(0, batterCardVal + batterMomentum + (batterChar?.zoneBonuses?.z2 || 0));
+  // Batter's launch angle / batted ball spectrum
+  const defaultSpectrum = [
+    { min:0, max:7, outcome:'groundout', label:'Groundout', color:'#718096' },
+    { min:8, max:10, outcome:'single', label:'Single', color:'#3182ce' },
+    { min:11, max:15, outcome:'homerun', label:'HOME RUN 🔥', color:'#ecc94b' },
+    { min:16, max:17, outcome:'double', label:'Double ⚡', color:'#38b2ac' },
+    { min:18, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
+  ];
 
-  const z2Margin = batterZ2Total - pitcherZ2Total;
-  const winner = z2Margin > 0 ? 'batter' : z2Margin < 0 ? 'pitcher' : 'tie';
-  const absMargin = Math.abs(z2Margin);
+  const spectrum = (batterChar?.battedBallSpectrum && batterChar.battedBallSpectrum.length > 0)
+    ? batterChar.battedBallSpectrum
+    : defaultSpectrum;
 
-  let cascadeEffect = 'solid_contact';
-  let hardContact = false;
+  // Find matching band on the spectrum
+  let matchedBand = spectrum.find(b => total >= b.min && total <= b.max) || spectrum[spectrum.length - 1];
+  let outcomeType = matchedBand.outcome;
+  let outcomeDisplay = matchedBand.label;
+  let specialEffectTriggered = null;
+  let isFoulBall = false;
+  let bonusRun = 0;
 
-  if (winner === 'pitcher' && absMargin >= 15) {
-    cascadeEffect = 'k_swinging';
-  } else if (winner === 'batter' && absMargin >= 15) {
-    hardContact = true;
-    cascadeEffect = 'hard_contact';
+  // ── Outcome Card Triggers ──────────────────────────────────────────────────
+  // 1. Infield Shift (P23): Swaps Single and Groundout
+  if (pCard?.outcomeEffect === 'infield_shift') {
+    if (outcomeType === 'single') {
+      outcomeType = 'groundout';
+      outcomeDisplay = 'Groundout (Into the Shift!)';
+      specialEffectTriggered = 'The Infield Shift takes away the single!';
+    } else if (outcomeType === 'groundout') {
+      outcomeType = 'single';
+      outcomeDisplay = 'Infield Single (Beat the Shift!)';
+      specialEffectTriggered = 'Found the hole against the shift!';
+    }
   }
+
+  // 2. Web Gem (P26): Robs Home Run into Flyout
+  if (pCard?.outcomeEffect === 'web_gem' && outcomeType === 'homerun') {
+    outcomeType = 'flyout';
+    outcomeDisplay = '🧤 ROBBED AT THE WALL! (Web Gem Out)';
+    specialEffectTriggered = 'Gold Glove Web Gem robs the Home Run!';
+  }
+
+  // 3. Double Play (P27): Turns Groundout with runner on 1st into 2-Out DP
+  let isDoublePlay = false;
+  if (pCard?.outcomeEffect === 'double_play' && outcomeType === 'groundout' && bases.first) {
+    isDoublePlay = true;
+    outcomeType = 'double_play';
+    outcomeDisplay = '⚡ 6-4-3 DOUBLE PLAY!';
+    specialEffectTriggered = 'Turned the textbook 6-4-3 double play!';
+  }
+
+  // 4. Wipeout Slider (P18): Converts Single into Strikeout if pitcher won Beat 1
+  if (pCard?.outcomeEffect === 'wipeout_slider' && (beat1Winner === 'pitcher' || z1Winner === 'pitcher') && outcomeType === 'single') {
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ STRIKEOUT SWINGING! (Wipeout)';
+    specialEffectTriggered = 'Nasty wipeout pitch fools the batter!';
+  }
+
+  // 5. Bunt Against Shift (B13): Converts Groundout under 8 into Infield Single
+  if (bCard?.outcomeEffect === 'bunt_shift' && total < 8 && outcomeType === 'groundout') {
+    outcomeType = 'single';
+    outcomeDisplay = '⚡ Infield Bunt Single!';
+    specialEffectTriggered = 'Dropped down a beautiful bunt against the shift!';
+  }
+
+  // 6. Spoil It (B19): Fouls off an Out or Strikeout (resets Beat 2)
+  if (bCard?.outcomeEffect === 'spoil_it' && (outcomeType === 'groundout' || outcomeType === 'flyout' || outcomeType === 'k')) {
+    isFoulBall = true;
+    outcomeDisplay = '⚾ FOUL BALL! (Spoiled Pitch)';
+    specialEffectTriggered = 'Battled and fouled off the pitch!';
+  }
+
+  // 7. Gap Power (B26): Upgrades Single -> Double, Double -> Triple
+  if (bCard?.outcomeEffect === 'gap_power') {
+    if (outcomeType === 'single') {
+      outcomeType = 'double';
+      outcomeDisplay = '⚡ Stand-up Double! (Gap Power)';
+      specialEffectTriggered = 'Drove it into the alley for extra bases!';
+    } else if (outcomeType === 'double') {
+      outcomeType = 'triple';
+      outcomeDisplay = '🚀 Triple! (Speed & Gap Power)';
+      specialEffectTriggered = 'Rattled around the corner for three bags!';
+    }
+  }
+
+  // 8. Moonshot (B27): Bonus run if Home Run hits
+  if (bCard?.outcomeEffect === 'moonshot' && outcomeType === 'homerun') {
+    bonusRun = 1;
+    outcomeDisplay = '💥 MOONSHOT HOME RUN (+1 BONUS RUN)!';
+    specialEffectTriggered = 'Towering moonshot clears the stadium for a bonus run!';
+  }
+
+  // ── Calculate Base Running & Outs ──────────────────────────────────────────
+  let runsScored = 0;
+  let outsAdded = 0;
+  let newBases = { ...bases };
+
+  if (isFoulBall) {
+    outsAdded = 0;
+    runsScored = 0;
+  } else if (outcomeType === 'homerun') {
+    runsScored = countRunners(bases) + 1 + bonusRun;
+    newBases = { first: false, second: false, third: false };
+    outsAdded = 0;
+  } else if (isDoublePlay || outcomeType === 'double_play') {
+    outsAdded = 2;
+    runsScored = 0;
+    newBases = { first: false, second: bases.third, third: false };
+  } else if (outcomeType === 'k' || outcomeType === 'groundout' || outcomeType === 'flyout' || outcomeType === 'out') {
+    outsAdded = 1;
+    runsScored = 0;
+  } else if (outcomeType === 'single') {
+    runsScored = runsOnHit(bases, 1);
+    newBases = advanceBases(bases, 1);
+    outsAdded = 0;
+  } else if (outcomeType === 'double') {
+    runsScored = runsOnHit(bases, 2);
+    newBases = advanceBases(bases, 2);
+    outsAdded = 0;
+  } else if (outcomeType === 'triple') {
+    runsScored = runsOnHit(bases, 3);
+    newBases = advanceBases(bases, 3);
+    outsAdded = 0;
+  }
+
+  const isHit = ['single','double','triple','homerun'].includes(outcomeType);
+  const winner = (runsScored > 0 || isHit) ? 'batter' : (isFoulBall ? 'tie' : 'pitcher');
+
+  const outcome = {
+    type: outcomeType,
+    display: outcomeDisplay,
+    runsScored,
+    outsAdded,
+    newBases,
+    isFoulBall,
+    bonusRun,
+    specialEffectTriggered,
+    needle: total,
+    rng: { rollPct: total, tier: outcomeDisplay, odds: [{ label: outcomeDisplay, pct: 100, range: `Sum ${total}` }] }
+  };
 
   return {
     winner,
-    margin: absMargin,
-    rawMargin: z2Margin,
-    batterTotal: Math.round(batterZ2Total),
-    pitcherTotal: Math.round(pitcherZ2Total),
-    z1Inheritance: z1Winner,
-    hardContact,
-    cascadeEffect,
+    total,
+    needle: total,
+    outcome,
+    outcomeType,
+    outcomeDisplay,
+    runsScored,
+    outsAdded,
+    newBases,
+    isFoulBall,
+    specialEffectTriggered,
+    pitcherTotal: pVal,
+    batterTotal: bVal,
     pitcherCardId,
     batterCardId,
     pitcherCards: pitcherCardId ? [pitcherCardId] : [],
     batterCards: batterCardId ? [batterCardId] : [],
+    spectrum,
   };
 }
 
-// BEAT 3: The Result & Defense
+// BEAT 3: Preserved for backward compatibility
 function resolveBeat3(opts) {
-  const {
-    hardContact = false,
-    pitcherCardId = null,
-    batterCardId = null,
-    pitcherChar = PITCHER_CHARACTERS['PC01'],
-    batterChar = BATTER_CHARACTERS['BC01'],
-    pitcherPAsFaced = 0,
-  } = opts;
-
-  const staminaMod = getStaminaMod(pitcherChar, pitcherPAsFaced);
-  const pitcherCardVal = pitcherCardId ? getZoneValue(getCard(pitcherCardId), 'z3') : 0;
-  const pitcherZ3Total = Math.max(0, pitcherCardVal + (pitcherChar?.zoneBonuses?.z3 || 0) + (staminaMod.z3 || 0));
-
-  let batterCardVal = batterCardId ? getZoneValue(getCard(batterCardId), 'z3') : 0;
-  if (hardContact) {
-    batterCardVal *= 2;
-  }
-  const batterZ3Total = Math.max(0, batterCardVal + (batterChar?.zoneBonuses?.z3 || 0));
-
-  const z3Margin = batterZ3Total - pitcherZ3Total;
-  const winner = z3Margin > 0 ? 'batter' : z3Margin < 0 ? 'pitcher' : 'tie';
-  const absMargin = Math.abs(z3Margin);
-
-  return {
-    winner,
-    margin: absMargin,
-    rawMargin: z3Margin,
-    batterTotal: Math.round(batterZ3Total),
-    pitcherTotal: Math.round(pitcherZ3Total),
-    hardContactActive: hardContact,
-    pitcherCardId,
-    batterCardId,
-    pitcherCards: pitcherCardId ? [pitcherCardId] : [],
-    batterCards: batterCardId ? [batterCardId] : [],
-  };
+  return { winner: 'tie', margin: 0, total: 0, batterTotal: 0, pitcherTotal: 0, pitcherCards: [], batterCards: [] };
 }
 
-// Combine the 3 beats into final PA outcome
+// Combine the beats into final PA outcome
 function resolveSequentialPA(opts) {
   const {
     beat1,
     beat2 = null,
-    beat3 = null,
     bases = { first:false, second:false, third:false },
     pitcherChar = PITCHER_CHARACTERS['PC01'],
     batterChar = BATTER_CHARACTERS['BC01'],
@@ -1105,25 +1231,25 @@ function resolveSequentialPA(opts) {
   } = opts;
 
   const log = [];
-  log.push(`Beat 1: Pitcher threw ${beat1.pitchCall?.toUpperCase()} (${beat1.pitcherTotal} pts) vs Batter guess ${beat1.batterGuess?.toUpperCase()} (${beat1.batterTotal} pts)`);
+  log.push(`Beat 1 (The Pitch): Pitcher threw ${beat1.pitchCall?.toUpperCase()} vs Batter guess ${beat1.batterGuess?.toUpperCase()} (Total: ${beat1.total} pts)`);
 
   // Instant Walk in Beat 1
   if (beat1.cascadeEffect === 'walk') {
     const runsScored = bases.third && bases.second && bases.first ? 1 : 0;
     const newBases = advanceBases(bases, 1);
-    log.push(`Instant Walk! Batter won Beat 1 by ${beat1.margin} >= 10.`);
+    log.push(`Instant Walk! Total ${beat1.total} >= wild bust threshold (${beat1.sz?.wildBust || 20}).`);
     const outcome = {
       type: 'walk',
       display: '🚶 WALK! (Ball Four)',
       runsScored,
       outsAdded: 0,
       newBases,
-      rng: { rollPct: 100, tier: 'Instant Walk', odds: [{ label: 'Walk 🚶', pct: 100, range: 'Zone 1 Knockout' }] }
+      rng: { rollPct: 100, tier: 'Instant Walk', odds: [{ label: 'Walk 🚶', pct: 100, range: 'Strike Zone Knockout' }] }
     };
     return {
       z1: beat1, z2: null, z3: null,
       zonesWon: { batter: 1, pitcher: 0 },
-      trigger: 'walk', advantageSide: 'batter', advantageScore: beat1.margin,
+      trigger: 'walk', advantageSide: 'batter', advantageScore: beat1.margin || 5,
       outcome, log, primaryPitchCall: beat1.pitchCall,
       pitcherCharName: pitcherChar?.name || 'Pitcher',
       batterCharName: batterChar?.name || 'Batter',
@@ -1133,19 +1259,19 @@ function resolveSequentialPA(opts) {
 
   // Instant Called Strike 3 in Beat 1
   if (beat1.cascadeEffect === 'called_k') {
-    log.push(`Instant Called Strike 3! Pitcher won Beat 1 by ${beat1.margin} >= 10.`);
+    log.push(`Instant Called Strike 3! Total hit exact bullseye (${beat1.sz?.bullseye || 13}).`);
     const outcome = {
       type: 'k',
       display: '⚡ STRIKEOUT LOOKING! (Called Strike 3)',
       runsScored: 0,
       outsAdded: 1,
       newBases: { ...bases },
-      rng: { rollPct: 0, tier: 'Instant Strikeout', odds: [{ label: 'Called Strike 3 ⚡', pct: 100, range: 'Zone 1 Knockout' }] }
+      rng: { rollPct: 0, tier: 'Instant Strikeout', odds: [{ label: 'Called Strike 3 ⚡', pct: 100, range: 'Strike Zone Knockout' }] }
     };
     return {
       z1: beat1, z2: null, z3: null,
       zonesWon: { batter: 0, pitcher: 1 },
-      trigger: 'called_k', advantageSide: 'pitcher', advantageScore: beat1.margin,
+      trigger: 'called_k', advantageSide: 'pitcher', advantageScore: beat1.margin || 5,
       outcome, log, primaryPitchCall: beat1.pitchCall,
       pitcherCharName: pitcherChar?.name || 'Pitcher',
       batterCharName: batterChar?.name || 'Batter',
@@ -1153,69 +1279,35 @@ function resolveSequentialPA(opts) {
     };
   }
 
-  // Instant Strikeout Swinging in Beat 2
-  if (beat2 && beat2.cascadeEffect === 'k_swinging') {
-    log.push(`Beat 2: Pitcher (${beat2.pitcherTotal} pts) blew away Batter (${beat2.batterTotal} pts). Margin: ${beat2.margin} >= 15.`);
-    log.push(`Instant Strikeout Swinging!`);
-    const outcome = {
-      type: 'k',
-      display: '⚡ STRIKEOUT SWINGING!',
-      runsScored: 0,
-      outsAdded: 1,
-      newBases: { ...bases },
-      rng: { rollPct: 0, tier: 'Instant Strikeout', odds: [{ label: 'Strikeout Swinging ⚡', pct: 100, range: 'Zone 2 Knockout' }] }
-    };
-    return {
-      z1: beat1, z2: beat2, z3: null,
-      zonesWon: { batter: (beat1.winner === 'batter' ? 1 : 0), pitcher: (beat1.winner === 'pitcher' ? 1 : 0) + 1 },
-      trigger: 'k_swinging', advantageSide: 'pitcher', advantageScore: beat2.margin,
-      outcome, log, primaryPitchCall: beat1.pitchCall,
-      pitcherCharName: pitcherChar?.name || 'Pitcher',
-      batterCharName: batterChar?.name || 'Batter',
-      half
-    };
+  // Beat 2: The Batted Ball
+  const b2Outcome = beat2?.outcome || {
+    type: 'out',
+    display: 'Out',
+    runsScored: 0,
+    outsAdded: 1,
+    newBases: { ...bases }
+  };
+
+  log.push(`Beat 2 (The Batted Ball): Combined Sum = ${beat2?.total || 0}. Outcome: ${b2Outcome.display}`);
+  if (beat2?.specialEffectTriggered) {
+    log.push(`⚡ Special Play: ${beat2.specialEffectTriggered}`);
   }
 
-  // Survived to Beat 3: Ball is in play!
-  let batterWins = 0;
-  let pitcherWins = 0;
-  if (beat1.winner === 'batter') batterWins++;
-  if (beat1.winner === 'pitcher') pitcherWins++;
-  if (beat2?.winner === 'batter') batterWins++;
-  if (beat2?.winner === 'pitcher') pitcherWins++;
-  if (beat3?.winner === 'batter') batterWins++;
-  if (beat3?.winner === 'pitcher') pitcherWins++;
-
-  const bMargin = (beat1.rawMargin || 0) + (beat2?.rawMargin || 0) + (beat3?.rawMargin || 0);
-  let advantageSide = 'neutral';
-  let advantageScore = 0;
-
-  if (batterWins > pitcherWins) {
-    advantageSide = 'batter';
-    advantageScore = Math.max(5, bMargin);
-  } else if (pitcherWins > batterWins) {
-    advantageSide = 'pitcher';
-    advantageScore = Math.max(5, -bMargin);
-  } else {
-    advantageSide = bMargin > 0 ? 'batter' : bMargin < 0 ? 'pitcher' : 'neutral';
-    advantageScore = Math.abs(bMargin);
-  }
-
-  log.push(`Beat 2 (The Swing): Batter ${beat2?.batterTotal || 0} vs Pitcher ${beat2?.pitcherTotal || 0} (${beat2?.winner?.toUpperCase() || 'TIE'})`);
-  log.push(`Beat 3 (The Result): Batter ${beat3?.batterTotal || 0} vs Pitcher ${beat3?.pitcherTotal || 0} (${beat3?.winner?.toUpperCase() || 'TIE'})`);
-  log.push(`Advantage: ${advantageSide.toUpperCase()} (+${advantageScore} pts · ${batterWins}-${pitcherWins} zones)`);
-
-  const outcome = getOutcome(advantageScore, advantageSide, bases);
+  const advantageSide = beat1.winner;
+  const zonesWon = {
+    batter: (beat1.winner === 'batter' ? 1 : 0) + (beat2?.winner === 'batter' ? 1 : 0),
+    pitcher: (beat1.winner === 'pitcher' ? 1 : 0) + (beat2?.winner === 'pitcher' ? 1 : 0),
+  };
 
   return {
     z1: beat1,
     z2: beat2,
-    z3: beat3,
-    zonesWon: { batter: batterWins, pitcher: pitcherWins },
-    trigger: null,
+    z3: null,
+    zonesWon,
+    trigger: beat2?.outcomeType || null,
     advantageSide,
-    advantageScore,
-    outcome,
+    advantageScore: beat1.margin || 5,
+    outcome: b2Outcome,
     log,
     primaryPitchCall: beat1.pitchCall,
     pitcherCharName: pitcherChar?.name || 'Pitcher',
@@ -1224,7 +1316,7 @@ function resolveSequentialPA(opts) {
   };
 }
 
-function executeBotPlayBeat(gameState, botRole, beat) {
+function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) {
   const half = gameState?.half || 'top';
   const botIsPitching = (botRole === 'host') ? (half === 'top') : (half === 'bottom');
   const botHand = [...(gameState?.hands?.[botRole] || [])];
@@ -1243,10 +1335,15 @@ function executeBotPlayBeat(gameState, botRole, beat) {
       pitchCall = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 'fastball';
 
       if (Math.random() < 0.6 && botHand.length > 0) {
-        const cIdx = botHand.findIndex(id => getCard(id)?.zone === 'read' || getCard(id)?.zone === 'any');
-        if (cIdx > -1) {
-          [cardId] = botHand.splice(cIdx, 1);
-        }
+        // Aim for strike zone (~12-14 total, pitch is 8/6/4)
+        const targetCardVal = (pitchCall === 'fastball') ? 5 : (pitchCall === 'breaking') ? 6 : 7;
+        let bestIdx = 0;
+        let bestDiff = 999;
+        botHand.forEach((id, idx) => {
+          const diff = Math.abs((getCard(id)?.value || 0) - targetCardVal);
+          if (diff < bestDiff) { bestDiff = diff; bestIdx = idx; }
+        });
+        [cardId] = botHand.splice(bestIdx, 1);
       }
     } else {
       const oppRole = botRole === 'host' ? 'guest' : 'host';
@@ -1258,28 +1355,48 @@ function executeBotPlayBeat(gameState, botRole, beat) {
       batterGuess = guessPool.length > 0 ? guessPool[Math.floor(Math.random() * guessPool.length)] : 'fastball';
 
       if (Math.random() < 0.6 && botHand.length > 0) {
-        const cIdx = botHand.findIndex(id => getCard(id)?.zone === 'read' || getCard(id)?.zone === 'any');
-        if (cIdx > -1) {
-          [cardId] = botHand.splice(cIdx, 1);
-        }
+        cardId = botHand.shift();
       }
     }
   } else if (beat === 'beat2') {
     if (botHand.length > 0) {
-      const cIdx = botHand.findIndex(id => getCard(id)?.zone === 'contact' || getCard(id)?.zone === 'any');
-      if (cIdx > -1) {
-        [cardId] = botHand.splice(cIdx, 1);
-      } else if (botHand.length > 1) {
-        cardId = botHand.shift();
-      }
-    }
-  } else if (beat === 'beat3') {
-    if (botHand.length > 0) {
-      const cIdx = botHand.findIndex(id => getCard(id)?.zone === 'result' || getCard(id)?.zone === 'any');
-      if (cIdx > -1) {
-        [cardId] = botHand.splice(cIdx, 1);
+      if (firstRevealedCard) {
+        // Bot has Reaction Advantage! Opponent already revealed firstRevealedCard!
+        const oppVal = getCard(firstRevealedCard)?.value || 0;
+        if (!botIsPitching) {
+          // Bot is Batter: aim for Home Run / Hit sweet spot ~12 to 14
+          const targetTotal = 13;
+          const needed = targetTotal - oppVal;
+          let bestIdx = 0;
+          let bestDiff = 999;
+          botHand.forEach((id, idx) => {
+            const diff = Math.abs((getCard(id)?.value || 0) - needed);
+            if (diff < bestDiff) { bestDiff = diff; bestIdx = idx; }
+          });
+          [cardId] = botHand.splice(bestIdx, 1);
+        } else {
+          // Bot is Pitcher: look for groundout (< 8) or flyout (> 16)
+          let bestIdx = 0;
+          let foundSafe = false;
+          botHand.forEach((id, idx) => {
+            const sum = oppVal + (getCard(id)?.value || 0);
+            if ((sum < 8 || sum > 16) && !foundSafe) {
+              bestIdx = idx;
+              foundSafe = true;
+            }
+          });
+          [cardId] = botHand.splice(bestIdx, 1);
+        }
       } else {
-        cardId = botHand.shift();
+        // Bot is First Player: play a balanced card
+        let bestIdx = 0;
+        let bestDiff = 999;
+        const target = botIsPitching ? 4 : 6;
+        botHand.forEach((id, idx) => {
+          const diff = Math.abs((getCard(id)?.value || 0) - target);
+          if (diff < bestDiff) { bestDiff = diff; bestIdx = idx; }
+        });
+        [cardId] = botHand.splice(bestIdx, 1);
       }
     }
   }
