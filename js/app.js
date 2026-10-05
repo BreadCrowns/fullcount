@@ -1588,7 +1588,12 @@ function nextPA() {
 
       // 1. Recycle placed cards from current PA into respective discard collections
       if (!gs.pitcherDiscards) gs.pitcherDiscards = { host: [], guest: [] };
+      if (!Array.isArray(gs.pitcherDiscards.host))  gs.pitcherDiscards.host = [];
+      if (!Array.isArray(gs.pitcherDiscards.guest)) gs.pitcherDiscards.guest = [];
+
       if (!gs.batterDiscards)  gs.batterDiscards  = { host: [], guest: [] };
+      if (!Array.isArray(gs.batterDiscards.host))  gs.batterDiscards.host = [];
+      if (!Array.isArray(gs.batterDiscards.guest)) gs.batterDiscards.guest = [];
 
       const playedCards = { host: [], guest: [] };
       ['beat1', 'beat2', 'beat3'].forEach(b => {
