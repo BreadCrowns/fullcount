@@ -5,12 +5,15 @@
   <title>Full Count — Unit Tests</title>
   <style>
     body { font-family: monospace; background: #0f141c; color: #d0dbe5; padding: 24px; }
-    h1 { color: #f5a623; }
-    .pass { color: #4caf50; }
-    .fail { color: #f44336; font-weight: bold; }
-    .summary { margin-top: 20px; font-size: 1.2rem; border-top: 1px solid #334; padding-top: 12px; }
   </style>
+  <script>
+    window.onerror = function(msg, url, line) {
+      document.body.innerHTML += '<h1 style="color:red">ERROR: ' + msg + ' LINE: ' + line + '</h1>';
+    };
+  </script>
 </head>
+
+
 <body>
   <h1>Full Count — Unit Test Runner</h1>
   <div id="results"></div>
@@ -54,17 +57,15 @@
         assert(batterCharKeys.length === 12, `12 Batter characters loaded (found ${batterCharKeys.length})`);
         assert(deckPresetKeys.length === 3, `3 Preset decks loaded (found ${deckPresetKeys.length})`);
 
-        // 2. Zone Value and Penalty
-        const fourSeam = getCard('P1'); // Four-Seam Fastball: read (z1), value 10
+        // 2. Pure Number Cards: Full value everywhere
+        const fourSeam = getCard('P1');
         assert(fourSeam && fourSeam.value === 10, `P1 card exists with value 10`);
-        assert(getZoneValue(fourSeam, 'z1') === 10, `P1 played in z1 (preferred) retains full value 10`);
-        assert(getZoneValue(fourSeam, 'z2') === 5, `P1 played outside preferred zone gets 50% penalty (floor(10*0.5) = 5)`);
+        assert(getZoneValue(fourSeam, 'z1') === 10, `P1 retains full value 10 in Beat 1`);
+        assert(getZoneValue(fourSeam, 'z2') === 10, `P1 retains full value 10 in Beat 2 without penalty`);
 
-        const universalCard = Object.values(ACTION_CARDS).find(c => c.zone === 'any');
-        if (universalCard) {
-          assert(getZoneValue(universalCard, 'z1') === universalCard.value && getZoneValue(universalCard, 'z2') === universalCard.value,
-            `Universal card ${universalCard.id} retains full value in all zones`);
-        }
+        const allPureNumberCards = Object.values(ACTION_CARDS).every(c => typeof c.value === 'number' && !c.powerBadge && !c.outcomeEffect);
+        assert(allPureNumberCards, `All 70 cards are pure number cards with no modifiers or bonuses`);
+
 
         // 3. sumZone
         const totalZ1 = sumZone(['P1', 'P2'], 'z1');
@@ -84,12 +85,13 @@
         assert(basesAfterSingle.first === true && basesAfterSingle.second === true && basesAfterSingle.third === false,
           `Single with runner on 1st moves runners to 1st & 2nd`);
 
-        // 5. Zone 1 Counter
-        const guessFastball = getCard('B1'); // counters: ['fastball', 'cutter_fast']
-        const z1CounterRes = checkZ1Counter(['B1'], ['P1'], null); // P1 has pitchCall: 'fastball'
-        assert(z1CounterRes.counterFired === true, `Guess Fastball (B1) counters Four-Seam Fastball (P1) in Zone 1`);
-        assert(z1CounterRes.pitchCallMatched === 'fastball', `Matched pitchCall is fastball`);
-        assert(z1CounterRes.multiplier === 2.0, `Counter multiplier is 2.0 (got ${z1CounterRes.multiplier})`);
+        // 5. Pure Number Cards - No Counter Multipliers
+        const b1Card = getCard('B1');
+        const p1Card = getCard('P1');
+        assert(b1Card && b1Card.value === 2, `B1 card is pure number with value 2`);
+        assert(p1Card && p1Card.value === 10, `P1 card is pure number with value 10`);
+        assert(!b1Card.counters && !p1Card.pitchCall, `Cards contain no counters or pitchCall modifiers`);
+
 
         // 6. Pitcher Stamina Degradation
         const acePitcher = PITCHER_CHARACTERS['PC01']; // Cole Vance
@@ -130,11 +132,12 @@
         assert(botPitchPlay.botPlacement.z2.includes('P13') || botPitchPlay.botPlacement.z3.includes('P23'), `Pitcher bot plays supporting card in Z2 or Z3`);
         assert(botPitchPlay.botHand.length < pitcherBotHand.length, `Pitcher bot removes played cards from hand (remaining: ${botPitchPlay.botHand.length})`);
 
-        const batterBotHand = ['B1', 'B13', 'B23']; // Guess Fastball (read/z1), Contact swing (contact/z2), Pull (result/z3)
+        const batterBotHand = ['B1', 'B13', 'B23'];
         const botBatState = { half: 'top', hands: { guest: [...batterBotHand] } }; // top = guest bats
         const botBatPlay = executeBotPlay(botBatState, 'guest');
-        assert(botBatPlay.botPlacement.z2.includes('B13'), `Batter bot plays swing card B13 in Zone 2`);
+        assert(botBatPlay.botPlacement.z2.length > 0, `Batter bot plays card in Zone 2`);
         assert(botBatPlay.botHand.length < batterBotHand.length, `Batter bot removes played cards from hand (remaining: ${botBatPlay.botHand.length})`);
+
 
         const emptyBotPlay = executeBotPlay({ half: 'top', hands: { guest: [] } }, 'guest');
         assert(emptyBotPlay.botPlacement.z1.length === 0 && emptyBotPlay.botPlacement.z2.length === 0, `Bot handles empty hand gracefully without error`);
@@ -273,77 +276,81 @@
         });
         assert(b2ContactProtect.outcomeType === 'groundout', `Contact swing chokes up and avoids strikeout, producing groundout`);
 
-        // Highlight Card 1: Web Gem (P26) Robs Home Run
-        const b2WebGem = resolveBeat2({
+        // Pure Number Clash 1: Hanging offspeed pitch crushed for Home Run
+        const b2ClashHanger = resolveBeat2({
           count: '3-1',
           pitchType: 'offspeed',
           pitchLocation: 'low',
-          pitcherCardId: 'P26', // Web Gem
+          pitcherCardId: 'P26', // Val 4 < Diff 8 (Hanger)
           swingType: 'power',
           targetZone: 'low',
-          batterCardId: 'B18',
+          batterCardId: 'B18', // Val 9 >= Diff 6 (Barreled)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2WebGem.outcomeType === 'flyout', `Web Gem (P26) robs Home Run into Out`);
-        assert(b2WebGem.specialEffectTriggered && b2WebGem.specialEffectTriggered.includes('Web Gem'), `Web Gem logs special effect`);
+        assert(b2ClashHanger.outcomeType === 'homerun', `Hanging offspeed pitch crushed for Home Run (${b2ClashHanger.outcomeDisplay})`);
 
-        // Highlight Card 2: Double Play (P27) Turns Groundout into 2 Outs
-        const b2DP = resolveBeat2({
+        // Pure Number Clash 2: Pitcher executes clean, contact swing mistimed produces Groundout
+        const b2ClashGroundout = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P27', // Double Play
+          pitcherCardId: 'P27', // Val 4 >= Diff 3 (Clean)
           swingType: 'contact',
           targetZone: 'high',
-          batterCardId: 'B14',
+          batterCardId: 'B14', // Val 2 < Diff 3 (Mistimed)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
           bases: { first: true, second: false, third: false }
         });
-        assert(b2DP.outcomeType === 'double_play' && b2DP.outsAdded === 2, `Double Play (P27) turns groundout into 2-Out DP`);
+        assert(b2ClashGroundout.outcomeType === 'groundout', `Clean pitch with mistimed contact produces Groundout (${b2ClashGroundout.outcomeDisplay})`);
 
-        // Highlight Card 3: Spoil It (B19) Fouls Off Out
-        const b2Spoil = resolveBeat2({
+        // Pure Number Clash 3: Clean pitch thrown in unpredicted zone produces Flyout
+        const b2ClashFlyout = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'low',
-          pitcherCardId: 'P14',
-          swingType: 'contact',
-          targetZone: 'high',
-          batterCardId: 'B19', // Spoil It
+          pitcherCardId: 'P14', // Val 6 >= Diff 3 (Clean)
+          swingType: 'power',
+          targetZone: 'high', // Location missed
+          batterCardId: 'B18', // Val 9 >= Diff 8 (Clean)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Spoil.isFoulBall === true, `Spoil It (B19) fouls off out (isFoulBall = true)`);
+        assert(b2ClashFlyout.outcomeType === 'flyout', `Clean pitch in unpredicted zone produces Flyout (${b2ClashFlyout.outcomeDisplay})`);
 
-        // Highlight Card 4: Gap Power (B26) Upgrades Single -> Double
-        const b2Gap = resolveBeat2({
+
+
+
+        // Pure Number Clash 4: Hanger met with clean contact stroke produces Single
+        const b2ClashSingle = resolveBeat2({
           count: '3-2',
           pitchType: 'offspeed',
           pitchLocation: 'low',
-          pitcherCardId: 'P19', // Fails -> Single
+          pitcherCardId: 'P19', // Val 1 < Diff 8 (Hanger)
           swingType: 'contact',
           targetZone: 'low',
-          batterCardId: 'B26', // Gap Power
+          batterCardId: 'B26', // Val 6 >= Diff 3 (Clean)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Gap.outcomeType === 'double', `Gap Power (B26) upgrades Single to Double`);
+        assert(b2ClashSingle.outcomeType === 'single', `Hanger met with clean contact stroke produces Single (${b2ClashSingle.outcomeDisplay})`);
 
-        // Highlight Card 5: Moonshot (B27) +1 Bonus Run
-        const b2Moon = resolveBeat2({
+        // Pure Number Clash 5: Both execute in High location produces Home Run
+        const b2ClashMoon = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14',
+          pitcherCardId: 'P14', // Val 6 >= Diff 3 (Clean)
           swingType: 'power',
           targetZone: 'high',
-          batterCardId: 'B27', // Moonshot (val 8 >= 8)
+          batterCardId: 'B27', // Val 8 >= Diff 8 (Clean)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Moon.outcomeType === 'homerun' && b2Moon.bonusRun === 1, `Moonshot (B27) adds +1 bonus run on Home Run`);
+        assert(b2ClashMoon.outcomeType === 'homerun', `Both execute in High location produces Home Run (${b2ClashMoon.outcomeDisplay})`);
+
+
 
         // 14. Sequential 2-Beat PA Resolution
         const seqPAResult = resolveSequentialPA({
@@ -518,7 +525,8 @@
       window.testResults = { passed, failed };
     }
 
-    window.addEventListener('DOMContentLoaded', runTests);
+    runTests();
   </script>
+
 </body>
 </html>

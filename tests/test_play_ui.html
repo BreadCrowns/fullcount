@@ -132,18 +132,56 @@
       const html = document.getElementById('app').innerHTML;
       report(html.length > 100, `Beat 1 placing rendered successfully (${html.length} chars)`);
 
-      // 3. Test Beat 2 placing
-      soloPlayState.currentPA.beat = 'beat2';
+      // Verify hand cards are pure number cards
+      const numberCards = document.querySelectorAll('.hand-cards-container .number-card');
+      report(numberCards.length > 0, `Hand renders pure number cards (found ${numberCards.length})`);
+      const hasLegacyDesc = document.querySelector('.hc-desc') !== null;
+      report(!hasLegacyDesc, 'Hand cards contain no legacy text descriptions or modifiers');
+
+      // 3. Test Beat 1 Result Modal phase
+      soloPlayState.currentPA.phase = 'beat1_result';
       soloPlayState.currentPA.beatResults.beat1 = {
         winner: 'pitcher',
         count: '0-2',
         countDisplay: "0-2 Pitcher's Count",
-        pitcherTotal: 7,
-        batterTotal: 4
+        pitcherCards: ['P1'],
+        batterCards: ['B1'],
+        pitcherTotal: 10,
+        batterTotal: 2
       };
+      handleGameState(soloPlayState);
+      const b1Modal = document.getElementById('beat1-result-modal');
+      report(b1Modal !== null, 'Beat 1 Result Modal renders in beat1_result phase');
+      report(b1Modal?.textContent.includes('0-2'), 'Beat 1 Result Modal shows established count (0-2)');
+
+      // 4. Test Beat 2 placing
+      soloPlayState.currentPA.phase = 'placing';
+      soloPlayState.currentPA.beat = 'beat2';
       handleGameState(soloPlayState);
       const b2Html = document.getElementById('app').innerHTML;
       report(b2Html.length > 100, `Beat 2 placing rendered successfully (${b2Html.length} chars)`);
+
+      // 5. Test Resolved phase (At-Bat Outcome Pop-up)
+      soloPlayState.currentPA.phase = 'resolved';
+      soloPlayState.currentPA.resolution = {
+        outcome: { display: '💥 HOME RUN!', runsScored: 2, outsAdded: 0 },
+        z1: { winner: 'batter', count: '3-1', pitcherTotal: 3, batterTotal: 8 },
+        z2: {
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherExecuted: true,
+          swingType: 'power',
+          targetZone: 'high',
+          batterExecuted: true,
+          sameLocation: true,
+          isHotZone: true,
+          outcomeDisplay: 'Home Run'
+        }
+      };
+      handleGameState(soloPlayState);
+      const outcomeModal = document.getElementById('outcome-overlay');
+      report(outcomeModal !== null, 'At-Bat Outcome Pop-up renders in resolved phase');
+      report(outcomeModal?.textContent.includes('HOME RUN'), 'At-Bat Outcome Pop-up shows outcome headline');
 
     } catch(e) {
       const p = document.createElement('p');

@@ -7,16 +7,9 @@
 
 function getZoneValue(card, targetZone) {
   if (!card) return 0;
-  if (card.zone === 'any' || card.beat === 'any') return card.value;
-  if (card.beat === 'beat1') {
-    return targetZone === 'z1' ? card.value : Math.floor(card.value * 0.5);
-  }
-  if (card.beat === 'beat2') {
-    return (targetZone === 'z2' || targetZone === 'z3') ? card.value : Math.floor(card.value * 0.5);
-  }
-  const prefMap = { read:'z1', contact:'z2', result:'z3' };
-  return prefMap[card.zone] === targetZone ? card.value : Math.floor(card.value * 0.5);
+  return card.value || 0;
 }
+
 
 // Sum effective values for a list of card IDs played in a given zone.
 function sumZone(cardIds, zoneName) {
@@ -965,10 +958,6 @@ function resolveBeat1(opts) {
     pitcherCardVal = Math.max(0, pitcherCardVal + staminaMod.z1);
   }
 
-  // First pitch ambush (B8)
-  if (isFirstPAOfInning && batterCardId === 'B8') {
-    batterCardVal += 3;
-  }
 
   let winner = 'tie';
   let count = '3-2';
@@ -1068,14 +1057,8 @@ function resolveBeat2(opts) {
   const bCard = getCard(batterCardId);
   let bCardVal = bCard ? (bCard.value || 0) : 0;
 
-  // Highlight Card / Perks modifiers on Batter Card Value
-  if (bCard?.outcomeEffect === 'power_surge' && (effectiveCount === '3-1' || z1Winner === 'batter')) {
-    bCardVal += 3;
-  }
-  if (batterAdvantagePerk === 'hang_breaking' || batterAdvantagePerk === 'ambush_first') {
-    bCardVal += 2;
-  }
   const batterExecuted = (bCardVal >= bEffDiff);
+
 
   // Public Scouting Report Matchup
   const sameLocation = (pitchLocation === targetZone);
@@ -1181,77 +1164,15 @@ function resolveBeat2(opts) {
     }
   }
 
-  // ── Highlight Card Triggers ──
-  // 1. Web Gem (P26): Robs Home Run into Flyout
-  if (pCard?.outcomeEffect === 'web_gem' && outcomeType === 'homerun') {
-    outcomeType = 'flyout';
-    outcomeDisplay = '🧤 ROBBED AT THE WALL! (Web Gem Out)';
-    perkLogs.push('Gold Glove Web Gem robs the Home Run!');
-  }
-
-  // 2. Double Play (P27): Turns Groundout with runner on 1st into 2-Out DP
   let isDoublePlay = false;
-  if (pCard?.outcomeEffect === 'double_play' && outcomeType === 'groundout' && bases.first) {
-    isDoublePlay = true;
-    outcomeType = 'double_play';
-    outcomeDisplay = '⚡ 6-4-3 DOUBLE PLAY!';
-    perkLogs.push('Turned the textbook 6-4-3 double play!');
-  }
-
-  // 3. Spoil It (B19): Fouls off Out or K (resets Beat 2)
   let isFoulBall = false;
-  if (bCard?.outcomeEffect === 'spoil_it' && (outcomeType === 'groundout' || outcomeType === 'flyout' || outcomeType === 'k')) {
-    isFoulBall = true;
-    outcomeDisplay = '⚾ FOUL BALL! (Spoiled Pitch)';
-    perkLogs.push('Battled and fouled off the pitch!');
-  }
-
-  // 4. Gap Power (B26): Upgrades Single -> Double, Double -> Triple
-  if (bCard?.outcomeEffect === 'gap_power') {
-    if (outcomeType === 'single') {
-      outcomeType = 'double';
-      outcomeDisplay = '⚡ Stand-up Double! (Gap Power)';
-      perkLogs.push('Drove it into the alley for extra bases!');
-    } else if (outcomeType === 'double') {
-      outcomeType = 'triple';
-      outcomeDisplay = '🚀 Triple! (Speed & Gap Power)';
-      perkLogs.push('Rattled around the corner for three bags!');
-    }
-  }
-
-  // 5. Moonshot (B27): Bonus run if Home Run hits
   let bonusRun = 0;
-  if (bCard?.outcomeEffect === 'moonshot' && outcomeType === 'homerun') {
-    bonusRun = 1;
-    outcomeDisplay = '💥 MOONSHOT HOME RUN (+1 BONUS RUN)!';
-    perkLogs.push('Towering moonshot clears the stadium for a bonus run!');
-  }
-
-  // 6. Wipeout Slider (P18): Converts Single into Strikeout if 0-2 Count
-  if (pCard?.outcomeEffect === 'wipeout_slider' && (effectiveCount === '0-2' || z1Winner === 'pitcher') && outcomeType === 'single') {
-    outcomeType = 'k';
-    outcomeDisplay = '⚡ STRIKEOUT SWINGING! (Wipeout)';
-    perkLogs.push('Nasty wipeout pitch fools the batter!');
-  }
-
-  // 7. High Cheese (P13, P15, P20, P22, P28): Converts High Flyout into Strikeout
-  if (pCard?.outcomeEffect === 'high_cheese' && pitchLocation === 'high' && (outcomeType === 'flyout' || outcomeType === 'out')) {
-    outcomeType = 'k';
-    outcomeDisplay = '⚡ STRIKEOUT SWINGING! (High Cheese)';
-    perkLogs.push('Blown away high in the zone!');
-  }
-
-  // 8. Bunt Against Shift (B13): Converts Groundout into Infield Single
-  if (bCard?.outcomeEffect === 'bunt_shift' && outcomeType === 'groundout') {
-    outcomeType = 'single';
-    outcomeDisplay = '⚡ Infield Bunt Single!';
-    perkLogs.push('Dropped down a beautiful bunt against the shift!');
-  }
 
   // Calculate Base Running & Outs
   let runsScored = 0;
   let outsAdded = 0;
   let newBases = { ...bases };
+
 
   if (isFoulBall) {
     outsAdded = 0;
