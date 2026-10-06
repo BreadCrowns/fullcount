@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Full Count — 10-Game Simulation Runner</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0b0f19; color: #e2e8f0; padding: 24px; line-height: 1.5; }
+    h1, h2, h3 { color: #f59e0b; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .card { background: #131c2e; border: 1px solid #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+    th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #1e293b; }
+    th { background: #1e293b; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+    tr:hover { background: rgba(255,255,255,0.02); }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+    .badge-win { background: #065f46; color: #34d399; }
+    .badge-loss { background: #7f1d1d; color: #f87171; }
+    .badge-tie { background: #78350f; color: #fcd34d; }
+    .stat-highlight { color: #38bdf8; font-weight: bold; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-box { background: #1e293b; border-radius: 6px; padding: 12px; text-align: center; }
+    .stat-box .val { font-size: 1.8rem; font-weight: 800; color: #f59e0b; }
+    .stat-box .lbl { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <h1>⚾ Full Count — 10-Game Tournament Simulation</h1>
+  <div id="status-container">Simulating 10 games...</div>
+  <div id="dashboard"></div>
+  <pre id="results-json" style="max-height:0; overflow:hidden;"></pre>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/resolution.js"></script>
+  <script>
+    'use strict';
+
+    const MATCHUPS = [
+      {
+        id: 1,
+        title: "Game 1: Power vs Control",
+        host: { name: "New York Titans", starter: 'PC01', reliever: 'PC07', lineup: 'sluggers', deck: 'bigInning' },
+        guest: { name: "Tokyo Ronin", starter: 'PC02', reliever: 'PC08', lineup: 'balanced', deck: 'grind' }
+      },
+      {
+        id: 2,
+        title: "Game 2: Ground Machine vs The Ace",
+        host: { name: "Havana Sinks", starter: 'PC03', reliever: 'PC07', lineup: 'speedy', deck: 'grind' },
+        guest: { name: "Santo Domingo Aces", starter: 'PC06', reliever: 'PC04', lineup: 'sluggers', deck: 'bigInning' }
+      },
+      {
+        id: 3,
+        title: "Game 3: Junkball Mystery vs Raw Heat",
+        host: { name: "Moscow Spinners", starter: 'PC05', reliever: 'PC04', lineup: 'balanced', deck: 'manager' },
+        guest: { name: "Texas Fireballs", starter: 'PC01', reliever: 'PC07', lineup: 'sluggers', deck: 'bigInning' }
+      },
+      {
+        id: 4,
+        title: "Game 4: The Ace vs Deception",
+        host: { name: "Boston Machine", starter: 'PC06', reliever: 'PC04', lineup: 'balanced', deck: 'bigInning' },
+        guest: { name: "Taipei Wizards", starter: 'PC08', reliever: 'PC03', lineup: 'speedy', deck: 'manager' }
+      },
+      {
+        id: 5,
+        title: "Game 5: Control vs Sinker Special",
+        host: { name: "Kyoto Artists", starter: 'PC02', reliever: 'PC08', lineup: 'sluggers', deck: 'grind' },
+        guest: { name: "Monterrey Sinks", starter: 'PC03', reliever: 'PC07', lineup: 'balanced', deck: 'grind' }
+      },
+      {
+        id: 6,
+        title: "Game 6: High Velocity Closer Showcase",
+        host: { name: "Miami Smoke", starter: 'PC04', reliever: 'PC01', lineup: 'sluggers', deck: 'bigInning' },
+        guest: { name: "Detroit Setup", starter: 'PC07', reliever: 'PC06', lineup: 'balanced', deck: 'manager' }
+      },
+      {
+        id: 7,
+        title: "Game 7: Small Ball Precision vs Heavy Slugging",
+        host: { name: "Seoul Magicians", starter: 'PC08', reliever: 'PC02', lineup: 'speedy', deck: 'manager' },
+        guest: { name: "Chicago Bashers", starter: 'PC01', reliever: 'PC04', lineup: 'sluggers', deck: 'bigInning' }
+      },
+      {
+        id: 8,
+        title: "Game 8: Master Tacticians Clash",
+        host: { name: "St. Petersburg Professors", starter: 'PC05', reliever: 'PC08', lineup: 'balanced', deck: 'manager' },
+        guest: { name: "Osaka Masters", starter: 'PC02', reliever: 'PC07', lineup: 'speedy', deck: 'grind' }
+      },
+      {
+        id: 9,
+        title: "Game 9: Dominant Ace vs Spin Wizard",
+        host: { name: "Santiago Machines", starter: 'PC06', reliever: 'PC03', lineup: 'sluggers', deck: 'bigInning' },
+        guest: { name: "Kiev Junkballers", starter: 'PC05', reliever: 'PC04', lineup: 'balanced', deck: 'manager' }
+      },
+      {
+        id: 10,
+        title: "Game 10: Grand Championship Finale",
+        host: { name: "All-Star Titans", starter: 'PC01', reliever: 'PC06', lineup: 'sluggers', deck: 'bigInning' },
+        guest: { name: "All-Star Artists", starter: 'PC02', reliever: 'PC04', lineup: 'balanced', deck: 'manager' }
+      }
+    ];
+
+    function createEmptyBatterStats(charId) {
+      const char = BATTER_CHARACTERS[charId] || { name: charId, archetype: 'Unknown' };
+      return {
+        id: charId,
+        name: char.name,
+        archetype: char.archetype,
+        pa: 0,
+        ab: 0,
+        r: 0,
+        h: 0,
+        singles: 0,
+        doubles: 0,
+        triples: 0,
+        hr: 0,
+        rbi: 0,
+        bb: 0,
+        so: 0,
+        dp: 0
+      };
+    }
+
+    function createEmptyPitcherStats(charId) {
+      const char = PITCHER_CHARACTERS[charId] || { name: charId, archetype: 'Unknown' };
+      return {
+        id: charId,
+        name: char.name,
+        archetype: char.archetype,
+        g: 0,
+        outsPitched: 0,
+        bf: 0, // batters faced
+        h: 0,
+        r: 0,
+        er: 0,
+        bb: 0,
+        so: 0,
+        calledK: 0,
+        hr: 0,
+        pitches: { fastball: 0, breaking: 0, offspeed: 0 }
+      };
+    }
+
+    function simulateSingleGame(matchup) {
+      const hostLineup = LINEUP_PRESETS[matchup.host.lineup]?.lineup || LINEUP_PRESETS.sluggers.lineup;
+      const guestLineup = LINEUP_PRESETS[matchup.guest.lineup]?.lineup || LINEUP_PRESETS.balanced.lineup;
+
+      const rosters = {
+        host: {
+          name: matchup.host.name,
+          startingPitcher: matchup.host.starter,
+          reliefPitcher: matchup.host.reliever,
+          lineup: hostLineup,
+          deckPreset: matchup.host.deck
+        },
+        guest: {
+          name: matchup.guest.name,
+          startingPitcher: matchup.guest.starter,
+          reliefPitcher: matchup.guest.reliever,
+          lineup: guestLineup,
+          deckPreset: matchup.guest.deck
+        }
+      };
+
+      const hostStarter = PITCHER_CHARACTERS[rosters.host.startingPitcher];
+      const guestStarter = PITCHER_CHARACTERS[rosters.guest.startingPitcher];
+
+      const simState = {
+        inning: 1,
+        half: 'top',
+        outs: 0,
+        score: { top: 0, bottom: 0 },
+        bases: { first: false, second: false, third: false },
+        batterIndex: { top: 0, bottom: 0 },
+        activePitcher: { host: rosters.host.startingPitcher, guest: rosters.guest.startingPitcher },
+        pitcherPAs: { host: 0, guest: 0 },
+        lastPitchCall: { host: null, guest: null },
+        arsenalCharges: {
+          host: { ...(hostStarter?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) },
+          guest: { ...(guestStarter?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) }
+        },
+        hands: {
+          host: [...(DECK_PRESETS[rosters.host.deckPreset]?.pitcherCards || DECK_PRESETS.grind.pitcherCards)],
+          guest: [...(DECK_PRESETS[rosters.guest.deckPreset]?.batterCards || DECK_PRESETS.grind.batterCards)]
+        }
+      };
+
+      const boxScore = {
+        innings: [], // { inning: 1, top: 0, bottom: 0 }
+        host: { runs: 0, hits: 0, errors: 0, lob: 0, batters: {}, pitchers: {} },
+        guest: { runs: 0, hits: 0, errors: 0, lob: 0, batters: {}, pitchers: {} },
+        paLog: [],
+        highlights: []
+      };
+
+      // Initialize batter tracking
+      hostLineup.forEach(id => { boxScore.host.batters[id] = createEmptyBatterStats(id); });
+      guestLineup.forEach(id => { boxScore.guest.batters[id] = createEmptyBatterStats(id); });
+
+      // Initialize pitcher tracking
+      [rosters.host.startingPitcher, rosters.host.reliefPitcher].forEach(id => {
+        boxScore.host.pitchers[id] = createEmptyPitcherStats(id);
+      });
+      [rosters.guest.startingPitcher, rosters.guest.reliefPitcher].forEach(id => {
+        boxScore.guest.pitchers[id] = createEmptyPitcherStats(id);
+      });
+
+      let currentInningRecord = { inning: 1, top: 0, bottom: 0 };
+      let totalPAs = 0;
+      let gameEnded = false;
+
+      while (!gameEnded && totalPAs < 150) {
+        totalPAs++;
+        const half = simState.half;
+        const pitchingRole = half === 'top' ? 'host' : 'guest';
+        const battingRole = half === 'top' ? 'guest' : 'host';
+        const currentPitcherId = simState.activePitcher[pitchingRole];
+        const pitcherChar = PITCHER_CHARACTERS[currentPitcherId] || PITCHER_CHARACTERS['PC01'];
+
+        const battingLineup = rosters[battingRole].lineup;
+        const bIdx = simState.batterIndex[half] % battingLineup.length;
+        const currentBatterId = battingLineup[bIdx] || 'BC01';
+        const batterChar = BATTER_CHARACTERS[currentBatterId] || BATTER_CHARACTERS['BC01'];
+
+        const batterStats = boxScore[battingRole].batters[currentBatterId];
+        const pitcherStats = boxScore[pitchingRole].pitchers[currentPitcherId];
+        batterStats.pa++;
+        pitcherStats.bf++;
+
+        // Auto bullpen substitution check (if starter is tiring/gassed and faced 6+ PAs)
+        if (currentPitcherId === rosters[pitchingRole].startingPitcher && simState.pitcherPAs[pitchingRole] >= 6) {
+          const reliefId = rosters[pitchingRole].reliefPitcher;
+          const reliever = PITCHER_CHARACTERS[reliefId];
+          simState.activePitcher[pitchingRole] = reliefId;
+          simState.pitcherPAs[pitchingRole] = 0;
+          simState.arsenalCharges[pitchingRole] = { ...(reliever?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) };
+          boxScore.highlights.push(`${rosters[pitchingRole].name} brings in reliever ${reliever?.name || reliefId} to pitch in Inning ${simState.inning}.`);
+        }
+
+        // Decisions for Beat 1
+        const pitchDecision = executeBotPlayBeat(simState, pitchingRole, 'beat1');
+        const batDecision = executeBotPlayBeat(simState, battingRole, 'beat1');
+        simState.hands[pitchingRole] = pitchDecision.botHand;
+        simState.hands[battingRole] = batDecision.botHand;
+
+        // Beat 1: The Count Battle
+        const b1 = resolveBeat1({
+          pitcherCardId: pitchDecision.cardId,
+          batterCardId: batDecision.cardId,
+          pitcherChar,
+          batterChar,
+          pitcherPAsFaced: simState.pitcherPAs[pitchingRole],
+          isFirstPAOfInning: simState.outs === 0
+        });
+
+        // Beat 2: The Payoff Pitch
+        const pitcherPlay = executeBotPlayBeat(simState, pitchingRole, 'beat2');
+        simState.hands[pitchingRole] = pitcherPlay.botHand;
+        const batterPlay = executeBotPlayBeat(simState, battingRole, 'beat2');
+        simState.hands[battingRole] = batterPlay.botHand;
+
+        const chosenPitch = pitcherPlay.pitchType || 'fastball';
+        if (simState.arsenalCharges[pitchingRole][chosenPitch] > 0) {
+          simState.arsenalCharges[pitchingRole][chosenPitch]--;
+        }
+        pitcherStats.pitches[chosenPitch] = (pitcherStats.pitches[chosenPitch] || 0) + 1;
+
+        const b2 = resolveBeat2({
+          count: b1.count,
+          beat1Winner: b1.winner,
+          z1Winner: b1.winner,
+          pitchType: pitcherPlay.pitchType || 'fastball',
+          pitchLocation: pitcherPlay.pitchLocation || 'high',
+          pitcherCardId: pitcherPlay.cardId,
+          swingType: batterPlay.swingType || 'balanced',
+          targetZone: batterPlay.targetZone || 'high',
+          batterCardId: batterPlay.cardId,
+          pitcherChar,
+          batterChar,
+          pitcherPAsFaced: simState.pitcherPAs[pitchingRole],
+          bases: simState.bases,
+          outs: simState.outs,
+          score: { batting: simState.score[half], pitching: simState.score[half === 'top' ? 'bottom' : 'top'] },
+          pitcherAdvantagePerk: b1.pitcherAdvantagePerk,
+          batterAdvantagePerk: b1.batterAdvantagePerk
+        });
+
+        const paResult = resolveSequentialPA({
+          beat1: b1,
+          beat2: b2,
+          bases: simState.bases,
+          pitcherChar,
+          batterChar,
+          score: { batting: simState.score[half], pitching: simState.score[half === 'top' ? 'bottom' : 'top'] },
+          outs: simState.outs,
+          half
+        });
+
+        const outcome = paResult.outcome;
+        const runsScored = outcome.runsScored || 0;
+        const outsAdded = outcome.outsAdded || 0;
+        const outcomeType = outcome.type;
+
+        // Update stats
+        if (outcomeType === 'walk') {
+          batterStats.bb++;
+          pitcherStats.bb++;
+          if (runsScored > 0) {
+            batterStats.rbi += runsScored;
+            pitcherStats.r += runsScored;
+            pitcherStats.er += runsScored;
+          }
+        } else if (outcomeType === 'k') {
+          batterStats.ab++;
+          batterStats.so++;
+          pitcherStats.so++;
+          pitcherStats.outsPitched += 1;
+          if (paResult.trigger === 'called_k') {
+            pitcherStats.calledK++;
+          }
+        } else {
+          // Batted ball outcome
+          batterStats.ab++;
+          if (outcomeType === 'single') {
+            batterStats.h++;
+            batterStats.singles++;
+            boxScore[battingRole].hits++;
+            pitcherStats.h++;
+          } else if (outcomeType === 'double') {
+            batterStats.h++;
+            batterStats.doubles++;
+            boxScore[battingRole].hits++;
+            pitcherStats.h++;
+          } else if (outcomeType === 'triple') {
+            batterStats.h++;
+            batterStats.triples++;
+            boxScore[battingRole].hits++;
+            pitcherStats.h++;
+          } else if (outcomeType === 'homerun') {
+            batterStats.h++;
+            batterStats.hr++;
+            batterStats.r++;
+            boxScore[battingRole].hits++;
+            pitcherStats.h++;
+            pitcherStats.hr++;
+          } else if (outcomeType === 'double_play') {
+            batterStats.dp++;
+          }
+
+          if (runsScored > 0) {
+            batterStats.rbi += runsScored;
+            pitcherStats.r += runsScored;
+            pitcherStats.er += runsScored;
+          }
+          pitcherStats.outsPitched += outsAdded;
+        }
+
+        // Apply state updates
+        simState.outs += outsAdded;
+        simState.bases = outcome.newBases || simState.bases;
+        simState.score[half] += runsScored;
+        currentInningRecord[half] += runsScored;
+        boxScore[battingRole].runs += runsScored;
+        simState.batterIndex[half]++;
+        simState.pitcherPAs[pitchingRole]++;
+        simState.lastPitchCall[pitchingRole] = paResult.primaryPitchCall;
+
+        // Log entry
+        boxScore.paLog.push({
+          paNum: totalPAs,
+          inning: simState.inning,
+          half,
+          pitcher: pitcherChar.name,
+          batter: batterChar.name,
+          pitch: chosenPitch,
+          guess: batDecision.batterGuess,
+          b1Winner: b1.winner,
+          b1Knockout: b1.cascadeEffect === 'walk' ? 'Walk' : b1.cascadeEffect === 'called_k' ? 'Called K' : null,
+          b2Outcome: outcome.display,
+          runsScored,
+          outsAdded,
+          score: `${simState.score.top}-${simState.score.bottom}`
+        });
+
+        // Special highlight log
+        if (outcomeType === 'homerun') {
+          boxScore.highlights.push(`💥 ${batterChar.name} crushed a HOME RUN (${runsScored} RBI) off ${pitcherChar.name} in Inn ${simState.inning}!`);
+        } else if (paResult.trigger === 'called_k') {
+          boxScore.highlights.push(`⚡ ${pitcherChar.name} threw a BULLSEYE Called Strikeout looking to punch out ${batterChar.name}!`);
+        } else if (outcomeType === 'double_play') {
+          boxScore.highlights.push(`⚡ ${pitcherChar.name} induced a textbook DOUBLE PLAY to escape the jam!`);
+        }
+
+        // Walk-off check in bottom half of 3rd or extra innings
+        if (simState.inning >= 3 && half === 'bottom' && simState.score.bottom > simState.score.top) {
+          gameEnded = true;
+          boxScore.highlights.push(`🎉 WALK-OFF VICTORY for ${rosters.host.name} in Inning ${simState.inning}!`);
+          break;
+        }
+
+        // Inning transition check
+        if (simState.outs >= 3) {
+          // Count left on base
+          const lobCount = countRunners(simState.bases);
+          boxScore[battingRole].lob += lobCount;
+
+          simState.outs = 0;
+          simState.bases = { first: false, second: false, third: false };
+
+          if (simState.half === 'top') {
+            simState.half = 'bottom';
+            // Check if bottom 3 is even needed (if home team is ahead after top 3)
+            if (simState.inning >= 3 && simState.score.bottom > simState.score.top) {
+              gameEnded = true;
+              break;
+            }
+          } else {
+            // End of full inning
+            boxScore.innings.push({ ...currentInningRecord });
+            if (simState.inning >= 3 && simState.score.top !== simState.score.bottom) {
+              gameEnded = true;
+            } else {
+              simState.inning++;
+              currentInningRecord = { inning: simState.inning, top: 0, bottom: 0 };
+              simState.half = 'top';
+            }
+          }
+        }
+
+        // Hand refill logic
+        ['host', 'guest'].forEach(r => {
+          const isPitching = (r === pitchingRole);
+          const deck = isPitching ? DECK_PRESETS[rosters[r].deckPreset]?.pitcherCards : DECK_PRESETS[rosters[r].deckPreset]?.batterCards;
+          const fallbackDeck = isPitching ? DECK_PRESETS.grind.pitcherCards : DECK_PRESETS.grind.batterCards;
+          const activeDeck = deck || fallbackDeck;
+          if (!simState.hands[r] || simState.hands[r].length < 3 || simState.hands[r].some(id => {
+            const card = getCard(id);
+            return card && card.type !== 'universal' && card.type !== (isPitching ? 'pitcher' : 'batter');
+          })) {
+            simState.hands[r] = [...activeDeck];
+          }
+        });
+      }
+
+      if (currentInningRecord.top > 0 || currentInningRecord.bottom > 0 || boxScore.innings.length < simState.inning) {
+        if (!boxScore.innings.some(rec => rec.inning === currentInningRecord.inning)) {
+          boxScore.innings.push({ ...currentInningRecord });
+        }
+      }
+
+      const winner = simState.score.bottom > simState.score.top ? 'host' : (simState.score.top > simState.score.bottom ? 'guest' : 'tie');
+
+      return {
+        id: matchup.id,
+        title: matchup.title,
+        rosters,
+        finalScore: {
+          host: simState.score.bottom,
+          guest: simState.score.top
+        },
+        winner,
+        winnerName: winner === 'host' ? rosters.host.name : (winner === 'guest' ? rosters.guest.name : 'Tie'),
+        inningsPlayed: simState.inning,
+        totalPAs,
+        boxScore
+      };
+    }
+
+    function runAllSimulations() {
+      const allResults = [];
+      MATCHUPS.forEach(m => {
+        allResults.push(simulateSingleGame(m));
+      });
+
+      // Aggregates
+      const aggregateStats = {
+        totalGames: allResults.length,
+        homeWins: allResults.filter(g => g.winner === 'host').length,
+        awayWins: allResults.filter(g => g.winner === 'guest').length,
+        ties: allResults.filter(g => g.winner === 'tie').length,
+        totalRuns: allResults.reduce((acc, g) => acc + g.finalScore.host + g.finalScore.guest, 0),
+        totalHits: allResults.reduce((acc, g) => acc + g.boxScore.host.hits + g.boxScore.guest.hits, 0),
+        totalPAs: allResults.reduce((acc, g) => acc + g.totalPAs, 0),
+        batters: {},
+        pitchers: {},
+        deckWins: { grind: 0, bigInning: 0, manager: 0 },
+        deckGames: { grind: 0, bigInning: 0, manager: 0 },
+        lineupWins: { sluggers: 0, balanced: 0, speedy: 0 },
+        lineupGames: { sluggers: 0, balanced: 0, speedy: 0 }
+      };
+
+      allResults.forEach(g => {
+        // Deck & Lineup tracking
+        const hDeck = g.rosters.host.deckPreset;
+        const aDeck = g.rosters.guest.deckPreset;
+        aggregateStats.deckGames[hDeck] = (aggregateStats.deckGames[hDeck] || 0) + 1;
+        aggregateStats.deckGames[aDeck] = (aggregateStats.deckGames[aDeck] || 0) + 1;
+
+        const hLineup = MATCHUPS.find(m => m.id === g.id).host.lineup;
+        const aLineup = MATCHUPS.find(m => m.id === g.id).guest.lineup;
+        aggregateStats.lineupGames[hLineup] = (aggregateStats.lineupGames[hLineup] || 0) + 1;
+        aggregateStats.lineupGames[aLineup] = (aggregateStats.lineupGames[aLineup] || 0) + 1;
+
+        if (g.winner === 'host') {
+          aggregateStats.deckWins[hDeck] = (aggregateStats.deckWins[hDeck] || 0) + 1;
+          aggregateStats.lineupWins[hLineup] = (aggregateStats.lineupWins[hLineup] || 0) + 1;
+        } else if (g.winner === 'guest') {
+          aggregateStats.deckWins[aDeck] = (aggregateStats.deckWins[aDeck] || 0) + 1;
+          aggregateStats.lineupWins[aLineup] = (aggregateStats.lineupWins[aLineup] || 0) + 1;
+        }
+
+        // Batters
+        ['host', 'guest'].forEach(side => {
+          Object.values(g.boxScore[side].batters).forEach(b => {
+            if (!aggregateStats.batters[b.id]) {
+              aggregateStats.batters[b.id] = createEmptyBatterStats(b.id);
+            }
+            const aggB = aggregateStats.batters[b.id];
+            aggB.pa += b.pa;
+            aggB.ab += b.ab;
+            aggB.r += b.r;
+            aggB.h += b.h;
+            aggB.singles += b.singles;
+            aggB.doubles += b.doubles;
+            aggB.triples += b.triples;
+            aggB.hr += b.hr;
+            aggB.rbi += b.rbi;
+            aggB.bb += b.bb;
+            aggB.so += b.so;
+            aggB.dp += b.dp;
+          });
+        });
+
+        // Pitchers
+        ['host', 'guest'].forEach(side => {
+          Object.values(g.boxScore[side].pitchers).forEach(p => {
+            if (!aggregateStats.pitchers[p.id]) {
+              aggregateStats.pitchers[p.id] = createEmptyPitcherStats(p.id);
+            }
+            const aggP = aggregateStats.pitchers[p.id];
+            if (p.bf > 0) aggP.g += 1;
+            aggP.outsPitched += p.outsPitched;
+            aggP.bf += p.bf;
+            aggP.h += p.h;
+            aggP.r += p.r;
+            aggP.er += p.er;
+            aggP.bb += p.bb;
+            aggP.so += p.so;
+            aggP.calledK += p.calledK;
+            aggP.hr += p.hr;
+            aggP.pitches.fastball += p.pitches.fastball;
+            aggP.pitches.breaking += p.pitches.breaking;
+            aggP.pitches.offspeed += p.pitches.offspeed;
+          });
+        });
+      });
+
+      // Output JSON into DOM
+      const outputPayload = {
+        summary: {
+          totalGames: aggregateStats.totalGames,
+          homeWins: aggregateStats.homeWins,
+          awayWins: aggregateStats.awayWins,
+          ties: aggregateStats.ties,
+          totalRuns: aggregateStats.totalRuns,
+          totalHits: aggregateStats.totalHits,
+          totalPAs: aggregateStats.totalPAs,
+          avgRunsPerGame: (aggregateStats.totalRuns / aggregateStats.totalGames).toFixed(2),
+          avgHitsPerGame: (aggregateStats.totalHits / aggregateStats.totalGames).toFixed(2)
+        },
+        deckPerformance: aggregateStats.deckWins,
+        lineupPerformance: aggregateStats.lineupWins,
+        batterLeaderboard: Object.values(aggregateStats.batters).map(b => {
+          const avg = b.ab > 0 ? (b.h / b.ab).toFixed(3) : '.000';
+          const obp = b.pa > 0 ? ((b.h + b.bb) / b.pa).toFixed(3) : '.000';
+          const slg = b.ab > 0 ? ((b.singles + b.doubles * 2 + b.triples * 3 + b.hr * 4) / b.ab).toFixed(3) : '.000';
+          const ops = (parseFloat(obp) + parseFloat(slg)).toFixed(3);
+          return { ...b, avg, obp, slg, ops };
+        }).sort((a, b) => parseFloat(b.ops) - parseFloat(a.ops)),
+        pitcherLeaderboard: Object.values(aggregateStats.pitchers).filter(p => p.bf > 0).map(p => {
+          const ip = (p.outsPitched / 3).toFixed(1);
+          const ipNum = p.outsPitched / 3;
+          const era = ipNum > 0 ? ((p.er * 3) / ipNum).toFixed(2) : '0.00'; // 3-inning game ERA scale
+          const whip = ipNum > 0 ? ((p.bb + p.h) / ipNum).toFixed(2) : '0.00';
+          const kPct = p.bf > 0 ? ((p.so / p.bf) * 100).toFixed(1) + '%' : '0.0%';
+          return { ...p, ip, era, whip, kPct };
+        }).sort((a, b) => parseFloat(a.era) - parseFloat(b.era)),
+        games: allResults
+      };
+
+      document.getElementById('results-json').textContent = JSON.stringify(outputPayload, null, 2);
+      renderDashboard(outputPayload);
+      document.getElementById('status-container').textContent = `✅ Successfully simulated 10 full games (${aggregateStats.totalPAs} total PAs played)!`;
+      window.simResults = outputPayload;
+    }
+
+    function renderDashboard(data) {
+      const db = document.getElementById('dashboard');
+      let html = `
+        <div class="grid-4">
+          <div class="stat-box"><div class="val">${data.summary.totalGames}</div><div class="lbl">Games Played</div></div>
+          <div class="stat-box"><div class="val">${data.summary.totalRuns}</div><div class="lbl">Total Runs (${data.summary.avgRunsPerGame}/gm)</div></div>
+          <div class="stat-box"><div class="val">${data.summary.totalHits}</div><div class="lbl">Total Hits (${data.summary.avgHitsPerGame}/gm)</div></div>
+          <div class="stat-box"><div class="val">${data.summary.totalPAs}</div><div class="lbl">Total Plate Apps</div></div>
+        </div>
+
+        <h2>🏆 Game-by-Game Scoreboard</h2>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Game</th>
+                <th>Away Team</th>
+                <th class="text-center">Score</th>
+                <th>Home Team</th>
+                <th>Innings</th>
+                <th>Winning Strategy</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.games.forEach(g => {
+        const awayBadge = g.winner === 'guest' ? '<span class="badge badge-win">W</span>' : '<span class="badge badge-loss">L</span>';
+        const homeBadge = g.winner === 'host' ? '<span class="badge badge-win">W</span>' : '<span class="badge badge-loss">L</span>';
+        html += `
+          <tr>
+            <td><strong>${g.title}</strong></td>
+            <td>${g.rosters.guest.name} (${g.rosters.guest.startingPitcher}) ${awayBadge}</td>
+            <td class="text-center"><span class="stat-highlight">${g.finalScore.guest} - ${g.finalScore.host}</span></td>
+            <td>${g.rosters.host.name} (${g.rosters.host.startingPitcher}) ${homeBadge}</td>
+            <td>${g.inningsPlayed} inn</td>
+            <td><em>${g.winnerName}</em></td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+
+        <h2>🥇 Top Hitters (Leaderboard by OPS)</h2>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Batter</th>
+                <th>Archetype</th>
+                <th class="text-right">PA</th>
+                <th class="text-right">AB</th>
+                <th class="text-right">H</th>
+                <th class="text-right">HR</th>
+                <th class="text-right">RBI</th>
+                <th class="text-right">BB</th>
+                <th class="text-right">SO</th>
+                <th class="text-right">AVG</th>
+                <th class="text-right">OBP</th>
+                <th class="text-right">SLG</th>
+                <th class="text-right">OPS</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.batterLeaderboard.slice(0, 8).forEach(b => {
+        html += `
+          <tr>
+            <td><strong>${b.name}</strong></td>
+            <td>${b.archetype}</td>
+            <td class="text-right">${b.pa}</td>
+            <td class="text-right">${b.ab}</td>
+            <td class="text-right">${b.h}</td>
+            <td class="text-right stat-highlight">${b.hr}</td>
+            <td class="text-right">${b.rbi}</td>
+            <td class="text-right">${b.bb}</td>
+            <td class="text-right">${b.so}</td>
+            <td class="text-right">${b.avg}</td>
+            <td class="text-right">${b.obp}</td>
+            <td class="text-right">${b.slg}</td>
+            <td class="text-right stat-highlight">${b.ops}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+
+        <h2>⚾ Pitching Staff Leaderboard</h2>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Pitcher</th>
+                <th>Archetype</th>
+                <th class="text-right">App</th>
+                <th class="text-right">IP</th>
+                <th class="text-right">BF</th>
+                <th class="text-right">H</th>
+                <th class="text-right">ER</th>
+                <th class="text-right">BB</th>
+                <th class="text-right">SO</th>
+                <th class="text-right">Called K</th>
+                <th class="text-right">WHIP</th>
+                <th class="text-right">ERA (3-Inn)</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.pitcherLeaderboard.forEach(p => {
+        html += `
+          <tr>
+            <td><strong>${p.name}</strong></td>
+            <td>${p.archetype}</td>
+            <td class="text-right">${p.g}</td>
+            <td class="text-right">${p.ip}</td>
+            <td class="text-right">${p.bf}</td>
+            <td class="text-right">${p.h}</td>
+            <td class="text-right">${p.er}</td>
+            <td class="text-right">${p.bb}</td>
+            <td class="text-right stat-highlight">${p.so}</td>
+            <td class="text-right">${p.calledK}</td>
+            <td class="text-right">${p.whip}</td>
+            <td class="text-right stat-highlight">${p.era}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      db.innerHTML = html;
+    }
+
+    runAllSimulations();
+  </script>
+</body>
+</html>

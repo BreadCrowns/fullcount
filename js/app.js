@@ -27,9 +27,13 @@ let myUid;       // Simple UID
 let localPlacement   = { z1:[], z2:[] };
 let localHand        = [];  // card IDs currently in hand
 let selectedCard     = null; // currently selected card ID from hand
-let localPitchChoice = null; // 'fastball' | 'breaking' | 'offspeed'
-let localGuessChoice = null; // 'fastball' | 'breaking' | 'offspeed'
+let localPitchChoice = null; // legacy alias
+let localGuessChoice = null; // legacy alias
 let localBeatCard    = null; // cardId placed in active beat (at most 1)
+let localPitchType     = 'fastball';  // 'fastball' | 'breaking' | 'offspeed'
+let localPitchLocation = 'high';      // 'high' | 'low'
+let localSwingType     = 'balanced';  // 'contact' | 'balanced' | 'power'
+let localTargetZone    = 'high';      // 'high' | 'low'
 let gameListener     = null; // Firebase listener ref
 
 const TOTAL_INNINGS = 3;
@@ -37,19 +41,41 @@ const MAX_HAND      = 6;
 const ZONE_LIMIT    = 2;  // max cards per zone
 const PA_CARD_LIMIT = 4;  // max cards per PA (BC09 The Captain: 5)
 
-function selectPitchCall(pitch) {
+function selectPitchType(pitch) {
+  localPitchType = pitch;
   localPitchChoice = pitch;
   const g = window._lastGameState;
   if (g) renderPlay(g);
 }
-window.selectPitchCall = selectPitchCall;
+window.selectPitchType = selectPitchType;
+window.selectPitchCall = selectPitchType;
 
-function selectBatterGuess(guess) {
-  localGuessChoice = guess;
+function selectPitchLocation(loc) {
+  localPitchLocation = loc;
   const g = window._lastGameState;
   if (g) renderPlay(g);
 }
-window.selectBatterGuess = selectBatterGuess;
+window.selectPitchLocation = selectPitchLocation;
+
+function selectSwingType(swing) {
+  localSwingType = swing;
+  const g = window._lastGameState;
+  if (g) renderPlay(g);
+}
+window.selectSwingType = selectSwingType;
+
+function selectTargetZone(zone) {
+  localTargetZone = zone;
+  localGuessChoice = (zone === 'high') ? 'fastball' : 'breaking';
+  const g = window._lastGameState;
+  if (g) renderPlay(g);
+}
+window.selectTargetZone = selectTargetZone;
+window.selectBatterGuess = function(guess) {
+  localGuessChoice = guess;
+  const g = window._lastGameState;
+  if (g) renderPlay(g);
+};
 
 function selectBeatCard(cardId) {
   if (!cardId) return;
@@ -529,42 +555,51 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
   let lockBtnDisabled = false;
 
   if (currentBeat === 'beat1') {
-    if (iAmPitching) {
-      if (!localPitchChoice) {
-        lockBtnLabel = 'CHOOSE PITCH';
-        lockBtnSub = 'Pick from Arsenal';
-        lockBtnDisabled = true;
-      } else {
-        lockBtnLabel = 'LOCK IN PITCH';
-        lockBtnSub = `${localPitchChoice.toUpperCase()}${localBeatCard ? ' + 1 Card' : ''}`;
-      }
+    if (!localBeatCard) {
+      lockBtnLabel = 'CHOOSE COUNT CARD';
+      lockBtnSub = 'Pick 1 card from hand';
+      lockBtnDisabled = true;
     } else {
-      if (!localGuessChoice) {
-        lockBtnLabel = 'GUESS PITCH';
-        lockBtnSub = 'Fast / Brk / Off';
-        lockBtnDisabled = true;
-      } else {
-        lockBtnLabel = 'LOCK IN GUESS';
-        lockBtnSub = `${localGuessChoice.toUpperCase()}${localBeatCard ? ' + 1 Card' : ''}`;
-      }
+      const cardObj = getCard(localBeatCard);
+      lockBtnLabel = 'LOCK IN COUNT CARD';
+      lockBtnSub = `${cardObj?.name || 'Card'} (Pwr +${cardObj?.value || 0})`;
+      lockBtnDisabled = false;
     }
   } else if (currentBeat === 'beat2') {
     const b1 = pa?.beatResults?.beat1;
-    const b1Winner = b1?.winner || 'pitcher';
-    const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-    const iHaveInitiative = (myRole === winnerRole);
-    const firstRevealedCard = pa?.firstRevealedCard;
+    const cardObj = localBeatCard ? getCard(localBeatCard) : null;
+    const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
-    if (firstRevealedCard) {
-      lockBtnLabel = 'COUNTER & RESOLVE';
-      lockBtnSub = localBeatCard ? '1 Card Placed' : 'No Card';
-    } else if (iHaveInitiative) {
-      lockBtnLabel = 'WAITING FOR OPPONENT';
-      lockBtnSub = 'Opponent reveals first';
-      lockBtnDisabled = true;
+    if (iAmPitching) {
+      const baseDiff = pitcherChar?.executionDifficulties?.[localPitchType] ?? 4;
+      const countDisc = (b1?.count === '0-2') ? 2 : 0;
+      const effDiff = Math.max(1, baseDiff - countDisc);
+      const executes = localBeatCard ? (cardVal >= effDiff) : false;
+
+      if (!localBeatCard) {
+        lockBtnLabel = 'CHOOSE PITCH CARD';
+        lockBtnSub = `${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()} &bull; Diff ${effDiff}`;
+        lockBtnDisabled = true;
+      } else {
+        lockBtnLabel = 'LOCK IN PAYOFF PITCH';
+        lockBtnSub = `${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()} &bull; Pwr ${cardVal} vs Diff ${effDiff} (${executes ? 'SPOT ON' : 'HANGER'})`;
+        lockBtnDisabled = false;
+      }
     } else {
-      lockBtnLabel = 'REVEAL FIRST MOVE';
-      lockBtnSub = localBeatCard ? '1 Card Placed' : 'No Card';
+      const baseDiff = batterChar?.swingDifficulties?.[localSwingType] ?? 5;
+      const countDisc = (b1?.count === '3-1') ? 2 : 0;
+      const effDiff = Math.max(1, baseDiff - countDisc);
+      const executes = localBeatCard ? (cardVal >= effDiff) : false;
+
+      if (!localBeatCard) {
+        lockBtnLabel = 'CHOOSE SWING CARD';
+        lockBtnSub = `${localSwingType.toUpperCase()} ${localTargetZone.toUpperCase()} &bull; Diff ${effDiff}`;
+        lockBtnDisabled = true;
+      } else {
+        lockBtnLabel = 'LOCK IN PAYOFF SWING';
+        lockBtnSub = `${localSwingType.toUpperCase()} ${localTargetZone.toUpperCase()} &bull; Pwr ${cardVal} vs Diff ${effDiff} (${executes ? 'BARRELED' : 'MISTIMED'})`;
+        lockBtnDisabled = false;
+      }
     }
   }
 
@@ -607,7 +642,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
             </div>
           </div>
           <div class="dock-controls-row">
-            <span class="placed-indicator">Beat: <b>${currentBeat === 'beat1' ? '1 (The Pitch)' : '2 (The Batted Ball)'}</b> · Card: <b>${localBeatCard ? '1' : '0'}</b>/1</span>
+            <span class="placed-indicator">Beat: <b>${currentBeat === 'beat1' ? '1 (Count Battle)' : '2 (Payoff Pitch)'}</b> · Card: <b>${localBeatCard ? '1' : '0'}</b>/1</span>
             ${canSub ? `<button class="btn-relief" onclick="substitutePitcher('${reliefId}')">Relief</button>` : ''}
             <button class="btn-intel" onclick="toggleMatchupModal(true)">ℹ️ Intel</button>
           </div>
@@ -709,198 +744,238 @@ function renderResolved(g, gs, pa, pitcherChar, batterChar, pitchingRole, battin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STRIKE ZONE GAUGE HELPER (BEAT 1)
+// PUBLIC SCOUTING & INTEL STRIP
 // ─────────────────────────────────────────────────────────────────────────────
-function renderStrikeZoneGauge(pitcherChar, needleVal, isPitcher = true, cardObj = null, pitchCall = null) {
-  const sz = pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 };
-  const GAUGE_MAX = 24;
+function renderPublicScoutingBar(pitcherChar, batterChar, charges, count = '0-0') {
+  const pDiffs = pitcherChar?.executionDifficulties || { fastball: 3, breaking: 5, offspeed: 8 };
+  const bScout = batterChar?.scoutingReport || { hotZone: 'high', coldZone: 'low', favoritePitch: 'fastball' };
+  const bDiffs = batterChar?.swingDifficulties || { contact: 3, balanced: 5, power: 8 };
 
-  const lowUnits  = Math.max(1, sz.low);
-  const zoneUnits = Math.max(1, sz.high - sz.low + 1);
-  const highUnits = Math.max(1, sz.wildBust - sz.high - 1);
-  const bustUnits = Math.max(1, GAUGE_MAX - sz.wildBust + 1);
-  const totalUnits = lowUnits + zoneUnits + highUnits + bustUnits;
+  const pName = pitcherChar?.name || 'Pitcher';
+  const bName = batterChar?.name || 'Batter';
 
-  const lowPct  = (lowUnits / totalUnits) * 100;
-  const zonePct = (zoneUnits / totalUnits) * 100;
-  const highPct = (highUnits / totalUnits) * 100;
-  const bustPct = (bustUnits / totalUnits) * 100;
-
-  // Bullseye pin location
-  const bullseyePct = Math.min(95, Math.max(5, (sz.bullseye / GAUGE_MAX) * 100));
-
-  let needleHtml = '';
-  let statusBadgeHtml = '';
-
-  if (needleVal !== null && needleVal !== undefined) {
-    const needlePct = Math.min(100, Math.max(0, (needleVal / GAUGE_MAX) * 100));
-    needleHtml = `
-      <div class="sz-gauge-needle" style="left: ${needlePct}%;" data-val="${needleVal}">
-        <div class="sz-needle-flag">${needleVal}</div>
-      </div>`;
-
-    if (needleVal === sz.bullseye) {
-      statusBadgeHtml = `<div class="sz-status-pill bullseye">🎯 BULLSEYE (${needleVal})! Paints the Black &bull; Instant Called Strike 3</div>`;
-    } else if (needleVal >= sz.wildBust) {
-      statusBadgeHtml = `<div class="sz-status-pill bust">⚠️ WILD PITCH BUST (${needleVal} &ge; ${sz.wildBust})! Instant Walk</div>`;
-    } else if (needleVal >= sz.low && needleVal <= sz.high) {
-      statusBadgeHtml = `<div class="sz-status-pill in-zone">✅ IN STRIKE ZONE (${needleVal}) &bull; Pitcher Advantage</div>`;
-    } else if (needleVal < sz.low) {
-      statusBadgeHtml = `<div class="sz-status-pill low">⚾ LOW BALL (${needleVal} &lt; ${sz.low}) &bull; Batter Advantage</div>`;
-    } else {
-      statusBadgeHtml = `<div class="sz-status-pill high">⚠️ HIGH BALL (${needleVal} &gt; ${sz.high}) &bull; Batter Advantage</div>`;
-    }
-  } else {
-    statusBadgeHtml = isPitcher
-      ? `<div class="sz-status-pill prompt">🎯 Dial in: Fastball (+8), Breaking (+6), or Offspeed (+4) + Card to hit Zone (${sz.low}&ndash;${sz.high})</div>`
-      : `<div class="sz-status-pill prompt">🎯 Anticipate the pitch type to trigger &times;2.0 Counter &amp; steal Advantage!</div>`;
-  }
+  const countBadgeClass = count === '0-2' ? 'count-pitcher' : count === '3-1' ? 'count-hitter' : count === '3-2' ? 'count-full' : 'count-duel';
+  const countLabel = count === '0-2' ? "0-2 (Pitcher -2 Diff)" : count === '3-1' ? "3-1 (Hitter -2 Diff)" : count === '3-2' ? "3-2 FULL COUNT" : "0-0 COUNT DUEL";
 
   return `
-    <div class="strike-zone-gauge">
-      <div class="sz-gauge-header">
-        <span class="sz-gauge-title">🎯 Strike Zone Target</span>
-        <span class="sz-gauge-spec">${pitcherChar?.name || 'Pitcher'} &bull; Zone ${sz.low}&ndash;${sz.high} &bull; Bullseye ${sz.bullseye}</span>
+    <div class="scouting-report-bar">
+      <!-- Pitcher Repertoire & Diff Strip -->
+      <div class="scout-card pitcher-card">
+        <div class="scout-header">
+          <span class="scout-avatar">⚾</span>
+          <span class="scout-name">${pName}</span>
+        </div>
+        <div class="scout-chips">
+          <span class="scout-chip ${charges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball: Diff ${pDiffs.fastball}">
+            🔥 FB <b>${pDiffs.fastball}</b> <small>(${charges?.fastball ?? 0})</small>
+          </span>
+          <span class="scout-chip ${charges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking: Diff ${pDiffs.breaking}">
+            🌀 BRK <b>${pDiffs.breaking}</b> <small>(${charges?.breaking ?? 0})</small>
+          </span>
+          <span class="scout-chip ${charges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed: Diff ${pDiffs.offspeed}">
+            ⏱️ OFF <b>${pDiffs.offspeed}</b> <small>(${charges?.offspeed ?? 0})</small>
+          </span>
+        </div>
       </div>
-      <div class="sz-gauge-track">
-        <div class="sz-band low" style="width: ${lowPct}%;" title="Low Ball (0-${sz.low - 1})">
-          <span>LOW (0&ndash;${sz.low - 1})</span>
-        </div>
-        <div class="sz-band in-zone" style="width: ${zonePct}%;" title="Strike Zone (${sz.low}-${sz.high}) &mdash; Pitcher Advantage">
-          <span>STRIKE ZONE (${sz.low}&ndash;${sz.high})</span>
-        </div>
-        <div class="sz-band high" style="width: ${highPct}%;" title="High Ball (${sz.high + 1}-${sz.wildBust - 1})">
-          <span>HIGH</span>
-        </div>
-        <div class="sz-band bust" style="width: ${bustPct}%;" title="Wild Pitch Bust (&ge;${sz.wildBust}) &mdash; Overthrow Walk">
-          <span>WILD (&ge;${sz.wildBust})</span>
-        </div>
-        <div class="sz-bullseye-pin" style="left: ${bullseyePct}%;" title="🎯 Bullseye at ${sz.bullseye}! Instant Called Strike 3">
-          <div class="sz-pin-icon">🎯</div>
-          <div class="sz-pin-num">${sz.bullseye}</div>
-        </div>
-        ${needleHtml}
+
+      <!-- Center Count Badge -->
+      <div class="scout-count-badge ${countBadgeClass}" title="Established Count for Payoff Pitch">
+        <span class="count-num">${count}</span>
+        <span class="count-tag">${countLabel}</span>
       </div>
-      <div class="sz-status-row">
-        ${statusBadgeHtml}
+
+      <!-- Batter Tendencies & Diff Strip -->
+      <div class="scout-card batter-card">
+        <div class="scout-header">
+          <span class="scout-avatar">🏏</span>
+          <span class="scout-name">${bName}</span>
+        </div>
+        <div class="scout-chips">
+          <span class="scout-chip hot" title="Hot Zone: High power / HR danger zone">
+            🔥 HOT: <b>${bScout.hotZone.toUpperCase()}</b>
+          </span>
+          <span class="scout-chip cold" title="Cold Zone: Weak contact / Out zone">
+            ❄️ COLD: <b>${bScout.coldZone.toUpperCase()}</b>
+          </span>
+          <span class="scout-chip fav" title="Favorite Pitch: Extra batter contact power">
+            ⭐ FAV: <b>${bScout.favoritePitch.toUpperCase().slice(0, 3)}</b>
+          </span>
+        </div>
       </div>
     </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PITCH SELECTOR DECK (BEAT 1 PITCHER TILES WITH PIP COUNTERS)
+// EXECUTION DIFFICULTY GAUGE HELPER
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPitchSelectorDeck(charges, localPitchChoice, cardObj) {
+function renderExecutionGauge(label, baseDiff, countDisc, cardVal, isPitcher = true) {
+  const effDiff = Math.max(1, baseDiff - countDisc);
+  const executed = (cardVal >= effDiff);
+
+  const statusClass = executed ? 'exec-pass' : 'exec-fail';
+  const statusText = isPitcher
+    ? (executed ? '🟢 SPOT ON (Clean Execution)' : '🔴 HANGER (Missed Location)')
+    : (executed ? '🟢 BARRELED UP (Crushed Contact)' : '🔴 MISTIMED (Weak Swing)');
+
+  return `
+    <div class="exec-gauge">
+      <div class="exec-gauge-top">
+        <span class="eg-title">${label}</span>
+        <span class="eg-formula">Base ${baseDiff}${countDisc > 0 ? ` &minus; ${countDisc} Count` : ''} = <b>Diff ${effDiff}</b></span>
+      </div>
+      <div class="exec-meter-track">
+        <div class="exec-meter-fill ${statusClass}" style="width: ${Math.min(100, Math.max(12, (cardVal / 10) * 100))}%;"></div>
+        <div class="exec-target-marker" style="left: ${Math.min(95, Math.max(5, (effDiff / 10) * 100))}%;" title="Difficulty threshold: ${effDiff}">
+          <span class="exec-target-label">Diff ${effDiff}</span>
+        </div>
+      </div>
+      <div class="exec-gauge-status ${statusClass}">
+        <span class="eg-val">Card Power: <b>+${cardVal}</b></span>
+        <span class="eg-badge">${statusText}</span>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PITCHER PAYOFF DECK (BEAT 2)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj) {
   const pitches = [
-    { key: 'fastball', name: 'Fastball', icon: '🔥', base: 8, max: 5 },
-    { key: 'breaking', name: 'Breaking', icon: '🌀', base: 6, max: 4 },
-    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', base: 4, max: 3 }
+    { key: 'fastball', name: 'Fastball', icon: '🔥', diff: pDiffs.fastball },
+    { key: 'breaking', name: 'Breaking', icon: '🌀', diff: pDiffs.breaking },
+    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', diff: pDiffs.offspeed },
   ];
 
-  return `
-    <div class="pitch-selector-deck">
-      ${pitches.map(p => {
-        const count = charges[p.key] ?? 0;
-        const isSelected = (localPitchChoice === p.key);
-        const isDisabled = count <= 0;
-        const hasSynergy = Boolean(cardObj && cardObj.synergyPitch === p.key);
-
-        let pips = '';
-        for (let i = 0; i < p.max; i++) {
-          pips += `<span class="pt-pip ${i < count ? 'filled' : 'empty'}"></span>`;
-        }
-
-        return `
-          <button class="pitch-tile ${isSelected ? 'selected' : ''} ${hasSynergy ? 'has-synergy' : ''} ${isDisabled ? 'disabled' : ''}"
-                  onclick="selectPitchCall('${p.key}')"
-                  ${isDisabled ? 'disabled' : ''}>
-            <div class="pt-header">
-              <span class="pt-icon">${p.icon}</span>
-              <span class="pt-base">+${p.base}</span>
-            </div>
-            <div class="pt-name">${p.name}</div>
-            <div class="pt-pips" title="${count} / ${p.max} charges remaining">${pips}</div>
-            ${hasSynergy ? `<div class="pt-synergy-tag">✨ SYNERGY +2</div>` : ''}
-          </button>`;
-      }).join('')}
-    </div>`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GUESS SELECTOR DECK (BEAT 1 BATTER TILES WITH COUNTER TAGS)
-// ─────────────────────────────────────────────────────────────────────────────
-function renderGuessSelectorDeck(localGuessChoice, cardObj) {
-  const guesses = [
-    { key: 'fastball', name: 'Fastball', icon: '🔥', base: 8 },
-    { key: 'breaking', name: 'Breaking', icon: '🌀', base: 6 },
-    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', base: 4 }
+  const locations = [
+    { key: 'high', label: 'HIGH ZONE', icon: '⬆️', isHot: bScout.hotZone === 'high', isCold: bScout.coldZone === 'high' },
+    { key: 'low',  label: 'LOW ZONE',  icon: '⬇️', isHot: bScout.hotZone === 'low',  isCold: bScout.coldZone === 'low' },
   ];
 
-  return `
-    <div class="guess-selector-deck">
-      ${guesses.map(g => {
-        const isSelected = (localGuessChoice === g.key);
-        const countersThis = Boolean(cardObj && cardObj.counters && cardObj.counters.some(c => c.toLowerCase().includes(g.key)));
-
-        return `
-          <button class="guess-tile ${isSelected ? 'selected' : ''} ${countersThis ? 'counters-this' : ''}"
-                  onclick="selectBatterGuess('${g.key}')">
-            <div class="gt-header">
-              <span class="gt-icon">${g.icon}</span>
-              <span class="gt-base">Base ${g.base}</span>
-            </div>
-            <div class="gt-name">${g.name}</div>
-            ${countersThis ? `<div class="gt-counter-tag">⚡ &times;2.0 ARMED</div>` : ''}
-          </button>`;
-      }).join('')}
-    </div>`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LAUNCH ANGLE GAUGE HELPER
-// ─────────────────────────────────────────────────────────────────────────────
-function renderLaunchAngleGauge(batterChar, needleVal) {
-  const spectrum = batterChar?.battedBallSpectrum || [
-    { min:0, max:7, outcome:'groundout', label:'Groundout', color:'#718096' },
-    { min:8, max:11, outcome:'single', label:'Single', color:'#3182ce' },
-    { min:12, max:15, outcome:'homerun', label:'Home Run 🔥', color:'#ecc94b' },
-    { min:16, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-  ];
-
-  const GAUGE_MAX = 20;
-
-  const bandsHtml = spectrum.map(band => {
-    const bMin = Math.max(0, band.min);
-    const bMax = Math.min(GAUGE_MAX, band.max >= 99 ? GAUGE_MAX : band.max);
-    const rangeSpan = Math.max(1, bMax - bMin + 1);
-    const widthPct = (rangeSpan / (GAUGE_MAX + 1)) * 100;
-    return `
-      <div class="gauge-band ${band.outcome}" style="width: ${widthPct}%; background-color: ${band.color};" title="${band.label} (${band.min}${band.max >= 99 ? '+' : '-' + band.max})">
-        <span>${band.label}</span>
-      </div>`;
-  }).join('');
-
-  let needleHtml = '';
-  if (needleVal !== null && needleVal !== undefined) {
-    const needlePct = Math.min(100, Math.max(0, (needleVal / GAUGE_MAX) * 100));
-    needleHtml = `<div class="gauge-needle" style="left: ${needlePct}%;" data-val="${needleVal}"></div>`;
-  }
+  const baseDiff = pDiffs[localPitchType] ?? 4;
+  const countDisc = (count === '0-2') ? 2 : 0;
+  const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
   return `
-    <div class="launch-angle-gauge">
-      <div class="gauge-header">
-        <span class="gauge-title">🎯 Launch Angle Target</span>
-        <span class="gauge-spectrum-name">${batterChar?.name || 'Batter'}</span>
+    <div class="payoff-controls-deck">
+      <!-- 1. Pitch Selection -->
+      <div class="control-section">
+        <div class="control-label">1. Choose Pitch Type:</div>
+        <div class="selection-tiles">
+          ${pitches.map(p => {
+            const countLeft = charges[p.key] ?? 0;
+            const isSelected = (localPitchType === p.key);
+            const isDisabled = countLeft <= 0;
+            return `
+              <button class="choice-tile ${isSelected ? 'active' : ''} ${isDisabled ? 'disabled' : ''}"
+                      onclick="selectPitchType('${p.key}')" ${isDisabled ? 'disabled' : ''}>
+                <div class="ct-header">
+                  <span class="ct-icon">${p.icon}</span>
+                  <span class="ct-count">${countLeft} left</span>
+                </div>
+                <div class="ct-name">${p.name}</div>
+                <div class="ct-diff">Diff: <b>${p.diff}</b></div>
+              </button>`;
+          }).join('')}
+        </div>
       </div>
-      <div class="gauge-track">
-        ${bandsHtml}
-        ${needleHtml}
+
+      <!-- 2. Location Selection -->
+      <div class="control-section">
+        <div class="control-label">2. Target Pitch Location:</div>
+        <div class="selection-tiles loc-tiles">
+          ${locations.map(l => {
+            const isSelected = (localPitchLocation === l.key);
+            const tagHtml = l.isHot
+              ? `<span class="intel-tag hot">⚠️ BATTER HOT</span>`
+              : (l.isCold ? `<span class="intel-tag cold">🎯 BATTER COLD</span>` : '');
+            return `
+              <button class="choice-tile loc ${isSelected ? 'active' : ''}"
+                      onclick="selectPitchLocation('${l.key}')">
+                <div class="ct-header">
+                  <span class="ct-icon">${l.icon}</span>
+                  ${tagHtml}
+                </div>
+                <div class="ct-name">${l.label}</div>
+              </button>`;
+          }).join('')}
+        </div>
       </div>
+
+      <!-- 3. Live Execution Preview Gauge -->
+      ${renderExecutionGauge(`Pitch Execution (${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()})`, baseDiff, countDisc, cardVal, true)}
     </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ZONE BOARD RENDERING (SINGLE ZONE FLOW + REACTION ADVANTAGE)
+// BATTER PAYOFF DECK (BEAT 2)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj) {
+  const swings = [
+    { key: 'contact',  name: 'Contact',  icon: '🛡️', diff: bDiffs.contact,  sub: 'Protect / Slap' },
+    { key: 'balanced', name: 'Balanced', icon: '⚖️', diff: bDiffs.balanced, sub: 'Line Drive' },
+    { key: 'power',    name: 'Power',    icon: '💥', diff: bDiffs.power,    sub: 'Home Run' },
+  ];
+
+  const locations = [
+    { key: 'high', label: 'HIGH ZONE', icon: '⬆️', isHot: bScout.hotZone === 'high', isCold: bScout.coldZone === 'high' },
+    { key: 'low',  label: 'LOW ZONE',  icon: '⬇️', isHot: bScout.hotZone === 'low',  isCold: bScout.coldZone === 'low' },
+  ];
+
+  const baseDiff = bDiffs[localSwingType] ?? 5;
+  const countDisc = (count === '3-1') ? 2 : 0;
+  const cardVal = cardObj ? (cardObj.value || 0) : 0;
+
+  return `
+    <div class="payoff-controls-deck">
+      <!-- 1. Swing Approach Selection -->
+      <div class="control-section">
+        <div class="control-label">1. Choose Swing Approach:</div>
+        <div class="selection-tiles">
+          ${swings.map(s => {
+            const isSelected = (localSwingType === s.key);
+            return `
+              <button class="choice-tile ${isSelected ? 'active' : ''}"
+                      onclick="selectSwingType('${s.key}')">
+                <div class="ct-header">
+                  <span class="ct-icon">${s.icon}</span>
+                  <span class="ct-diff">Diff: <b>${s.diff}</b></span>
+                </div>
+                <div class="ct-name">${s.name}</div>
+                <div class="ct-sub">${s.sub}</div>
+              </button>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- 2. Target Zone Selection -->
+      <div class="control-section">
+        <div class="control-label">2. Anticipate Pitch Location:</div>
+        <div class="selection-tiles loc-tiles">
+          ${locations.map(l => {
+            const isSelected = (localTargetZone === l.key);
+            const tagHtml = l.isHot
+              ? `<span class="intel-tag hot">🔥 YOUR HOT ZONE</span>`
+              : (l.isCold ? `<span class="intel-tag cold">❄️ YOUR COLD ZONE</span>` : '');
+            return `
+              <button class="choice-tile loc ${isSelected ? 'active' : ''}"
+                      onclick="selectTargetZone('${l.key}')">
+                <div class="ct-header">
+                  <span class="ct-icon">${l.icon}</span>
+                  ${tagHtml}
+                </div>
+                <div class="ct-name">${l.label}</div>
+              </button>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- 3. Live Execution Preview Gauge -->
+      ${renderExecutionGauge(`Swing Execution (${localSwingType.toUpperCase()} ${localTargetZone.toUpperCase()})`, baseDiff, countDisc, cardVal, false)}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ZONE BOARD RENDERING (2-BEAT FLOW: COUNT DUEL & PAYOFF PITCH)
 // ─────────────────────────────────────────────────────────────────────────────
 function setViewZone(zoneKey) {
   window.selectedViewZone = zoneKey;
@@ -914,422 +989,214 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
   const oppKey = opponentRole();
   const revealed = phase === 'reveal' || phase === 'resolved';
 
-  const zoneMeta = {
-    z1: { tag:'BEAT 1: THE PITCH', icon:'⚾', title:'STRIKE ZONE & REPERTOIRE', summary:'Pitcher establishes strike zone. Advantage goes to zone control.' },
-    z2: { tag:'BEAT 2: THE BATTED BALL', icon:'💥', title:'LAUNCH ANGLE GAUGE', summary:'Combined power determines ball flight on Batter spectrum. Initiative reacts.' }
-  };
-
   const half = (revealed && res?.half) ? res.half : (gs?.half || 'top');
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const battingRole  = half === 'top' ? 'guest' : 'host';
   const charges = gs?.arsenalCharges?.[pitchingRole] || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
   const currentBeat = pa?.beat || 'beat1';
 
-  // Check if at-bat concluded on Beat 1 via walk or called strike 3 knockout
-  const isKnockout = Boolean(
-    (res?.z1?.cascadeEffect === 'walk' || res?.z1?.cascadeEffect === 'called_k') ||
-    (pa?.beatResults?.beat1?.cascadeEffect === 'walk' || pa?.beatResults?.beat1?.cascadeEffect === 'called_k')
-  );
+  const b1Data = res?.z1 || pa?.beatResults?.beat1;
+  const count = b1Data?.count || (currentBeat === 'beat1' ? '0-0' : '3-2');
 
-  // Single-zone display logic: Zone 1 for the Pitch, Zone 2 for the Outcome
-  let activeZoneKey = 'z1';
-  if (revealed) {
-    activeZoneKey = isKnockout ? 'z1' : 'z2';
-  } else {
-    activeZoneKey = (currentBeat === 'beat1') ? 'z1' : 'z2';
+  const pDiffs = pitcherChar?.executionDifficulties || { fastball: 3, breaking: 5, offspeed: 8 };
+  const bScout = batterChar?.scoutingReport || { hotZone: 'high', coldZone: 'low', favoritePitch: 'fastball' };
+  const bDiffs = batterChar?.swingDifficulties || { contact: 3, balanced: 5, power: 8 };
+
+  const oppCommitted = Boolean(pa?.committed?.[oppKey]);
+  const cardObj = localBeatCard ? getCard(localBeatCard) : null;
+
+  // Track active beat view (allows inspecting Beat 1 when in Beat 2)
+  let activeBeatView = window.selectedViewZone === 'z1' ? 'beat1' : (window.selectedViewZone === 'z2' ? 'beat2' : currentBeat);
+  if (revealed && !window.selectedViewZone) {
+    activeBeatView = 'resolved';
   }
 
-  // Allow manual toggle via setViewZone if user clicked a step
-  if (window.selectedViewZone === 'z1' || window.selectedViewZone === 'z2') {
-    activeZoneKey = window.selectedViewZone;
-  }
+  // 1. Public Scouting Report Bar (Always accessible, clearly visible)
+  const scoutingBarHtml = renderPublicScoutingBar(pitcherChar, batterChar, charges, count);
 
-  const zones = [activeZoneKey];
-
-  // Active character names
-  const batterName  = batterChar?.name || (iAmBatting ? 'You' : 'Opponent');
-  const pitcherName = pitcherChar?.name || (!iAmBatting ? 'You' : 'Opponent');
-
-  // 1. Repertoire Bar
-  const repertoireBar = `
-    <div class="repertoire-tracker">
-      <div class="rep-label">⚾ <b>${pitcherName}</b>'s Arsenal:</div>
-      <div class="rep-pills">
-        <div class="rep-pill ${charges.fastball > 0 ? '' : 'exhausted'}" title="Fastball charges remaining">
-          <span class="rep-icon">🔥</span>
-          <span class="rep-name">Fastball</span>
-          <span class="rep-count">${charges.fastball ?? 0}</span>
-        </div>
-        <div class="rep-pill ${charges.breaking > 0 ? '' : 'exhausted'}" title="Breaking charges remaining">
-          <span class="rep-icon">🌀</span>
-          <span class="rep-name">Breaking</span>
-          <span class="rep-count">${charges.breaking ?? 0}</span>
-        </div>
-        <div class="rep-pill ${charges.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed charges remaining">
-          <span class="rep-icon">⏱️</span>
-          <span class="rep-name">Offspeed</span>
-          <span class="rep-count">${charges.offspeed ?? 0}</span>
-        </div>
-      </div>
-    </div>`;
-
-  // 2. Beat Step Progress Bar
+  // 2. Beat Step Navigation Bar
   const b1Done = Boolean(pa?.beatResults?.beat1 || (revealed && res?.z1));
   const b2Done = Boolean(pa?.beatResults?.beat2 || (revealed && res?.z2));
 
   const beatStepBar = `
     <div class="beat-step-tracker">
-      <div class="beat-step ${activeZoneKey === 'z1' ? 'active' : b1Done ? 'done' : ''}"
+      <div class="beat-step ${activeBeatView === 'beat1' ? 'active' : b1Done ? 'done' : ''}"
            onclick="setViewZone('z1')"
-           title="View Beat 1: Pitch & Read"
+           title="Beat 1: The Count Battle"
            style="cursor:pointer;">
         <span class="step-num">${b1Done ? '✓' : '1'}</span>
-        <span class="step-label">Beat 1: Pitch &amp; Read</span>
+        <span class="step-label">Beat 1: Count Battle</span>
       </div>
       <div class="beat-step-arrow">&rarr;</div>
-      <div class="beat-step ${activeZoneKey === 'z2' ? 'active' : b2Done ? 'done' : ''}"
-           ${(b1Done || currentBeat === 'beat2' || revealed) ? 'onclick="setViewZone(\'z2\')" style="cursor:pointer;"' : 'style="opacity:0.5;cursor:not-allowed;"'}
-           title="${(b1Done || currentBeat === 'beat2' || revealed) ? 'View Beat 2: Batted Ball & Outcome' : 'Locked until Beat 1 finishes'}">
+      <div class="beat-step ${activeBeatView === 'beat2' ? 'active' : b2Done ? 'done' : ''}"
+           ${(b1Done || currentBeat === 'beat2' || revealed) ? 'onclick="setViewZone(\'z2\')" style="cursor:pointer;"' : 'style="opacity:0.4;cursor:not-allowed;"'}
+           title="${(b1Done || currentBeat === 'beat2' || revealed) ? 'Beat 2: The Payoff Pitch' : 'Locked until Beat 1 resolves'}">
         <span class="step-num">${b2Done ? '✓' : '2'}</span>
-        <span class="step-label">Beat 2: Batted Ball &amp; Outcome</span>
+        <span class="step-label">Beat 2: Payoff Pitch</span>
       </div>
     </div>`;
 
-  // Beat 1 Recap Banner (displayed above Zone 2 or when viewing history)
-  let beat1RecapHtml = '';
-  const b1Data = res?.z1 || pa?.beatResults?.beat1;
-  if (activeZoneKey === 'z2' && b1Data) {
-    const pCall = (b1Data.pitchCall || 'fastball').toUpperCase();
-    const bGuess = (b1Data.batterGuess || 'fastball').toUpperCase();
-    const guessedRight = (b1Data.pitchCall === b1Data.batterGuess);
-    const b1Winner = b1Data.winner || 'tie';
-    const b1WinnerLabel = (b1Winner === 'pitcher')
-      ? '⚾ Pitcher Reaction Advantage'
-      : (b1Winner === 'batter')
-        ? '🏏 Batter Reaction Advantage'
-        : '⚖️ Even Battle';
-    const b1WinnerClass = (b1Winner === 'pitcher') ? 'pitcher-adv' : (b1Winner === 'batter') ? 'batter-adv' : 'tie-adv';
-
-    beat1RecapHtml = `
-      <div class="beat1-recap-banner">
-        <div class="b1-recap-badge">BEAT 1 RECAP</div>
-        <div class="b1-recap-info">
-          <span class="b1-recap-matchup">Pitch: <b>${pCall}</b> vs Guess: <b>${bGuess}</b> ${guessedRight ? '🎯' : ''}</span>
-          <span class="b1-recap-winner ${b1WinnerClass}">${b1WinnerLabel}</span>
-        </div>
-        <button class="b1-inspect-btn" onclick="setViewZone('z1')" title="Inspect Beat 1 full board">🔍 Details</button>
-      </div>`;
-  } else if (activeZoneKey === 'z1' && (b1Done || revealed) && !isKnockout && (currentBeat === 'beat2' || revealed)) {
-    beat1RecapHtml = `
-      <div class="beat1-recap-banner return">
-        <span class="b1-inspect-note">👁️ Viewing Beat 1 Pitch &amp; Read</span>
-        <button class="b1-inspect-btn return" onclick="setViewZone('z2')">Return to Outcome ➔</button>
-      </div>`;
-  }
-
-  // 3. Center Battlefield Advantage Metrics
-  let hitterTotal = 0;
-  let pitcherTotal = 0;
-  let advantageSide = 'neutral';
-  let centerStatusTitle = '';
-  let centerStatusSub = '';
+  let mainContentHtml = '';
 
   if (revealed && res) {
-    advantageSide = res.advantageSide || 'neutral';
-    centerStatusTitle = res.outcome?.display || 'AT-BAT COMPLETE';
-    centerStatusSub = res.outcome?.runsScored > 0
-      ? `💥 ${res.outcome.runsScored} RUN${res.outcome.runsScored > 1 ? 'S' : ''} SCORED!`
-      : (res.outcome?.outsAdded ? `🧤 ${res.outcome.outsAdded} OUT RECORDED` : 'Play Resolved');
+    // ── REVEALED AT-BAT CLASH BREAKDOWN ──
+    const z1 = res.z1 || b1Data;
+    const z2 = res.z2;
 
-    hitterTotal = (res.z1?.batterTotal || 0) + (res.z2?.batterTotal || 0);
-    pitcherTotal = (res.z1?.pitcherTotal || 0) + (res.z2?.pitcherTotal || 0);
+    const b1WinnerLabel = z1?.winner === 'pitcher' ? "⚾ 0-2 Pitcher Count" : (z1?.winner === 'batter' ? "🏏 3-1 Hitter Count" : "⚖️ 3-2 Full Count");
+    const pCardObj = z1?.pitcherCards?.[0] ? getCard(z1.pitcherCards[0]) : null;
+    const bCardObj = z1?.batterCards?.[0] ? getCard(z1.batterCards[0]) : null;
+
+    const pPayoffCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : null;
+    const bPayoffCard = z2?.batterCardId ? getCard(z2.batterCardId) : null;
+
+    mainContentHtml = `
+      <div class="battlefield-clash-board">
+        <!-- Beat 1 Recap Header -->
+        <div class="clash-beat-header">
+          <span class="cbh-tag">BEAT 1 RESULT: ${b1WinnerLabel}</span>
+          <div class="cbh-cards">
+            <span>P: <b>${pCardObj?.name || 'Card'} (+${z1?.pitcherTotal ?? 0})</b></span>
+            <span>vs</span>
+            <span>B: <b>${bCardObj?.name || 'Card'} (+${z1?.batterTotal ?? 0})</b></span>
+          </div>
+        </div>
+
+        <!-- Beat 2 Payoff Pitch Clash Details -->
+        ${z2 ? `
+          <div class="payoff-clash-card">
+            <div class="clash-matchup-header">
+              <span class="cm-tag">💥 THE PAYOFF PITCH</span>
+              <span class="cm-loc ${z2.sameLocation ? 'match' : 'diff'}">${z2.sameLocation ? '🎯 LOCATION MATCHED!' : '❌ LOCATION MISSED'}</span>
+            </div>
+
+            <div class="clash-teams-row">
+              <!-- Pitcher Side -->
+              <div class="clash-side pitcher">
+                <div class="cs-label">⚾ ${res.pitcherCharName || 'Pitcher'}</div>
+                <div class="cs-action">${(z2.pitchType || 'fastball').toUpperCase()} &bull; ${(z2.pitchLocation || 'high').toUpperCase()}</div>
+                <div class="cs-exec ${z2.pitcherExecuted ? 'pass' : 'fail'}">
+                  ${z2.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
+                </div>
+                <div class="cs-card">${pPayoffCard ? `${pPayoffCard.name} (+${pPayoffCard.value})` : '—'}</div>
+              </div>
+
+              <div class="clash-vs-divider">VS</div>
+
+              <!-- Batter Side -->
+              <div class="clash-side batter">
+                <div class="cs-label">🏏 ${res.batterCharName || 'Batter'}</div>
+                <div class="cs-action">${(z2.swingType || 'balanced').toUpperCase()} &bull; ${(z2.targetZone || 'high').toUpperCase()}</div>
+                <div class="cs-exec ${z2.batterExecuted ? 'pass' : 'fail'}">
+                  ${z2.batterExecuted ? '🟢 BARRELED UP' : '🔴 MISTIMED'}
+                </div>
+                <div class="cs-card">${bPayoffCard ? `${bPayoffCard.name} (+${bPayoffCard.value})` : '—'}</div>
+              </div>
+            </div>
+
+            <!-- Hot/Cold Factor Tag -->
+            ${z2.isHotZone ? `<div class="clash-zone-note hot">🔥 Pitch thrown into Batter's Hot Zone (+Power!)</div>` : ''}
+            ${z2.isColdZone ? `<div class="clash-zone-note cold">❄️ Pitch thrown into Batter's Cold Zone (Pitcher Advantage!)</div>` : ''}
+            ${z2.isFavoritePitch ? `<div class="clash-zone-note fav">⭐ Pitch was Batter's Favorite Pitch!</div>` : ''}
+
+            <!-- Outcome Callout -->
+            <div class="clash-outcome-badge">
+              <span class="cob-title">${z2.outcomeDisplay || res.outcome?.display || 'Outcome Resolved'}</span>
+            </div>
+          </div>
+        ` : `
+          <div class="payoff-clash-card">
+            <div class="clash-outcome-badge">
+              <span class="cob-title">${res.outcome?.display || 'At-Bat Complete'}</span>
+            </div>
+          </div>
+        `}
+      </div>`;
+
+  } else if (activeBeatView === 'beat1') {
+    // ── BEAT 1: THE COUNT BATTLE (SETUP) ──
+    const myPlacedCardHtml = localBeatCard
+      ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0)
+      : (!myCommitted
+          ? `<div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="selectBeatCard(selectedCard)">
+               <span style="font-size:0.75rem;font-weight:800;">+ Select 1 Card from Hand</span>
+             </div>`
+          : '<div class="board-slot empty-drop" style="opacity:0.3;">—</div>');
+
+    const oppSlotHtml = oppCommitted
+      ? `<div class="hidden-opponent-card"><span class="mystery-mark">✓ OPPONENT READY</span></div>`
+      : `<div class="board-slot empty-drop" style="opacity:0.4;cursor:default;font-size:0.7rem;">⏳ Opponent Choosing...</div>`;
+
+    mainContentHtml = `
+      <div class="beat1-arena">
+        <!-- Opponent Slot -->
+        <div class="b1-slot-container opponent">
+          <div class="slot-role-tag">${iAmBatting ? '⚾ Pitcher Card (Secret)' : '🏏 Batter Card (Secret)'}</div>
+          ${oppSlotHtml}
+        </div>
+
+        <!-- Center Count Meter / Instructions -->
+        <div class="b1-duel-center">
+          <div class="b1-duel-title">⚔️ COUNT ADVANTAGE BATTLE</div>
+          <div class="b1-duel-pills">
+            <div class="b1-count-tier pitcher">0-2 Count<small>Pitcher Wins</small></div>
+            <div class="b1-count-tier tie">3-2 Full Count<small>Even Battle</small></div>
+            <div class="b1-count-tier batter">3-1 Count<small>Hitter Wins</small></div>
+          </div>
+          <div class="b1-duel-hint">
+            <b>Hand Economy:</b> Both players commit 1 card face down. Highest card wins the count. <b>Played cards are discarded</b> for Beat 2!
+          </div>
+        </div>
+
+        <!-- Player Slot -->
+        <div class="b1-slot-container mine">
+          <div class="slot-role-tag">${iAmBatting ? '🏏 Your Count Card' : '⚾ Your Count Card'}</div>
+          ${myPlacedCardHtml}
+        </div>
+      </div>`;
+
   } else {
-    if (currentBeat === 'beat1') {
-      centerStatusTitle = 'BEAT 1: THE PITCH & ADVANTAGE';
-      centerStatusSub = 'Pitch Selection vs Guess';
-      hitterTotal = iAmBatting ? (localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0) : '?';
-      pitcherTotal = !iAmBatting ? ((PITCH_BASE_POWER[localPitchChoice || 'fastball'] || 8) + (localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0)) : '?';
-    } else if (currentBeat === 'beat2') {
-      centerStatusTitle = 'BEAT 2: THE BATTED BALL';
-      const b1Winner = pa?.beatResults?.beat1?.winner || 'tie';
-      centerStatusSub = (b1Winner === 'pitcher') ? '⚾ Pitcher has Reaction Advantage' : (b1Winner === 'batter') ? '🏏 Batter has Reaction Advantage' : 'Even Battle';
-      const firstVal = (pa?.firstRevealedCard && pa.firstRevealedCard !== 'NONE') ? (getCard(pa.firstRevealedCard)?.value || 0) : 0;
-      const myVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
-      hitterTotal = iAmBatting ? myVal : (pa?.firstPlayerRole === battingRole ? firstVal : '?');
-      pitcherTotal = !iAmBatting ? myVal : (pa?.firstPlayerRole === pitchingRole ? firstVal : '?');
-    }
+    // ── BEAT 2: THE PAYOFF PITCH ──
+    const oppSlotHtml = oppCommitted
+      ? `<div class="hidden-opponent-card"><span class="mystery-mark">✓ OPPONENT LOCKED IN</span></div>`
+      : `<div class="board-slot empty-drop" style="opacity:0.4;cursor:default;font-size:0.7rem;">⏳ Opponent Planning Move...</div>`;
+
+    const myPlacedCardHtml = localBeatCard
+      ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted, 0)
+      : (!myCommitted
+          ? `<div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="selectBeatCard(selectedCard)">
+               <span style="font-size:0.75rem;font-weight:800;">+ Select Execution Card</span>
+             </div>`
+          : '<div class="board-slot empty-drop" style="opacity:0.3;">—</div>');
+
+    mainContentHtml = `
+      <div class="beat2-arena">
+        <!-- Opponent Status -->
+        <div class="b2-opp-strip">
+          <span class="opp-role-label">${iAmBatting ? '⚾ Pitcher Move:' : '🏏 Batter Move:'}</span>
+          ${oppSlotHtml}
+        </div>
+
+        <!-- Player Controls: Pitcher vs Batter -->
+        <div class="b2-player-deck">
+          ${!iAmBatting
+            ? renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj)
+            : renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj)}
+        </div>
+
+        <!-- Player Execution Card Slot -->
+        <div class="b2-my-slot-section">
+          <div class="slot-role-label">Your Payoff Card:</div>
+          ${myPlacedCardHtml}
+        </div>
+      </div>`;
   }
 
-  const centerAdvantageBar = `
-    <div class="center-advantage-hud">
-      <div class="hud-adv-team hitter ${revealed && advantageSide === 'batter' ? 'winner' : ''}">
-        <span class="hud-adv-icon">🏏</span>
-        <div class="hud-adv-meta">
-          <div class="hud-adv-role">HITTER${iAmBatting ? ' (YOU)' : ''}</div>
-          <div class="hud-adv-name">${batterName}</div>
-        </div>
-        <div class="hud-adv-score">
-          <div class="hud-score-num">${hitterTotal}</div>
-          <div class="hud-score-sub">${revealed ? 'total' : 'power'}</div>
-        </div>
-      </div>
-
-      <div class="hud-adv-center ${revealed ? 'revealed' : ''} adv-${advantageSide}">
-        <div class="hud-adv-status-tag">${centerStatusTitle}</div>
-        <div class="hud-adv-status-sub">${centerStatusSub}</div>
-      </div>
-
-      <div class="hud-adv-team pitcher ${revealed && advantageSide === 'pitcher' ? 'winner' : ''}">
-        <div class="hud-adv-score">
-          <div class="hud-score-num">${pitcherTotal}</div>
-          <div class="hud-score-sub">${revealed ? 'total' : 'power'}</div>
-        </div>
-        <div class="hud-adv-meta">
-          <div class="hud-adv-role">PITCHER${!iAmBatting ? ' (YOU)' : ''}</div>
-          <div class="hud-adv-name">${pitcherName}</div>
-        </div>
-        <span class="hud-adv-icon">⚾</span>
-      </div>
-    </div>`;
-
-  const oppRoleLabel = iAmBatting ? '⚾ Pitcher' : '🏏 Hitter';
-  const myRoleLabel  = iAmBatting ? '🏏 Hitter (You)' : '⚾ Pitcher (You)';
-
   return `
-    ${activeZoneKey === 'z2' ? repertoireBar : ''}
+    ${scoutingBarHtml}
     ${beatStepBar}
-    ${centerAdvantageBar}
-    ${beat1RecapHtml}
-    <div class="zones-container">
-      ${zones.map(z => {
-        const meta = zoneMeta[z];
-        let zoneClass = '';
-        let oppScoreDisplay = '0';
-        let myScoreDisplay = '0';
-        let zoneAdvantageHtml = '';
-        let cascadeHighlightHtml = '';
-        let centerCustomHtml = '';
-        let oppCardsHtml = '';
-        let myCardsHtml = '';
-
-        const zRes = res?.[z] || (z === 'z1' ? pa?.beatResults?.beat1 : z === 'z2' ? pa?.beatResults?.beat2 : null);
-
-        if (zRes) {
-          // This zone is resolved
-          const youWin = (iAmBatting && zRes.winner === 'batter') || (!iAmBatting && zRes.winner === 'pitcher');
-
-          if (zRes.winner === 'tie') {
-            zoneClass = '';
-            zoneAdvantageHtml = `<div class="loc-adv-chip tie">⚖️ TIED</div>`;
-          } else if (zRes.winner === 'batter') {
-            zoneClass = youWin ? 'winner-me' : 'winner-opp';
-            zoneAdvantageHtml = `<div class="loc-adv-chip batter">🏏 Hitter Advantage</div>`;
-          } else if (zRes.winner === 'pitcher') {
-            zoneClass = youWin ? 'winner-me' : 'winner-opp';
-            zoneAdvantageHtml = `<div class="loc-adv-chip pitcher">⚾ Pitcher Advantage</div>`;
-          }
-
-          if (z === 'z1') {
-            const pCall = (zRes.pitchCall || '').toUpperCase();
-            const bGuess = (zRes.batterGuess || '').toUpperCase();
-            const pCardObj = zRes.pitcherCards?.[0] ? getCard(zRes.pitcherCards[0]) : null;
-            centerCustomHtml = `
-              <div class="loc-beat-result-strip">
-                <span class="loc-pitch-spec">⚾ ${pCall} vs 🎯 ${bGuess}</span>
-              </div>
-              ${renderStrikeZoneGauge(pitcherChar, zRes.total, !iAmBatting, pCardObj, zRes.pitchCall)}`;
-
-            if (zRes.counterFired) {
-              cascadeHighlightHtml = `<div class="loc-cascade-note counter">🎯 Counter &times;${zRes.multiplier || zRes.mult || 2}</div>`;
-            } else if (zRes.cascadeEffect === 'walk') {
-              cascadeHighlightHtml = `<div class="loc-cascade-note counter">🚶 Instant Walk</div>`;
-            } else if (zRes.cascadeEffect === 'called_k') {
-              cascadeHighlightHtml = `<div class="loc-cascade-note k">⚡ Called Strike 3</div>`;
-            } else if (zRes.winner !== 'tie') {
-              cascadeHighlightHtml = `<div class="loc-cascade-note" style="background:rgba(245,176,39,0.2);color:var(--gold-bright);">⚡ Reaction Advantage &rarr; Z2</div>`;
-            }
-          } else if (z === 'z2') {
-            centerCustomHtml = renderLaunchAngleGauge(batterChar, zRes.needle ?? zRes.total);
-            if (zRes.specialEffectTriggered) {
-              cascadeHighlightHtml = `<div class="loc-cascade-note counter">✨ ${zRes.specialEffectTriggered}</div>`;
-            } else {
-              cascadeHighlightHtml = `<div class="loc-cascade-note hard">${zRes.outcomeDisplay || zRes.outcome?.display || 'Outcome Resolved'}</div>`;
-            }
-          }
-
-          oppScoreDisplay = String(iAmBatting ? (zRes.pitcherTotal ?? 0) : (zRes.batterTotal ?? 0));
-          myScoreDisplay  = String(iAmBatting ? (zRes.batterTotal ?? 0)  : (zRes.pitcherTotal ?? 0));
-
-          const oppCards = (iAmBatting ? zRes.pitcherCards : zRes.batterCards) || [];
-          const myCards  = (iAmBatting ? zRes.batterCards : zRes.pitcherCards) || [];
-
-          oppCardsHtml = oppCards.map(id => renderMiniPlacedCard(id, z, false)).join('') || '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>';
-          myCardsHtml  = myCards.map(id => renderMiniPlacedCard(id, z, false)).join('') || '<div class="board-slot empty-drop" style="opacity:0.25;cursor:default;">—</div>';
-
-        } else {
-          // Zone is not resolved yet
-          const isThisBeatActive = !revealed && (
-            (z === 'z1' && currentBeat === 'beat1') ||
-            (z === 'z2' && currentBeat === 'beat2')
-          );
-
-          if (isThisBeatActive) {
-            zoneClass = 'zone-active';
-            zoneAdvantageHtml = `<div class="loc-adv-chip placing">ACTIVE BEAT</div>`;
-
-            if (z === 'z1') {
-              const cardObj = localBeatCard ? getCard(localBeatCard) : null;
-              const cardVal = cardObj ? (cardObj.value || 0) : 0;
-
-              if (!iAmBatting) {
-                // Pitcher controls with live graphical strike zone gauge + tactile deck
-                const curPitch = localPitchChoice || 'fastball';
-                const basePower = PITCH_BASE_POWER[curPitch] || 8;
-                const hasSynergy = Boolean(cardObj && cardObj.synergyPitch === curPitch);
-                const synergyBonus = hasSynergy ? (cardObj.synergyBonus || 2) : 0;
-                const totalPower = localPitchChoice ? (basePower + cardVal + synergyBonus) : null;
-
-                centerCustomHtml = `
-                  ${renderStrikeZoneGauge(pitcherChar, totalPower, true, cardObj, curPitch)}
-                  ${renderPitchSelectorDeck(charges, localPitchChoice, cardObj)}`;
-              } else {
-                // Batter controls with strike zone target + guess selector deck
-                centerCustomHtml = `
-                  ${renderStrikeZoneGauge(pitcherChar, null, false, cardObj, null)}
-                  ${renderGuessSelectorDeck(localGuessChoice, cardObj)}`;
-              }
-
-              if (localBeatCard) {
-                myCardsHtml = renderMiniPlacedCard(localBeatCard, z, !myCommitted, 0);
-                myScoreDisplay = String(getCard(localBeatCard)?.value || 0);
-              } else if (!myCommitted) {
-                myCardsHtml = `
-                  <div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="selectBeatCard(selectedCard)">
-                    <span style="font-size:0.75rem;font-weight:800;">+ Optional Card</span>
-                  </div>`;
-                myScoreDisplay = '0';
-              }
-
-              const oppCommitted = pa?.committed?.[oppKey];
-              oppCardsHtml = oppCommitted
-                ? '<div class="hidden-opponent-card"><span class="mystery-mark" style="font-size:0.7rem;">✓ READY</span></div>'
-                : '<div class="board-slot empty-drop" style="opacity:0.4;cursor:default;font-size:0.65rem;">⏳ Deciding…</div>';
-              oppScoreDisplay = oppCommitted ? '?' : '0';
-
-            } else if (z === 'z2') {
-              // Beat 2 is active!
-              const b1Winner = pa?.beatResults?.beat1?.winner || 'pitcher';
-              const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-              const iHaveInitiative = (myRole === winnerRole);
-              const firstRevealedCard = (pa?.firstRevealedCard && pa.firstRevealedCard !== 'NONE') ? pa.firstRevealedCard : null;
-
-              // Needle calculation
-              let needleVal = null;
-              if (firstRevealedCard) {
-                const firstVal = getCard(firstRevealedCard)?.value || 0;
-                const myVal = localBeatCard ? (getCard(localBeatCard)?.value || 0) : 0;
-                needleVal = firstVal + myVal;
-              } else if (localBeatCard) {
-                needleVal = getCard(localBeatCard)?.value || 0;
-              }
-
-              let initiativeBannerHtml = '';
-              if (firstRevealedCard) {
-                initiativeBannerHtml = `
-                  <div class="revealed-first-card">
-                    <span class="fc-title">Revealed: <b>${getCard(firstRevealedCard)?.name}</b></span>
-                    <span class="fc-val">+${getCard(firstRevealedCard)?.value}</span>
-                  </div>
-                  ${iHaveInitiative ? `<div class="initiative-banner">⚡ REACTION ADVANTAGE: Counter now!</div>` : ''}`;
-              } else if (iHaveInitiative) {
-                initiativeBannerHtml = `<div class="initiative-banner waiting">⏳ Waiting for opponent to reveal first move...</div>`;
-              } else {
-                initiativeBannerHtml = `<div class="initiative-banner">⚠️ You lost Beat 1. You must commit first!</div>`;
-              }
-
-              centerCustomHtml = `
-                ${renderLaunchAngleGauge(batterChar, needleVal)}
-                ${initiativeBannerHtml}`;
-
-              if (localBeatCard) {
-                myCardsHtml = renderMiniPlacedCard(localBeatCard, z, !myCommitted, 0);
-                myScoreDisplay = String(getCard(localBeatCard)?.value || 0);
-              } else if (!myCommitted && (!iHaveInitiative || firstRevealedCard)) {
-                myCardsHtml = `
-                  <div class="board-slot empty-drop ${selectedCard ? 'pulse-ready' : ''}" onclick="selectBeatCard(selectedCard)">
-                    <span style="font-size:0.75rem;font-weight:800;">+ Select Card</span>
-                  </div>`;
-                myScoreDisplay = '0';
-              } else if (iHaveInitiative && !firstRevealedCard) {
-                myCardsHtml = `<div class="board-slot empty-drop" style="opacity:0.3;cursor:not-allowed;font-size:0.65rem;">Waiting for opponent reveal…</div>`;
-                myScoreDisplay = '0';
-              }
-
-              // Opponent slot in Beat 2
-              if (firstRevealedCard && pa?.firstPlayerRole === oppKey) {
-                oppCardsHtml = renderMiniPlacedCard(firstRevealedCard, z, false);
-                oppScoreDisplay = String(getCard(firstRevealedCard)?.value || 0);
-              } else if (pa?.committed?.[oppKey]) {
-                oppCardsHtml = '<div class="hidden-opponent-card"><span class="mystery-mark" style="font-size:0.7rem;">✓ READY</span></div>';
-                oppScoreDisplay = '?';
-              } else {
-                oppCardsHtml = '<div class="board-slot empty-drop" style="opacity:0.4;cursor:default;font-size:0.65rem;">⏳ Deciding…</div>';
-                oppScoreDisplay = '0';
-              }
-            }
-
-          } else {
-            // Waiting zone (upcoming beat)
-            zoneClass = 'zone-waiting';
-            zoneAdvantageHtml = `<div class="loc-adv-chip empty">—</div>`;
-            centerCustomHtml = `
-              <div class="zone-unlock-placeholder">
-                <span class="lock-icon">🔒</span>
-                <span>Unlocks in Beat 2 (The Batted Ball)</span>
-              </div>
-              ${renderLaunchAngleGauge(batterChar, null)}`;
-            oppCardsHtml = '<div class="board-slot empty-drop" style="opacity:0.2;cursor:default;">—</div>';
-            myCardsHtml  = '<div class="board-slot empty-drop" style="opacity:0.2;cursor:default;">—</div>';
-            oppScoreDisplay = '—';
-            myScoreDisplay  = '—';
-          }
-        }
-
-        return `
-          <div class="zone-column zone-${z} ${zoneClass}" data-zone="${z}">
-            <!-- TOP: OPPONENT PLAYED CARDS -->
-            <div class="zone-slots opponent-slots">
-              ${oppCardsHtml}
-            </div>
-
-            <!-- MIDDLE: LOCATION CARD -->
-            <div class="location-card">
-              <div class="loc-power-badge opp ${zoneClass === 'winner-opp' ? 'winning' : ''}">
-                <span class="loc-badge-role">${oppRoleLabel}</span>
-                <span class="loc-badge-val">${oppScoreDisplay}</span>
-              </div>
-
-              <div class="loc-center-emblem">
-                <div class="loc-zone-tag ${z}">${meta.tag}</div>
-                <div class="loc-advantage-strip">
-                  ${zoneAdvantageHtml}
-                </div>
-                ${centerCustomHtml}
-                ${cascadeHighlightHtml}
-              </div>
-
-              <div class="loc-power-badge mine ${zoneClass === 'winner-me' ? 'winning' : ''}">
-                <span class="loc-badge-role">${myRoleLabel}</span>
-                <span class="loc-badge-val">${myScoreDisplay}</span>
-              </div>
-            </div>
-
-            <!-- BOTTOM: PLAYER PLAYED CARDS -->
-            <div class="zone-slots my-slots" id="slots-${z}">
-              ${myCardsHtml}
-            </div>
-          </div>`;
-      }).join('')}
+    <div class="battlefield-main">
+      ${mainContentHtml}
     </div>`;
 }
 
@@ -1562,13 +1429,36 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
         const beatTagClass = beatTag === 'BEAT 1' ? 'beat1' : (beatTag === 'BEAT 2' ? 'beat2' : 'any');
 
         let dynamicOutcomeHtml = '';
-        if (currentBeat === 'beat2' && oppFirstVal !== null && spectrum.length > 0) {
-          const projectedTotal = oppFirstVal + (card.value || 0);
-          const band = spectrum.find(b => projectedTotal >= b.min && projectedTotal <= b.max) || spectrum[spectrum.length - 1];
-          if (band) {
-            const icon = band.outcome === 'homerun' ? '💥' : (['single','double','triple'].includes(band.outcome)) ? '🏏' : '🧤';
-            dynamicOutcomeHtml = `<div class="dynamic-outcome-tag ${band.outcome}">${icon} ${band.label} (${projectedTotal})</div>`;
+        if (currentBeat === 'beat2') {
+          const g = window._lastGameState;
+          const pa = g?.currentPA;
+          const gs = g?.gameState;
+          const b1Count = pa?.beatResults?.beat1?.count;
+          const half = gs?.half || 'top';
+          const pitchingRole = half === 'top' ? 'host' : 'guest';
+          const pitcherChar = getPitcher(gs?.activePitcher?.[pitchingRole]);
+
+          if (iAmPitching) {
+            const pDiffs = pitcherChar?.executionDifficulties || { fastball: 3, breaking: 5, offspeed: 8 };
+            const baseDiff = pDiffs[localPitchType] ?? 4;
+            const countDisc = (b1Count === '0-2') ? 2 : 0;
+            const effDiff = Math.max(1, baseDiff - countDisc);
+            const executes = (card.value >= effDiff);
+            dynamicOutcomeHtml = executes
+              ? `<div class="card-exec-chip pass">🎯 SPOT ON (Diff ${effDiff})</div>`
+              : `<div class="card-exec-chip fail">⚠️ HANGER (Diff ${effDiff})</div>`;
+          } else {
+            const bDiffs = batterChar?.swingDifficulties || { contact: 3, balanced: 5, power: 8 };
+            const baseDiff = bDiffs[localSwingType] ?? 5;
+            const countDisc = (b1Count === '3-1') ? 2 : 0;
+            const effDiff = Math.max(1, baseDiff - countDisc);
+            const executes = (card.value >= effDiff);
+            dynamicOutcomeHtml = executes
+              ? `<div class="card-exec-chip pass">💥 BARREL (Diff ${effDiff})</div>`
+              : `<div class="card-exec-chip fail">⚠️ MISTIME (Diff ${effDiff})</div>`;
           }
+        } else if (currentBeat === 'beat1' && card.advantagePerk) {
+          dynamicOutcomeHtml = `<div class="card-perk-chip">⚡ ${card.advantagePerk.replace('_', ' ').toUpperCase()}</div>`;
         }
 
         return `
@@ -1666,12 +1556,13 @@ function commitPlacement() {
   const isBot        = Boolean(g.isSolo || g.guest?.isBot);
 
   if (currentBeat === 'beat1') {
-    if (iAmPitching && !localPitchChoice) {
-      alert('Please choose a pitch to throw from your repertoire.');
+    if (!localBeatCard) {
+      alert('Please choose 1 card from your hand to contest the Count Battle.');
       return;
     }
-    if (!iAmPitching && !localGuessChoice) {
-      alert('Please guess the pitch (Fastball, Breaking, or Offspeed).');
+  } else if (currentBeat === 'beat2') {
+    if (!localBeatCard) {
+      alert('Please choose an execution card from your hand for the Payoff Pitch.');
       return;
     }
   }
@@ -1703,8 +1594,10 @@ function commitPlacement() {
     const liveGS = liveG.gameState || {};
 
     const myBeatPlacement = (currentBeat === 'beat1')
-      ? (iAmPitching ? { pitchCall: localPitchChoice, cardId: localBeatCard } : { batterGuess: localGuessChoice, cardId: localBeatCard })
-      : { cardId: localBeatCard };
+      ? { cardId: localBeatCard }
+      : (iAmPitching
+          ? { pitchType: localPitchType, pitchLocation: localPitchLocation, cardId: localBeatCard }
+          : { swingType: localSwingType, targetZone: localTargetZone, cardId: localBeatCard });
 
     const updates = {
       [`currentPA/beatPlacements/${currentBeat}/${myRole}`]: myBeatPlacement,
@@ -1718,17 +1611,12 @@ function commitPlacement() {
     if (currentBeat === 'beat1') {
       if (isBot && myRole === 'host') {
         const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat1');
-        const botIsPitching = (liveGS.half === 'bottom');
-        const botBeatPlacement = botIsPitching
-          ? { pitchCall: botPlay.pitchCall, cardId: botPlay.cardId }
-          : { batterGuess: botPlay.batterGuess, cardId: botPlay.cardId };
-
         const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
         if (botPlay.cardId) {
           updatedBotPlacement.z1 = [botPlay.cardId];
         }
 
-        updates['currentPA/beatPlacements/beat1/guest'] = botBeatPlacement;
+        updates['currentPA/beatPlacements/beat1/guest'] = { cardId: botPlay.cardId };
         updates['currentPA/placement/guest']           = updatedBotPlacement;
         updates['currentPA/committed/guest']           = true;
         updates['gameState/hands/guest']               = botPlay.botHand;
@@ -1740,41 +1628,34 @@ function commitPlacement() {
         }
       }
     } else if (currentBeat === 'beat2') {
-      const b1 = livePA.beatResults?.beat1;
-      const b1Winner = b1?.winner || 'pitcher';
-      const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-      const loserRole  = (b1Winner === 'pitcher') ? battingRole : pitchingRole;
-      const firstRevealedCard = livePA.firstRevealedCard;
+      if (isBot && myRole === 'host') {
+        const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2');
+        const botIsPitching = (liveGS.half === 'bottom');
+        const botBeatPlacement = botIsPitching
+          ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
+          : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, cardId: botPlay.cardId };
 
-      if (!firstRevealedCard) {
-        // First player reveals move!
-        updates['currentPA/firstRevealedCard'] = localBeatCard || 'NONE';
+        const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
+        if (botPlay.cardId) {
+          updatedBotPlacement.z2 = [botPlay.cardId];
+        }
 
-        if (isBot && myRole === 'host') {
-          // Bot is second player with Reaction Advantage!
-          const botCounterPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2', localBeatCard);
-          const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
-          if (botCounterPlay.cardId) {
-            updatedBotPlacement.z2 = [botCounterPlay.cardId];
-          }
-
-          updates['currentPA/beatPlacements/beat2/guest'] = { cardId: botCounterPlay.cardId };
-          updates['currentPA/placement/guest']           = updatedBotPlacement;
-          updates['currentPA/committed/guest']           = true;
-          updates['gameState/hands/guest']               = botCounterPlay.botHand;
+        updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
+        updates['currentPA/placement/guest']           = updatedBotPlacement;
+        updates['currentPA/committed/guest']           = true;
+        updates['gameState/hands/guest']               = botPlay.botHand;
+        shouldResolve = true;
+      } else {
+        const oppRole = opponentRole();
+        if (livePA.committed?.[oppRole]) {
           shouldResolve = true;
         }
-      } else {
-        // Second player counters! Both committed.
-        shouldResolve = true;
       }
     }
 
     gameRef().update(updates).then(() => {
-      localPitchChoice = null;
-      localGuessChoice = null;
-      localBeatCard    = null;
-      selectedCard     = null;
+      localBeatCard = null;
+      selectedCard  = null;
       if (shouldResolve && myRole === 'host') {
         resolveBeatStep(currentBeat);
       }
@@ -1817,24 +1698,10 @@ function resolveBeatStep(beat) {
       const outs = gs.outs || 0;
 
       if (beat === 'beat1') {
-        const pitchCall = pPlacements.pitchCall || 'fastball';
-        const batterGuess = bPlacements.batterGuess || 'fastball';
         const pitcherCardId = pPlacements.cardId || null;
         const batterCardId = bPlacements.cardId || null;
 
-        const charges = { ...(gs.arsenalCharges || {}) };
-        if (!charges[pitchingRole]) {
-          charges[pitchingRole] = { ...(pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) };
-        } else {
-          charges[pitchingRole] = { ...charges[pitchingRole] };
-        }
-        if ((charges[pitchingRole][pitchCall] || 0) > 0) {
-          charges[pitchingRole][pitchCall]--;
-        }
-
         const beat1Result = resolveBeat1({
-          pitchCall,
-          batterGuess,
           pitcherCardId,
           batterCardId,
           pitcherChar,
@@ -1854,49 +1721,52 @@ function resolveBeatStep(beat) {
             outs,
             half
           });
-          finalizePA(g, res, charges);
+          finalizePA(g, res);
           return;
         }
 
         // Advance to Beat 2
-        const b1Winner = beat1Result.winner || 'pitcher';
-        const loserRole = (b1Winner === 'pitcher') ? battingRole : pitchingRole;
-        const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-
         const updates = {
-          'gameState/arsenalCharges': charges,
           'currentPA/beat': 'beat2',
           'currentPA/committed/host': false,
           'currentPA/committed/guest': false,
-          'currentPA/firstRevealedCard': null,
-          'currentPA/firstPlayerRole': loserRole,
-          'currentPA/secondPlayerRole': winnerRole,
           'currentPA/beatResults/beat1': beat1Result,
           [`currentPA/placement/${pitchingRole}/z1`]: pitcherCardId ? [pitcherCardId] : [],
           [`currentPA/placement/${battingRole}/z1`]:  batterCardId ? [batterCardId] : [],
         };
-
-        const isBot = Boolean(g.isSolo || g.guest?.isBot);
-        if (isBot && loserRole === 'guest') {
-          const botFirstPlay = executeBotPlayBeat(gs, 'guest', 'beat2', null);
-          updates['currentPA/firstRevealedCard'] = botFirstPlay.cardId || 'NONE';
-          updates['currentPA/beatPlacements/beat2/guest'] = { cardId: botFirstPlay.cardId };
-          updates['currentPA/placement/guest/z2'] = botFirstPlay.cardId ? [botFirstPlay.cardId] : [];
-          updates['currentPA/committed/guest'] = true;
-          updates['gameState/hands/guest'] = botFirstPlay.botHand;
-        }
 
         gameRef().update(updates);
 
       } else if (beat === 'beat2') {
         const beat1Result = pa.beatResults?.beat1 || {};
         const pitcherCardId = pPlacements.cardId || null;
+        const pitchType = pPlacements.pitchType || 'fastball';
+        const pitchLocation = pPlacements.pitchLocation || 'high';
+
         const batterCardId = bPlacements.cardId || null;
+        const swingType = bPlacements.swingType || 'balanced';
+        const targetZone = bPlacements.targetZone || 'high';
+
+        // Deduct pitch charge
+        const charges = { ...(gs.arsenalCharges || {}) };
+        if (!charges[pitchingRole]) {
+          charges[pitchingRole] = { ...(pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) };
+        } else {
+          charges[pitchingRole] = { ...charges[pitchingRole] };
+        }
+        if ((charges[pitchingRole][pitchType] || 0) > 0) {
+          charges[pitchingRole][pitchType]--;
+        }
 
         const beat2Result = resolveBeat2({
-          z1Winner: beat1Result.winner || 'tie',
+          count: beat1Result.count || '3-2',
           beat1Winner: beat1Result.winner || 'tie',
+          z1Winner: beat1Result.winner || 'tie',
+          pitchType,
+          pitchLocation,
           pitcherCardId,
+          swingType,
+          targetZone,
           batterCardId,
           pitcherChar,
           batterChar,
@@ -1910,32 +1780,15 @@ function resolveBeatStep(beat) {
 
         // Spoil It: fouls off an out, resetting Beat 2
         if (beat2Result.isFoulBall) {
-          const b1Winner = beat1Result.winner || 'pitcher';
-          const loserRole = (b1Winner === 'pitcher') ? battingRole : pitchingRole;
-          const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-          const isBot = Boolean(g.isSolo || g.guest?.isBot);
-
           const updates = {
             'currentPA/beat': 'beat2',
             'currentPA/committed/host': false,
             'currentPA/committed/guest': false,
-            'currentPA/firstRevealedCard': null,
-            'currentPA/firstPlayerRole': loserRole,
-            'currentPA/secondPlayerRole': winnerRole,
             'currentPA/beatPlacements/beat2': { host:{}, guest:{} },
             [`currentPA/placement/${pitchingRole}/z2`]: [],
             [`currentPA/placement/${battingRole}/z2`]:  [],
+            'gameState/arsenalCharges': charges,
           };
-
-          if (isBot && loserRole === 'guest') {
-            const botFirstPlay = executeBotPlayBeat(gs, 'guest', 'beat2', null);
-            updates['currentPA/firstRevealedCard'] = botFirstPlay.cardId || 'NONE';
-            updates['currentPA/beatPlacements/beat2/guest'] = { cardId: botFirstPlay.cardId };
-            updates['currentPA/placement/guest/z2'] = botFirstPlay.cardId ? [botFirstPlay.cardId] : [];
-            updates['currentPA/committed/guest'] = true;
-            updates['gameState/hands/guest'] = botFirstPlay.botHand;
-          }
-
           gameRef().update(updates);
           return;
         }
@@ -1950,9 +1803,14 @@ function resolveBeatStep(beat) {
           outs,
           half
         });
-        finalizePA(g, res);
+        finalizePA(g, res, charges);
       }
     } catch(err) {
+      console.error('resolveBeatStep error:', err);
+      showError('Beat resolution error: ' + err.message);
+    }
+  });
+}
       console.error('resolveBeatStep error:', err);
       showError('Beat resolution error: ' + err.message);
     }
@@ -2159,6 +2017,10 @@ function nextPA() {
         localGuessChoice = null;
         localBeatCard    = null;
         selectedCard     = null;
+        localPitchType   = 'fastball';
+        localPitchLocation = 'high';
+        localSwingType   = 'balanced';
+        localTargetZone  = 'high';
         localPlacement   = { z1:[], z2:[] };
       }).catch(err => {
         console.error('nextPA update error:', err);
@@ -2377,26 +2239,32 @@ function renderZoneCascadeStep(res, zKey, title, icon, isBatting) {
   let cascadeHtml = '';
 
   if (zKey === 'z1') {
-    if (z.counterFired) {
-      extraHtml += `<div class="cascade-callout counter">🎯 <b>PITCH GUESS COUNTERED!</b> Batter read <b>${(z.pitchCallMatched || '').toUpperCase()}</b> &rarr; Action power multiplied by <b>&times;${z.multiplier || z.mult || 2}</b>!</div>`;
-    } else {
-      extraHtml += `<div class="cascade-callout neutral">Pitch: <b>${(z.pitchCall || '').toUpperCase()}</b> | Guess: <b>${(z.batterGuess || '').toUpperCase()}</b> (Total: <b>${z.total}</b>)</div>`;
-    }
+    const countDisplay = z.countDisplay || (z.count ? `${z.count} Count` : 'Even Battle');
+    extraHtml = `<div class="cascade-callout neutral">Count Established: <b>${countDisplay}</b></div>`;
 
-    if (z.cascadeEffect === 'walk') {
-      cascadeHtml = `<div class="cascade-trigger-alert walk">🚶 <b>INSTANT WALK TRIGGERED!</b> Total (${z.total}) &ge; wild bust threshold (${z.sz?.wildBust || 20}). Walk awarded!</div>`;
-    } else if (z.cascadeEffect === 'called_k') {
-      cascadeHtml = `<div class="cascade-trigger-alert k">⚡ <b>INSTANT CALLED STRIKE 3!</b> Total (${z.total}) hit exact bullseye (${z.sz?.bullseye || 11}). Strikeout looking!</div>`;
-    } else if (winner !== 'tie') {
-      cascadeHtml = `<div class="cascade-effect-banner">⚡ <b>REACTION ADVANTAGE:</b> <b>${winner.toUpperCase()}</b> earned Initiative for Beat 2!</div>`;
+    if (z.winner === 'pitcher') {
+      cascadeHtml = `<div class="cascade-effect-banner">⚡ <b>0-2 PITCHER'S COUNT:</b> Pitcher Execution Difficulties discounted by <b>-2</b> in Beat 2!</div>`;
+    } else if (z.winner === 'batter') {
+      cascadeHtml = `<div class="cascade-effect-banner">⚡ <b>3-1 HITTER'S COUNT:</b> Batter Swing Difficulties discounted by <b>-2</b> in Beat 2!</div>`;
     } else {
-      cascadeHtml = `<div class="cascade-effect-banner neutral">⚖️ Strike Zone tied &mdash; neutral Initiative.</div>`;
+      cascadeHtml = `<div class="cascade-effect-banner neutral">⚖️ <b>3-2 FULL COUNT:</b> Even battle &mdash; standard difficulties for both sides.</div>`;
     }
   } else if (zKey === 'z2') {
+    const pStatus = z.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER';
+    const bStatus = z.batterExecuted ? '🟢 BARRELED UP' : '🔴 MISTIMED';
+    const locMatch = z.sameLocation ? '🎯 LOCATION MATCHED' : '❌ LOCATION MISSED';
+
+    extraHtml = `
+      <div class="cascade-callout neutral" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+        <span>Pitcher: <b>${(z.pitchType || 'fastball').toUpperCase()} ${(z.pitchLocation || 'high').toUpperCase()}</b> (${pStatus})</span>
+        <span>Batter: <b>${(z.swingType || 'balanced').toUpperCase()} ${(z.targetZone || 'high').toUpperCase()}</b> (${bStatus})</span>
+        <span><b>${locMatch}</b></span>
+      </div>`;
+
     if (z.specialEffectTriggered) {
       extraHtml += `<div class="cascade-callout counter">✨ <b>HIGHLIGHT CARD TRIGGERED:</b> ${z.specialEffectTriggered}</div>`;
     }
-    cascadeHtml = `<div class="cascade-effect-banner">🎯 Combined Power: <b>${z.total}</b> &rarr; Outcome: <b>${z.outcomeDisplay || z.outcome?.display || ''}</b></div>`;
+    cascadeHtml = `<div class="cascade-effect-banner">💥 Payoff Result: <b>${z.outcomeDisplay || z.outcome?.display || ''}</b></div>`;
   }
 
   return `

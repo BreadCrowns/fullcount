@@ -3206,5 +3206,705 @@ body {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   PUBLIC SCOUTING & INTEL STRIP
+   ========================================================================== */
+.scouting-report-bar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 6px;
+  background: rgba(13, 20, 34, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+.scout-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.scout-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.scout-avatar {
+  font-size: 0.75rem;
+}
+
+.scout-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+.scout-chips {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.scout-chip {
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.scout-chip.hot {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.scout-chip.cold {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+.scout-chip.fav {
+  background: rgba(245, 176, 39, 0.15);
+  border-color: rgba(245, 176, 39, 0.45);
+  color: var(--gold-bright);
+}
+
+.scout-chip.exhausted {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.scout-count-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  min-width: 75px;
+  text-align: center;
+  background: linear-gradient(135deg, #1c2638, #111a28);
+  border: 1.5px solid var(--border-light);
+}
+
+.scout-count-badge .count-num {
+  font-size: 1.15rem;
+  font-weight: 900;
+  font-family: monospace;
+  line-height: 1;
+}
+
+.scout-count-badge .count-tag {
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.scout-count-badge.count-pitcher {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.6), rgba(15, 23, 42, 0.8));
+  color: #93c5fd;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.scout-count-badge.count-hitter {
+  border-color: #f97316;
+  background: linear-gradient(135deg, rgba(124, 45, 18, 0.6), rgba(15, 23, 42, 0.8));
+  color: #fdba74;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+}
+
+.scout-count-badge.count-full {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(120, 83, 10, 0.6), rgba(15, 23, 42, 0.8));
+  color: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(245, 176, 39, 0.35);
+}
+
+.scout-count-badge.count-duel {
+  border-color: var(--border-light);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   EXECUTION GAUGE
+   ========================================================================== */
+.exec-gauge {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exec-gauge-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+}
+
+.exec-gauge-top .eg-title {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.exec-gauge-top .eg-formula {
+  color: var(--text-muted);
+}
+
+.exec-gauge-top .eg-formula b {
+  color: var(--gold-bright);
+}
+
+.exec-meter-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  position: relative;
+  overflow: visible;
+}
+
+.exec-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+.exec-meter-fill.exec-pass {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.exec-meter-fill.exec-fail {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.exec-target-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 6px #fff;
+}
+
+.exec-target-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5rem;
+  font-weight: 900;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.exec-gauge-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  margin-top: 2px;
+}
+
+.exec-gauge-status .eg-val b {
+  color: #fff;
+}
+
+.exec-gauge-status .eg-badge {
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.exec-gauge-status.exec-pass .eg-badge {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.exec-gauge-status.exec-fail .eg-badge {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* ==========================================================================
+   PAYOFF CONTROLS DECK (BEAT 2)
+   ========================================================================== */
+.payoff-controls-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.control-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.control-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.selection-tiles {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.choice-tile {
+  flex: 1;
+  background: linear-gradient(145deg, #1c2638, #111a28);
+  border: 1.5px solid var(--border-light);
+  border-radius: 8px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 52px;
+}
+
+.choice-tile:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.choice-tile.active {
+  border-color: var(--gold);
+  background: linear-gradient(145deg, #2b3952, #18263c);
+  box-shadow: 0 0 10px rgba(245, 176, 39, 0.4);
+  transform: scale(1.02);
+}
+
+.choice-tile.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.choice-tile .ct-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.choice-tile .ct-icon {
+  font-size: 0.85rem;
+}
+
+.choice-tile .ct-count,
+.choice-tile .ct-diff {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--gold-bright);
+}
+
+.choice-tile .ct-name {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.choice-tile .ct-sub {
+  font-size: 0.52rem;
+  color: var(--text-muted);
+}
+
+.choice-tile.loc {
+  min-height: 44px;
+}
+
+.intel-tag {
+  font-size: 0.5rem;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.intel-tag.hot {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.intel-tag.cold {
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+/* ==========================================================================
+   BEAT 1 & BEAT 2 ARENA LAYOUTS
+   ========================================================================== */
+.beat1-arena,
+.beat2-arena {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.b1-slot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.slot-role-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.b1-duel-center {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px dashed var(--border-light);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.b1-duel-title {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+  letter-spacing: 0.5px;
+}
+
+.b1-duel-pills {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.b1-count-tier {
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.b1-count-tier small {
+  font-size: 0.5rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.b1-count-tier.pitcher {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+
+.b1-count-tier.tie {
+  background: rgba(245, 176, 39, 0.15);
+  border: 1px solid rgba(245, 176, 39, 0.4);
+  color: var(--gold-bright);
+}
+
+.b1-count-tier.batter {
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  color: #fdba74;
+}
+
+.b1-duel-hint {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+.b2-opp-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.b2-opp-strip .opp-role-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.b2-my-slot-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+
+.b2-my-slot-section .slot-role-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   HAND CARD CHIPS (DYNAMIC IN-HAND PREVIEWS)
+   ========================================================================== */
+.card-exec-chip {
+  font-size: 0.52rem;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.card-exec-chip.pass {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.card-exec-chip.fail {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.card-perk-chip {
+  font-size: 0.52rem;
+  font-weight: 900;
+  background: rgba(245, 176, 39, 0.15);
+  color: var(--gold-bright);
+  border: 1px solid rgba(245, 176, 39, 0.4);
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   REVEALED BATTLEFIELD CLASH BOARD
+   ========================================================================== */
+.battlefield-clash-board {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.clash-beat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 0.68rem;
+}
+
+.clash-beat-header .cbh-tag {
+  font-weight: 800;
+  color: var(--gold-bright);
+}
+
+.clash-beat-header .cbh-cards {
+  display: flex;
+  gap: 6px;
+  color: var(--text-muted);
+}
+
+.clash-beat-header .cbh-cards b {
+  color: #fff;
+}
+
+.payoff-clash-card {
+  background: linear-gradient(145deg, #18263c, #0e1726);
+  border: 1.5px solid var(--border-light);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clash-matchup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+.clash-matchup-header .cm-tag {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+}
+
+.clash-matchup-header .cm-loc {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.clash-matchup-header .cm-loc.match {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.clash-matchup-header .cm-loc.diff {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.clash-teams-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clash-side {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.clash-side .cs-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.clash-side .cs-action {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.clash-side .cs-exec {
+  font-size: 0.58rem;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.clash-side .cs-exec.pass {
+  color: #34d399;
+}
+
+.clash-side .cs-exec.fail {
+  color: #f87171;
+}
+
+.clash-side .cs-card {
+  font-size: 0.58rem;
+  color: var(--gold-bright);
+}
+
+.clash-vs-divider {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--text-dim);
+}
+
+.clash-zone-note {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.clash-zone-note.hot {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.clash-zone-note.cold {
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.clash-zone-note.fav {
+  background: rgba(245, 176, 39, 0.15);
+  color: var(--gold-bright);
+  border: 1px solid rgba(245, 176, 39, 0.3);
+}
+
+.clash-outcome-badge {
+  background: linear-gradient(135deg, rgba(245, 176, 39, 0.2), rgba(245, 176, 39, 0.05));
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.clash-outcome-badge .cob-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(245, 176, 39, 0.5);
+  letter-spacing: 0.5px;
+}
+
 
 

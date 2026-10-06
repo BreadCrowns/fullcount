@@ -162,64 +162,126 @@
           assert(totalPitches === 9, `Pitcher ${p.name} has exactly 9 pitch charges (${totalPitches})`);
         });
 
-        // 12. Sequential Beat 1 Tests (Strike Zone Evaluation)
-        // Pitcher Harmon: strikeZone { low: 10, high: 16, bullseye: 13, wildBust: 20 }
-        // Fastball (8) + P2 (6) = 14 (Inside Zone 10-16 -> Pitcher Advantage)
-        const b1Normal = resolveBeat1({
-          pitchCall: 'fastball',
-          batterGuess: 'breaking',
-          pitcherCardId: 'P25', // Infield In (value 4) -> Fastball 8 + 4 = 12 (Inside zone 10-16)
-          batterCardId: null,
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1Normal.winner === 'pitcher', `Beat 1 inside strike zone awards pitcher advantage`);
-        assert(b1Normal.cascadeEffect === 'pitcher_advantage', `Beat 1 inside zone awards pitcher initiative`);
-
-        // Beat 1 Instant Walk (Wild Bust >= 20)
-        // Pitcher Fastball (8) + P1 (10) = 18. Batter Guess Fastball B1 (4 * 2 = 8). Total = 26 >= 20.
-        const b1Walk = resolveBeat1({
-          pitchCall: 'fastball',
-          batterGuess: 'fastball',
+        // 12. Sequential Beat 1 Tests (Count Battle & Economy)
+        // Pitcher P1 (val 10) vs Batter B13 (val 1) -> 0-2 Pitcher Count
+        const b1PitcherWins = resolveBeat1({
           pitcherCardId: 'P1',
-          batterCardId: 'B1',
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC02'],
-        });
-        assert(b1Walk.cascadeEffect === 'walk', `Beat 1 wild bust triggers instant walk (${b1Walk.total} >= 20)`);
-        assert(b1Walk.winner === 'batter', `Instant walk awards winner to batter`);
-
-        // Beat 1 Instant Called Strike 3 (Bullseye === 13)
-        // Pitcher Breaking (6) + P13 (7) = 13. Batter 0. Total = 13 === 13.
-        const b1CalledK = resolveBeat1({
-          pitchCall: 'breaking',
-          batterGuess: 'offspeed',
-          pitcherCardId: 'P13',
-          batterCardId: null,
+          batterCardId: 'B13',
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b1CalledK.cascadeEffect === 'called_k', `Beat 1 bullseye triggers instant called strike 3 (Total ${b1CalledK.total})`);
-        assert(b1CalledK.winner === 'pitcher', `Bullseye awards called strike to pitcher`);
+        assert(b1PitcherWins.winner === 'pitcher', `Beat 1 higher pitcher card awards pitcher advantage`);
+        assert(b1PitcherWins.count === '0-2', `Beat 1 pitcher win establishes 0-2 Pitcher's Count`);
+        assert(b1PitcherWins.pitcherDiscount === 2, `Pitcher receives -2 execution difficulty discount in 0-2 count`);
 
-        // 13. Sequential Beat 2 Tests (Launch Angle Bell Curve & Highlight Cards)
-        // Normal Home Run: Boomer Martinez BC01 (11–15 Home Run). P14 (6) + B11 (6) = 12.
+        // Batter B6 (val 9) vs Pitcher P6 (val 2) -> 3-1 Hitter Count
+        const b1BatterWins = resolveBeat1({
+          pitcherCardId: 'P6',
+          batterCardId: 'B6',
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b1BatterWins.winner === 'batter', `Beat 1 higher batter card awards batter advantage`);
+        assert(b1BatterWins.count === '3-1', `Beat 1 batter win establishes 3-1 Hitter's Count`);
+        assert(b1BatterWins.batterDiscount === 2, `Batter receives -2 execution difficulty discount in 3-1 count`);
+
+        // Tie: P23 (val 5) vs B17 (val 5) -> 3-2 Full Count
+        const b1Tie = resolveBeat1({
+          pitcherCardId: 'P23',
+          batterCardId: 'B17',
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b1Tie.winner === 'tie', `Beat 1 equal cards results in tie`);
+        assert(b1Tie.count === '3-2', `Beat 1 tie establishes 3-2 Full Count`);
+
+        // 13. Sequential Beat 2 Tests (Intent & Execution Clash)
+        // Clean Execution + Same Zone (High Fastball vs High Power): Home Run for BC01
+        // Harmon Fastball Diff 3, Boomer Power Diff 8. P14 (val 6 >= 3), B18 (val 9 >= 8). Both execute High!
         const b2HR = resolveBeat2({
-          beat1Winner: 'batter',
-          pitcherCardId: 'P14',
-          batterCardId: 'B11',
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherCardId: 'P14', // val 6 >= 3
+          swingType: 'power',
+          targetZone: 'high',
+          batterCardId: 'B18',  // val 9 >= 8
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2HR.outcomeType === 'homerun', `Combined sum 12 lands on Home Run for BC01`);
-        assert(b2HR.winner === 'batter', `Home run resolves as batter win`);
+        assert(b2HR.pitcherExecuted === true, `Pitcher executes fastball clean (6 >= 3)`);
+        assert(b2HR.batterExecuted === true, `Batter executes power swing clean (9 >= 8)`);
+        assert(b2HR.sameLocation === true, `Pitcher and batter matched in High location`);
+        assert(b2HR.outcomeType === 'homerun', `Both execute + same location results in Home Run`);
+
+        // Clean Execution + Different Location: Pitcher fools batter (High Fastball vs Low Power)
+        const b2Flyout = resolveBeat2({
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherCardId: 'P14', // val 6 >= 3
+          swingType: 'power',
+          targetZone: 'low',
+          batterCardId: 'B18',  // val 9 >= 8
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2Flyout.outcomeType === 'flyout', `Pitcher clean pitch in unpredicted zone produces Flyout`);
+
+        // Pitcher Fails Execution (Meatball) + Batter Executes Power -> Monster Home Run!
+        // Offspeed Diff 8. Pitcher plays P19 (val 1 < 8 -> Fails). Batter plays B18 (val 9 >= 8 -> Barrels).
+        const b2Hanger = resolveBeat2({
+          count: '3-2',
+          pitchType: 'offspeed',
+          pitchLocation: 'low',
+          pitcherCardId: 'P19', // val 1 < 8
+          swingType: 'power',
+          targetZone: 'high',
+          batterCardId: 'B18',  // val 9 >= 8
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2Hanger.pitcherExecuted === false, `Pitcher fails execution on offspeed with low card (1 < 8)`);
+        assert(b2Hanger.outcomeType === 'homerun', `Hanging mistake pitch crushed for Monster Home Run`);
+
+        // Pitcher Executes Clean + Batter Fails Execution (Power Swing with low card) -> Strikeout (K)!
+        const b2Strikeout = resolveBeat2({
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherCardId: 'P14', // val 6 >= 3
+          swingType: 'power',
+          targetZone: 'high',
+          batterCardId: 'B13',  // val 1 < 8
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2Strikeout.batterExecuted === false, `Batter fails execution on power swing with low card (1 < 8)`);
+        assert(b2Strikeout.outcomeType === 'k', `Mistimed power swing on clean pitch results in Strikeout`);
+
+        // Contact Swing avoids strikeout on mistimed swing
+        const b2ContactProtect = resolveBeat2({
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherCardId: 'P14', // val 6 >= 3
+          swingType: 'contact',
+          targetZone: 'high',
+          batterCardId: 'B14',  // val 2 < 3
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2ContactProtect.outcomeType === 'groundout', `Contact swing chokes up and avoids strikeout, producing groundout`);
 
         // Highlight Card 1: Web Gem (P26) Robs Home Run
-        // P26 (4) + B21 (7) = 11 (normally Home Run). P26 robs it!
         const b2WebGem = resolveBeat2({
-          beat1Winner: 'pitcher',
-          pitcherCardId: 'P26',
-          batterCardId: 'B21',
+          count: '3-1',
+          pitchType: 'offspeed',
+          pitchLocation: 'low',
+          pitcherCardId: 'P26', // Web Gem
+          swingType: 'power',
+          targetZone: 'low',
+          batterCardId: 'B18',
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -227,11 +289,14 @@
         assert(b2WebGem.specialEffectTriggered && b2WebGem.specialEffectTriggered.includes('Web Gem'), `Web Gem logs special effect`);
 
         // Highlight Card 2: Double Play (P27) Turns Groundout into 2 Outs
-        // P27 (2) + B13 (1) = 3 (Groundout). Runners on 1st.
         const b2DP = resolveBeat2({
-          beat1Winner: 'pitcher',
-          pitcherCardId: 'P27',
-          batterCardId: 'B13',
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
+          pitcherCardId: 'P27', // Double Play
+          swingType: 'contact',
+          targetZone: 'high',
+          batterCardId: 'B14',
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
           bases: { first: true, second: false, third: false }
@@ -239,68 +304,50 @@
         assert(b2DP.outcomeType === 'double_play' && b2DP.outsAdded === 2, `Double Play (P27) turns groundout into 2-Out DP`);
 
         // Highlight Card 3: Spoil It (B19) Fouls Off Out
-        // P13 (0) + B19 (3) = 3 (normally Groundout). B19 spoils it!
         const b2Spoil = resolveBeat2({
-          beat1Winner: 'pitcher',
-          pitcherCardId: null,
-          batterCardId: 'B19',
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'low',
+          pitcherCardId: 'P14',
+          swingType: 'contact',
+          targetZone: 'high',
+          batterCardId: 'B19', // Spoil It
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2Spoil.isFoulBall === true, `Spoil It (B19) fouls off out (isFoulBall = true)`);
 
         // Highlight Card 4: Gap Power (B26) Upgrades Single -> Double
-        // U2 (3) + B26 (6) = 9 (normally Single for BC01). Gap Power upgrades to Double!
         const b2Gap = resolveBeat2({
-          beat1Winner: 'batter',
-          pitcherCardId: 'U2',
-          batterCardId: 'B26',
+          count: '3-2',
+          pitchType: 'offspeed',
+          pitchLocation: 'low',
+          pitcherCardId: 'P19', // Fails -> Single
+          swingType: 'contact',
+          targetZone: 'low',
+          batterCardId: 'B26', // Gap Power
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2Gap.outcomeType === 'double', `Gap Power (B26) upgrades Single to Double`);
 
         // Highlight Card 5: Moonshot (B27) +1 Bonus Run
-        // P14 (6) + B27 (8) = 14 (Home Run). Moonshot adds +1 bonus run!
         const b2Moon = resolveBeat2({
-          beat1Winner: 'batter',
+          count: '3-2',
+          pitchType: 'fastball',
+          pitchLocation: 'high',
           pitcherCardId: 'P14',
-          batterCardId: 'B27',
+          swingType: 'power',
+          targetZone: 'high',
+          batterCardId: 'B27', // Moonshot (val 8 >= 8)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Moon.outcomeType === 'homerun' && b2Moon.outcome.bonusRun === 1, `Moonshot (B27) adds +1 bonus run on Home Run`);
-
-        // Beat 1 Pitch Synergy Test (Breaking pitch + Breaking card P8 inside zone)
-        const b1Synergy = resolveBeat1({
-          pitchCall: 'breaking',
-          batterGuess: 'fastball',
-          pitcherCardId: 'P8', // Breaking synergy +2, value 6
-          batterCardId: null,
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1Synergy.pitcherSynergyActive === true, `P8 triggers pitch synergy with Breaking pitch`);
-        assert(b1Synergy.pitcherTotal === 6 + 6 + 2, `Pitcher total includes +2 pitch synergy bonus (14)`);
-        assert(b1Synergy.winner === 'pitcher', `Total 14 is inside strike zone awarding pitcher advantage`);
-        assert(b1Synergy.pitcherAdvantagePerk === 'nasty_bite', `P8 attaches nasty_bite advantage perk when advantage is won`);
-
-        // Beat 2 Advantage Perk Test (hang_breaking adds +3 power)
-        const b2PerkTest = resolveBeat2({
-          beat1Winner: 'batter',
-          batterAdvantagePerk: 'hang_breaking',
-          pitcherCardId: 'P16', // value 2
-          batterCardId: 'B11',  // value 6
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        // 2 (pitcher) + 6 (batter) + 3 (perk) = 11 -> Home Run for BC01
-        assert(b2PerkTest.batterTotal === 9, `Batter total received +3 from hang_breaking perk (6 + 3 = 9)`);
-        assert(b2PerkTest.outcomeType === 'homerun', `Boosted total 11 reaches Home Run band`);
+        assert(b2Moon.outcomeType === 'homerun' && b2Moon.bonusRun === 1, `Moonshot (B27) adds +1 bonus run on Home Run`);
 
         // 14. Sequential 2-Beat PA Resolution
         const seqPAResult = resolveSequentialPA({
-          beat1: b1Normal,
+          beat1: b1PitcherWins,
           beat2: b2HR,
           bases: { first:false, second:false, third:false },
           pitcherChar: PITCHER_CHARACTERS['PC01'],
@@ -311,25 +358,19 @@
         });
         assert(seqPAResult && seqPAResult.outcome && seqPAResult.outcome.display, `Sequential PA resolves full outcome (${seqPAResult?.outcome?.display})`);
 
-        // Instant Knockout PA outcomes
-        const walkPA = resolveSequentialPA({ beat1: b1Walk, half: 'top' });
-        assert(walkPA.outcome.type === 'walk', `Instant walk PA produces walk outcome`);
-
-        const calledKPA = resolveSequentialPA({ beat1: b1CalledK, half: 'top' });
-        assert(calledKPA.outcome.type === 'k', `Instant called strike PA produces K outcome`);
-
-        // 15. Beat-Specific Solo Bot Decision Tests with Initiative
+        // 15. Beat-Specific Solo Bot Decision Tests
         const botState = {
-          half: 'top', // guest bats, host pitches
+          half: 'top',
           arsenalCharges: { host: { fastball: 4, breaking: 2, offspeed: 1 } },
           hands: { guest: ['B1', 'B11', 'B21'] }
         };
         const botBeat1 = executeBotPlayBeat(botState, 'guest', 'beat1');
-        assert(botBeat1.batterGuess !== null, `Bot selects pitch guess for Beat 1 (${botBeat1.batterGuess})`);
+        assert(botBeat1.cardId !== null, `Bot selects card for Beat 1 Count battle (${botBeat1.cardId})`);
 
-        // Bot with Reaction Advantage in Beat 2 reacts to opponent's revealed card
-        const botBeat2 = executeBotPlayBeat(botState, 'guest', 'beat2', 'P14'); // Opponent played P14 (val 6)
-        assert(botBeat2.cardId !== null, `Bot with Reaction Advantage selects counter card (${botBeat2.cardId})`);
+        const botBeat2 = executeBotPlayBeat(botState, 'guest', 'beat2');
+        assert(botBeat2.swingType !== null, `Bot selects swing type for Beat 2 (${botBeat2.swingType})`);
+        assert(botBeat2.targetZone !== null, `Bot selects target zone for Beat 2 (${botBeat2.targetZone})`);
+        assert(botBeat2.cardId !== null, `Bot selects card for Beat 2 execution (${botBeat2.cardId})`);
 
         // 16. Full 3-Inning Sequential 2-Beat Game Simulation
         const simState = {
@@ -376,16 +417,8 @@
           simState.hands[pitchingRole] = pitchDecision.botHand;
           simState.hands[battingRole] = batDecision.botHand;
 
-          // Decrement charge
-          const chosenPitch = pitchDecision.pitchCall || 'fastball';
-          if (simState.arsenalCharges[pitchingRole][chosenPitch] > 0) {
-            simState.arsenalCharges[pitchingRole][chosenPitch]--;
-          }
-
-          // Beat 1
+          // Beat 1: The Count
           const b1 = resolveBeat1({
-            pitchCall: chosenPitch,
-            batterGuess: batDecision.batterGuess || 'fastball',
             pitcherCardId: pitchDecision.cardId,
             batterCardId: batDecision.cardId,
             pitcherChar,
@@ -394,57 +427,48 @@
             isFirstPAOfInning: simState.outs === 0
           });
 
-          let paResult = null;
-          if (b1.cascadeEffect === 'walk' || b1.cascadeEffect === 'called_k') {
-            paResult = resolveSequentialPA({
-              beat1: b1,
-              bases: simState.bases,
-              pitcherChar,
-              batterChar,
-              score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
-              outs: simState.outs,
-              half
-            });
-          } else {
-            // Beat 2 with Initiative: Loser reveals first, Winner reacts!
-            const b1Winner = b1.winner || 'pitcher';
-            const winnerRole = (b1Winner === 'pitcher') ? pitchingRole : battingRole;
-            const loserRole  = (b1Winner === 'pitcher') ? battingRole : pitchingRole;
+          // Beat 2: The Payoff Pitch
+          const pitcherPlay = executeBotPlayBeat(simState, pitchingRole, 'beat2');
+          simState.hands[pitchingRole] = pitcherPlay.botHand;
+          const batterPlay = executeBotPlayBeat(simState, battingRole, 'beat2');
+          simState.hands[battingRole] = batterPlay.botHand;
 
-            // Loser plays first
-            const loserPlay = executeBotPlayBeat(simState, loserRole, 'beat2', null);
-            simState.hands[loserRole] = loserPlay.botHand;
-            // Winner plays with reaction advantage!
-            const winnerPlay = executeBotPlayBeat(simState, winnerRole, 'beat2', loserPlay.cardId);
-            simState.hands[winnerRole] = winnerPlay.botHand;
-
-            const pCard = (pitchingRole === loserRole) ? loserPlay.cardId : winnerPlay.cardId;
-            const bCard = (battingRole === loserRole) ? loserPlay.cardId : winnerPlay.cardId;
-
-            const b2 = resolveBeat2({
-              z1Winner: b1.winner,
-              beat1Winner: b1.winner,
-              pitcherCardId: pCard,
-              batterCardId: bCard,
-              pitcherChar,
-              batterChar,
-              pitcherPAsFaced: simState.pitcherPAs[pitchingRole],
-              bases: simState.bases,
-              outs: simState.outs,
-              score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] }
-            });
-
-            paResult = resolveSequentialPA({
-              beat1: b1,
-              beat2: b2,
-              bases: simState.bases,
-              pitcherChar,
-              batterChar,
-              score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
-              outs: simState.outs,
-              half
-            });
+          // Deduct pitch charge
+          const chosenPitch = pitcherPlay.pitchType || 'fastball';
+          if (simState.arsenalCharges[pitchingRole][chosenPitch] > 0) {
+            simState.arsenalCharges[pitchingRole][chosenPitch]--;
           }
+
+          const b2 = resolveBeat2({
+            count: b1.count,
+            beat1Winner: b1.winner,
+            z1Winner: b1.winner,
+            pitchType: pitcherPlay.pitchType || 'fastball',
+            pitchLocation: pitcherPlay.pitchLocation || 'high',
+            pitcherCardId: pitcherPlay.cardId,
+            swingType: batterPlay.swingType || 'balanced',
+            targetZone: batterPlay.targetZone || 'high',
+            batterCardId: batterPlay.cardId,
+            pitcherChar,
+            batterChar,
+            pitcherPAsFaced: simState.pitcherPAs[pitchingRole],
+            bases: simState.bases,
+            outs: simState.outs,
+            score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+            pitcherAdvantagePerk: b1.pitcherAdvantagePerk,
+            batterAdvantagePerk: b1.batterAdvantagePerk,
+          });
+
+          const paResult = resolveSequentialPA({
+            beat1: b1,
+            beat2: b2,
+            bases: simState.bases,
+            pitcherChar,
+            batterChar,
+            score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+            outs: simState.outs,
+            half
+          });
 
           // Apply PA outcome
           const outcome = paResult.outcome;
