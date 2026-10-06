@@ -2,9 +2,6 @@ $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 if (-not $root) { $root = (Get-Location).Path }
 
-$testHtml = Join-Path $root "tests\test_resolution.html"
-$testUri = "file:///" + $testHtml.Replace('\', '/')
-
 # Find browser
 $browser = $null
 $candidates = @(
@@ -27,36 +24,50 @@ if (-not $browser) {
 }
 
 Write-Host "Running tests using: $browser" -ForegroundColor Cyan
-Write-Host "Test file: $testHtml" -ForegroundColor Gray
-Write-Host "----------------------------------------------------------"
 
-$tempFile = [System.IO.Path]::GetTempFileName()
-try {
-    cmd.exe /c "`"$browser`" --headless=new --dump-dom `"$testUri`" > `"$tempFile`" 2>&1"
-    $output = Get-Content $tempFile -Raw
-} finally {
-    if (Test-Path $tempFile) { Remove-Item $tempFile -Force -ErrorAction SilentlyContinue }
+$testFiles = @(
+    (Join-Path $root "tests\test_resolution.html"),
+    (Join-Path $root "tests\test_play_ui.html")
+)
+
+$totalPass = 0
+$totalFail = 0
+
+
+foreach ($tFile in $testFiles) {
+    $tUri = "file:///" + $tFile.Replace('\', '/')
+    Write-Host "Running test file: $tFile" -ForegroundColor Cyan
+    Write-Host "----------------------------------------------------------"
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    try {
+        cmd.exe /c "`"$browser`" --headless=new --dump-dom `"$tUri`" > `"$tempFile`" 2>&1"
+        $output = Get-Content $tempFile -Raw
+    } finally {
+        if (Test-Path $tempFile) { Remove-Item $tempFile -Force -ErrorAction SilentlyContinue }
+    }
+
+    $cleanOutput = $output -replace '(?s)<script[^>]*>.*?</script>', ''
+    $passMatches = [regex]::Matches($cleanOutput, '<p class="pass">\[PASS\] ([^<]+)</p>')
+    $failMatches = [regex]::Matches($cleanOutput, '<p class="fail">\[(FAIL|SYNTAX|FATAL)[^<]*\] ([^<]+)</p>')
+
+
+    foreach ($m in $passMatches) {
+        Write-Host "  [PASS] $($m.Groups[1].Value)" -ForegroundColor Green
+    }
+    foreach ($m in $failMatches) {
+        Write-Host "  [FAIL] $($m.Groups[2].Value)" -ForegroundColor Red
+    }
+
+    $totalPass += $passMatches.Count
+    $totalFail += $failMatches.Count
+    Write-Host "----------------------------------------------------------"
 }
 
-$passMatches = [regex]::Matches($output, '<p class="pass">\[PASS\] ([^<]+)</p>')
-$failMatches = [regex]::Matches($output, '<p class="fail">\[FAIL\] ([^<]+)</p>')
-
-foreach ($m in $passMatches) {
-    Write-Host "  [PASS] $($m.Groups[1].Value)" -ForegroundColor Green
-}
-
-foreach ($m in $failMatches) {
-    Write-Host "  [FAIL] $($m.Groups[1].Value)" -ForegroundColor Red
-}
-
-$passCount = $passMatches.Count
-$failCount = $failMatches.Count
-
-Write-Host "----------------------------------------------------------"
-if ($failCount -eq 0 -and $passCount -gt 0) {
-    Write-Host "[SUCCESS] ALL TESTS PASSED ($passCount passed, 0 failed)" -ForegroundColor Green
+if ($totalFail -eq 0 -and $totalPass -gt 0) {
+    Write-Host "[SUCCESS] ALL TESTS PASSED ($totalPass passed, 0 failed)" -ForegroundColor Green
     exit 0
 } else {
-    Write-Host "[FAILURE] TESTS FAILED ($passCount passed, $failCount failed)" -ForegroundColor Red
+    Write-Host "[FAILURE] TESTS FAILED ($totalPass passed, $totalFail failed)" -ForegroundColor Red
     exit 1
 }
+

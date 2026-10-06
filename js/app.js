@@ -127,7 +127,20 @@ function initApp() {
 // ─────────────────────────────────────────────────────────────────────────────
 // FIREBASE HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-function gameRef(path = '') { return db.ref(`fullcount_games/${gameId}${path ? '/'+path : ''}`); }
+function gameRef(path = '') {
+  if (typeof db === 'undefined' || !db) {
+    const dummy = {
+      update: () => Promise.resolve(),
+      set: () => Promise.resolve(),
+      once: (evt, cb) => { if (cb) cb({ val: () => null }); return Promise.resolve({ val: () => null }); },
+      on: () => {},
+      off: () => {}
+    };
+    return dummy;
+  }
+  return db.ref(`fullcount_games/${gameId}${path ? '/'+path : ''}`);
+}
+
 
 function handleGameState(g) {
   switch(g.phase) {
@@ -1811,11 +1824,7 @@ function resolveBeatStep(beat) {
     }
   });
 }
-      console.error('resolveBeatStep error:', err);
-      showError('Beat resolution error: ' + err.message);
-    }
-  });
-}
+
 
 function resolveAndAdvance() {
   gameRef('currentPA').once('value', snap => {
