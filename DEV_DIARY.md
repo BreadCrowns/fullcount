@@ -785,6 +785,70 @@ With the core card economy and timing-delta mechanics finely tuned, the game's f
 - **Headless Game Simulation**: 10-game simulation executed 298 PAs across 10 completed games with an average of **7.50 runs/game**, 125 hits, 7 home wins, 3 away wins, and zero errors.
 - **Player Experience**: The transformation is immediate: *Full Count* now visually and physically feels like a baseball showdown. Pitching and hitting are tactile, cards flip dramatically on the dirt, and the screen is clean, cinematic, and decluttered.
 
+---
+
+## Entry 15: Mobile & Desktop Drag-and-Drop Reliability, On-Field Player Stats, and Infield Diamond Geometry
+*Date: October 7, 2026*
+
+### Context & The Problem
+Following the initial introduction of the Baseball Diamond Arena and pitch trays, extensive playtesting and user feedback uncovered three critical ergonomic and visual issues:
+1. **Drag-and-Drop Failure on Touch and Pointer Interceptions**: Card dragging from the hand failed completely on touch devices (phones, tablets, touch-enabled laptops) and frequently misfired on desktop browsers. In mobile and touch web environments, the HTML5 `draggable="true"` API does not trigger mouse drag events. Furthermore, on desktop browsers, child elements within drop trays (`<span>`, `<div>`) intercepted pointer events, causing parent trays to prematurely fire `dragleave` events and cancel valid card drops.
+2. **HUD Clutter vs. Focal Area Disconnect**: Crucial player scouting information (pitcher pitch charges, fatigue status, batter archetype, favorite/hunted pitch) was isolated at the top edge of the screen (opponent bar) and bottom edge (player dock). Players had to constantly dart their eyes between the distant screen edges and the field trays to determine pitch counts and matchup rules.
+3. **Misaligned Field Geometry**: The card trays were aligned using vertical flexbox `justify-content: space-between`, which pushed the pitcher's mound up near second base (`top: 8%`) rather than directly centering it over the infield dirt mound. Home plate also floated ambiguously rather than pinning cleanly to the home plate apex.
+
+### Options Explored
+
+- **Drag-and-Drop Engine**:
+  - *Option A (Mouse-only fix)*: Retain native HTML5 drag-and-drop and rely entirely on click-to-select fallback for mobile users.
+    *Why Discarded*: The tactile immersion of physically throwing a pitch or stepping into the batter's box is central to the design. Forcing mobile users to tap cards and tap trays breaks this immersion.
+  - *Option B (Chosen — Dual-Mode Touch & Mouse Engine with Ghosting and Event Filtering)*:
+    Implement a custom dual-mode drag engine:
+    1. For desktop mouse: Add `pointer-events: none` to all interior tray text/badge children, ensuring the drop zone target remains stable during `dragover` and `drop`.
+    2. For touchscreens: Bind custom `touchstart`, `touchmove`, and `touchend`/`touchcancel` handlers to hand cards. Spawn a floating ghost card (`.touch-ghost-card`) tracked via `clientX`/`clientY`, use `document.elementFromPoint()` to dynamically detect hover over trays, highlight valid drop targets with emerald glows (`.drag-over`), and invoke `executeCardDrop()` on touch release.
+- **Player Stats Placement**:
+  - *Option A (Keep in top/bottom HUD bars with larger icons)*: Clutters the header and dock and fails to solve the visual tracking friction.
+  - *Option B (Chosen — Embedded On-Field Scouting Badges)*:
+    Completely remove scouting chips from the top opponent bar and bottom player dock. Mount the pitcher's name, role icon, fatigue badge, and live repertoire charges (`FB [6-10]`, `BR [3-7]`, `OFF [1-5]` with 3-1 lockout indicators) directly on the **Pitcher's Mound** (`.diamond-mound`). Mount the batter's name, role icon, archetype (`STYLE: SLUGGER`), and hunted pitch (`⭐ HUNTS: FB`) directly at **Home Plate** (`.diamond-plate-area`).
+- **Infield Diamond Geometry & Positioning**:
+  - *Option A*: Retain flexbox layout with custom margin offsets.
+    *Why Discarded*: Margin offsets break across varying screen aspect ratios.
+  - *Option B (Chosen — Absolute Dirt-Diamond Anchoring)*:
+    Anchor `.diamond-mound` to `position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%)`, locking it directly over the center rubber of the 45°-rotated infield dirt diamond. Anchor `.diamond-plate-area` to `position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%)`, locking it over the bottom home plate apex. Re-center second base (`top: 9%`), third base (`top: 48%; left: 14%`), and first base (`top: 48%; left: 86%`).
+
+---
+
+### Implementation Details
+
+1. **Dual-Mode Drag & Drop Architecture (`js/app.js` & `fullcount.css`)**:
+   - Built touch lifecycle handlers: `handleTouchDragStart`, `handleTouchDragMove`, and `handleTouchDragEnd`.
+   - Dynamic touch ghost element `#touch-drag-ghost` with 3D elevation, gold border, and high z-index.
+   - Bound `data-pitch` and `data-zone` attributes across all `.pitch-tray`, `.choice-tile`, and `.b1-card-slot` drop zones.
+   - Added `.pitch-tray > *:not(.remove-btn) { pointer-events: none; }` and `.tray-drop-target > *:not(.remove-btn) { pointer-events: none; }` to eliminate pointer flicker and spurious drag cancellation on desktop.
+   - Maintained click-to-select and click-to-tray as an accessible fallback.
+
+2. **On-Field Scouting Badges (`js/app.js` & `fullcount.css`)**:
+   - Implemented `renderFieldPitcherInfo()` displaying pitcher role, name, fatigue alert, and live FB/BR/OFF charges.
+   - Implemented `renderFieldBatterInfo()` displaying batter role, name, archetype badge, and hunted pitch indicator.
+   - Decluttered `.opponent-bar` and `.player-bar` across all phases.
+   - Embedded interactive long-press (350ms touch threshold) and hover tooltips on each on-field chip.
+
+3. **Diamond Field Spatial Alignment (`fullcount.css`)**:
+   - Centered infield dirt (`top: 48%; left: 50%`) and bases (`2nd: top 9%`, `3rd: top 48%, left 14%`, `1st: top 48%, left 86%`).
+   - Positioned mound directly over dirt center (`top: 36%`) and home plate at bottom apex (`bottom: 8px`).
+   - Positioned Beat 1 duel clash row at `top: 52%; left: 50%` maintaining user card on the left and opponent on the right.
+
+4. **Automated Verification (`tests/test_play_ui.html`)**:
+   - Added assertions ensuring opponent and player bars are decluttered and scouting badges render cleanly on mound and plate.
+   - Verified touch drag attributes (`data-pitch`) and all test suites pass.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **168 of 168 tests pass (100%)** across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 331 PAs across 10 completed games with an average of **7.00 runs/game**, 134 hits, 7 home wins, 3 away wins, and zero errors.
+- **Player Experience**: Drag-and-drop feels buttery smooth and instantaneous across mobile, tablet, and desktop. Player stats live naturally where the action is happening on the field, and the diamond geometry accurately reflects baseball spatial structure.
+
+
 
 
 

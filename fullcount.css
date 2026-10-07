@@ -4665,8 +4665,9 @@ body {
 .diamond-field {
   width: 100%;
   flex: 1;
-  min-height: 270px;
-  max-height: 420px;
+  min-height: 350px;
+  height: 375px;
+  max-height: 440px;
   position: relative;
   border-radius: 18px;
   overflow: hidden;
@@ -4674,19 +4675,16 @@ body {
     radial-gradient(circle at 50% 50%, #1e4a24 0%, #15381a 60%, #0d2411 100%);
   border: 2px solid rgba(255, 255, 255, 0.14);
   box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.75), 0 8px 30px rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   padding: 8px 10px;
 }
 
 /* Infield Dirt Diamond */
 .infield-dirt {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
-  width: 210px;
-  height: 210px;
+  width: 220px;
+  height: 220px;
   transform: translate(-50%, -50%) rotate(45deg);
   background: radial-gradient(circle at 50% 50%, #875731 0%, #6d4423 70%, #523117 100%);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -4698,10 +4696,10 @@ body {
 /* Basepaths Chalk Lines */
 .basepath-lines {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
-  width: 206px;
-  height: 206px;
+  width: 216px;
+  height: 216px;
   transform: translate(-50%, -50%) rotate(45deg);
   border: 1px dashed rgba(255, 255, 255, 0.4);
   pointer-events: none;
@@ -4725,17 +4723,17 @@ body {
 }
 
 .diamond-base.base-second {
-  top: 14%;
+  top: 9%;
   left: 50%;
 }
 
 .diamond-base.base-third {
-  top: 50%;
+  top: 48%;
   left: 14%;
 }
 
 .diamond-base.base-first {
-  top: 50%;
+  top: 48%;
   left: 86%;
 }
 
@@ -4756,28 +4754,35 @@ body {
   transform: rotate(-45deg);
 }
 
-/* Pitcher's Mound (Center) */
+/* Pitcher's Mound (Directly Centered over Infield Dirt Mound) */
 .diamond-mound {
-  position: relative;
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 20;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-radius: 12px;
   padding: 5px 8px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(6px);
-  width: 100%;
-  max-width: 98%;
-  margin: 0 auto;
+  width: 95%;
+  max-width: 360px;
   transition: all 0.2s ease;
 }
 
 .diamond-mound.mine-territory {
-  border-color: rgba(96, 165, 250, 0.6);
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+  border-color: rgba(96, 165, 250, 0.7);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+}
+
+.diamond-mound.opp-territory {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
 }
 
 .mound-rubber {
@@ -4798,28 +4803,35 @@ body {
   margin-bottom: 3px;
 }
 
-/* Home Plate / Batter's Box (Bottom) */
+/* Home Plate / Batter's Box (Directly Centered over Home Plate Apex) */
 .diamond-plate-area {
-  position: relative;
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 20;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-radius: 12px;
   padding: 5px 8px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(6px);
-  width: 100%;
-  max-width: 98%;
-  margin: 0 auto;
+  width: 95%;
+  max-width: 360px;
   transition: all 0.2s ease;
 }
 
 .diamond-plate-area.mine-territory {
-  border-color: rgba(52, 211, 153, 0.6);
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+  border-color: rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+}
+
+.diamond-plate-area.opp-territory {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
 }
 
 .home-plate-pentagon {
@@ -4829,6 +4841,134 @@ body {
   clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 50% 100%, 0% 50%);
   margin-bottom: 2px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* On-Field Player Information Badges */
+.field-player-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 3px;
+}
+
+.fpc-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.fpc-identity {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.fpc-role-icon {
+  font-size: 0.72rem;
+}
+
+.fpc-role-title {
+  color: var(--text-dim);
+  font-size: 0.54rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fpc-side-pill {
+  font-size: 0.48rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 900;
+}
+
+.fpc-side-pill.mine {
+  background: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.4);
+}
+
+.fpc-side-pill.opp {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.fpc-name {
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.68rem;
+  letter-spacing: 0.3px;
+}
+
+.fpc-fatigue-badge {
+  font-size: 0.5rem;
+  font-weight: 900;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.field-scout-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.field-scout-chips .scout-chip {
+  font-size: 0.56rem;
+  padding: 2px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-dim);
+  transition: all 0.15s ease;
+}
+
+.field-scout-chips .scout-chip:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.field-scout-chips .scout-chip b {
+  color: #fff;
+}
+
+.field-scout-chips .scout-chip.hot {
+  border-color: rgba(245, 176, 39, 0.4);
+  color: var(--gold-bright);
+}
+
+.field-scout-chips .scout-chip.fav {
+  border-color: rgba(46, 213, 115, 0.4);
+  color: #2ed573;
+}
+
+.field-scout-chips .scout-chip.locked {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  opacity: 0.7;
+}
+
+.field-scout-chips .scout-chip.exhausted {
+  opacity: 0.35;
+  text-decoration: line-through;
 }
 
 /* Pitch & Batter Trays */
@@ -4951,20 +5091,68 @@ body {
 }
 
 /* Drag State for Number Cards */
+.number-card {
+  -webkit-user-drag: element;
+  user-select: none;
+  touch-action: none;
+}
+
 .number-card.is-dragging {
   opacity: 0.4;
   transform: scale(0.95);
   box-shadow: 0 0 16px var(--gold-glow);
 }
 
+/* Drop targets: ensure child elements don't intercept dragover/drop */
+.pitch-tray > *:not(.remove-btn),
+.tray-drop-target > *:not(.remove-btn),
+.b1-card-slot > *:not(.remove-btn),
+.choice-tile > *:not(.remove-btn) {
+  pointer-events: none;
+}
+
+.remove-btn {
+  pointer-events: auto;
+}
+
+/* Touch Ghost Card for Mobile/Tablet Drag & Drop */
+.touch-ghost-card {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%) scale(1.1);
+  width: 48px;
+  height: 68px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 2px solid var(--gold-bright);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px var(--gold-glow);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-family: 'Impact', sans-serif;
+}
+
+body.is-dragging-card {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* Beat 1 Diamond Row Layout */
 .diamond-b1-row {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  width: 100%;
-  margin: auto 0;
+  width: 95%;
+  max-width: 360px;
   z-index: 25;
 }
 

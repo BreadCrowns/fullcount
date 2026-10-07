@@ -239,8 +239,10 @@
       report(lockedOffspeed !== null && lockedOffspeed.textContent.includes('Offspeed'), 'Beat 2 locks out Offspeed pitch on 3-1 count');
       report(document.querySelector('.beat2-advantage-banner') !== null, 'Beat 2 advantage banner renders in Beat 2 arena');
       report(document.querySelector('.beat2-advantage-banner.count-hitter') !== null, 'Beat 2 advantage banner reflects 3-1 count leverage');
-      report(document.querySelector('.opponent-bar .opp-scout-chips') !== null, 'Opponent scouting chips display in top opponent bar');
-      report(document.querySelector('.player-bar .my-scout-chips') !== null, 'User scouting chips display in bottom player dock');
+      report(document.querySelector('.opponent-bar .opp-scout-chips') === null, 'Opponent scouting chips removed from top opponent bar');
+      report(document.querySelector('.player-bar .my-scout-chips') === null, 'User scouting chips removed from bottom player dock');
+      report(document.querySelector('.diamond-mound .field-scout-chips') !== null, 'Pitcher scouting stats display directly on the pitcher mound');
+      report(document.querySelector('.diamond-plate-area .field-scout-chips') !== null, 'Batter scouting stats display directly at home plate');
 
       // 4b. Test Baseball Diamond & Drag Trays
       report(document.querySelector('.diamond-field') !== null, 'Play area renders Baseball Diamond field');
@@ -250,6 +252,7 @@
       report(trays.length === 3, `Beat 2 renders exactly 3 pitch selection trays (found ${trays.length})`);
       const draggableCards = document.querySelectorAll('.number-card[draggable="true"]');
       report(draggableCards.length > 0, `Active hand cards are draggable for drag-and-drop (found ${draggableCards.length})`);
+      report(document.querySelector('.pitch-tray[data-pitch]') !== null, 'Pitch trays contain data-pitch attributes for drop targeting');
 
       // 4c. Test Tooltip Popup System
       showTooltipPopup('Fastball Intel', 'High heat window is 6-10.');
