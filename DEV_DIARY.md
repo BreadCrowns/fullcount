@@ -307,3 +307,91 @@ For the batter, making four distinct choices on every single payoff pitch was ex
 - **Automated Unit Tests**: 120 of 120 browser tests pass (`run-tests.ps1`).
 - **Game Simulation**: 10-game simulation (`run-sim.ps1`) completed 260 PAs with realistic baseball totals (5.70 runs/game, 94 total hits, 5 home wins, 5 away wins).
 - **Player Experience**: Beat 2 now feels electric, focused, and fast-paced. Pitcher and batter engage in an uncluttered mind game of pitch selection and timing execution.
+
+---
+
+## Entry 9: Total Duel Symmetry — Removing Swing Type for Pure Pitch Guessing
+
+### The Problem: Asymmetry and Residual Redundancy in Beat 2
+Even after eliminating high/low locations in Entry 8, an immediate player experience friction remained. The user pointed it out directly:
+> *"Hold on, the batter is still choosing 3 things. That seems redundant and just as much cognitive overload as the pitching used to be. For now, lets remove swing type and only focus on guessing pitch type and timing card."*
+
+The math of player actions was uneven:
+- **Pitcher**: Pick Pitch Type (`fastball`, `breaking`, `offspeed`) + Pick Number Card (1–10). *(2 decisions)*
+- **Batter**: Anticipate Pitch (`fastball`, `breaking`, `offspeed`) + Pick Swing Approach (`contact`, `balanced`, `power`) + Pick Number Card (1–10). *(3 decisions)*
+
+Beyond the cognitive asymmetry, the swing approach was mechanically redundant with the overlapping pitch ranges. In Entry 7, we defined:
+- **Offspeed**: [1–5] (Touch & Deception)
+- **Breaking**: [3–7] (Bite & Spin)
+- **Fastball**: [6–10] (Velocity & Heat)
+
+If a batter was anticipating a **Fastball**, of course they were timing for the high-velocity 6–10 window! Forcing them to also click the "Power" button (which had the exact same 6–10 range) was completely superfluous button-clicking. If a batter was looking for an **Offspeed** changeup, forcing them to click "Contact" (1–5) was just as redundant.
+
+### Options Explored
+
+1. **Option 1: Retain Swing Type as an Automatic Background Setting**
+   - *Concept*: Automatically set the swing approach based on the card value played (e.g. Card 8 auto-selects Power).
+   - *Why Rejected*: Overcomplicates the internal model and creates hidden rules. If the card value and the pitch type already dictate the physics of the collision, there is no need for a third intermediary concept like "swing type."
+
+2. **Option 2 (Chosen): Total Duel Symmetry — 2 Choices Each**
+   - **Pitcher**:
+     1. Choose Pitch Type (`fastball` [6–10], `breaking` [3–7], `offspeed` [1–5])
+     2. Play Timing Card (1–10)
+   - **Batter**:
+     1. Anticipate Pitch Type (`fastball`, `breaking`, `offspeed`)
+     2. Play Timing Card (1–10)
+   - *Why it succeeds*:
+     - **Intuitive Mental Model**: The batter is hunting a pitch. If they think heat is coming, they hunt Fastball [6–10] and try to match the pitcher's card value.
+     - **Zero UI Clutter**: Both players look at a single row of 3 pitch tiles, see their target timing bracket, tap a card in their hand, and lock in.
+     - **Pure Psychological Poker**: It's a direct mind game: *What pitch is coming, and what timing card are they throwing it with?*
+
+### Technical Implementation
+
+1. **Resolution Engine (`js/resolution.js`)**:
+   - `resolveBeat2`: Removed dependencies on `swingType`.
+   - The batter's target timing range is now directly the range of the pitch they anticipated:
+     $$\text{bRange} = \text{PITCH\_RANGES}[\text{effectiveGuessPitch}]$$
+     $$\text{batterExecuted} = (\text{bCardVal} \ge \text{bRange.min} \land \text{bCardVal} \le \text{bRange.max})$$
+   - Outcome matrix refactored around natural baseball contact physics, batter archetypes, and count leverage:
+     - **Pitch Anticipated (`pitchMatched === true`)**:
+       - **$\Delta = 0$ (Squared Up Barrel 🎯)**:
+         - On 0-2 Count (Two Strikes): Batter protects plate; capped at Double (`⚡ CLUTCH DOUBLE OFF THE WALL (TWO-STRIKE BARREL)!`).
+         - Favorite Pitch read: Crushed Home Run (`💥 CRUSHED MOONSHOT HOME RUN (FAVORITE PITCH BARRELED)!`).
+         - Slugger archetype on Fastball / Card $\ge 7$: Home Run (`💥 NO-DOUBTER HOME RUN!`).
+         - High fastball barrel (Card $\ge 9$): Home Run (`💥 CRUSHED HOME RUN OVER THE WALL!`).
+         - Otherwise: Gap Double (`⚡ ROCKET DOUBLE INTO THE GAP!`).
+       - **$\Delta \le 2$ (Solid Timing 🏏)**:
+         - Pitcher mistake (`!pitcherExecuted` hanger): Punished for Home Run or Wall-Ball Double.
+         - Favorite Pitch read: Home Run (Sluggers) or Double.
+         - $\Delta = 1$: Clean Line Drive Single.
+         - $\Delta = 2$: Solid contact, but against well-executed pitches: Single on 3-1 count; otherwise sharp well-hit outs (Lineout or Hard Groundout).
+       - **$\Delta \le 4$ (Off-Balance Contact 🧤)**:
+         - On 3-1 count: Bloop Single.
+         - Contact Hitter / Speed Specialist: Infield Chopper Single.
+         - Otherwise: Routine Groundout or Flyout.
+       - **$\Delta \ge 5$ (Badly Mistimed ⚡)**:
+         - On 3-1 count: Walk (Ball Four).
+         - Otherwise: Swinging Strikeout.
+     - **Fooled on Pitch (`whiff`)**:
+       - $\Delta \le 2$: Fluke contact capped at popouts and routine groundouts.
+       - $\Delta \ge 3$: Swinging strikeouts dominate (unless protected by a 3-1 walk or contact-hitter groundout).
+   - Bot AI (`executeBotPlayBeat`):
+     - Bot batter now chooses their pitch guess and timing card directly, with full pitch randomization when charge pools empty to prevent stale pitching loops.
+
+2. **User Interface (`js/app.js`)**:
+   - `renderBatterPayoffDeck`: Section 2 (Swing Approach) completely deleted. The deck now features:
+     1. **Anticipate Pitch**: Fastball [6–10], Breaking [3–7], Offspeed [1–5].
+     2. **Timing & Range Feedback Bar**: Dynamic live readout (`Looking FASTBALL: Target Timing 6–10` &bull; `🟢 IN RANGE [Card 8]`).
+   - Action lock button subtext updated: `LOOKING [PITCH] &bull; Card [X] ✓ In Timing Range`.
+   - `renderZoneBoard`: Simplified the revealed clash recap card to display `LOOKING [PITCH]` without swing type text.
+   - `renderOutcomeOverlay`: Streamlined at-bat outcome recap to show `Looking [PITCH] [Card X]`.
+   - `commitPlacement`: Both human and bot batter payloads streamlined to `{ guessPitch, cardId }`.
+
+3. **Test Suites & Verification**:
+   - `tests/test_resolution.html`: Updated Section 13 and Section 16 simulation loop to eliminate `swingType` arguments and verify the streamlined duel.
+   - `tests/sim_games.html`: Updated 10-game simulation runner.
+
+### Verification Results
+- **Automated Unit Tests**: 119 of 119 browser tests pass (`run-tests.ps1`).
+- **Game Simulation**: 10-game headless simulation (`run-sim.ps1`) executed 322 PAs across 10 completed games with an average of 8.00 runs/game, 122 total hits, 6 home wins, 4 away wins, and zero runaway innings.
+- **Player Experience**: Perfect symmetry has been achieved. Both pitcher and batter now make exactly two decisions per payoff pitch: **Pitch Type** and **Timing Card**. The game is fast, intuitive, and razor-sharp.
