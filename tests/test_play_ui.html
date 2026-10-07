@@ -153,13 +153,25 @@
       const b1Modal = document.getElementById('beat1-result-modal');
       report(b1Modal !== null, 'Beat 1 Result Modal renders in beat1_result phase');
       report(b1Modal?.textContent.includes('0-2'), 'Beat 1 Result Modal shows established count (0-2)');
+      report(b1Modal?.querySelector('.anticipate-banner') !== null, 'Beat 1 Result Modal contains anticipation banner animation');
+      report(b1Modal?.querySelector('.rm-suspense-label') !== null, 'Beat 1 Result Modal displays suspense duel header');
 
       // 4. Test Beat 2 placing
       soloPlayState.currentPA.phase = 'placing';
       soloPlayState.currentPA.beat = 'beat2';
+      soloPlayState.currentPA.beatResults.beat1 = {
+        winner: 'batter',
+        count: '3-1',
+        lockedOption: 'offspeed',
+        isDominant: true,
+        revealCardFirst: 'pitcher',
+        margin: 6
+      };
       handleGameState(soloPlayState);
       const b2Html = document.getElementById('app').innerHTML;
       report(b2Html.length > 100, `Beat 2 placing rendered successfully (${b2Html.length} chars)`);
+      const lockedOffspeed = document.querySelector('.choice-tile.locked');
+      report(lockedOffspeed !== null && lockedOffspeed.textContent.includes('Offspeed'), 'Beat 2 locks out Offspeed pitch on 3-1 count');
 
       // 5. Test Resolved phase (At-Bat Outcome Pop-up)
       soloPlayState.currentPA.phase = 'resolved';
@@ -182,6 +194,8 @@
       const outcomeModal = document.getElementById('outcome-overlay');
       report(outcomeModal !== null, 'At-Bat Outcome Pop-up renders in resolved phase');
       report(outcomeModal?.textContent.includes('HOME RUN'), 'At-Bat Outcome Pop-up shows outcome headline');
+      report(outcomeModal?.querySelector('.anticipate-outcome') !== null, 'Outcome overlay includes dramatic outcome slam animation');
+      report(outcomeModal?.querySelector('.rm-suspense-label') !== null, 'Outcome overlay includes suspense payoff clash tag');
 
     } catch(e) {
       const p = document.createElement('p');

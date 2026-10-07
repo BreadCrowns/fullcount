@@ -959,37 +959,51 @@ function resolveBeat1(opts) {
   }
 
 
+  const margin = Math.abs(pitcherCardVal - batterCardVal);
+  const isDominant = margin >= 5;
+
   let winner = 'tie';
   let count = '3-2';
   let countDisplay = '3-2 Full Count (Even Battle)';
   let cascadeEffect = 'count_3_2';
   let advantageSide = 'neutral';
+  let lockedOption = null;
+  let revealCardFirst = null;
   let pitcherDiscount = 0;
   let batterDiscount = 0;
 
   if (pitcherCardVal > batterCardVal) {
     winner = 'pitcher';
     count = '0-2';
-    countDisplay = "0-2 Pitcher's Count (Pitcher Count Advantage: -2 Diff)";
+    lockedOption = 'power';
     cascadeEffect = 'count_0_2';
     advantageSide = 'pitcher';
-    pitcherDiscount = 2;
+    if (isDominant) {
+      revealCardFirst = 'batter';
+      countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Batter Power Locked + Plays Face-Up First)";
+    } else {
+      countDisplay = "0-2 Pitcher's Count (Batter Power Swing Locked Out)";
+    }
   } else if (batterCardVal > pitcherCardVal) {
     winner = 'batter';
     count = '3-1';
-    countDisplay = "3-1 Hitter's Count (Hitter Count Advantage: -2 Diff)";
+    lockedOption = 'offspeed';
     cascadeEffect = 'count_3_1';
     advantageSide = 'batter';
-    batterDiscount = 2;
+    if (isDominant) {
+      revealCardFirst = 'pitcher';
+      countDisplay = "3-1 Hitter's Count (DOMINANT ADVANTAGE: Pitcher Offspeed Locked + Throws Face-Up First)";
+    } else {
+      countDisplay = "3-1 Hitter's Count (Pitcher Offspeed Locked Out)";
+    }
   } else {
     winner = 'tie';
     count = '3-2';
-    countDisplay = '3-2 Full Count (Even Battle)';
+    countDisplay = '3-2 Full Count (Even Battle - All Options Available)';
     cascadeEffect = 'count_3_2';
     advantageSide = 'neutral';
   }
 
-  const margin = Math.abs(pitcherCardVal - batterCardVal);
   const pitcherAdvantagePerk = (winner === 'pitcher' && pCard?.advantagePerk) ? pCard.advantagePerk : null;
   const batterAdvantagePerk = (winner === 'batter' && bCard?.advantagePerk) ? bCard.advantagePerk : null;
 
@@ -999,6 +1013,9 @@ function resolveBeat1(opts) {
     countDisplay,
     cascadeEffect,
     advantageSide,
+    lockedOption,
+    revealCardFirst,
+    isDominant,
     pitcherDiscount,
     batterDiscount,
     pitcherTotal: pitcherCardVal,
@@ -1042,18 +1059,16 @@ function resolveBeat2(opts) {
 
   const effectiveCount = count || (z1Winner === 'pitcher' ? '0-2' : z1Winner === 'batter' ? '3-1' : '3-2');
 
-  // Pitcher Execution
+  // Pitcher Execution (Pure base difficulty - count provides option lockouts, not numerical discounts)
   const pBaseDiff = pitcherChar?.executionDifficulties?.[pitchType] ?? (pitchType === 'fastball' ? 3 : pitchType === 'breaking' ? 5 : 8);
-  const pCountDiscount = (effectiveCount === '0-2' || z1Winner === 'pitcher') ? 2 : 0;
-  const pEffDiff = Math.max(1, pBaseDiff - pCountDiscount);
+  const pEffDiff = pBaseDiff;
   const pCard = getCard(pitcherCardId);
   const pCardVal = pCard ? (pCard.value || 0) : 0;
   const pitcherExecuted = (pCardVal >= pEffDiff);
 
-  // Batter Execution
+  // Batter Execution (Pure base difficulty - count provides option lockouts, not numerical discounts)
   const bBaseDiff = batterChar?.swingDifficulties?.[swingType] ?? (swingType === 'contact' ? 3 : swingType === 'power' ? 8 : 5);
-  const bCountDiscount = (effectiveCount === '3-1' || z1Winner === 'batter') ? 2 : 0;
-  const bEffDiff = Math.max(1, bBaseDiff - bCountDiscount);
+  const bEffDiff = bBaseDiff;
   const bCard = getCard(batterCardId);
   let bCardVal = bCard ? (bCard.value || 0) : 0;
 
@@ -1410,27 +1425,31 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     batterGuess = 'fastball';
 
   } else if (beat === 'beat2') {
-    const b1Winner = gameState?.currentPA?.beatResults?.beat1?.winner || 'tie';
-    const count = (b1Winner === 'pitcher') ? '0-2' : (b1Winner === 'batter') ? '3-1' : '3-2';
+    const b1 = gameState?.currentPA?.beatResults?.beat1 || {};
+    const b1Winner = b1.winner || 'tie';
+    const count = b1.count || ((b1Winner === 'pitcher') ? '0-2' : (b1Winner === 'batter') ? '3-1' : '3-2');
+    const lockedOption = b1.lockedOption || (count === '0-2' ? 'power' : count === '3-1' ? 'offspeed' : null);
+    const oppRevealedCardId = firstRevealedCard || gameState?.currentPA?.firstRevealedCard || null;
+    const oppRevealedCard = oppRevealedCardId ? getCard(oppRevealedCardId) : null;
+    const oppRevealedVal = oppRevealedCard ? (oppRevealedCard.value || 0) : null;
 
     if (botIsPitching) {
-      // 1. Pick Pitch Type from repertoire
+      // 1. Pick Pitch Type from repertoire (respect lockout)
       const available = [];
       if ((charges.fastball || 0) > 0) available.push('fastball', 'fastball');
       if ((charges.breaking || 0) > 0) available.push('breaking');
-      if ((charges.offspeed || 0) > 0) available.push('offspeed');
+      if (lockedOption !== 'offspeed' && (charges.offspeed || 0) > 0) available.push('offspeed');
       pitchType = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : 'fastball';
       pitchCall = pitchType;
 
-      // 2. Pick Pitch Location: avoid Batter Hot Zone 70% of time!
+      // 2. Pick Pitch Location: avoid Batter Hot Zone 70% of time
       const bHot = batterChar?.scoutingReport?.hotZone || 'high';
       const bCold = batterChar?.scoutingReport?.coldZone || 'low';
       pitchLocation = (Math.random() < 0.70) ? bCold : bHot;
 
-      // 3. Pick Execution Card: find card >= effectiveDiff
+      // 3. Pick Execution Card: baseDiff (no count discount)
       const baseDiff = pitcherChar?.executionDifficulties?.[pitchType] || 4;
-      const countDisc = (count === '0-2') ? 2 : 0;
-      const effDiff = Math.max(1, baseDiff - countDisc);
+      const effDiff = baseDiff;
 
       if (botHand.length > 0) {
         let bestIdx = -1;
@@ -1457,11 +1476,22 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     } else {
       // Bot is Batter
       if (count === '3-1') {
+        // Hitter count - offspeed eliminated, pitcher must challenge!
         swingType = (Math.random() < 0.6) ? 'power' : 'balanced';
-      } else if (count === '0-2') {
-        swingType = 'contact';
+      } else if (count === '0-2' || lockedOption === 'power') {
+        // Pitcher count - power swing locked out!
+        swingType = (Math.random() < 0.6) ? 'contact' : 'balanced';
       } else {
         swingType = (Math.random() < 0.5) ? 'balanced' : 'contact';
+      }
+
+      // If pitcher card was revealed, exploit hanging pitch or protect against ace execution
+      if (oppRevealedVal !== null) {
+        if (oppRevealedVal < 4 && lockedOption !== 'power') {
+          swingType = 'power'; // Hanging mistake pitch! Ambush for extra bases
+        } else if (oppRevealedVal >= 8 && lockedOption !== 'power') {
+          swingType = 'contact'; // Nasty spot on pitch! Choke up to avoid K
+        }
       }
 
       const myHot = batterChar?.scoutingReport?.hotZone || 'high';
@@ -1470,8 +1500,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
       batterGuess = (targetZone === 'high') ? 'fastball' : 'breaking';
 
       const baseDiff = batterChar?.swingDifficulties?.[swingType] || (swingType === 'contact' ? 3 : swingType === 'power' ? 8 : 5);
-      const countDisc = (count === '3-1') ? 2 : 0;
-      const effDiff = Math.max(1, baseDiff - countDisc);
+      const effDiff = baseDiff;
 
       if (botHand.length > 0) {
         let bestIdx = -1;

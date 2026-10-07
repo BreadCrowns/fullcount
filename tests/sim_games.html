@@ -252,6 +252,8 @@
           isFirstPAOfInning: simState.outs === 0
         });
 
+        simState.currentPA = { beatResults: { beat1: b1 } };
+
         // Beat 2: The Payoff Pitch
         const pitcherPlay = executeBotPlayBeat(simState, pitchingRole, 'beat2');
         simState.hands[pitchingRole] = pitcherPlay.botHand;

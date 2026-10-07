@@ -820,12 +820,16 @@ function renderPublicScoutingBar(pitcherChar, batterChar, charges, count = '0-0'
 // ─────────────────────────────────────────────────────────────────────────────
 // PITCHER PAYOFF DECK (BEAT 2)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj) {
-  const countDisc = (count === '0-2') ? 2 : 0;
+function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj, b1Data) {
+  const isOffspeedLocked = (count === '3-1') || (b1Data?.lockedOption === 'offspeed');
+  if (isOffspeedLocked && localPitchType === 'offspeed') {
+    localPitchType = 'fastball';
+  }
+
   const pitches = [
     { key: 'fastball', name: 'Fastball', icon: '🔥', baseDiff: pDiffs.fastball },
     { key: 'breaking', name: 'Breaking', icon: '🌀', baseDiff: pDiffs.breaking },
-    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', baseDiff: pDiffs.offspeed },
+    { key: 'offspeed', name: 'Offspeed', icon: '⏱️', baseDiff: pDiffs.offspeed, locked: isOffspeedLocked },
   ];
 
   const locations = [
@@ -834,7 +838,7 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
   ];
 
   const baseDiff = pDiffs[localPitchType] ?? 4;
-  const effDiff = Math.max(1, baseDiff - countDisc);
+  const effDiff = baseDiff;
   const cardVal = cardObj ? (cardObj.value || 0) : 0;
   const executes = cardObj ? (cardVal >= effDiff) : null;
 
@@ -847,17 +851,18 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
           ${pitches.map(p => {
             const countLeft = charges[p.key] ?? 0;
             const isSelected = (localPitchType === p.key);
-            const isDisabled = countLeft <= 0;
-            const pEffDiff = Math.max(1, p.baseDiff - countDisc);
+            const isLocked = Boolean(p.locked);
+            const isDisabled = countLeft <= 0 || isLocked;
+            const pEffDiff = p.baseDiff;
             return `
-              <button class="choice-tile ${isSelected ? 'active' : ''} ${isDisabled ? 'disabled' : ''}"
-                      onclick="selectPitchType('${p.key}')" ${isDisabled ? 'disabled' : ''}>
+              <button class="choice-tile ${isSelected ? 'active' : ''} ${isDisabled ? 'disabled' : ''} ${isLocked ? 'locked' : ''}"
+                      onclick="${isLocked ? '' : `selectPitchType('${p.key}')`}" ${isDisabled ? 'disabled' : ''}>
                 <div class="ct-header">
-                  <span class="ct-icon">${p.icon}</span>
-                  <span class="ct-count">${countLeft} left</span>
+                  <span class="ct-icon">${isLocked ? '🔒' : p.icon}</span>
+                  <span class="ct-count">${isLocked ? 'LOCKED' : `${countLeft} left`}</span>
                 </div>
                 <div class="ct-name">${p.name}</div>
-                <div class="ct-diff">Diff: <b>${pEffDiff}</b></div>
+                <div class="ct-diff">${isLocked ? '3-1 Count Lockout' : `Diff: <b>${pEffDiff}</b>`}</div>
               </button>`;
           }).join('')}
         </div>
@@ -896,12 +901,16 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
 // ─────────────────────────────────────────────────────────────────────────────
 // BATTER PAYOFF DECK (BEAT 2)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj) {
-  const countDisc = (count === '3-1') ? 2 : 0;
+function renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj, b1Data) {
+  const isPowerLocked = (count === '0-2') || (b1Data?.lockedOption === 'power');
+  if (isPowerLocked && localSwingType === 'power') {
+    localSwingType = 'balanced';
+  }
+
   const swings = [
     { key: 'contact',  name: 'Contact',  icon: '🛡️', baseDiff: bDiffs.contact },
     { key: 'balanced', name: 'Balanced', icon: '⚖️', baseDiff: bDiffs.balanced },
-    { key: 'power',    name: 'Power',    icon: '💥', baseDiff: bDiffs.power },
+    { key: 'power',    name: 'Power',    icon: '💥', baseDiff: bDiffs.power, locked: isPowerLocked },
   ];
 
   const locations = [
@@ -910,7 +919,7 @@ function renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs,
   ];
 
   const baseDiff = bDiffs[localSwingType] ?? 5;
-  const effDiff = Math.max(1, baseDiff - countDisc);
+  const effDiff = baseDiff;
   const cardVal = cardObj ? (cardObj.value || 0) : 0;
   const executes = cardObj ? (cardVal >= effDiff) : null;
 
@@ -922,15 +931,18 @@ function renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs,
         <div class="selection-tiles">
           ${swings.map(s => {
             const isSelected = (localSwingType === s.key);
-            const sEffDiff = Math.max(1, s.baseDiff - countDisc);
+            const isLocked = Boolean(s.locked);
+            const isDisabled = isLocked;
+            const sEffDiff = s.baseDiff;
             return `
-              <button class="choice-tile ${isSelected ? 'active' : ''}"
-                      onclick="selectSwingType('${s.key}')">
+              <button class="choice-tile ${isSelected ? 'active' : ''} ${isLocked ? 'locked disabled' : ''}"
+                      onclick="${isLocked ? '' : `selectSwingType('${s.key}')`}" ${isDisabled ? 'disabled' : ''}>
                 <div class="ct-header">
-                  <span class="ct-icon">${s.icon}</span>
-                  <span class="ct-diff">Diff: <b>${sEffDiff}</b></span>
+                  <span class="ct-icon">${isLocked ? '🔒' : s.icon}</span>
+                  <span class="ct-diff">${isLocked ? 'LOCKED' : `Diff: <b>${sEffDiff}</b>`}</span>
                 </div>
                 <div class="ct-name">${s.name}</div>
+                ${isLocked ? `<div class="ct-sub" style="color:#ff6b81;font-size:0.5rem;font-weight:800;">0-2 Count Lockout</div>` : ''}
               </button>`;
           }).join('')}
         </div>
@@ -1097,9 +1109,40 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
   } else {
     // ── BEAT 2: THE PAYOFF PITCH ──
-    const oppSlotHtml = oppCommitted
-      ? `<span class="opp-status-chip ready">LOCKED IN ✓</span>`
-      : `<span class="opp-status-chip waiting">PLANNING MOVE…</span>`;
+    const isDominant = Boolean(b1Data?.isDominant);
+    const disAdvSide = b1Data?.revealCardFirst;
+    const battingRole = (pitchingRole === 'host') ? 'guest' : 'host';
+    const disAdvRole = (disAdvSide === 'pitcher') ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null);
+    const isOppDisadvantaged = Boolean(disAdvRole && disAdvRole === oppKey);
+    const amIDisadvantaged = Boolean(disAdvRole && disAdvRole === myKey);
+
+    let oppSlotHtml = '';
+    if (isDominant && isOppDisadvantaged && oppCommitted) {
+      const oppCardId = pa?.beatPlacements?.beat2?.[oppKey]?.cardId || pa?.firstRevealedCard || null;
+      const oppCard = oppCardId ? getCard(oppCardId) : null;
+      const oppVal = oppCard ? oppCard.value : '?';
+      oppSlotHtml = `
+        <div class="opp-revealed-block">
+          <div class="number-card sm revealed-faceup-card">
+            <span class="card-hero-num">${oppVal}</span>
+          </div>
+          <div class="revealed-info">
+            <span class="revealed-intel-badge">👁️ REVEALED INTEL &bull; FACE-UP</span>
+            <span class="ri-title">${iAmBatting ? 'Pitcher' : 'Batter'} committed Card [${oppVal}]</span>
+            <span class="ri-sub">You have complete information advantage!</span>
+          </div>
+        </div>`;
+    } else if (isDominant && isOppDisadvantaged && !oppCommitted) {
+      oppSlotHtml = `<span class="opp-status-chip waiting">⏳ WAITING FOR OPPONENT TO COMMIT FACE-UP FIRST…</span>`;
+    } else {
+      oppSlotHtml = oppCommitted
+        ? `<span class="opp-status-chip ready">LOCKED IN ✓</span>`
+        : `<span class="opp-status-chip waiting">PLANNING MOVE…</span>`;
+    }
+
+    const disAdvNoticeHtml = amIDisadvantaged
+      ? `<div class="disadvantaged-notice-banner">⚠️ DOMINANT COUNT DISADVANTAGE: You must lock in your execution card FIRST. Your card value will be visible to your opponent!</div>`
+      : '';
 
     const myPlacedCardHtml = localBeatCard
       ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted)
@@ -1111,6 +1154,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
     mainContentHtml = `
       <div class="beat2-arena">
+        ${disAdvNoticeHtml}
         <div class="b2-opp-strip">
           <span class="opp-role-label">${iAmBatting ? '⚾ Pitcher Move:' : '🏏 Batter Move:'}</span>
           ${oppSlotHtml}
@@ -1118,12 +1162,12 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
         <div class="b2-controls-wrapper">
           ${!iAmBatting
-            ? renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj)
-            : renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj)}
+            ? renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj, b1Data)
+            : renderBatterPayoffDeck(localSwingType, localTargetZone, bScout, bDiffs, count, cardObj, b1Data)}
         </div>
 
         <div class="b2-exec-slot-row">
-          <div class="exec-slot-label">Execution Card:</div>
+          <div class="exec-slot-label">${amIDisadvantaged ? '⚠️ Face-Up Execution Card:' : 'Execution Card:'}</div>
           ${myPlacedCardHtml}
         </div>
       </div>`;
@@ -1327,22 +1371,35 @@ function commitPlacement() {
         }
       }
     } else if (currentBeat === 'beat2') {
+      const b1 = livePA.beatResults?.beat1 || {};
+      const half = liveGS.half || 'top';
+      const pitchingRole = half === 'top' ? 'host' : 'guest';
+      const battingRole  = half === 'top' ? 'guest' : 'host';
+      const disAdvSide = b1.revealCardFirst;
+      const disAdvRole = (disAdvSide === 'pitcher') ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null);
+
+      if (b1.isDominant && disAdvRole === myRole && localBeatCard) {
+        updates['currentPA/firstRevealedCard'] = localBeatCard;
+      }
+
       if (isBot && myRole === 'host') {
-        const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2');
-        const botIsPitching = (liveGS.half === 'bottom');
-        const botBeatPlacement = botIsPitching
-          ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
-          : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, cardId: botPlay.cardId };
+        if (!livePA.committed?.guest) {
+          const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2', localBeatCard);
+          const botIsPitching = (liveGS.half === 'bottom');
+          const botBeatPlacement = botIsPitching
+            ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
+            : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, cardId: botPlay.cardId };
 
-        const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
-        if (botPlay.cardId) {
-          updatedBotPlacement.z2 = [botPlay.cardId];
+          const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
+          if (botPlay.cardId) {
+            updatedBotPlacement.z2 = [botPlay.cardId];
+          }
+
+          updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
+          updates['currentPA/placement/guest']           = updatedBotPlacement;
+          updates['currentPA/committed/guest']           = true;
+          updates['gameState/hands/guest']               = botPlay.botHand;
         }
-
-        updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
-        updates['currentPA/placement/guest']           = updatedBotPlacement;
-        updates['currentPA/committed/guest']           = true;
-        updates['gameState/hands/guest']               = botPlay.botHand;
         shouldResolve = true;
       } else {
         const oppRole = opponentRole();
@@ -1899,22 +1956,40 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
   const bCard = b1.batterCards?.[0] ? getCard(b1.batterCards[0]) : null;
   const pVal = pCard?.value ?? b1.pitcherTotal ?? 0;
   const bVal = bCard?.value ?? b1.batterTotal ?? 0;
+  const margin = b1.margin ?? Math.abs(pVal - bVal);
+  const isDominant = Boolean(b1.isDominant || margin >= 5);
 
   let countTitle = '3-2 FULL COUNT';
   let bannerClass = 'count-full';
-  let explanation = 'Both cards had equal value. Even battle &mdash; standard execution difficulties apply for the payoff pitch.';
+  let explanation = 'Both cards had equal value. Even battle &mdash; all pitch and swing options available for the payoff pitch.';
   let winnerTag = '⚖️ COUNT TIED';
 
   if (winner === 'pitcher') {
     countTitle = "0-2 PITCHER'S COUNT";
     bannerClass = 'count-pitcher';
-    explanation = 'Pitcher won the count battle! Pitcher earns a <b>-2 difficulty discount</b> on all pitch executions in Beat 2.';
     winnerTag = isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
+    if (isDominant) {
+      explanation = isPitcherMe
+        ? `🔥 <b>Dominant Win (+${margin})!</b> Batter's <b>Power Swing is LOCKED OUT</b>, and Batter must commit their execution card <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Power Swing is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+    } else {
+      explanation = isPitcherMe
+        ? `Pitcher won the count battle! Batter's <b>Power Swing is LOCKED OUT</b> (cannot hit home runs on clean pitches).`
+        : `Opponent won the count battle! Your <b>Power Swing is LOCKED OUT</b> (forced to choose Contact or Balanced).`;
+    }
   } else if (winner === 'batter') {
     countTitle = "3-1 HITTER'S COUNT";
     bannerClass = 'count-hitter';
-    explanation = 'Batter won the count battle! Batter earns a <b>-2 difficulty discount</b> on all swing approaches in Beat 2.';
     winnerTag = !isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
+    if (isDominant) {
+      explanation = !isPitcherMe
+        ? `🔥 <b>Dominant Win (+${margin})!</b> Pitcher's <b>Offspeed is LOCKED OUT</b>, and Pitcher must commit their execution card <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Offspeed is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+    } else {
+      explanation = !isPitcherMe
+        ? `Batter won the count battle! Pitcher's <b>Offspeed is LOCKED OUT</b> (forced to challenge with Fastball or Breaking).`
+        : `Opponent won the count battle! Your <b>Offspeed is LOCKED OUT</b> (changeups eliminated).`;
+    }
   }
 
   return `
@@ -1922,18 +1997,19 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
       <div class="result-modal-card">
         <div class="rm-header">
           <span class="rm-tag">BEAT 1 RESULT &bull; THE COUNT</span>
+          <span class="rm-suspense-label">⚡ COUNT DUEL REVEAL</span>
           <span class="rm-winner-pill ${bannerClass}">${winnerTag}</span>
         </div>
 
         <div class="rm-cards-compare">
-          <div class="rm-player-box">
+          <div class="rm-player-box anticipate-flip-p">
             <span class="rm-role">⚾ Pitcher</span>
             <div class="number-card sm selected">
               <span class="card-hero-num">${pVal}</span>
             </div>
           </div>
-          <div class="rm-vs">VS</div>
-          <div class="rm-player-box">
+          <div class="rm-vs anticipate-vs">VS</div>
+          <div class="rm-player-box anticipate-flip-b">
             <span class="rm-role">🏏 Batter</span>
             <div class="number-card sm selected">
               <span class="card-hero-num">${bVal}</span>
@@ -1941,16 +2017,18 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
           </div>
         </div>
 
-        <div class="rm-count-banner ${bannerClass}">
+        <div class="rm-count-banner ${bannerClass} anticipate-banner">
           <div class="rm-count-num">${count}</div>
           <div class="rm-count-label">${countTitle}</div>
         </div>
 
-        <div class="rm-explanation">
+        ${isDominant ? `<div class="rm-dominant-tag anticipate-dominant">🔥 DOMINANT BEAT (+${margin}) &bull; COMBINED ADVANTAGE</div>` : ''}
+
+        <div class="rm-explanation anticipate-explain">
           ${explanation}
         </div>
 
-        <button class="btn-primary rm-btn" onclick="proceedToBeat2()">
+        <button class="btn-primary rm-btn anticipate-btn" onclick="proceedToBeat2()">
           Continue to Payoff Pitch &rarr;
         </button>
       </div>
@@ -1958,14 +2036,52 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
 }
 
 function proceedToBeat2() {
-  const updates = {
-    'currentPA/phase': 'placing',
-    'currentPA/beat': 'beat2',
-    'currentPA/committed/host': false,
-    'currentPA/committed/guest': false,
-  };
-  gameRef().update(updates).catch(err => {
-    console.error('proceedToBeat2 error:', err);
+  gameRef().once('value', snap => {
+    const g = snap.val();
+    if (!g) return;
+    const pa = g.currentPA || {};
+    const gs = g.gameState || {};
+    const isBot = Boolean(g.isSolo || g.guest?.isBot);
+    const half = gs.half || 'top';
+    const pitchingRole = half === 'top' ? 'host' : 'guest';
+    const battingRole  = half === 'top' ? 'guest' : 'host';
+    const b1 = pa.beatResults?.beat1 || {};
+
+    const updates = {
+      'currentPA/phase': 'placing',
+      'currentPA/beat': 'beat2',
+      'currentPA/committed/host': false,
+      'currentPA/committed/guest': false,
+      'currentPA/firstRevealedCard': null,
+    };
+
+    // If dominant beat, check if Bot is the disadvantaged player who must play first!
+    if (isBot && b1.isDominant) {
+      const disAdvSide = b1.revealCardFirst; // 'pitcher' or 'batter'
+      const disAdvRole = (disAdvSide === 'pitcher' ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null));
+      if (disAdvRole === 'guest') {
+        const botPlay = executeBotPlayBeat(gs, 'guest', 'beat2');
+        const botIsPitching = (half === 'bottom');
+        const botBeatPlacement = botIsPitching
+          ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
+          : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, cardId: botPlay.cardId };
+
+        const updatedBotPlacement = { ...(pa.placement?.guest || { z1:[], z2:[] }) };
+        if (botPlay.cardId) {
+          updatedBotPlacement.z2 = [botPlay.cardId];
+        }
+
+        updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
+        updates['currentPA/placement/guest']           = updatedBotPlacement;
+        updates['currentPA/committed/guest']           = true;
+        updates['currentPA/firstRevealedCard']         = botPlay.cardId;
+        updates['gameState/hands/guest']               = botPlay.botHand;
+      }
+    }
+
+    gameRef().update(updates).catch(err => {
+      console.error('proceedToBeat2 error:', err);
+    });
   });
 }
 window.proceedToBeat2 = proceedToBeat2;
@@ -2006,38 +2122,39 @@ function renderOutcomeOverlay(res, isBatting = false) {
       <div class="result-modal-card outcome">
         <div class="rm-header">
           <span class="rm-tag">AT-BAT OUTCOME</span>
+          <span class="rm-suspense-label">⚡ PAYOFF CLASH</span>
           <span class="rm-count-tag">${z1?.count ? `Count: ${z1.count}` : ''}</span>
         </div>
 
-        <div class="rm-outcome-banner hero">
-          <div class="rm-outcome-title">${o.display || 'At-Bat Complete'}</div>
-        </div>
-
-        <div class="rm-impact-row">
-          ${runsScored > 0
-            ? `<span class="impact-runs">⚾ ${runsScored} RUN${runsScored > 1 ? 'S' : ''} SCORED!</span>`
-            : '<span class="impact-noruns">No runs scored</span>'}
-          <span class="impact-outs">${outsAdded > 0 ? `+${outsAdded} Out${outsAdded > 1 ? 's' : ''}` : 'No outs recorded'}</span>
-        </div>
-
         <div class="rm-clash-recap">
-          <div class="recap-row">
+          <div class="recap-row anticipate-p-action">
             <span class="recap-label">⚾ Pitch:</span>
             <span class="recap-val"><b>${pPitch} &bull; ${pLoc}</b> [${pVal}] &bull; <span class="${pExec ? 'pass' : 'fail'}">${pExecText}</span></span>
           </div>
-          <div class="recap-row">
+          <div class="recap-row anticipate-b-action">
             <span class="recap-label">🏏 Swing:</span>
             <span class="recap-val"><b>${bSwing} &bull; ${bZone}</b> [${bVal}] &bull; <span class="${bExec ? 'pass' : 'fail'}">${bExecText}</span></span>
           </div>
           ${z2 ? `
-            <div class="recap-row">
+            <div class="recap-row anticipate-matchup">
               <span class="recap-label">🎯 Matchup:</span>
               <span class="recap-val">${locMatchText}</span>
             </div>
           ` : ''}
         </div>
 
-        <button class="btn-primary rm-btn btn-next-batter" onclick="nextPA()">
+        <div class="rm-outcome-banner hero anticipate-outcome">
+          <div class="rm-outcome-title">${o.display || 'At-Bat Complete'}</div>
+        </div>
+
+        <div class="rm-impact-row anticipate-impact">
+          ${runsScored > 0
+            ? `<span class="impact-runs">⚾ ${runsScored} RUN${runsScored > 1 ? 'S' : ''} SCORED!</span>`
+            : '<span class="impact-noruns">No runs scored</span>'}
+          <span class="impact-outs">${outsAdded > 0 ? `+${outsAdded} Out${outsAdded > 1 ? 's' : ''}` : 'No outs recorded'}</span>
+        </div>
+
+        <button class="btn-primary rm-btn btn-next-batter anticipate-next-btn" onclick="nextPA()">
           Next Batter &rarr;
         </button>
       </div>

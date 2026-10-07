@@ -3519,6 +3519,21 @@ body {
   pointer-events: none;
 }
 
+.choice-tile.locked {
+  background: rgba(20, 10, 15, 0.6) !important;
+  border: 1px dashed rgba(255, 71, 87, 0.5) !important;
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.choice-tile.locked .ct-icon {
+  filter: grayscale(1);
+}
+.choice-tile.locked .ct-diff,
+.choice-tile.locked .ct-count {
+  color: #ff6b81 !important;
+}
+
 .choice-tile .ct-header {
   display: flex;
   align-items: center;
@@ -4123,6 +4138,221 @@ body {
   margin-top: 4px;
   box-shadow: 0 4px 18px var(--gold-glow);
 }
+
+/* ==========================================================================
+   DOMINANT ADVANTAGE & OPPONENT REVEALED INTEL
+   ========================================================================== */
+.disadvantaged-notice-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(0, 0, 0, 0.4));
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.62rem;
+  color: #fca5a5;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+.opp-revealed-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(245, 176, 39, 0.15), rgba(15, 23, 42, 0.7));
+  border: 1.5px solid var(--gold);
+  border-radius: 10px;
+  padding: 8px 12px;
+  width: 100%;
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.revealed-intel-badge {
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+  background: rgba(245, 176, 39, 0.2);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+.revealed-faceup-card {
+  border-color: var(--gold-bright) !important;
+  box-shadow: 0 0 14px var(--gold-glow) !important;
+  animation: revealedPulse 2s infinite ease-in-out;
+}
+
+@keyframes revealedPulse {
+  0%, 100% { box-shadow: 0 0 12px var(--gold-glow); transform: scale(1); }
+  50% { box-shadow: 0 0 20px var(--gold-glow); transform: scale(1.04); }
+}
+
+.revealed-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.revealed-info .ri-title {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.revealed-info .ri-sub {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.rm-dominant-tag {
+  background: linear-gradient(135deg, rgba(245, 176, 39, 0.25), rgba(239, 68, 68, 0.25));
+  border: 1.5px solid var(--gold);
+  border-radius: 6px;
+  color: var(--gold-bright);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  text-shadow: 0 0 10px rgba(245, 176, 39, 0.5);
+  box-shadow: 0 0 14px rgba(245, 176, 39, 0.25);
+}
+
+/* ==========================================================================
+   DRAMATIC ANTICIPATION ANIMATIONS FOR RESULTS
+   ========================================================================== */
+.rm-suspense-label {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: suspenseBlink 1.2s infinite ease-in-out;
+}
+
+@keyframes suspenseBlink {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Beat 1 Phased Reveals */
+.anticipate-flip-p {
+  animation: cardFlipInPitcher 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.25) 0.25s both;
+}
+
+.anticipate-vs {
+  animation: vsClashPulse 0.4s ease 0.65s both;
+}
+
+.anticipate-flip-b {
+  animation: cardFlipInBatter 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.25) 0.85s both;
+}
+
+.anticipate-banner {
+  animation: bannerSlam 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.25) 1.35s both;
+}
+
+.anticipate-dominant {
+  animation: dominantFlourish 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.25) 1.6s both;
+}
+
+.anticipate-explain {
+  animation: fadeInUp 0.45s ease-out 1.85s both;
+}
+
+.anticipate-btn {
+  animation: buttonPulseIn 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.25) 2.1s both;
+}
+
+/* Beat 2 / Outcome Phased Reveals */
+.anticipate-p-action {
+  animation: clashSlideLeft 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+}
+
+.anticipate-b-action {
+  animation: clashSlideRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s both;
+}
+
+.anticipate-matchup {
+  animation: clashMatchupSlam 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.25) 0.95s both;
+}
+
+.anticipate-outcome {
+  animation: outcomeSlam 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.25) 1.35s both;
+}
+
+.anticipate-impact {
+  animation: fadeInUp 0.45s ease-out 1.75s both;
+}
+
+.anticipate-next-btn {
+  animation: buttonPulseIn 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.25) 2.05s both;
+}
+
+@keyframes cardFlipInPitcher {
+  0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes cardFlipInBatter {
+  0% { transform: rotateY(-90deg) scale(0.8); opacity: 0; }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes vsClashPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.3); opacity: 1; color: var(--gold-bright); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bannerSlam {
+  0% { transform: translateY(-25px) scale(1.12); opacity: 0; }
+  60% { transform: translateY(3px) scale(0.98); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes outcomeSlam {
+  0% { transform: scale(1.4); opacity: 0; filter: blur(4px); }
+  60% { transform: scale(0.95); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+
+@keyframes dominantFlourish {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes clashSlideLeft {
+  0% { transform: translateX(-25px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes clashSlideRight {
+  0% { transform: translateX(25px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes clashMatchupSlam {
+  0% { transform: scale(0.8); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes buttonPulseIn {
+  0% { transform: scale(0.92); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 
 
 
