@@ -1045,6 +1045,7 @@ function resolveBeat2(opts) {
     pitchType = 'fastball',
     pitchLocation = 'high',
     pitcherCardId = null,
+    guessPitch = null,
     swingType = 'balanced',
     targetZone = 'high',
     batterCardId = null,
@@ -1058,25 +1059,36 @@ function resolveBeat2(opts) {
   } = opts;
 
   const effectiveCount = count || (z1Winner === 'pitcher' ? '0-2' : z1Winner === 'batter' ? '3-1' : '3-2');
+  const effectiveGuessPitch = guessPitch || opts.batterGuess || 'fastball';
 
-  // Pitcher Execution (Pure base difficulty - count provides option lockouts, not numerical discounts)
+  // Deduction Check: Did batter anticipate pitch type and location?
+  const pitchMatched = (effectiveGuessPitch === pitchType);
+  const locationMatched = (pitchLocation === targetZone);
+
+  let matchTier = 'whiff';
+  if (pitchMatched && locationMatched) {
+    matchTier = 'full';
+  } else if (pitchMatched || locationMatched) {
+    matchTier = 'partial';
+  } else {
+    matchTier = 'whiff';
+  }
+
+  // Pitcher Execution
   const pBaseDiff = pitcherChar?.executionDifficulties?.[pitchType] ?? (pitchType === 'fastball' ? 3 : pitchType === 'breaking' ? 5 : 8);
   const pEffDiff = pBaseDiff;
   const pCard = getCard(pitcherCardId);
   const pCardVal = pCard ? (pCard.value || 0) : 0;
   const pitcherExecuted = (pCardVal >= pEffDiff);
 
-  // Batter Execution (Pure base difficulty - count provides option lockouts, not numerical discounts)
+  // Batter Execution
   const bBaseDiff = batterChar?.swingDifficulties?.[swingType] ?? (swingType === 'contact' ? 3 : swingType === 'power' ? 8 : 5);
   const bEffDiff = bBaseDiff;
   const bCard = getCard(batterCardId);
   let bCardVal = bCard ? (bCard.value || 0) : 0;
-
   const batterExecuted = (bCardVal >= bEffDiff);
 
-
   // Public Scouting Report Matchup
-  const sameLocation = (pitchLocation === targetZone);
   const hotZone = batterChar?.scoutingReport?.hotZone || 'high';
   const coldZone = batterChar?.scoutingReport?.coldZone || 'low';
   const favPitch = batterChar?.scoutingReport?.favoritePitch || 'fastball';
@@ -1088,15 +1100,20 @@ function resolveBeat2(opts) {
   let outcomeDisplay = 'Out';
   const perkLogs = [];
 
-  // Resolution Matrix
-  if (pitcherExecuted && batterExecuted) {
-    if (sameLocation) {
-      // Both executed and batter anticipated location!
+  // ═════════════════════════════════════════════════════════════════════════
+  // DEDUCTION-FIRST RESOLUTION MATRIX
+  // ═════════════════════════════════════════════════════════════════════════
+  if (matchTier === 'full') {
+    // ── FULL MATCH: Batter anticipated BOTH Pitch Type and Location! ──
+    // Result heavily favors the batter.
+    if (batterExecuted) {
       if (swingType === 'power') {
         outcomeType = 'homerun';
-        outcomeDisplay = isHotZone ? '💥 CRUSHED MOONSHOT HOME RUN!' : '🔥 HOME RUN OVER THE WALL!';
+        outcomeDisplay = !pitcherExecuted
+          ? '💥 NO-DOUBTER HOME RUN (MEATBALL OBLITERATED)!'
+          : (isHotZone ? '💥 CRUSHED MOONSHOT HOME RUN!' : '🔥 HOME RUN OVER THE WALL!');
       } else if (swingType === 'balanced') {
-        if (isHotZone || isFavoritePitch) {
+        if (!pitcherExecuted || isHotZone || isFavoritePitch) {
           outcomeType = 'homerun';
           outcomeDisplay = '🔥 HOT ZONE HOME RUN!';
         } else {
@@ -1106,18 +1123,45 @@ function resolveBeat2(opts) {
       } else {
         // Contact
         outcomeType = 'single';
-        outcomeDisplay = '🏏 CLEAN LINE DRIVE SINGLE!';
+        outcomeDisplay = !pitcherExecuted
+          ? '🏏 SHARP SINGLE OFF THE WALL!'
+          : '🏏 CLEAN LINE DRIVE SINGLE!';
       }
     } else {
-      // Both executed, but different zones (pitcher fooled batter on location)
+      // Batter mistimed swing, but had the pitch completely read
+      if (!pitcherExecuted) {
+        outcomeType = (swingType === 'power' || swingType === 'balanced') ? 'double' : 'single';
+        outcomeDisplay = (outcomeType === 'double')
+          ? '⚡ WALL-BALL DOUBLE (HANGER DRIVEN)!'
+          : '🏏 BLOOP SINGLE (MISTIMED CONTACT)!';
+      } else {
+        if (swingType === 'contact') {
+          outcomeType = 'single';
+          outcomeDisplay = '🏏 INFIELD SINGLE (READ PITCH PERFECTLY)!';
+        } else if (swingType === 'power') {
+          outcomeType = 'flyout';
+          outcomeDisplay = '🧤 DEEP FLYOUT (WARNING TRACK POWER)!';
+        } else {
+          outcomeType = 'flyout';
+          outcomeDisplay = '🧤 HIGH FLYOUT TO CENTER FIELD';
+        }
+      }
+    }
+
+  } else if (matchTier === 'partial') {
+    // ── PARTIAL MATCH: Batter guessed 1 of 2 (Pitch OR Location) ──
+    // Execution cards decide the contested battle!
+    if (pitcherExecuted && batterExecuted) {
       if (swingType === 'power') {
         outcomeType = 'flyout';
-        outcomeDisplay = '🧤 DEEP FLYOUT (FOOLED ON LOCATION)';
+        outcomeDisplay = pitchMatched
+          ? '🧤 DEEP FLYOUT (TIMED PITCH, WRONG ZONE)'
+          : '🧤 DEEP FLYOUT (CHASED LOCATION, FOOLED BY PITCH)';
       } else if (swingType === 'balanced') {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ SHARP GROUNDOUT TO SHORT';
       } else {
-        // Contact swing protects the plate!
+        // Contact swing protects the plate
         if (isHotZone) {
           outcomeType = 'single';
           outcomeDisplay = '🏏 FLAIR SINGLE TO OPPOSITE FIELD!';
@@ -1126,56 +1170,88 @@ function resolveBeat2(opts) {
           outcomeDisplay = '⚾ ROUTINE GROUNDOUT (CONTACT PROTECT)';
         }
       }
-    }
-  } else if (!pitcherExecuted && batterExecuted) {
-    // Pitcher hung a mistake pitch right down the middle, batter barreled it!
-    if (swingType === 'power') {
-      outcomeType = 'homerun';
-      outcomeDisplay = '🔥 MONSTER HOME RUN (MEATBALL CRUSHED)!';
-    } else if (swingType === 'balanced') {
-      if (effectiveCount === '3-1' || isHotZone) {
+    } else if (!pitcherExecuted && batterExecuted) {
+      // Pitcher hung a mistake, batter had partial read and punished it!
+      if (swingType === 'power') {
         outcomeType = 'homerun';
         outcomeDisplay = '🔥 HANGING PITCH HAMMERED (HOME RUN)!';
+      } else if (swingType === 'balanced') {
+        if (effectiveCount === '3-1' || isHotZone) {
+          outcomeType = 'homerun';
+          outcomeDisplay = '🔥 HANGING PITCH HAMMERED (HOME RUN)!';
+        } else {
+          outcomeType = 'double';
+          outcomeDisplay = '⚡ WALL-BALL DOUBLE (HANGER DRIVEN)!';
+        }
       } else {
-        outcomeType = 'double';
-        outcomeDisplay = '⚡ WALL-BALL DOUBLE (HANGER DRIVEN)!';
+        outcomeType = 'single';
+        outcomeDisplay = '🏏 SOLID BASE HIT THROUGH THE INFIELD';
+      }
+    } else if (pitcherExecuted && !batterExecuted) {
+      // Pitcher hit spot, batter mistimed on partial read
+      if (swingType === 'power') {
+        outcomeType = 'k';
+        outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
+      } else if (swingType === 'balanced') {
+        if (locationMatched) {
+          outcomeType = 'groundout';
+          outcomeDisplay = '⚾ WEAK ROLLOVER GROUNDOUT';
+        } else {
+          outcomeType = 'k';
+          outcomeDisplay = '⚡ SWINGING STRIKEOUT!';
+        }
+      } else {
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ CHOPPER GROUNDOUT (AVOIDS K)';
       }
     } else {
-      outcomeType = 'single';
-      outcomeDisplay = '🏏 SOLID BASE HIT THROUGH THE INFIELD';
+      // Both failed execution
+      if (effectiveCount === '3-1') {
+        outcomeType = 'walk';
+        outcomeDisplay = '🚶 WALK (BALL FOUR OUT OF ZONE)';
+      } else if (swingType === 'power') {
+        outcomeType = 'flyout';
+        outcomeDisplay = '🧤 POPOUT TO SHORTSTOP';
+      } else if (swingType === 'balanced') {
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ WEAK CHOPPER TO FIRST';
+      } else {
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ SLOW ROLLER OUT';
+      }
     }
-  } else if (pitcherExecuted && !batterExecuted) {
-    // Pitcher hit spot, batter mistimed or was fooled
-    if (swingType === 'power') {
-      outcomeType = 'k';
-      outcomeDisplay = '⚡ SWINGING STRIKEOUT (PUNCHED OUT)!';
-    } else if (swingType === 'balanced') {
-      if (sameLocation) {
+
+  } else {
+    // ── WHIFF / FOOLED: Batter guessed NEITHER Pitch Type NOR Location! ──
+    // Pitcher heavily favored! Even good swings cannot produce clean hits.
+    if (pitcherExecuted) {
+      if (swingType === 'power') {
+        outcomeType = 'k';
+        outcomeDisplay = '⚡ SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
+      } else if (swingType === 'balanced') {
+        outcomeType = 'k';
+        outcomeDisplay = '⚡ STRIKEOUT (FOOLED ON PITCH & LOCATION)!';
+      } else {
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ ROUTINE GROUNDOUT (FOOLED ON PITCH & ZONE)';
+      }
+    } else {
+      // Pitcher hung it, but batter had complete wrong timing and zone
+      if (swingType === 'power') {
+        outcomeType = 'flyout';
+        outcomeDisplay = '🧤 MILE-HIGH POPOUT (OFF-BALANCE SWING)';
+      } else if (swingType === 'balanced') {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ WEAK ROLLOVER GROUNDOUT';
       } else {
-        outcomeType = 'k';
-        outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
+        if (effectiveCount === '3-1') {
+          outcomeType = 'walk';
+          outcomeDisplay = '🚶 WALK (BALL FOUR OUT OF ZONE)';
+        } else {
+          outcomeType = 'groundout';
+          outcomeDisplay = '⚾ SLOW ROLLER TO FIRST';
+        }
       }
-    } else {
-      // Contact chokes up to avoid strikeout
-      outcomeType = 'groundout';
-      outcomeDisplay = '⚾ CHOPPER GROUNDOUT (AVOIDS K)';
-    }
-  } else {
-    // Both failed execution
-    if (effectiveCount === '3-1') {
-      outcomeType = 'walk';
-      outcomeDisplay = '🚶 WALK (BALL FOUR OUT OF ZONE)';
-    } else if (swingType === 'power') {
-      outcomeType = 'flyout';
-      outcomeDisplay = '🧤 MILE-HIGH POPOUT';
-    } else if (swingType === 'balanced') {
-      outcomeType = 'groundout';
-      outcomeDisplay = '⚾ WEAK CHOPPER TO FIRST';
-    } else {
-      outcomeType = 'groundout';
-      outcomeDisplay = '⚾ SLOW ROLLER OUT';
     }
   }
 
@@ -1252,8 +1328,12 @@ function resolveBeat2(opts) {
     specialEffectTriggered: outcome.specialEffectTriggered,
     pitchType,
     pitchLocation,
+    guessPitch: effectiveGuessPitch,
     swingType,
     targetZone,
+    pitchMatched,
+    locationMatched,
+    matchTier,
     pitcherExecuted,
     pitcherCardVal: pCardVal,
     pitcherEffectiveDiff: pEffDiff,
@@ -1262,7 +1342,7 @@ function resolveBeat2(opts) {
     batterCardVal: bCardVal,
     batterEffectiveDiff: bEffDiff,
     batterBaseDiff: bBaseDiff,
-    sameLocation,
+    sameLocation: locationMatched,
     isHotZone,
     isColdZone,
     isFavoritePitch,
@@ -1354,7 +1434,7 @@ function resolveSequentialPA(opts) {
 
   const pExecStr = beat2?.pitcherExecuted ? 'Hit Spot' : 'Hanging Mistake';
   const bExecStr = beat2?.batterExecuted ? 'Barreled' : 'Mistimed';
-  log.push(`Beat 2 (The Payoff): Pitcher threw ${beat2?.pitchType?.toUpperCase() || 'PITCH'} ${beat2?.pitchLocation?.toUpperCase() || 'ZONE'} (${pExecStr}) vs Batter ${beat2?.swingType?.toUpperCase() || 'SWING'} ${beat2?.targetZone?.toUpperCase() || 'ZONE'} (${bExecStr}) → ${b2Outcome.display}`);
+  log.push(`Beat 2 (The Payoff): Pitcher threw ${beat2?.pitchType?.toUpperCase() || 'PITCH'} ${beat2?.pitchLocation?.toUpperCase() || 'ZONE'} (${pExecStr}) vs Batter ${beat2?.swingType?.toUpperCase() || 'SWING'} (Guessed ${beat2?.guessPitch?.toUpperCase() || 'FASTBALL'} ${beat2?.targetZone?.toUpperCase() || 'ZONE'}) [${beat2?.matchTier?.toUpperCase() || 'MATCH'}] (${bExecStr}) → ${b2Outcome.display}`);
   if (beat2?.specialEffectTriggered) {
     log.push(`⚡ Special Play: ${beat2.specialEffectTriggered}`);
   }
@@ -1400,6 +1480,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
   let pitchLocation = null;
   let swingType = null;
   let targetZone = null;
+  let guessPitch = null;
   let cardId = null;
 
   if (beat === 'beat1') {
@@ -1494,10 +1575,25 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
         }
       }
 
+      const pCharges = gameState?.arsenalCharges?.[oppRole] || charges;
+      const bFav = batterChar?.scoutingReport?.favoritePitch || 'fastball';
+
+      const pitchPool = [];
+      if (lockedOption !== 'offspeed' && (pCharges.offspeed || 0) > 0) pitchPool.push('offspeed');
+      if ((pCharges.breaking || 0) > 0) pitchPool.push('breaking', 'breaking');
+      if ((pCharges.fastball || 0) > 0) pitchPool.push('fastball', 'fastball', 'fastball');
+
+      guessPitch = 'fastball';
+      if (pitchPool.includes(bFav) && Math.random() < 0.5) {
+        guessPitch = bFav;
+      } else if (pitchPool.length > 0) {
+        guessPitch = pitchPool[Math.floor(Math.random() * pitchPool.length)];
+      }
+
       const myHot = batterChar?.scoutingReport?.hotZone || 'high';
       const myCold = batterChar?.scoutingReport?.coldZone || 'low';
       targetZone = (Math.random() < 0.65) ? myHot : myCold;
-      batterGuess = (targetZone === 'high') ? 'fastball' : 'breaking';
+      batterGuess = guessPitch;
 
       const baseDiff = batterChar?.swingDifficulties?.[swingType] || (swingType === 'contact' ? 3 : swingType === 'power' ? 8 : 5);
       const effDiff = baseDiff;
@@ -1533,6 +1629,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     pitchLocation,
     swingType,
     targetZone,
+    guessPitch: guessPitch || batterGuess || 'fastball',
     cardId,
     botHand
   };

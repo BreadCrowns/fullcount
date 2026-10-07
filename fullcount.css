@@ -4353,6 +4353,37 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* ==========================================================================
+   DEDUCTION MATCHUP BADGES
+   ========================================================================== */
+.deduction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.64rem;
+  font-weight: 900;
+  border-radius: 5px;
+  padding: 3px 8px;
+  letter-spacing: 0.4px;
+}
 
+.deduction-badge.full {
+  background: rgba(46, 213, 115, 0.2);
+  border: 1.5px solid #2ed573;
+  color: #2ed573;
+  box-shadow: 0 0 12px rgba(46, 213, 115, 0.3);
+}
 
+.deduction-badge.partial {
+  background: rgba(245, 166, 35, 0.2);
+  border: 1.5px solid var(--gold);
+  color: var(--gold-bright);
+  box-shadow: 0 0 12px rgba(245, 166, 35, 0.3);
+}
 
+.deduction-badge.whiff {
+  background: rgba(255, 71, 87, 0.2);
+  border: 1.5px solid #ff4757;
+  color: #ff4757;
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.3);
+}
