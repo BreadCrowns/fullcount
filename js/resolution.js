@@ -1115,60 +1115,100 @@ function resolveBeat2(opts) {
 
   let outcomeType = 'out';
   let outcomeDisplay = 'Out';
+  let ruleReason = '';
   const perkLogs = [];
 
   // ═════════════════════════════════════════════════════════════════════════
   // TIMING-DELTA & DEDUCTION OUTCOME RESOLUTION MATRIX
   // ═════════════════════════════════════════════════════════════════════════
-  if (pitchMatched) {
-    // ── PITCH READ: Batter anticipated the Pitch Type! ──
+  if (!pitcherExecuted) {
+    // ── MISTAKE PITCH / HANGER: Pitcher failed execution window! ──
+    // e.g., Fastball (6-10) thrown with Card 1-5, or Offspeed (1-5) thrown with 6-10.
+    if (pitchMatched) {
+      if (batterExecuted) {
+        // Punished mistake pitch! Batter anticipated the pitch and properly timed the zone.
+        if (isSlugger || isFavoritePitch || bCardVal >= 7) {
+          outcomeType = 'homerun';
+          outcomeDisplay = '💥 CRUSHED HOME RUN (MISTAKE PITCH PUNISHED)!';
+          ruleReason = `Pitcher failed execution (Card [${pCardVal}] outside ${pitchType.toUpperCase()} [${pRange.min}–${pRange.max}]) against batter's timed read (Card [${bCardVal}]). Grooved meatball crushed for a Home Run!`;
+        } else {
+          outcomeType = 'double';
+          outcomeDisplay = '⚡ WALL-BALL DOUBLE (HANGER CRUSHED)!';
+          ruleReason = `Pitcher hung an out-of-range mistake pitch. Batter anticipated and drove it off the wall for a Double!`;
+        }
+      } else {
+        // Both pitcher and batter missed their execution windows
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ WEAK DRIBBLER (BOTH SIDES MIS-TIMED)';
+        ruleReason = `Both pitcher and batter missed their target execution windows. Uncontrolled contact resulted in a weak groundout.`;
+      }
+    } else {
+      // Pitcher missed execution, but batter guessed the wrong pitch
+      if (effectiveCount === '3-1') {
+        outcomeType = 'walk';
+        outcomeDisplay = '🚶 WALK (BALL FOUR - UNEXECUTED PITCH MISSED ZONE)!';
+        ruleReason = `3-1 Hitter's count: Pitcher's out-of-range delivery missed the strike zone for ball four Walk.`;
+      } else if (effectiveCount === '0-2') {
+        outcomeType = 'k';
+        outcomeDisplay = '⚡ AWKWARD STRIKEOUT (CHASED WILD PITCH IN DIRT)!';
+        ruleReason = `0-2 Count: Batter was fooled on pitch type and chased an unexecuted pitch in the dirt for strike three.`;
+      } else {
+        outcomeType = pitchType === 'fastball' ? 'flyout' : 'groundout';
+        outcomeDisplay = '🧤 WEAK CONTACT OUT (FOOLED ON MISTAKE PITCH)';
+        ruleReason = `Pitcher threw an out-of-range mistake, but batter was looking for ${effectiveGuessPitch.toUpperCase()}. Fluke weak contact recorded an out.`;
+      }
+    }
+
+  } else if (pitchMatched) {
+    // ── PITCH READ: Batter anticipated the Pitch Type & Pitcher Executed! ──
     if (timingDelta === 0) {
       // 🎯 PERFECT TIMING COLLISION (DELTA 0 - SQUARED UP BARREL)
       if (effectiveCount === '0-2') {
         outcomeType = 'double';
         outcomeDisplay = '⚡ CLUTCH DOUBLE OFF THE WALL (TWO-STRIKE BARREL)!';
+        ruleReason = `Squared-up barrel collision (Delta 0), but 0-2 two-strike plate protection capped the hit at a Double!`;
       } else if (isFavoritePitch) {
         outcomeType = 'homerun';
         outcomeDisplay = '💥 CRUSHED MOONSHOT HOME RUN (FAVORITE PITCH BARRELED)!';
+        ruleReason = `Batter hunted their favorite pitch (${pitchType.toUpperCase()}) with perfect Delta 0 timing for a moonshot Home Run!`;
       } else if (isSlugger && (pitchType === 'fastball' || bCardVal >= 7)) {
         outcomeType = 'homerun';
         outcomeDisplay = '💥 NO-DOUBTER HOME RUN (SLUGGER SQUARED UP HEAT)!';
+        ruleReason = `Slugger barreled up spot-on pitch with Delta 0 timing for a towering Home Run!`;
       } else if (pitchType === 'fastball' && bCardVal >= 9) {
         outcomeType = 'homerun';
         outcomeDisplay = '💥 CRUSHED HOME RUN OVER THE WALL!';
+        ruleReason = `High fastball squared up with Delta 0 timing drives it over the wall!`;
       } else {
         outcomeType = 'double';
         outcomeDisplay = '⚡ ROCKET DOUBLE INTO THE GAP (SWEET SPOT BARREL)!';
+        ruleReason = `Perfect Delta 0 sweet-spot collision ripped into the gap for a Double!`;
       }
 
     } else if (timingDelta <= 2) {
       // 🏏 SOLID TIMING (DELTA 1–2)
-      if (!pitcherExecuted) {
-        // Hanger / mistake pitch punished!
-        if (isSlugger || isFavoritePitch) {
-          outcomeType = 'homerun';
-          outcomeDisplay = '🔥 TOWERING HOME RUN (PUNISHED MISTAKE PITCH)!';
-        } else {
-          outcomeType = 'double';
-          outcomeDisplay = '⚡ WALL-BALL DOUBLE (HANGER CRUSHED)!';
-        }
-      } else if (isFavoritePitch) {
+      if (isFavoritePitch) {
         outcomeType = isSlugger ? 'homerun' : 'double';
         outcomeDisplay = isSlugger ? '🔥 HOME RUN (FAVORITE PITCH HUNTED)!' : '⚡ SHARP DOUBLE DOWN THE LINE!';
+        ruleReason = `Batter anticipated their favorite pitch with solid timing (Delta ${timingDelta}) for extra bases!`;
       } else if (timingDelta === 1) {
         outcomeType = 'single';
         outcomeDisplay = '🏏 CLEAN LINE DRIVE SINGLE!';
+        ruleReason = `Pitch anticipated with Delta 1 solid contact produced a clean line drive Single!`;
       } else {
-        // Delta 2: solid contact, but pitch was executed well
+        // Delta 2: solid contact, but pitch was executed spot-on
         if (effectiveCount === '3-1') {
           outcomeType = 'single';
           outcomeDisplay = '🏏 SHARP SINGLE THROUGH THE HOLE!';
+          ruleReason = `3-1 Hitter's count leverage: Solid Delta 2 contact found a hole for a Single.`;
         } else if (isSlugger) {
           outcomeType = 'flyout';
           outcomeDisplay = '🧤 DEEP FLYOUT (WARNING TRACK POWER)!';
+          ruleReason = `Solid Delta 2 contact driven deep to the warning track, caught for an out.`;
         } else {
           outcomeType = 'groundout';
           outcomeDisplay = '⚾ SHARP GROUNDOUT TO SECOND';
+          ruleReason = `Pitcher's spot-on execution handled solid Delta 2 contact for a sharp groundout.`;
         }
       }
 
@@ -1177,15 +1217,19 @@ function resolveBeat2(opts) {
       if (effectiveCount === '3-1') {
         outcomeType = 'single';
         outcomeDisplay = '🏏 BLOOP SINGLE (ANTICIPATED PITCH DROPS IN)!';
+        ruleReason = `3-1 Hitter's count: Off-balance swing on read pitch blooped over the infield for a Single.`;
       } else if (isContactHitter) {
         outcomeType = 'single';
         outcomeDisplay = '🏏 CHOPPER INFIELD SINGLE (BEATS THE THROW)!';
+        ruleReason = `Contact Hitter archetype chopped an off-balance pitch and beat the throw for an infield Single.`;
       } else if (isSlugger) {
         outcomeType = 'flyout';
         outcomeDisplay = '🧤 DEEP FLYOUT (PITCH CAUGHT ON END OF BAT)!';
+        ruleReason = `Pitch anticipated, but off-balance timing (Delta ${timingDelta}) caught the ball on the end of the bat for a flyout.`;
       } else {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ ROUTINE GROUNDOUT (OFF-BALANCE TIMING)';
+        ruleReason = `Off-balance timing (Delta ${timingDelta}) produced a routine groundout.`;
       }
 
     } else {
@@ -1193,42 +1237,50 @@ function resolveBeat2(opts) {
       if (effectiveCount === '3-1') {
         outcomeType = 'walk';
         outcomeDisplay = '🚶 WALK (BALL FOUR - MISTIMED PITCH MISSED ZONE)!';
+        ruleReason = `3-1 Hitter's count: Badly mistimed swing protected by ball four Walk.`;
       } else {
         outcomeType = 'k';
         outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
+        ruleReason = `Pitch anticipated, but massive timing mismatch (Delta ${timingDelta}) resulted in a swinging Strikeout on spot-on stuff!`;
       }
     }
 
   } else {
-    // ── WHIFF / FOOLED: Batter anticipated the wrong pitch! ──
-    // Pitcher heavily favored!
+    // ── WHIFF / FOOLED: Batter anticipated the wrong pitch against executed delivery! ──
     if (timingDelta <= 2) {
       // Fluke timing on wrong pitch -> weak contact out
       if (pitchType === 'fastball') {
         outcomeType = 'flyout';
         outcomeDisplay = '🧤 MILE-HIGH POPOUT (OFF-BALANCE SWING ON WRONG PITCH)';
+        ruleReason = `Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}). Fluke timing popped it straight up for an out.`;
       } else {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ WEAK ROLLOVER GROUNDOUT (FOOLED ON PITCH)';
+        ruleReason = `Batter fooled on pitch type rolled over for a routine groundout.`;
       }
     } else if (timingDelta <= 4) {
       if (effectiveCount === '0-2') {
         outcomeType = 'k';
         outcomeDisplay = '⚡ STRIKEOUT SWINGING (PUNCHOUT ON PUT-AWAY PITCH)!';
+        ruleReason = `0-2 Count: Pitcher put away the fooled batter with a spot-on punchout Strikeout!`;
       } else if (isContactHitter) {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ SLOW ROLLER TO FIRST (AVOIDS K)';
+        ruleReason = `Contact Hitter archetype spoiled the fooled pitch to avoid a strikeout, grounded out to first.`;
       } else {
         outcomeType = 'k';
         outcomeDisplay = '⚡ SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
+        ruleReason = `Batter completely fooled on pitch type against spot-on delivery (Delta ${timingDelta}). Swinging Strikeout.`;
       }
     } else {
       if (effectiveCount === '3-1') {
         outcomeType = 'walk';
         outcomeDisplay = '🚶 WALK (BALL FOUR - WILD PITCH OUT OF ZONE)!';
+        ruleReason = `3-1 Hitter's count: Pitcher missed out of zone for ball four Walk.`;
       } else {
         outcomeType = 'k';
         outcomeDisplay = '⚡ UGLY SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
+        ruleReason = `Batter completely fooled on pitch type with massive timing delta (${timingDelta}). Dominant swinging Strikeout!`;
       }
     }
   }
@@ -1289,6 +1341,7 @@ function resolveBeat2(opts) {
     needle: timingDelta,
     timingDelta,
     timingQuality,
+    ruleReason,
     rng: { rollPct: timingDelta, tier: outcomeDisplay, odds: [{ label: outcomeDisplay, pct: 100, range: `Timing Δ: ${timingDelta} (${timingQuality})` }] }
   };
 
@@ -1301,6 +1354,7 @@ function resolveBeat2(opts) {
     outcome,
     outcomeType,
     outcomeDisplay,
+    ruleReason,
     runsScored,
     outsAdded,
     newBases,

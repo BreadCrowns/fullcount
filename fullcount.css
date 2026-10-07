@@ -4449,3 +4449,198 @@ body {
 .anticipate-timing {
   animation: clashMatchupSlam 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.25) 0.8s both;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOP/BOTTOM SCOUTING & CHIPS LAYOUT
+   ───────────────────────────────────────────────────────────────────────────── */
+.opp-scout-chips, .my-scout-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BEAT 2 COUNT ADVANTAGE & PENALTY BANNER
+   ───────────────────────────────────────────────────────────────────────────── */
+.beat2-advantage-banner {
+  margin: 4px 8px 10px 8px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  border: 1.5px solid var(--border);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.beat2-advantage-banner .b2-adv-badge {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.beat2-advantage-banner .b2-adv-desc {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--text-light, #e2e8f0);
+}
+
+.beat2-advantage-banner .b2-dominant-callout {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  background: rgba(245, 176, 39, 0.2);
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+}
+
+.beat2-advantage-banner .b2-dominant-callout.penalty {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.beat2-advantage-banner.count-pitcher {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+.beat2-advantage-banner.count-pitcher .b2-adv-badge {
+  color: #93c5fd;
+}
+
+.beat2-advantage-banner.count-hitter {
+  background: linear-gradient(135deg, rgba(20, 83, 45, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-color: rgba(74, 222, 128, 0.5);
+}
+
+.beat2-advantage-banner.count-hitter .b2-adv-badge {
+  color: #86efac;
+}
+
+.beat2-advantage-banner.count-full {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.beat2-advantage-banner.count-full .b2-adv-badge {
+  color: #cbd5e1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OUTCOME OVERLAY RESOLUTION BREAKDOWN & MATRIX GUIDE
+   ───────────────────────────────────────────────────────────────────────────── */
+.rm-resolution-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  text-align: left;
+}
+
+.rb-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.68rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 4px;
+}
+
+.rb-step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rb-step-title {
+  font-weight: 800;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  min-width: 85px;
+}
+
+.rb-step-val {
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: var(--text);
+  flex: 1;
+  text-align: right;
+}
+
+.rb-step-val.success { color: #4ade80; }
+.rb-step-val.fail { color: #f87171; }
+
+.rm-rule-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(245, 176, 39, 0.12);
+  border: 1px solid rgba(245, 176, 39, 0.35);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--gold-bright);
+  text-align: left;
+}
+
+.rre-icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rm-matrix-guide {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  margin-top: 6px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 0.65rem;
+}
+
+.rmg-header {
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rmg-header:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rmg-body {
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rmg-item b {
+  color: var(--text);
+}

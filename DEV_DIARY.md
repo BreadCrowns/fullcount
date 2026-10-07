@@ -495,3 +495,111 @@ Furthermore, a secondary issue was uncovered: `executeBotPlayBeat(gs, 'guest', '
 - **Game Simulation**: 10-game headless simulation executed 295 PAs across 10 completed games with an average of **6.10 runs/game**, 103 hits, 7 home wins, 3 away wins, and zero runaway innings.
 - **Player Experience**: Dominant Beat 1 victories now transition instantly and smoothly into the Payoff Pitch arena, displaying the opponent's revealed card face-up with full information advantage.
 
+---
+
+## Entry 11: Spatial Clarity & Outcome Transparency — Top/Bottom Layout Isolation, Beat 2 Advantage Banners, and Mistake Pitch Balancing
+*Date: October 6, 2026*
+
+### Context & The Problem
+After completing our first full end-to-end 3-inning game playtest, several critical usability hurdles and balance anomalies emerged that obscured the core thrill of the duel:
+
+1. **Spatial Role Confusion**:
+   The shared public scouting bar was centered in the middle of the screen above the arena, locking the Pitcher on the left and Batter on the right regardless of whether the user was batting or pitching. This created severe cognitive friction—players had to constantly look between the center bar, top HUD, and bottom dock to discern whose charges, archetype, and favorite pitch were whose. The design mandate: **User player information must display exclusively at the bottom of the play area; Opponent information must display exclusively at the top.**
+
+2. **Invisible Count Advantage in Beat 2**:
+   After battling through Beat 1 to establish an advantage (such as a 0-2 Pitcher's Count or a 3-1 Hitter's Count), the Beat 2 Payoff Pitch arena provided no prominent, persistent reminder of the active bonuses or penalties in play (Two-Strike Plate Protection, Offspeed pitch lockout, or dominant face-up commitment requirements).
+
+3. **Outcome Matrix Opacity**:
+   When the At-Bat Outcome pop-up appeared at the end of a plate appearance, players were often confused by why a particular result occurred. The modal showed a final badge (e.g., "SWINGING STRIKEOUT" or "CLEAN SINGLE") without articulating the underlying 3-step clash mechanics (Pitch Read &rarr; Execution & Timing Delta &rarr; Matrix Resolution Rule).
+
+4. **The Fastball "Mistake Pitch" Anomaly**:
+   During the playtest, a user pitched a Card value `1` on a `Fastball` (Fastball range is 6–10; Card 1 represents a grooved, poorly executed mistake pitch). Unexpectedly, the engine awarded the pitcher a swinging strikeout!
+   *Investigation*: Because the batter anticipated Fastball and played a card in range (e.g., Card 8), the timing delta was calculated as $|1 - 8| = 7$. Because $\Delta \ge 5$, the old matrix unconditionally mapped high deltas to "Badly Mistimed &rarr; Swinging Strikeout on Nasty Stuff", failing to recognize that the pitcher had thrown an out-of-range meatball!
+
+---
+
+### Options Explored
+
+#### 1. Spatial Layout Re-Architecture
+- **Option A: Retain Center Scouting Bar with Dynamic Swapping**: Flip the left/right position of cards in the center scouting bar depending on who is home/away.
+  - *Cons*: Still placed opponent stats directly next to player stats in the center arena, causing visual clutter and dividing attention from the cards in play.
+- **Option B (Chosen): Complete Top/Bottom Domain Isolation**:
+  - Top HUD (`.opponent-bar`): Strictly shows opponent profile, avatar, remaining repertoire charges (if pitching) or archetype and hunted pitch (if batting), and hand count.
+  - Bottom Player Dock (`.player-bar`): Strictly shows user profile, role badge, user arsenal charges or batter archetype/favorite pitch, and turn status indicators.
+  - Center Battlefield: Freed entirely from scouting clutter to focus purely on the duel arena and cards.
+
+#### 2. Beat 2 Advantage & Penalty Visibility
+- **Option A: Passive Tooltips**: Add informational hover tooltips to cards and buttons.
+  - *Cons*: Easy to overlook; does not convey active count tension.
+- **Option B (Chosen): Dynamic Beat 2 Advantage Banner (`.beat2-advantage-banner`)**:
+  - Mounted directly at the top of the Payoff Pitch arena in Beat 2.
+  - Distinct styling for each count state:
+    - **0-2 Pitcher Count (`.count-pitcher`)**: Pitcher count leverage active; put-away punchouts enabled on fooled swings; batter power suppressed (Delta 0 capped at Double).
+    - **3-1 Hitter Count (`.count-hitter`)**: Batter count leverage active; pitcher locked out of throwing Offspeed [1–5]; mistimed swings convert into walks / bloop hits.
+    - **3-2 Full Count (`.count-full`)**: Neutral duel; all pitches available.
+    - **Dominant Reveal Callouts**: Clearly flags who must play their card face-up first.
+
+#### 3. Outcome Transparency & Context
+- **Option A: Detailed Verbose Paragraph**: Write a long text log describing the play.
+  - *Cons*: Dense to read on mobile and fast-paced screens.
+- **Option B (Chosen): 3-Step Resolution Breakdown + Collapsible Matrix Guide**:
+  - **Step 1: Pitch Read**: Displays whether the batter anticipated the pitch type or was fooled.
+  - **Step 2: Execution & Timing Collision**: Displays whether each side executed in-range and the resulting Timing Delta.
+  - **Plain-English Rule Explanation**: A clear callout badge (`.rm-rule-explanation`) describing the exact baseball logic that decided the play.
+  - **Collapsible Outcome Matrix Guide**: An expandable dropdown educating players on how pitch anticipation, delta tiers, and count leverage interact.
+
+#### 4. Mistake Pitch Balancing
+- **Option A: Treat Mistake Pitches as Instant Walks**:
+  - *Cons*: Unrealistic for baseball; an unexecuted pitch down the middle should be hammered by an anticipating hitter, not automatically called a ball.
+- **Option B (Chosen): Execution Gate Priority in Resolution Ladder**:
+  - Check `if (!pitcherExecuted)` at the very top of `resolveBeat2`.
+  - If pitcher threw out-of-range (e.g. Card 1 on Fastball) and batter anticipated with in-range timing (e.g. Card 8):
+    - Award a **Home Run** (for Sluggers, favorite pitch hunts, or card $\ge 7$) or **Double** (all others). It is physically impossible to strike out on an anticipated hanger!
+  - If both sides failed execution windows: weak contact dribbler groundout.
+  - If batter guessed the wrong pitch: weak contact out or walk (3-1), never an unearned strikeout on spot-on stuff.
+
+---
+
+### Implementation Details
+
+1. **Resolution Engine Overhaul (`js/resolution.js`)**:
+   - Re-architected `resolveBeat2`:
+     ```javascript
+     if (!pitcherExecuted) {
+       // Pitcher threw an out-of-range hanger/mistake pitch!
+       if (pitchMatched) {
+         if (batterExecuted) {
+           // Grooved meatball punished for extra bases!
+           outcomeType = (isSlugger || isFavoritePitch || bCardVal >= 7) ? 'homerun' : 'double';
+           outcomeDisplay = (outcomeType === 'homerun') ? '💥 CRUSHED HOME RUN (MISTAKE PITCH PUNISHED)!' : '⚡ WALL-BALL DOUBLE (HANGER CRUSHED)!';
+           ruleReason = `Pitcher failed execution (Card [${pCardVal}] outside ${pitchType.toUpperCase()} [${pRange.min}–${pRange.max}]) against batter's timed read (Card [${bCardVal}]). Grooved meatball crushed for extra bases!`;
+         } else {
+           outcomeType = 'groundout';
+           ruleReason = `Both pitcher and batter missed their target execution windows. Weak contact recorded an out.`;
+         }
+       } else {
+         // Batter fooled on mistake pitch
+         ...
+       }
+     }
+     ```
+   - Added plain-English `ruleReason` strings to all branches of `resolveBeat2` and propagated through `resolveSequentialPA`.
+
+2. **User Interface Redesign (`js/app.js` & `fullcount.css`)**:
+   - Implemented `renderBeat2AdvantageBanner(b1Data, iAmBatting, iAmPitching)` with contextual color themes and dominant callouts.
+   - Removed `renderPublicScoutingBar` from the center battlefield in `renderZoneBoard`.
+   - Placed `.opp-scout-chips` in `.opponent-bar` (top) and `.my-scout-chips` in `.player-bar` (bottom) across both `renderPlacing` and `renderReveal`.
+   - Replaced outcome modal card recap with the 3-Step Resolution Breakdown, `.rm-rule-explanation`, and `<details class="rm-matrix-guide">`.
+
+3. **Automated Verification Suite (`tests/test_resolution.html` & `tests/test_play_ui.html`)**:
+   - Added unit test asserting that throwing Card 1 on Fastball against an anticipated Card 8 produces a Home Run with a valid `ruleReason`, never a strikeout.
+   - Added UI tests asserting proper placement of top opponent chips, bottom user chips, Beat 2 advantage banner rendering, and outcome modal breakdown elements.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **137 of 137 tests pass** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 317 PAs across 10 completed games with an average of **9.60 runs/game**, 115 hits, 7 home wins, 3 away wins, and zero errors.
+- **Player Experience**: Clean spatial separation between player and opponent, immediate visual clarity on count bonuses during Beat 2, transparent post-clash explanations, and fair punishment of mistake pitches.
+
+

@@ -579,6 +579,47 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
   const canSub = iAmPitching && !myCommitted && gs.activePitcher[pitchingRole] === g.rosters[pitchingRole].startingPitcher;
   const reliefId = canSub ? g.rosters[pitchingRole].reliefPitcher : null;
 
+  const pCharges = gs?.arsenalCharges?.[pitchingRole] || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
+  const bScout = batterChar?.scoutingReport || { favoritePitch: 'fastball' };
+
+  // Opponent chips (Top bar exclusively)
+  let oppScoutChips = '';
+  if (iAmBatting) {
+    // Opponent is Pitcher
+    oppScoutChips = `
+      <div class="opp-scout-chips">
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+      </div>`;
+  } else {
+    // Opponent is Batter
+    oppScoutChips = `
+      <div class="opp-scout-chips">
+        <span class="scout-chip hot" title="Archetype">STYLE: <b>${oppChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+      </div>`;
+  }
+
+  // User chips (Bottom dock exclusively)
+  let myScoutChips = '';
+  if (iAmPitching) {
+    // User is Pitcher
+    myScoutChips = `
+      <div class="my-scout-chips">
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+      </div>`;
+  } else {
+    // User is Batter
+    myScoutChips = `
+      <div class="my-scout-chips">
+        <span class="scout-chip hot" title="Archetype">STYLE: <b>${myChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+      </div>`;
+  }
+
   // Lock In Button Configuration based on Active Beat
   let lockBtnLabel = 'LOCK IN';
   let lockBtnSub = '';
@@ -631,7 +672,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
 
   document.getElementById('app').innerHTML = `
     <div class="game-screen">
-      <!-- TOP HUD -->
+      <!-- TOP HUD: OPPONENT INFORMATION ONLY -->
       <header class="game-hud">
         ${renderScoreHeader(gs, half, g.rosters)}
         <div class="opponent-bar">
@@ -639,9 +680,10 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
             <div class="opp-avatar">${iAmBatting ? '⚾' : '🏏'}</div>
             <div class="opp-meta">
               <div class="opp-name">${oppName}</div>
-              <div class="opp-role-tag">${oppRoleTag} · ${oppChar?.name || ''}</div>
+              <div class="opp-role-tag">${oppRoleTag} &bull; ${oppChar?.name || ''}</div>
             </div>
           </div>
+          ${oppScoutChips}
           <div class="opp-hand-count" title="Opponent cards in hand">
             <span>🎴</span>
             <span>${oppHand.length}</span>
@@ -652,12 +694,12 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
         </div>
       </header>
 
-      <!-- CENTER BATTLEFIELD -->
+      <!-- CENTER BATTLEFIELD: THE DUEL -->
       <main class="battlefield">
         ${renderZoneBoard(pa, iAmBatting, myCommitted, pa.phase, null, pitcherChar, batterChar, gs)}
       </main>
 
-      <!-- BOTTOM PLAYER DOCK -->
+      <!-- BOTTOM PLAYER DOCK: USER INFORMATION ONLY -->
       <footer class="player-dock">
         <div class="player-bar">
           <div class="player-profile">
@@ -667,6 +709,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
               <span class="my-char-name">${myChar?.name || ''}</span>
             </div>
           </div>
+          ${myScoutChips}
           <div class="dock-controls-row">
             <span class="placed-indicator">Beat <b>${currentBeat === 'beat1' ? '1' : '2'}</b> &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1</span>
             ${canSub ? `<button class="btn-relief" onclick="substitutePitcher('${reliefId}')">Relief</button>` : ''}
@@ -714,6 +757,43 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
   const oppRoleTag = (battingRole === myRole) ? '⚾ PITCHING' : '🏏 BATTING';
 
   const myChar = (battingRole === myRole) ? batterChar : pitcherChar;
+  const iAmBatting = (battingRole === myRole);
+  const pCharges = gs?.arsenalCharges?.[pitchingRole] || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
+  const bScout = batterChar?.scoutingReport || { favoritePitch: 'fastball' };
+
+  // Opponent chips (Top bar exclusively)
+  let oppScoutChips = '';
+  if (iAmBatting) {
+    oppScoutChips = `
+      <div class="opp-scout-chips">
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+      </div>`;
+  } else {
+    oppScoutChips = `
+      <div class="opp-scout-chips">
+        <span class="scout-chip hot" title="Archetype">STYLE: <b>${oppChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+      </div>`;
+  }
+
+  // User chips (Bottom dock exclusively)
+  let myScoutChips = '';
+  if (!iAmBatting) {
+    myScoutChips = `
+      <div class="my-scout-chips">
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+      </div>`;
+  } else {
+    myScoutChips = `
+      <div class="my-scout-chips">
+        <span class="scout-chip hot" title="Archetype">STYLE: <b>${myChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+      </div>`;
+  }
 
   document.getElementById('app').innerHTML = `
     <div class="game-screen">
@@ -725,14 +805,15 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
             <div class="opp-avatar">${battingRole === myRole ? '⚾' : '🏏'}</div>
             <div class="opp-meta">
               <div class="opp-name">${oppName}</div>
-              <div class="opp-role-tag">${oppRoleTag} · ${oppChar?.name || ''}</div>
+              <div class="opp-role-tag">${oppRoleTag} &bull; ${oppChar?.name || ''}</div>
             </div>
           </div>
+          ${oppScoutChips}
           <div class="opp-status-pill ready">REVEAL</div>
         </div>
       </header>
 
-      <!-- CENTER MARVEL SNAP 3-ZONE BATTLEFIELD (REVEALED) -->
+      <!-- CENTER BATTLEFIELD -->
       <main class="battlefield">
         ${renderZoneBoard(pa, battingRole === myRole, true, 'reveal', res, pitcherChar, batterChar, gs)}
       </main>
@@ -747,6 +828,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
               <span class="my-char-name">${myChar?.name || ''}</span>
             </div>
           </div>
+          ${myScoutChips}
           <button class="btn-intel" onclick="toggleMatchupModal(true)">ℹ️ Intel</button>
         </div>
 
@@ -755,7 +837,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
         </div>
       </footer>
 
-      <!-- OUTCOME MODAL OVERLAY (MARVEL SNAP DRAMATIC REVEAL) -->
+      <!-- OUTCOME MODAL OVERLAY -->
       ${res ? renderOutcomeOverlay(res, battingRole === myRole) : ''}
 
       <!-- MATCHUP INTEL DRAWER -->
@@ -929,6 +1011,57 @@ function renderBatterPayoffDeck(localGuessPitch, bScout, count, cardObj, b1Data)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// BEAT 2 COUNT ADVANTAGE & PENALTY BANNER
+// ─────────────────────────────────────────────────────────────────────────────
+function renderBeat2AdvantageBanner(b1Data, iAmBatting, iAmPitching) {
+  const count = b1Data?.count || '3-2';
+  let bannerClass = 'count-full';
+  let badgeText = '';
+  let descText = '';
+
+  if (count === '0-2') {
+    bannerClass = 'count-pitcher';
+    if (iAmPitching) {
+      badgeText = '⚾ 0-2 PITCHER COUNT &bull; TWO-STRIKE ADVANTAGE';
+      descText = 'Pitcher holds count leverage: Put-away punchouts active on fooled swings (Delta 3–4). Batter power is suppressed (Delta 0 capped at Double).';
+    } else {
+      badgeText = '⚠️ 0-2 TWO-STRIKE COUNT &bull; PLATE PROTECTION DEFICIT';
+      descText = 'Defensive count: Fooled swings trigger strikeouts. Power is capped at a Double even on a perfect Delta 0 barrel.';
+    }
+  } else if (count === '3-1') {
+    bannerClass = 'count-hitter';
+    if (iAmBatting) {
+      badgeText = '🏏 3-1 HITTER COUNT &bull; COUNT ADVANTAGE';
+      descText = 'Pitcher cannot throw Offspeed! Mistimed swings convert into walks or bloop hits. Hunt Fastball [6–10] or Breaking [3–7]!';
+    } else {
+      badgeText = '⚠️ 3-1 HITTER COUNT &bull; OFFSPEED LOCKOUT PENALTY';
+      descText = 'Penalty active: Offspeed [1–5] is locked out! You must execute Fastball [6–10] or Breaking [3–7].';
+    }
+  } else {
+    bannerClass = 'count-full';
+    badgeText = '⚖️ 3-2 FULL COUNT &bull; NEUTRAL DUEL';
+    descText = 'Full count payoff: All pitch types available. Pure execution duel on the final pitch!';
+  }
+
+  let dominantCallout = '';
+  if (b1Data?.isDominant && b1Data?.revealCardFirst) {
+    const iAmDisadvantaged = (iAmPitching && b1Data.revealCardFirst === 'pitcher') || (iAmBatting && b1Data.revealCardFirst === 'batter');
+    if (iAmDisadvantaged) {
+      dominantCallout = `<div class="b2-dominant-callout penalty">⚠️ DOMINANT REVEAL PENALTY: You must play your execution card FACE-UP first!</div>`;
+    } else {
+      dominantCallout = `<div class="b2-dominant-callout">👁️ DOMINANT REVEAL ADVANTAGE: Opponent must play their execution card FACE-UP first!</div>`;
+    }
+  }
+
+  return `
+    <div class="beat2-advantage-banner ${bannerClass}">
+      <div class="b2-adv-badge">${badgeText}</div>
+      <div class="b2-adv-desc">${descText}</div>
+      ${dominantCallout}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ZONE BOARD RENDERING (2-BEAT FLOW: COUNT DUEL & PAYOFF PITCH)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, batterChar, gs) {
@@ -950,9 +1083,6 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
   const oppCommitted = Boolean(pa?.committed?.[oppKey]);
   const cardObj = localBeatCard ? getCard(localBeatCard) : null;
-
-  // 1. Strategic scouting bar
-  const scoutingBarHtml = renderPublicScoutingBar(pitcherChar, batterChar, charges, count);
 
   let mainContentHtml = '';
 
@@ -1104,6 +1234,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
     mainContentHtml = `
       <div class="beat2-arena">
+        ${renderBeat2AdvantageBanner(b1Data, iAmBatting, !iAmBatting)}
         ${disAdvNoticeHtml}
         <div class="b2-opp-strip">
           <span class="opp-role-label">${iAmBatting ? '⚾ Pitcher Move:' : '🏏 Batter Move:'}</span>
@@ -1124,7 +1255,6 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
   }
 
   return `
-    ${scoutingBarHtml}
     <div class="battlefield-main">
       ${mainContentHtml}
     </div>`;
@@ -2088,6 +2218,17 @@ function renderOutcomeOverlay(res, isBatting = false) {
     deductionBadgeHtml = `<span class="deduction-badge whiff">❌ FOOLED ON PITCH (Threw ${pPitch}, Anticipated ${bGuess})</span>`;
   }
 
+  // 3-Step Breakdown Details
+  const step1ReadHtml = pitchMatched
+    ? `<span class="rb-step-val success">🎯 ANTICIPATED (${pPitch})</span>`
+    : `<span class="rb-step-val fail">❌ FOOLED (${pPitch} vs Looking ${bGuess})</span>`;
+
+  const pExecText = z2 ? (z2.pitcherExecuted ? `P: [${pVal}] 🟢 Spot-on` : `P: [${pVal}] 🔴 Hanger`) : `P: [${pVal}]`;
+  const bExecText = z2 ? (z2.batterExecuted ? `B: [${bVal}] 🟢 In Range` : `B: [${bVal}] 🔴 Out of Range`) : `B: [${bVal}]`;
+  const step2ExecHtml = `<span class="rb-step-val">${pExecText} vs ${bExecText} &bull; Δ ${timingDelta}</span>`;
+
+  const ruleReason = z2?.ruleReason || o.ruleReason || (pitchMatched ? `Anticipated pitch with Delta ${timingDelta} contact.` : `Fooled on pitch type with Delta ${timingDelta} swing.`);
+
   return `
     <div class="result-modal-overlay" id="outcome-overlay">
       <div class="result-modal-card outcome">
@@ -2118,6 +2259,24 @@ function renderOutcomeOverlay(res, isBatting = false) {
           ` : ''}
         </div>
 
+        <!-- 3-STEP RESOLUTION BREAKDOWN -->
+        <div class="rm-resolution-breakdown">
+          <div class="rb-step">
+            <span class="rb-step-title">1. PITCH READ:</span>
+            ${step1ReadHtml}
+          </div>
+          <div class="rb-step">
+            <span class="rb-step-title">2. EXECUTION &amp; &Delta;:</span>
+            ${step2ExecHtml}
+          </div>
+        </div>
+
+        <!-- PLAIN-ENGLISH RULE REASON -->
+        <div class="rm-rule-explanation">
+          <span class="rre-icon">💡</span>
+          <div class="rre-text">${ruleReason}</div>
+        </div>
+
         <div class="rm-outcome-banner hero anticipate-outcome">
           <div class="rm-outcome-title">${o.display || 'At-Bat Complete'}</div>
         </div>
@@ -2128,6 +2287,18 @@ function renderOutcomeOverlay(res, isBatting = false) {
             : '<span class="impact-noruns">No runs scored</span>'}
           <span class="impact-outs">${outsAdded > 0 ? `+${outsAdded} Out${outsAdded > 1 ? 's' : ''}` : 'No outs recorded'}</span>
         </div>
+
+        <!-- MATRIX QUICK GUIDE (COLLAPSIBLE) -->
+        <details class="rm-matrix-guide">
+          <summary class="rmg-header"><span>📖 Outcome Matrix Guide</span><span>▼</span></summary>
+          <div class="rmg-body">
+            <div class="rmg-item">🎯 <b>Anticipated + &Delta; 0:</b> Squared-up barrel &rarr; Moonshot HR (capped at Double on 0-2 count).</div>
+            <div class="rmg-item">🏏 <b>Anticipated + &Delta; 1–2:</b> Solid timing &rarr; Line drive Single or Wall Double.</div>
+            <div class="rmg-item">🧤 <b>Anticipated + &Delta; 3–4:</b> Off-balance swing &rarr; Groundout/Flyout (Single on 3-1 count).</div>
+            <div class="rmg-item">⚡ <b>Fooled on Pitch:</b> Pitcher advantage &rarr; Popout (&Delta; 0–2), Strikeout (&Delta; 3+), Punchout on 0-2.</div>
+            <div class="rmg-item">⚠️ <b>Mistake Pitch (Out-of-Range):</b> Hung pitch with anticipated in-range timing is crushed for extra bases (HR/2B), never an out!</div>
+          </div>
+        </details>
 
         <button class="btn-primary rm-btn btn-next-batter anticipate-next-btn" onclick="nextPA()">
           Next Batter &rarr;
