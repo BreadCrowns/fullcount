@@ -395,3 +395,103 @@ If a batter was anticipating a **Fastball**, of course they were timing for the 
 - **Automated Unit Tests**: 119 of 119 browser tests pass (`run-tests.ps1`).
 - **Game Simulation**: 10-game headless simulation (`run-sim.ps1`) executed 322 PAs across 10 completed games with an average of 8.00 runs/game, 122 total hits, 6 home wins, 4 away wins, and zero runaway innings.
 - **Player Experience**: Perfect symmetry has been achieved. Both pitcher and batter now make exactly two decisions per payoff pitch: **Pitch Type** and **Timing Card**. The game is fast, intuitive, and razor-sharp.
+
+---
+
+## Entry 10: Unfreezing the Dominant Duel — Resolving the Beat 1 Result Modal Lockup
+
+### The Bug Report
+During playtesting of the new streamlined 2-choice duel, an immediate roadblock surfaced:
+> *"I had a dominant beat 1 and the game froze in the results pop-up."*
+
+When a player achieved a dominant Beat 1 Count victory ($\Delta \ge 5$, establishing an 0-2 Pitcher's Count or 3-1 Hitter's Count), the "BEAT 1 RESULT • THE COUNT" modal appeared as designed. However, clicking **"Continue to Payoff Pitch →"** did nothing. The button remained unresponsive, and the game remained completely stuck on the results pop-up.
+
+---
+
+### Root Cause Analysis: The Ghost of Deprecated Fields in Firebase Updates
+
+To preserve the asymmetry of dominant count victories, the game engine requires the disadvantaged player to commit their Beat 2 execution card **face-up first**. In solo play, when the human player achieves a dominant win (e.g. pitching a 10 vs. a 2, or batting a 9 vs. a 1), the bot is the disadvantaged participant.
+
+When clicking "Continue to Payoff Pitch →", `proceedToBeat2()` is invoked. Recognizing that the bot was the disadvantaged player, `proceedToBeat2()` called `executeBotPlayBeat()` so the bot would pre-commit its card and display it face-up to the human player entering Beat 2.
+
+The crash occurred in the payload construction:
+```javascript
+// Legacy code in proceedToBeat2():
+const botBeatPlacement = botIsPitching
+  ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
+  : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, guessPitch: botPlay.guessPitch, cardId: botPlay.cardId };
+```
+
+In Entries 8 and 9, we systematically eliminated `pitchLocation`, `targetZone`, and `swingType` from `executeBotPlayBeat()`. As a result:
+- `botPlay.pitchLocation` evaluated to `undefined`.
+- `botPlay.targetZone` evaluated to `undefined`.
+
+In the Google Firebase Realtime Database JavaScript SDK, calling `ref.update(updates)` with an object that contains even a single `undefined` value immediately throws a fatal exception:
+`Firebase.update failed: First argument contains undefined in property 'currentPA/beatPlacements/beat2/guest/pitchLocation'`.
+
+Because the error was caught in `gameRef().update(updates).catch(...)`, the database write was entirely aborted. The game phase was never transitioned from `'beat1_result'` to `'placing'`, and the modal pop-up was never dismissed.
+
+Furthermore, a secondary issue was uncovered: `executeBotPlayBeat(gs, 'guest', 'beat2')` was receiving only `gameState`, lacking `currentPA`. Without `currentPA.beatResults.beat1`, the bot could not read which pitch option had been locked out (e.g., Offspeed locked on a 3-1 count). Finally, the modal copy still referenced legacy mechanics ("Batter's Power Swing is LOCKED OUT"), which no longer existed in the 2-choice model.
+
+---
+
+### Options Explored
+
+1. **Option A: Eliminate Bot Pre-Commitment on Dominant Beats**
+   - *Concept*: Stop having the bot pre-commit face-up during `proceedToBeat2()`. Instead, let both players enter Beat 2 concurrently as in non-dominant counts.
+   - *Verdict*: **Rejected**. Dominant counts are the core reward for decisive Beat 1 hand-management victories. Stripping face-up pre-commitment would eliminate the thrill of having complete information advantage over the opponent.
+
+2. **Option B: Clean 2-Choice Payload, Robust State Passing, and Fail-Safe Sanitization**
+   - *Concept*:
+     1. Modernize `proceedToBeat2()` and `commitPlacement()` to generate clean 2-choice payloads: `{ pitchType, cardId }` for pitchers, and `{ guessPitch, cardId }` for batters.
+     2. Provide defensive fallback defaults (`|| null`, `|| 'fastball'`) guaranteeing zero `undefined` values can ever be passed to Firebase.
+     3. Provide immediate button UI feedback (`⏳ Proceeding to Payoff Pitch…`) with error rollback if the network rejects a write.
+     4. Pass full contextual state `{ ...gs, currentPA: pa }` into `executeBotPlayBeat()` so the AI bot always respects count lockouts.
+     5. Update modal copy to accurately explain 2-choice count rules (0-2 Two-Strike Plate Protection capping home runs at doubles; 3-1 Offspeed lockout).
+   - *Verdict*: **Accepted**. This restores seamless gameplay, maintains strategic asymmetry, and ensures the UI matches the underlying game engine.
+
+---
+
+### Implementation Details
+
+1. **User Interface & State Transitions (`js/app.js`)**:
+   - `proceedToBeat2`:
+     - Added instant button feedback disabling duplicate clicks and displaying progress.
+     - Reconstructed `botBeatPlacement` strictly according to the 2-choice contract:
+       ```javascript
+       const botBeatPlacement = botIsPitching
+         ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
+         : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
+       ```
+     - Passed `{ ...gs, currentPA: pa }` into `executeBotPlayBeat` so the bot evaluates the count accurately.
+     - Added button re-enablement on `.catch()` to prevent unrecoverable UI states.
+   - `commitPlacement`:
+     - Added identical defensive fallbacks for bot placement updates during Beat 2.
+   - `renderBeat1ResultModal`:
+     - Updated explanation text:
+       - **0-2 Count**: "Two-strike plate protection in effect (home runs capped at doubles, elevated strikeout danger), and Batter must commit their execution card FACE-UP FIRST!"
+       - **3-1 Count**: "Pitcher's Offspeed pitch is LOCKED OUT, and Pitcher must commit their execution card FACE-UP FIRST!"
+   - `gameRef`:
+     - Added support for `window.db` mock fallback in headless testing environments.
+
+2. **AI Bot & Resolution Engine (`js/resolution.js`)**:
+   - `executeBotPlayBeat`:
+     - Robustified Beat 1 data ingestion to accept `gameState?.currentPA?.beatResults?.beat1`, `gameState?.beatResults?.beat1`, or `gameState?.beat1`.
+     - Read `oppRevealedCardId` from `firstRevealedCard`, `currentPA.firstRevealedCard`, or `gameState.firstRevealedCard`.
+   - `resolveBeat1`:
+     - Updated `countDisplay` to accurately reflect two-strike plate protection.
+
+3. **Automated Testing Suite (`tests/test_play_ui.html`)**:
+   - Added automated tests verifying `proceedToBeat2()` under Dominant Beat 1 conditions:
+     - Confirmed phase transitions to `'placing'`.
+     - Confirmed beat transitions to `'beat2'`.
+     - Confirmed disadvantaged bot pre-commits face-up with card revealed.
+     - Validated that the updates payload contains strictly zero `undefined` values across all keys and nested objects.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **125 of 125 tests pass** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Game Simulation**: 10-game headless simulation executed 295 PAs across 10 completed games with an average of **6.10 runs/game**, 103 hits, 7 home wins, 3 away wins, and zero runaway innings.
+- **Player Experience**: Dominant Beat 1 victories now transition instantly and smoothly into the Payoff Pitch arena, displaying the opponent's revealed card face-up with full information advantage.
+

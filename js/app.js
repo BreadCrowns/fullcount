@@ -143,7 +143,8 @@ function initApp() {
 // FIREBASE HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 function gameRef(path = '') {
-  if (typeof db === 'undefined' || !db) {
+  const activeDb = (typeof window !== 'undefined' && window.db) ? window.db : (typeof db !== 'undefined' ? db : null);
+  if (!activeDb) {
     const dummy = {
       update: () => Promise.resolve(),
       set: () => Promise.resolve(),
@@ -153,7 +154,7 @@ function gameRef(path = '') {
     };
     return dummy;
   }
-  return db.ref(`fullcount_games/${gameId}${path ? '/'+path : ''}`);
+  return activeDb.ref(`fullcount_games/${gameId}${path ? '/'+path : ''}`);
 }
 
 
@@ -1302,16 +1303,16 @@ function commitPlacement() {
 
     if (currentBeat === 'beat1') {
       if (isBot && myRole === 'host') {
-        const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat1');
+        const botPlay = executeBotPlayBeat({ ...liveGS, currentPA: livePA }, 'guest', 'beat1');
         const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
         if (botPlay.cardId) {
           updatedBotPlacement.z1 = [botPlay.cardId];
         }
 
-        updates['currentPA/beatPlacements/beat1/guest'] = { cardId: botPlay.cardId };
+        updates['currentPA/beatPlacements/beat1/guest'] = { cardId: botPlay.cardId || null };
         updates['currentPA/placement/guest']           = updatedBotPlacement;
         updates['currentPA/committed/guest']           = true;
-        updates['gameState/hands/guest']               = botPlay.botHand;
+        updates['gameState/hands/guest']               = botPlay.botHand || [];
         shouldResolve = true;
       } else {
         const oppRole = opponentRole();
@@ -1333,11 +1334,11 @@ function commitPlacement() {
 
       if (isBot && myRole === 'host') {
         if (!livePA.committed?.guest) {
-          const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2', localBeatCard);
+          const botPlay = executeBotPlayBeat({ ...liveGS, currentPA: livePA }, 'guest', 'beat2', localBeatCard);
           const botIsPitching = (liveGS.half === 'bottom');
           const botBeatPlacement = botIsPitching
-            ? { pitchType: botPlay.pitchType, cardId: botPlay.cardId }
-            : { guessPitch: botPlay.guessPitch, cardId: botPlay.cardId };
+            ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
+            : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
 
           const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
           if (botPlay.cardId) {
@@ -1347,7 +1348,7 @@ function commitPlacement() {
           updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
           updates['currentPA/placement/guest']           = updatedBotPlacement;
           updates['currentPA/committed/guest']           = true;
-          updates['gameState/hands/guest']               = botPlay.botHand;
+          updates['gameState/hands/guest']               = botPlay.botHand || [];
         }
         shouldResolve = true;
       } else {
@@ -1914,12 +1915,12 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
     winnerTag = isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
     if (isDominant) {
       explanation = isPitcherMe
-        ? `🔥 <b>Dominant Win (+${margin})!</b> Batter's <b>Power Swing is LOCKED OUT</b>, and Batter must commit their execution card <b>FACE-UP FIRST</b>!`
-        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Power Swing is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+        ? `🔥 <b>Dominant Win (+${margin})!</b> 0-2 Count established &mdash; two-strike plate protection in effect, and Batter must commit their execution card <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Loss (+${margin})!</b> 0-2 Count against you &mdash; two-strike plate protection in effect, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
     } else {
       explanation = isPitcherMe
-        ? `Pitcher won the count battle! Batter's <b>Power Swing is LOCKED OUT</b> (cannot hit home runs on clean pitches).`
-        : `Opponent won the count battle! Your <b>Power Swing is LOCKED OUT</b> (forced to choose Contact or Balanced).`;
+        ? `Pitcher won the count battle! 0-2 Count established &mdash; two-strike plate protection in effect (home runs capped at doubles, elevated strikeout danger).`
+        : `Opponent won the count battle! 0-2 Count against you &mdash; two-strike plate protection in effect (home runs capped at doubles).`;
     }
   } else if (winner === 'batter') {
     countTitle = "3-1 HITTER'S COUNT";
@@ -1927,12 +1928,12 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
     winnerTag = !isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
     if (isDominant) {
       explanation = !isPitcherMe
-        ? `🔥 <b>Dominant Win (+${margin})!</b> Pitcher's <b>Offspeed is LOCKED OUT</b>, and Pitcher must commit their execution card <b>FACE-UP FIRST</b>!`
-        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Offspeed is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+        ? `🔥 <b>Dominant Win (+${margin})!</b> Pitcher's <b>Offspeed pitch is LOCKED OUT</b>, and Pitcher must commit their execution card <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Offspeed pitch is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
     } else {
       explanation = !isPitcherMe
-        ? `Batter won the count battle! Pitcher's <b>Offspeed is LOCKED OUT</b> (forced to challenge with Fastball or Breaking).`
-        : `Opponent won the count battle! Your <b>Offspeed is LOCKED OUT</b> (changeups eliminated).`;
+        ? `Batter won the count battle! Pitcher's <b>Offspeed pitch is LOCKED OUT</b> (forced to challenge with Fastball or Breaking).`
+        : `Opponent won the count battle! Your <b>Offspeed pitch is LOCKED OUT</b> (changeups eliminated).`;
     }
   }
 
@@ -1980,9 +1981,21 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
 }
 
 function proceedToBeat2() {
+  const btn = document.querySelector('#beat1-result-modal .rm-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-icon">⏳</span> Proceeding to Payoff Pitch…';
+  }
+
   gameRef().once('value', snap => {
     const g = snap.val();
-    if (!g) return;
+    if (!g) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue to Payoff Pitch &rarr;';
+      }
+      return;
+    }
     const pa = g.currentPA || {};
     const gs = g.gameState || {};
     const isBot = Boolean(g.isSolo || g.guest?.isBot);
@@ -1990,6 +2003,8 @@ function proceedToBeat2() {
     const pitchingRole = half === 'top' ? 'host' : 'guest';
     const battingRole  = half === 'top' ? 'guest' : 'host';
     const b1 = pa.beatResults?.beat1 || {};
+    const margin = b1.margin ?? Math.abs((b1.pitcherTotal ?? 0) - (b1.batterTotal ?? 0));
+    const isDominant = Boolean(b1.isDominant || margin >= 5);
 
     const updates = {
       'currentPA/phase': 'placing',
@@ -2000,15 +2015,15 @@ function proceedToBeat2() {
     };
 
     // If dominant beat, check if Bot is the disadvantaged player who must play first!
-    if (isBot && b1.isDominant) {
-      const disAdvSide = b1.revealCardFirst; // 'pitcher' or 'batter'
+    if (isBot && isDominant) {
+      const disAdvSide = b1.revealCardFirst || (b1.winner === 'pitcher' ? 'batter' : (b1.winner === 'batter' ? 'pitcher' : null));
       const disAdvRole = (disAdvSide === 'pitcher' ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null));
       if (disAdvRole === 'guest') {
-        const botPlay = executeBotPlayBeat(gs, 'guest', 'beat2');
-        const botIsPitching = (half === 'bottom');
+        const botPlay = executeBotPlayBeat({ ...gs, currentPA: pa }, 'guest', 'beat2');
+        const botIsPitching = (disAdvSide === 'pitcher');
         const botBeatPlacement = botIsPitching
-          ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
-          : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, guessPitch: botPlay.guessPitch, cardId: botPlay.cardId };
+          ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
+          : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
 
         const updatedBotPlacement = { ...(pa.placement?.guest || { z1:[], z2:[] }) };
         if (botPlay.cardId) {
@@ -2018,13 +2033,17 @@ function proceedToBeat2() {
         updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
         updates['currentPA/placement/guest']           = updatedBotPlacement;
         updates['currentPA/committed/guest']           = true;
-        updates['currentPA/firstRevealedCard']         = botPlay.cardId;
-        updates['gameState/hands/guest']               = botPlay.botHand;
+        updates['currentPA/firstRevealedCard']         = botPlay.cardId || null;
+        updates['gameState/hands/guest']               = botPlay.botHand || [];
       }
     }
 
     gameRef().update(updates).catch(err => {
       console.error('proceedToBeat2 error:', err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue to Payoff Pitch &rarr;';
+      }
     });
   });
 }

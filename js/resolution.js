@@ -1000,9 +1000,9 @@ function resolveBeat1(opts) {
     advantageSide = 'pitcher';
     if (isDominant) {
       revealCardFirst = 'batter';
-      countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Batter Power Locked + Plays Face-Up First)";
+      countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Two-Strike Protection + Batter Plays Face-Up First)";
     } else {
-      countDisplay = "0-2 Pitcher's Count (Batter Power Swing Locked Out)";
+      countDisplay = "0-2 Pitcher's Count (Two-Strike Protection: Home Runs Capped at Doubles)";
     }
   } else if (batterCardVal > pitcherCardVal) {
     winner = 'batter';
@@ -1478,11 +1478,11 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     batterGuess = 'fastball';
 
   } else if (beat === 'beat2') {
-    const b1 = gameState?.currentPA?.beatResults?.beat1 || {};
+    const b1 = gameState?.currentPA?.beatResults?.beat1 || gameState?.beatResults?.beat1 || gameState?.beat1 || {};
     const b1Winner = b1.winner || 'tie';
     const count = b1.count || ((b1Winner === 'pitcher') ? '0-2' : (b1Winner === 'batter') ? '3-1' : '3-2');
     const lockedOption = b1.lockedOption || (count === '0-2' ? 'power' : count === '3-1' ? 'offspeed' : null);
-    const oppRevealedCardId = firstRevealedCard || gameState?.currentPA?.firstRevealedCard || null;
+    const oppRevealedCardId = firstRevealedCard || gameState?.currentPA?.firstRevealedCard || gameState?.firstRevealedCard || null;
     const oppRevealedCard = oppRevealedCardId ? getCard(oppRevealedCardId) : null;
     const oppRevealedVal = oppRevealedCard ? (oppRevealedCard.value || 0) : null;
 

@@ -156,6 +156,63 @@
       report(b1Modal?.querySelector('.anticipate-banner') !== null, 'Beat 1 Result Modal contains anticipation banner animation');
       report(b1Modal?.querySelector('.rm-suspense-label') !== null, 'Beat 1 Result Modal displays suspense duel header');
 
+      // 3b. Test proceedToBeat2() under Dominant Beat 1 condition
+      let capturedUpdates = null;
+      window.db = {
+        ref: () => ({
+          once: (evt, cb) => {
+            const snap = {
+              val: () => ({
+                ...soloPlayState,
+                currentPA: {
+                  ...soloPlayState.currentPA,
+                  beatResults: {
+                    beat1: {
+                      winner: 'pitcher',
+                      count: '0-2',
+                      isDominant: true,
+                      revealCardFirst: 'batter',
+                      margin: 8,
+                      pitcherTotal: 10,
+                      batterTotal: 2
+                    }
+                  }
+                }
+              })
+            };
+            cb(snap);
+            return Promise.resolve(snap);
+          },
+          update: (updates) => {
+            capturedUpdates = updates;
+            return Promise.resolve();
+          }
+        })
+      };
+
+      proceedToBeat2();
+
+      report(capturedUpdates !== null, 'proceedToBeat2 executed gameRef.update()');
+      report(capturedUpdates?.['currentPA/phase'] === 'placing', 'proceedToBeat2 transitions phase to placing');
+      report(capturedUpdates?.['currentPA/beat'] === 'beat2', 'proceedToBeat2 transitions beat to beat2');
+      report(capturedUpdates?.['currentPA/committed/guest'] === true, 'Disadvantaged bot commits card face-up first');
+      report(Boolean(capturedUpdates?.['currentPA/firstRevealedCard']), `Disadvantaged bot card is revealed (${capturedUpdates?.['currentPA/firstRevealedCard']})`);
+
+      // Ensure no values in capturedUpdates contain undefined
+      let hasUndefined = false;
+      for (const [k, v] of Object.entries(capturedUpdates || {})) {
+        if (v === undefined) hasUndefined = true;
+        if (typeof v === 'object' && v !== null) {
+          for (const [subK, subV] of Object.entries(v)) {
+            if (subV === undefined) hasUndefined = true;
+          }
+        }
+      }
+      report(!hasUndefined, 'proceedToBeat2 updates payload contains zero undefined fields (prevents Firebase freeze)');
+
+      // Restore mock db
+      window.db = undefined;
+
       // 4. Test Beat 2 placing
       soloPlayState.currentPA.phase = 'placing';
       soloPlayState.currentPA.beat = 'beat2';
