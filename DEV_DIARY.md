@@ -672,5 +672,58 @@ A user playtest revealed two distinct issues that disrupted player intuition:
 - **Headless Game Simulation**: 10-game simulation executed 370 PAs across 10 completed games with an average of **10.80 runs/game**, 149 hits, 5 home wins, 5 away wins, and zero errors.
 - **Player Experience**: Perfect spatial predictability—the player is always on the left. Wild pitches now act like real baseball wild pitches, punishing pitcher misfires on 0-2 by advancing runners and resetting to a full-count duel.
 
+---
+
+## Entry 13: Purging the Phantom Walk — Execution Priority on 3-1 Counts
+*Date: October 7, 2026*
+
+### Context & The Problem
+During a live playtest, a user experienced a baffling resolution that felt like an outright engine bug:
+- **Count**: `3-1` (established from Beat 1).
+- **Pitcher**: Threw a `FASTBALL` with `Card 9` (Target range `6–10`). The pitcher hit their target window dead-on (`pitcherExecuted === true`), throwing a spot-on strike.
+- **Batter**: Anticipated `FASTBALL` with `Card 3` (out of range `3 < 6`). The batter swung with bad timing: $|9 - 3| = 6$ ($\Delta = 6$).
+- **The Result Shown**: `🚶 WALK (BALL FOUR - MISTIMED PITCH MISSED ZONE)!` with rule explanation: *"3-1 Hitter's count: Badly mistimed swing protected by ball four Walk."*
+
+### Why It Broke Game Intuition
+1. **The Contradiction**: The game declared the pitch had "missed the zone" even though the pitcher executed a strike in the zone with Card 9.
+2. **Baseball Fundamentals**: In baseball, if a pitcher throws a strike on 3-1 and the batter swings and completely misses ($\Delta = 6$), that is **Strike Two**—it is never Ball Four. A batter cannot be awarded a base on balls for swinging and missing at a strike.
+3. **Perverse Incentive**: On a 3-1 count, a batter who timed the ball relatively well ($\Delta = 2$ to $4$) was punished with a routine groundout or flyout, while a batter who took an awful hack and whiffed by 6 deltas was rewarded with a free base on balls!
+
+### Options Explored
+
+- **Option 1 (Chosen): Decisive Swinging Strikeout (`⚡ SWINGING STRIKEOUT`)**:
+  - If the pitcher executes a strike in the zone and the batter swings and whiffs with $\Delta \ge 5$ (or was fooled on pitch type with $\Delta \ge 5$), the pitcher blew it past them. It resolves to a **Swinging Strikeout**.
+  *Rationale*: In Full Count's 2-Beat design, Beat 2 is the decisive payoff confrontation. Executing spot-on heat against a flailing whiff must reward the pitcher with an out. Walks on 3-1 or 3-2 are strictly reserved for `!pitcherExecuted` (where the pitcher actually misses the zone).
+- **Option 2: Count Reset to 3-2 Full Count (Swinging Strike Two)**:
+  - Treat the swinging strike as Strike Two, announce `⚡ SWINGING STRIKE TWO! (COUNT RUNS FULL: 3-2)`, and reset to a neutral 3-2 payoff pitch without advancing runners.
+  *Why Discarded*: While realistic to pitch-by-pitch baseball, it unnecessarily lengthens at-bats and dilutes the reward of executing high-pressure strikes against mistimed swings.
+- **Option 3: Weak Infield Contact Out (Groundout / Popout)**:
+  - Treat the 3-1 count leverage as avoiding the strikeout, rolling over for a routine groundout.
+  *Why Discarded*: On a $\Delta \ge 5$ whiff, the bat did not even touch the ball; calling it contact feels artificial compared to a clean swinging strikeout.
+
+### Implementation Details
+
+1. **Resolution Ladder Clean-up (`js/resolution.js`)**:
+   - Removed the legacy `if (effectiveCount === '3-1') outcomeType = 'walk';` checks from both:
+     - The **Anticipated Whiff branch** (`pitchMatched && timingDelta >= 5`): Now cleanly resolves to `outcomeType = 'k'` (`⚡ SWINGING STRIKEOUT ON NASTY STUFF!`).
+     - The **Fooled Whiff branch** (`!pitchMatched && timingDelta >= 5`): Now cleanly resolves to `outcomeType = 'k'` (`⚡ UGLY SWINGING STRIKEOUT (COMPLETELY FOOLED)!`).
+   - Walks on 3-1 and 3-2 counts are now **100% strictly gated by `!pitcherExecuted`** (when the pitcher fails their delivery range and misses the strike zone).
+
+2. **Outcome Matrix Guide Update (`js/app.js`)**:
+   - Explicitly updated the collapsible `<details class="rm-matrix-guide">` to state:
+     - `⚡ Anticipated + Δ 5+: Whiffed swing → Swinging Strikeout on executed delivery.`
+
+3. **Automated Verification Suite (`tests/test_resolution.html`)**:
+   - Added unit tests verifying:
+     - Executed Fastball (Card 9) on 3-1 count vs. Anticipated Card 3 ($\Delta = 6$) resolves to Strikeout (`k`), never Walk.
+     - Executed Fastball (Card 9) on 3-1 count vs. Fooled Card 3 ($\Delta = 6$) resolves to Strikeout (`k`), never Walk.
+     - Unexecuted Fastball (Card 1) on 3-1 count against fooled batter properly resolves to Walk (Ball Four).
+
+### Verification Results
+- **Automated Unit Tests**: **157 of 157 tests pass** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 282 PAs across 10 games with an average of **6.60 runs/game**, 110 hits, 5 home wins, 5 away wins, and zero errors.
+- **Player Experience**: Complete alignment with baseball reality and card duel intuition: throw a strike in the zone against a flailing swing, and you get the strikeout you earned. Walks now only occur when you actually throw a ball outside the strike zone!
+
+
 
 

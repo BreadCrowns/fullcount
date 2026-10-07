@@ -1237,15 +1237,9 @@ function resolveBeat2(opts) {
 
     } else {
       // ⚡ BADLY MISTIMED (DELTA 5+)
-      if (effectiveCount === '3-1') {
-        outcomeType = 'walk';
-        outcomeDisplay = '🚶 WALK (BALL FOUR - MISTIMED PITCH MISSED ZONE)!';
-        ruleReason = `3-1 Hitter's count: Badly mistimed swing protected by ball four Walk.`;
-      } else {
-        outcomeType = 'k';
-        outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
-        ruleReason = `Pitch anticipated, but massive timing mismatch (Delta ${timingDelta}) resulted in a swinging Strikeout on spot-on stuff!`;
-      }
+      outcomeType = 'k';
+      outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
+      ruleReason = `Pitch anticipated, but massive timing mismatch (Delta ${timingDelta}) resulted in a swinging Strikeout on spot-on stuff!`;
     }
 
   } else {
@@ -1276,15 +1270,9 @@ function resolveBeat2(opts) {
         ruleReason = `Batter completely fooled on pitch type against spot-on delivery (Delta ${timingDelta}). Swinging Strikeout.`;
       }
     } else {
-      if (effectiveCount === '3-1') {
-        outcomeType = 'walk';
-        outcomeDisplay = '🚶 WALK (BALL FOUR - WILD PITCH OUT OF ZONE)!';
-        ruleReason = `3-1 Hitter's count: Pitcher missed out of zone for ball four Walk.`;
-      } else {
-        outcomeType = 'k';
-        outcomeDisplay = '⚡ UGLY SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
-        ruleReason = `Batter completely fooled on pitch type with massive timing delta (${timingDelta}). Dominant swinging Strikeout!`;
-      }
+      outcomeType = 'k';
+      outcomeDisplay = '⚡ UGLY SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
+      ruleReason = `Batter completely fooled on pitch type with massive timing delta (${timingDelta}). Dominant swinging Strikeout!`;
     }
   }
 

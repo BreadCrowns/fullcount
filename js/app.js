@@ -2510,6 +2510,7 @@ function renderOutcomeOverlay(res, isBatting = false) {
             <div class="rmg-item">🎯 <b>Anticipated + &Delta; 0:</b> Squared-up barrel &rarr; Moonshot HR (capped at Double on 0-2 count).</div>
             <div class="rmg-item">🏏 <b>Anticipated + &Delta; 1–2:</b> Solid timing &rarr; Line drive Single or Wall Double.</div>
             <div class="rmg-item">🧤 <b>Anticipated + &Delta; 3–4:</b> Off-balance swing &rarr; Groundout/Flyout (Single on 3-1 count).</div>
+            <div class="rmg-item">⚡ <b>Anticipated + &Delta; 5+:</b> Whiffed swing &rarr; Swinging Strikeout on executed delivery.</div>
             <div class="rmg-item">⚡ <b>Fooled on Pitch:</b> Pitcher advantage &rarr; Popout (&Delta; 0–2), Strikeout (&Delta; 3+), Punchout on 0-2.</div>
             <div class="rmg-item">⚠️ <b>Mistake Pitch (Out-of-Range):</b> Hung pitch with anticipated in-range timing is crushed for extra bases (HR/2B), never an out!</div>
           </div>
