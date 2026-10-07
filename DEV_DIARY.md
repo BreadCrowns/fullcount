@@ -602,4 +602,75 @@ After completing our first full end-to-end 3-inning game playtest, several criti
 - **Headless Game Simulation**: 10-game simulation executed 317 PAs across 10 completed games with an average of **9.60 runs/game**, 115 hits, 7 home wins, 3 away wins, and zero errors.
 - **Player Experience**: Clean spatial separation between player and opponent, immediate visual clarity on count bonuses during Beat 2, transparent post-clash explanations, and fair punishment of mistake pitches.
 
+---
+
+## Entry 12: The Wild Pitch in the Dirt & Absolute Left-Side Player Orientation
+*Date: October 7, 2026*
+
+### Context & The Problem
+A user playtest revealed two distinct issues that disrupted player intuition:
+
+1. **The 0-2 Botched Delivery Anomaly**:
+   A user pitched a Fastball with Card `3` (Fastball range is `6–10`, meaning Card 3 was an out-of-range failed delivery / wild pitch). The batter anticipated Offspeed with Card `3` (an exact $\Delta = 0$ timing match). The game resolved this into `⚡ AWKWARD STRIKEOUT (CHASED WILD PITCH IN DIRT)!`.
+   While the engine was attempting to emulate a two-strike chase in the dirt, awarding the pitcher a strikeout on an unexecuted fastball creates a perverse incentive: pitchers could dump useless low cards with zero risk. Furthermore, with $\Delta = 0$, the batter's bat crossed the plate right on time with the ball.
+2. **Left/Right Placement Inconsistency**:
+   During Beat 1 placement, the player’s card slot was placed on the right (`b1-card-slot mine`) and the opponent on the left. However, in the Beat 1 Result modal and outcome clash boards, Pitcher was hardcoded on the left and Batter on the right. If the user was pitching, they placed on the right but saw their results on the left; if batting, vice versa. The mandate was clear: **The player’s cards and actions must ALWAYS be on the left side everywhere in the game.**
+
+---
+
+### Options Explored for the 0-2 Botched Pitch
+
+- **Option 1: Weak Groundout / Infield Dribbler**: Batter makes awkward contact on the mistake pitch for a routine out.
+  - *Cons*: Still lets the pitcher off the hook with a free out despite a botched pitch.
+- **Option 2: Batter Timing Override**: Batter slaps the $\Delta = 0$ mistake pitch for an infield single.
+  - *Cons*: Ignores that the batter guessed the wrong pitch type.
+- **Option 3 (Chosen): Wild Pitch / Ball in the Dirt**:
+  - In baseball, an unexecuted pitch out of the zone is a **Ball**. On an 0-2 count, a wild pitch in the dirt misses the zone (Ball One) and allows base runners to advance 1 base (runner on 3rd scores).
+  - The count resets to a **3-2 Full Count payoff pitch**, preserving the at-bat and forcing the pitcher to execute properly in a neutral duel!
+  - If the pitcher misses execution again on 3-2, it becomes Ball Four &rarr; **Walk**.
+
+---
+
+### Implementation Details
+
+1. **Engine Logic (`js/resolution.js`)**:
+   - In `resolveBeat2`: when `!pitcherExecuted && !pitchMatched && effectiveCount === '0-2'`:
+     ```javascript
+     outcomeType = 'wild_pitch';
+     isWildPitchReset = true;
+     runsScored = bases.third ? 1 : 0;
+     newBases = {
+       first: false,
+       second: Boolean(bases.first),
+       third: Boolean(bases.second)
+     };
+     outsAdded = 0;
+     outcomeDisplay = '⚡ WILD PITCH IN THE DIRT (BALL / RUNNERS ADVANCE)!';
+     ruleReason = `0-2 Count: Pitcher threw an out-of-range delivery into the dirt (Ball). Any runners advance on the wild pitch, and count resets to a neutral 3-2 Full Count!`;
+     ```
+   - On 3-2 count, an unexecuted delivery resolves to a **Walk** (Ball Four).
+
+2. **Game State & Modal Flow (`js/app.js`)**:
+   - In `resolveBeatStep`: when `beat2Result.isWildPitchReset`, updates `currentPA/phase` to `'wild_pitch_result'`, advances runners in `gameState/bases`, and adds runs if scored.
+   - Added `renderWildPitchModal(res, isBatting)` showing:
+     - Player action on the left vs Opponent on the right.
+     - Explanation of the ball in dirt and runner advancements.
+     - "Continue to 3-2 Payoff Pitch &rarr;" button invoking `proceedFromWildPitch()`.
+   - `proceedFromWildPitch()` resets `currentPA` to `beat2` with count `3-2` and cleared placements, allowing both players to contest the full-count payoff pitch.
+
+3. **Absolute Left-Side Player Orientation (`js/app.js`)**:
+   - **Beat 1 Placement Arena**: Player slot (`.b1-card-slot.mine`) is on the LEFT; opponent slot (`.b1-card-slot.opp`) is on the RIGHT.
+   - **Beat 1 Result Modal**: Player box (`.rm-player-box.mine`) is on the LEFT; opponent box is on the RIGHT.
+   - **Battlefield Clash Cards**: Player action (`.clash-side.batter`/`.pitcher`) is on the LEFT; opponent is on the RIGHT.
+   - **At-Bat Outcome Pop-up**: Player recap row and execution delta score are ALWAYS first/left; opponent is second/right.
+   - **Wild Pitch Modal**: Player is on the left; opponent on the right.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **150 of 150 tests pass** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 370 PAs across 10 completed games with an average of **10.80 runs/game**, 149 hits, 5 home wins, 5 away wins, and zero errors.
+- **Player Experience**: Perfect spatial predictability—the player is always on the left. Wild pitches now act like real baseball wild pitches, punishing pitcher misfires on 0-2 by advancing runners and resetting to a full-count duel.
+
+
 

@@ -138,6 +138,10 @@
       const hasLegacyDesc = document.querySelector('.hc-desc') !== null;
       report(!hasLegacyDesc, 'Hand cards contain no legacy text descriptions or modifiers');
 
+      // Verify Player card is on the left in Beat 1 placing arena
+      const slots = document.querySelectorAll('.b1-cards-row .b1-card-slot');
+      report(slots.length === 2 && slots[0].classList.contains('mine') && slots[1].classList.contains('opp'), 'Beat 1 placing places user card on left side and opponent on right');
+
       // 3. Test Beat 1 Result Modal phase
       soloPlayState.currentPA.phase = 'beat1_result';
       soloPlayState.currentPA.beatResults.beat1 = {
@@ -155,6 +159,10 @@
       report(b1Modal?.textContent.includes('0-2'), 'Beat 1 Result Modal shows established count (0-2)');
       report(b1Modal?.querySelector('.anticipate-banner') !== null, 'Beat 1 Result Modal contains anticipation banner animation');
       report(b1Modal?.querySelector('.rm-suspense-label') !== null, 'Beat 1 Result Modal displays suspense duel header');
+
+      // Verify Player card is on the left in Beat 1 Result Modal
+      const rmBoxes = document.querySelectorAll('.rm-cards-compare .rm-player-box');
+      report(rmBoxes.length === 2 && rmBoxes[0].classList.contains('mine') && rmBoxes[1].classList.contains('opp'), 'Beat 1 result modal places user card on left side and opponent on right');
 
       // 3b. Test proceedToBeat2() under Dominant Beat 1 condition
       let capturedUpdates = null;
@@ -261,6 +269,25 @@
       report(outcomeModal?.querySelector('.rm-resolution-breakdown') !== null, 'Outcome overlay includes 3-step resolution breakdown');
       report(outcomeModal?.querySelector('.rm-rule-explanation') !== null, 'Outcome overlay includes plain-English rule explanation');
       report(outcomeModal?.querySelector('.rm-matrix-guide') !== null, 'Outcome overlay includes collapsible matrix guide');
+
+      // 6. Test Wild Pitch Result Modal
+      soloPlayState.currentPA.phase = 'wild_pitch_result';
+      soloPlayState.currentPA.resolution = {
+        outcome: { display: '⚡ WILD PITCH IN THE DIRT!', runsScored: 0, outsAdded: 0, isWildPitchReset: true, ruleReason: 'Wild pitch in dirt' },
+        z1: { count: '0-2' },
+        z2: {
+          pitchType: 'fastball',
+          guessPitch: 'offspeed',
+          pitcherCardVal: 3,
+          batterCardVal: 3,
+          timingDelta: 0
+        }
+      };
+      handleGameState(soloPlayState);
+      const wpModal = document.getElementById('wild-pitch-modal');
+      report(wpModal !== null, 'Wild Pitch result modal renders when phase is wild_pitch_result');
+      report(wpModal?.textContent.includes('WILD PITCH IN THE DIRT'), 'Wild Pitch modal shows correct title');
+      report(wpModal?.querySelector('.btn-wild-pitch-continue') !== null, 'Wild Pitch modal provides continue button');
 
     } catch(e) {
       const p = document.createElement('p');

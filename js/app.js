@@ -551,10 +551,11 @@ function renderPlay(g) {
   localHand = gs.hands?.[myRole] || [];
 
   switch(pa.phase) {
-    case 'placing':      renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
-    case 'beat1_result': renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
-    case 'reveal':       renderReveal(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
-    case 'resolved':     renderResolved(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'placing':           renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'beat1_result':      renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'wild_pitch_result': renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'reveal':            renderReveal(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'resolved':          renderResolved(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
   }
 }
 
@@ -739,6 +740,9 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
 
       <!-- BEAT 1 RESULT MODAL POP-UP (WHEN IN BEAT 1 RESULT PHASE) -->
       ${pa.phase === 'beat1_result' ? renderBeat1ResultModal(pa.beatResults?.beat1, pitchingRole === myRole) : ''}
+
+      <!-- WILD PITCH MODAL POP-UP (WHEN IN WILD PITCH RESULT PHASE) -->
+      ${pa.phase === 'wild_pitch_result' ? renderWildPitchModal(pa.resolution, battingRole === myRole) : ''}
     </div>`;
 
   updateCardCount();
@@ -838,7 +842,7 @@ function renderReveal(g, gs, pa, pitcherChar, batterChar, pitchingRole, battingR
       </footer>
 
       <!-- OUTCOME MODAL OVERLAY -->
-      ${res ? renderOutcomeOverlay(res, battingRole === myRole) : ''}
+      ${(pa.phase === 'wild_pitch_result' || res?.outcome?.isWildPitchReset) ? renderWildPitchModal(res, battingRole === myRole) : (res ? renderOutcomeOverlay(res, battingRole === myRole) : '')}
 
       <!-- MATCHUP INTEL DRAWER -->
       ${renderMatchupDrawer(pitcherChar, staminaState, gs.pitcherPAs[pitchingRole], pitchingRole === myRole, g.rosters[pitchingRole].reliefPitcher, gs.activePitcher[pitchingRole], batterChar, battingRole === myRole, score, gs, half)}
@@ -1098,14 +1102,59 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     const pPayoffCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : null;
     const bPayoffCard = z2?.batterCardId ? getCard(z2.batterCardId) : null;
 
+    const myZ1Val = iAmBatting ? (bCardObj?.value ?? z1?.batterTotal ?? 0) : (pCardObj?.value ?? z1?.pitcherTotal ?? 0);
+    const oppZ1Val = iAmBatting ? (pCardObj?.value ?? z1?.pitcherTotal ?? 0) : (bCardObj?.value ?? z1?.batterTotal ?? 0);
+    const myZ1Label = iAmBatting ? 'You (B)' : 'You (P)';
+    const oppZ1Label = iAmBatting ? 'Opp (P)' : 'Opp (B)';
+
+    const mySideHtml = iAmBatting ? `
+      <div class="clash-side batter">
+        <div class="cs-label">🏏 You (Batter)</div>
+        <div class="cs-action">LOOKING ${(z2?.guessPitch || 'fastball').toUpperCase()}</div>
+        <div class="cs-exec ${z2?.batterExecuted ? 'pass' : 'fail'}">
+          ${z2?.batterExecuted ? '🟢 IN RANGE' : '🔴 OUT OF RANGE'}
+        </div>
+        <div class="cs-card">Card: [${bPayoffCard?.value ?? z2?.batterCardVal ?? '—'}]</div>
+      </div>
+    ` : `
+      <div class="clash-side pitcher">
+        <div class="cs-label">⚾ You (Pitcher)</div>
+        <div class="cs-action">${(z2?.pitchType || 'fastball').toUpperCase()}</div>
+        <div class="cs-exec ${z2?.pitcherExecuted ? 'pass' : 'fail'}">
+          ${z2?.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
+        </div>
+        <div class="cs-card">Card: [${pPayoffCard?.value ?? z2?.pitcherCardVal ?? '—'}]</div>
+      </div>
+    `;
+
+    const oppSideHtml = iAmBatting ? `
+      <div class="clash-side pitcher">
+        <div class="cs-label">⚾ Opponent (Pitcher)</div>
+        <div class="cs-action">${(z2?.pitchType || 'fastball').toUpperCase()}</div>
+        <div class="cs-exec ${z2?.pitcherExecuted ? 'pass' : 'fail'}">
+          ${z2?.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
+        </div>
+        <div class="cs-card">Card: [${pPayoffCard?.value ?? z2?.pitcherCardVal ?? '—'}]</div>
+      </div>
+    ` : `
+      <div class="clash-side batter">
+        <div class="cs-label">🏏 Opponent (Batter)</div>
+        <div class="cs-action">LOOKING ${(z2?.guessPitch || 'fastball').toUpperCase()}</div>
+        <div class="cs-exec ${z2?.batterExecuted ? 'pass' : 'fail'}">
+          ${z2?.batterExecuted ? '🟢 IN RANGE' : '🔴 OUT OF RANGE'}
+        </div>
+        <div class="cs-card">Card: [${bPayoffCard?.value ?? z2?.batterCardVal ?? '—'}]</div>
+      </div>
+    `;
+
     mainContentHtml = `
       <div class="battlefield-clash-board">
         <div class="clash-beat-header">
           <span class="cbh-tag">BEAT 1: ${b1WinnerLabel}</span>
           <div class="cbh-cards">
-            <span>P: <b>[${pCardObj?.value ?? z1?.pitcherTotal ?? 0}]</b></span>
+            <span>${myZ1Label}: <b>[${myZ1Val}]</b></span>
             <span>vs</span>
-            <span>B: <b>[${bCardObj?.value ?? z1?.batterTotal ?? 0}]</b></span>
+            <span>${oppZ1Label}: <b>[${oppZ1Val}]</b></span>
           </div>
         </div>
 
@@ -1117,25 +1166,9 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             </div>
 
             <div class="clash-teams-row">
-              <div class="clash-side pitcher">
-                <div class="cs-label">⚾ Pitcher</div>
-                <div class="cs-action">${(z2.pitchType || 'fastball').toUpperCase()}</div>
-                <div class="cs-exec ${z2.pitcherExecuted ? 'pass' : 'fail'}">
-                  ${z2.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
-                </div>
-                <div class="cs-card">Card: [${pPayoffCard?.value ?? z2.pitcherCardVal ?? '—'}]</div>
-              </div>
-
+              ${mySideHtml}
               <div class="clash-vs-divider">VS</div>
-
-              <div class="clash-side batter">
-                <div class="cs-label">🏏 Batter</div>
-                <div class="cs-action">LOOKING ${(z2.guessPitch || 'fastball').toUpperCase()}</div>
-                <div class="cs-exec ${z2.batterExecuted ? 'pass' : 'fail'}">
-                  ${z2.batterExecuted ? '🟢 IN RANGE' : '🔴 OUT OF RANGE'}
-                </div>
-                <div class="cs-card">Card: [${bPayoffCard?.value ?? z2.batterCardVal ?? '—'}]</div>
-              </div>
+              ${oppSideHtml}
             </div>
 
             <div class="clash-outcome-badge">
@@ -1173,16 +1206,16 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
         </div>
 
         <div class="b1-cards-row">
-          <div class="b1-card-slot opp">
-            <span class="slot-role-tag">${iAmBatting ? '⚾ Pitcher Card' : '🏏 Batter Card'}</span>
-            ${oppSlotHtml}
+          <div class="b1-card-slot mine">
+            <span class="slot-role-tag">${iAmBatting ? '🏏 Your Card' : '⚾ Your Card'}</span>
+            ${myPlacedCardHtml}
           </div>
 
           <div class="b1-vs-badge">VS</div>
 
-          <div class="b1-card-slot mine">
-            <span class="slot-role-tag">${iAmBatting ? '🏏 Your Card' : '⚾ Your Card'}</span>
-            ${myPlacedCardHtml}
+          <div class="b1-card-slot opp">
+            <span class="slot-role-tag">${iAmBatting ? '⚾ Opponent Card' : '🏏 Opponent Card'}</span>
+            ${oppSlotHtml}
           </div>
         </div>
       </div>`;
@@ -1620,6 +1653,33 @@ function resolveBeatStep(beat) {
             'currentPA/beatPlacements/beat2': { host:{}, guest:{} },
             [`currentPA/placement/${pitchingRole}/z2`]: [],
             [`currentPA/placement/${battingRole}/z2`]:  [],
+            'gameState/arsenalCharges': charges,
+          };
+          gameRef().update(updates);
+          return;
+        }
+
+        // Option 3: Wild Pitch in dirt on 0-2 resets count to 3-2 and advances runners!
+        if (beat2Result.isWildPitchReset) {
+          const res = resolveSequentialPA({
+            beat1: beat1Result,
+            beat2: beat2Result,
+            bases,
+            pitcherChar,
+            batterChar,
+            score,
+            outs,
+            half
+          });
+
+          const newScore = { ...(gs.score || { top:0, bottom:0 }) };
+          newScore[half] = (newScore[half] || 0) + (beat2Result.runsScored || 0);
+
+          const updates = {
+            'currentPA/phase': 'wild_pitch_result',
+            'currentPA/resolution': res,
+            'gameState/bases': beat2Result.newBases,
+            'gameState/score': newScore,
             'gameState/arsenalCharges': charges,
           };
           gameRef().update(updates);
@@ -2067,6 +2127,11 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
     }
   }
 
+  const myCardVal = isPitcherMe ? pVal : bVal;
+  const oppCardVal = isPitcherMe ? bVal : pVal;
+  const myRoleTag = isPitcherMe ? '⚾ You (Pitcher)' : '🏏 You (Batter)';
+  const oppRoleTag = isPitcherMe ? '🏏 Opponent (Batter)' : '⚾ Opponent (Pitcher)';
+
   return `
     <div class="result-modal-overlay" id="beat1-result-modal">
       <div class="result-modal-card">
@@ -2077,17 +2142,17 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
         </div>
 
         <div class="rm-cards-compare">
-          <div class="rm-player-box anticipate-flip-p">
-            <span class="rm-role">⚾ Pitcher</span>
+          <div class="rm-player-box mine anticipate-flip-p">
+            <span class="rm-role">${myRoleTag}</span>
             <div class="number-card sm selected">
-              <span class="card-hero-num">${pVal}</span>
+              <span class="card-hero-num">${myCardVal}</span>
             </div>
           </div>
           <div class="rm-vs anticipate-vs">VS</div>
-          <div class="rm-player-box anticipate-flip-b">
-            <span class="rm-role">🏏 Batter</span>
+          <div class="rm-player-box opp anticipate-flip-b">
+            <span class="rm-role">${oppRoleTag}</span>
             <div class="number-card sm selected">
-              <span class="card-hero-num">${bVal}</span>
+              <span class="card-hero-num">${oppCardVal}</span>
             </div>
           </div>
         </div>
@@ -2179,6 +2244,142 @@ function proceedToBeat2() {
 }
 window.proceedToBeat2 = proceedToBeat2;
 
+function renderWildPitchModal(res, isBatting = false) {
+  if (!res?.outcome) return '';
+  const o = res.outcome;
+  const z1 = res.z1;
+  const z2 = res.z2;
+
+  const runsScored = o.runsScored || 0;
+
+  const pCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : null;
+  const pVal = pCard?.value ?? z2?.pitcherCardVal ?? '—';
+  const pPitch = z2?.pitchType ? z2.pitchType.toUpperCase() : 'FASTBALL';
+
+  const bCard = z2?.batterCardId ? getCard(z2.batterCardId) : null;
+  const bVal = bCard?.value ?? z2?.batterCardVal ?? '—';
+  const bGuess = z2?.guessPitch ? z2.guessPitch.toUpperCase() : 'OFFSPEED';
+
+  const myVal = isBatting ? bVal : pVal;
+  const oppVal = isBatting ? pVal : bVal;
+  const myRoleTag = isBatting ? '🏏 You (Batter)' : '⚾ You (Pitcher)';
+  const oppRoleTag = isBatting ? '⚾ Opponent (Pitcher)' : '🏏 Opponent (Batter)';
+
+  const myActionText = isBatting ? `Looking <b>${bGuess}</b> [Card ${bVal}]` : `<b>${pPitch}</b> [Card ${pVal}] (🔴 Wild Pitch in Dirt)`;
+  const oppActionText = isBatting ? `<b>${pPitch}</b> [Card ${pVal}] (🔴 Wild Pitch in Dirt)` : `Looking <b>${bGuess}</b> [Card ${bVal}]`;
+
+  return `
+    <div class="result-modal-overlay" id="wild-pitch-modal">
+      <div class="result-modal-card outcome">
+        <div class="rm-header">
+          <span class="rm-tag">PAYOFF PITCH &bull; BALL IN DIRT</span>
+          <span class="rm-suspense-label">⚡ WILD PITCH</span>
+          <span class="rm-count-tag">Count: 0-2 &rarr; 3-2</span>
+        </div>
+
+        <div class="rm-clash-recap">
+          <div class="recap-row">
+            <span class="recap-label">${myRoleTag}:</span>
+            <span class="recap-val">${myActionText}</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">${oppRoleTag}:</span>
+            <span class="recap-val">${oppActionText}</span>
+          </div>
+        </div>
+
+        <div class="rm-rule-explanation">
+          <span class="rre-icon">💡</span>
+          <div class="rre-text">${o.ruleReason || z2?.ruleReason || '0-2 Count: Pitcher threw an out-of-range delivery in the dirt (Ball). Runners advance on the wild pitch, resetting count to 3-2 Full Count!'}</div>
+        </div>
+
+        <div class="rm-outcome-banner hero count-hitter">
+          <div class="rm-outcome-title">⚡ WILD PITCH IN THE DIRT!</div>
+        </div>
+
+        <div class="rm-impact-row anticipate-impact">
+          ${runsScored > 0
+            ? `<span class="impact-runs">⚾ ${runsScored} RUN SCORED ON WILD PITCH!</span>`
+            : '<span class="impact-noruns">Runners advance 1 base &bull; No outs recorded</span>'}
+        </div>
+
+        <button class="btn-primary rm-btn btn-wild-pitch-continue" onclick="proceedFromWildPitch()">
+          Continue to 3-2 Payoff Pitch &rarr;
+        </button>
+      </div>
+    </div>`;
+}
+
+function proceedFromWildPitch() {
+  const btn = document.querySelector('#wild-pitch-modal .rm-btn') || document.querySelector('.btn-wild-pitch-continue');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-icon">⏳</span> Resetting Count to 3-2…';
+  }
+
+  gameRef().once('value', snap => {
+    const g = snap.val();
+    if (!g) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue to 3-2 Payoff Pitch &rarr;';
+      }
+      return;
+    }
+    const pa = g.currentPA || {};
+    const gs = g.gameState || {};
+    const half = gs.half || 'top';
+    const pitchingRole = half === 'top' ? 'host' : 'guest';
+    const battingRole  = half === 'top' ? 'guest' : 'host';
+
+    const b1 = pa.beatResults?.beat1 || {};
+    const resetB1 = {
+      ...b1,
+      count: '3-2',
+      winner: 'tie',
+      isDominant: false,
+      revealCardFirst: null,
+      lockedOption: null,
+      margin: 0
+    };
+
+    const updates = {
+      'currentPA/phase': 'placing',
+      'currentPA/beat': 'beat2',
+      'currentPA/resolution': null,
+      'currentPA/committed/host': false,
+      'currentPA/committed/guest': false,
+      'currentPA/firstRevealedCard': null,
+      'currentPA/beatResults/beat1': resetB1,
+      'currentPA/beatPlacements/beat2': { host: {}, guest: {} },
+      [`currentPA/placement/${pitchingRole}/z2`]: [],
+      [`currentPA/placement/${battingRole}/z2`]: [],
+    };
+
+    // Discard the played beat2 cards so hands remain in sync
+    ['host', 'guest'].forEach(r => {
+      const playedCardId = pa.beatPlacements?.beat2?.[r]?.cardId;
+      if (playedCardId && gs.hands?.[r]) {
+        const hand = [...gs.hands[r]];
+        const idx = hand.indexOf(playedCardId);
+        if (idx > -1) {
+          hand.splice(idx, 1);
+          updates[`gameState/hands/${r}`] = hand;
+        }
+      }
+    });
+
+    gameRef().update(updates).catch(err => {
+      console.error('proceedFromWildPitch error:', err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue to 3-2 Payoff Pitch &rarr;';
+      }
+    });
+  });
+}
+window.proceedFromWildPitch = proceedFromWildPitch;
+
 function renderOutcomeOverlay(res, isBatting = false) {
   if (!res?.outcome) return '';
   const o = res.outcome;
@@ -2223,9 +2424,23 @@ function renderOutcomeOverlay(res, isBatting = false) {
     ? `<span class="rb-step-val success">🎯 ANTICIPATED (${pPitch})</span>`
     : `<span class="rb-step-val fail">❌ FOOLED (${pPitch} vs Looking ${bGuess})</span>`;
 
-  const pExecText = z2 ? (z2.pitcherExecuted ? `P: [${pVal}] 🟢 Spot-on` : `P: [${pVal}] 🔴 Hanger`) : `P: [${pVal}]`;
-  const bExecText = z2 ? (z2.batterExecuted ? `B: [${bVal}] 🟢 In Range` : `B: [${bVal}] 🔴 Out of Range`) : `B: [${bVal}]`;
-  const step2ExecHtml = `<span class="rb-step-val">${pExecText} vs ${bExecText} &bull; Δ ${timingDelta}</span>`;
+  const myVal = isBatting ? bVal : pVal;
+  const oppVal = isBatting ? pVal : bVal;
+  const myRoleTag = isBatting ? '🏏 You (Batter)' : '⚾ You (Pitcher)';
+  const oppRoleTag = isBatting ? '⚾ Opponent (Pitcher)' : '🏏 Opponent (Batter)';
+
+  const myActionText = isBatting ? `Looking <b>${bGuess}</b> [Card ${bVal}]` : `<b>${pPitch}</b> [Card ${pVal}]`;
+  const oppActionText = isBatting ? `<b>${pPitch}</b> [Card ${pVal}]` : `Looking <b>${bGuess}</b> [Card ${bVal}]`;
+
+  const myExecText = isBatting
+    ? (z2 ? (z2.batterExecuted ? `You: [${bVal}] 🟢 In Range` : `You: [${bVal}] 🔴 Out of Range`) : `You: [${bVal}]`)
+    : (z2 ? (z2.pitcherExecuted ? `You: [${pVal}] 🟢 Spot-on` : `You: [${pVal}] 🔴 Hanger`) : `You: [${pVal}]`);
+
+  const oppExecText = isBatting
+    ? (z2 ? (z2.pitcherExecuted ? `Opp: [${pVal}] 🟢 Spot-on` : `Opp: [${pVal}] 🔴 Hanger`) : `Opp: [${pVal}]`)
+    : (z2 ? (z2.batterExecuted ? `Opp: [${bVal}] 🟢 In Range` : `Opp: [${bVal}] 🔴 Out of Range`) : `Opp: [${bVal}]`);
+
+  const step2ExecHtml = `<span class="rb-step-val">${myExecText} vs ${oppExecText} &bull; Δ ${timingDelta}</span>`;
 
   const ruleReason = z2?.ruleReason || o.ruleReason || (pitchMatched ? `Anticipated pitch with Delta ${timingDelta} contact.` : `Fooled on pitch type with Delta ${timingDelta} swing.`);
 
@@ -2240,12 +2455,12 @@ function renderOutcomeOverlay(res, isBatting = false) {
 
         <div class="rm-clash-recap">
           <div class="recap-row anticipate-p-action">
-            <span class="recap-label">⚾ Pitch:</span>
-            <span class="recap-val"><b>${pPitch}</b> [Card ${pVal}]</span>
+            <span class="recap-label">${myRoleTag}:</span>
+            <span class="recap-val">${myActionText}</span>
           </div>
           <div class="recap-row anticipate-b-action">
-            <span class="recap-label">🏏 Batter:</span>
-            <span class="recap-val">Looking <b>${bGuess}</b> [Card ${bVal}]</span>
+            <span class="recap-label">${oppRoleTag}:</span>
+            <span class="recap-val">${oppActionText}</span>
           </div>
           ${z2 ? `
             <div class="recap-row anticipate-timing">

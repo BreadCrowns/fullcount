@@ -1116,6 +1116,7 @@ function resolveBeat2(opts) {
   let outcomeType = 'out';
   let outcomeDisplay = 'Out';
   let ruleReason = '';
+  let isWildPitchReset = false;
   const perkLogs = [];
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -1144,14 +1145,16 @@ function resolveBeat2(opts) {
       }
     } else {
       // Pitcher missed execution, but batter guessed the wrong pitch
-      if (effectiveCount === '3-1') {
+      if (effectiveCount === '0-2') {
+        // Option 3: Wild Pitch / Ball in the dirt!
+        outcomeType = 'wild_pitch';
+        isWildPitchReset = true;
+        outcomeDisplay = '⚡ WILD PITCH IN THE DIRT (BALL / RUNNERS ADVANCE)!';
+        ruleReason = `0-2 Count: Pitcher threw an out-of-range delivery into the dirt (Ball). Any runners advance on the wild pitch, and count resets to a neutral 3-2 Full Count!`;
+      } else if (effectiveCount === '3-1' || effectiveCount === '3-2') {
         outcomeType = 'walk';
         outcomeDisplay = '🚶 WALK (BALL FOUR - UNEXECUTED PITCH MISSED ZONE)!';
-        ruleReason = `3-1 Hitter's count: Pitcher's out-of-range delivery missed the strike zone for ball four Walk.`;
-      } else if (effectiveCount === '0-2') {
-        outcomeType = 'k';
-        outcomeDisplay = '⚡ AWKWARD STRIKEOUT (CHASED WILD PITCH IN DIRT)!';
-        ruleReason = `0-2 Count: Batter was fooled on pitch type and chased an unexecuted pitch in the dirt for strike three.`;
+        ruleReason = `${effectiveCount} Count: Pitcher's out-of-range delivery missed the strike zone for ball four Walk.`;
       } else {
         outcomeType = pitchType === 'fastball' ? 'flyout' : 'groundout';
         outcomeDisplay = '🧤 WEAK CONTACT OUT (FOOLED ON MISTAKE PITCH)';
@@ -1287,6 +1290,7 @@ function resolveBeat2(opts) {
 
   let isDoublePlay = false;
   let isFoulBall = false;
+  if (outcomeType === 'wild_pitch') isWildPitchReset = true;
   let bonusRun = 0;
 
   // Calculate Base Running & Outs
@@ -1297,6 +1301,16 @@ function resolveBeat2(opts) {
   if (isFoulBall) {
     outsAdded = 0;
     runsScored = 0;
+  } else if (outcomeType === 'wild_pitch') {
+    // Wild pitch in dirt: runner on 3rd scores, others advance 1 base!
+    runsScored = bases.third ? 1 : 0;
+    newBases = {
+      first: false,
+      second: Boolean(bases.first),
+      third: Boolean(bases.second)
+    };
+    outsAdded = 0;
+    isWildPitchReset = true;
   } else if (outcomeType === 'homerun') {
     runsScored = countRunners(bases) + 1 + bonusRun;
     newBases = { first: false, second: false, third: false };
@@ -1327,7 +1341,7 @@ function resolveBeat2(opts) {
   }
 
   const isHit = ['single','double','triple','homerun'].includes(outcomeType);
-  const winner = (runsScored > 0 || isHit || outcomeType === 'walk') ? 'batter' : (isFoulBall ? 'tie' : 'pitcher');
+  const winner = (runsScored > 0 || isHit || outcomeType === 'walk' || outcomeType === 'wild_pitch') ? 'batter' : (isFoulBall ? 'tie' : 'pitcher');
 
   const outcome = {
     type: outcomeType,
@@ -1336,6 +1350,7 @@ function resolveBeat2(opts) {
     outsAdded,
     newBases,
     isFoulBall,
+    isWildPitchReset,
     bonusRun,
     specialEffectTriggered: perkLogs.length > 0 ? perkLogs.join(' · ') : null,
     needle: timingDelta,
@@ -1355,6 +1370,7 @@ function resolveBeat2(opts) {
     outcomeType,
     outcomeDisplay,
     ruleReason,
+    isWildPitchReset,
     runsScored,
     outsAdded,
     newBases,

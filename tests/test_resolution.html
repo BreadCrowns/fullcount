@@ -336,6 +336,26 @@
         assert(Boolean(b2MistakeFastball.ruleReason), `Rule reason is populated on mistake pitch resolution`);
         assert(b2MistakeFastball.ruleReason.includes('failed execution') || b2MistakeFastball.ruleReason.includes('mistake'), `Rule reason describes failed execution/mistake pitch`);
 
+        // Option 3 Wild Pitch Test: Pitcher plays Card 3 on Fastball on 0-2 count, Batter guesses Offspeed with Card 3
+        const b2WildPitch02 = resolveBeat2({
+          count: '0-2',
+          pitchType: 'fastball',
+          pitcherCardId: 'P7', // Val 3 (out of range 6-10 for Fastball)
+          guessPitch: 'offspeed', // Fooled on pitch
+          batterCardId: 'B4', // Val 3 (Delta 0)
+          bases: { first: true, second: false, third: true },
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(!b2WildPitch02.pitcherExecuted, `Pitcher failed execution window throwing Card 3 on Fastball`);
+        assert(!b2WildPitch02.pitchMatched, `Batter was fooled on pitch type`);
+        assert(b2WildPitch02.outcomeType === 'wild_pitch', `Unexecuted pitch on 0-2 count resolves to wild_pitch, not Strikeout`);
+        assert(b2WildPitch02.isWildPitchReset === true, `isWildPitchReset is flagged true on 0-2 wild pitch`);
+        assert(b2WildPitch02.outsAdded === 0, `Wild pitch adds zero outs`);
+        assert(b2WildPitch02.runsScored === 1, `Runner on 3rd scores on wild pitch`);
+        assert(b2WildPitch02.newBases.second === true && b2WildPitch02.newBases.first === false, `Runner on 1st advances to 2nd on wild pitch`);
+        assert(b2WildPitch02.ruleReason.includes('Wild pitch') || b2WildPitch02.ruleReason.includes('wild pitch'), `Rule reason describes wild pitch in dirt`);
+
 
 
         // 14. Sequential 2-Beat PA Resolution
