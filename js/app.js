@@ -31,10 +31,8 @@ let localPitchChoice = null; // legacy alias
 let localGuessChoice = null; // legacy alias
 let localBeatCard    = null; // cardId placed in active beat (at most 1)
 let localPitchType     = 'fastball';  // 'fastball' | 'breaking' | 'offspeed'
-let localPitchLocation = 'high';      // 'high' | 'low'
 let localGuessPitch    = 'fastball';  // 'fastball' | 'breaking' | 'offspeed'
 let localSwingType     = 'balanced';  // 'contact' | 'balanced' | 'power'
-let localTargetZone    = 'high';      // 'high' | 'low'
 let gameListener     = null; // Firebase listener ref
 
 const TOTAL_INNINGS = 3;
@@ -53,13 +51,7 @@ function selectPitchType(pitch) {
 }
 window.selectPitchType = selectPitchType;
 window.selectPitchCall = selectPitchType;
-
-function selectPitchLocation(loc) {
-  localPitchLocation = loc;
-  const g = window._lastGameState;
-  if (g) renderPlay(g);
-}
-window.selectPitchLocation = selectPitchLocation;
+window.selectPitchLocation = function() {}; // legacy stub
 
 function selectGuessPitch(pitch) {
   localGuessPitch = pitch;
@@ -75,13 +67,7 @@ function selectSwingType(swing) {
   if (g) renderPlay(g);
 }
 window.selectSwingType = selectSwingType;
-
-function selectTargetZone(zone) {
-  localTargetZone = zone;
-  const g = window._lastGameState;
-  if (g) renderPlay(g);
-}
-window.selectTargetZone = selectTargetZone;
+window.selectTargetZone = function() {}; // legacy stub
 window.selectBatterGuess = function(guess) {
   localGuessPitch = guess;
   localGuessChoice = guess;
@@ -628,33 +614,29 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
     const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
     if (iAmPitching) {
-      const baseDiff = pitcherChar?.executionDifficulties?.[localPitchType] ?? 4;
-      const countDisc = (b1?.count === '0-2') ? 2 : 0;
-      const effDiff = Math.max(1, baseDiff - countDisc);
-      const executes = localBeatCard ? (cardVal >= effDiff) : false;
+      const pRange = PITCH_RANGES[localPitchType] || { min: 1, max: 10 };
+      const inRange = localBeatCard ? (cardVal >= pRange.min && cardVal <= pRange.max) : false;
 
       if (!localBeatCard) {
         lockBtnLabel = 'CHOOSE CARD';
-        lockBtnSub = `${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()} &bull; Diff ${effDiff}`;
+        lockBtnSub = `${localPitchType.toUpperCase()} &bull; Timing Range [${pRange.min}–${pRange.max}]`;
         lockBtnDisabled = true;
       } else {
         lockBtnLabel = 'LOCK IN PITCH';
-        lockBtnSub = `${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()} &bull; [${cardVal}] vs Diff ${effDiff} (${executes ? 'SPOT ON' : 'HANGER'})`;
+        lockBtnSub = `${localPitchType.toUpperCase()} &bull; Card [${cardVal}] ${inRange ? '✓ In Timing Range' : '⚠ Out of Range'}`;
         lockBtnDisabled = false;
       }
     } else {
-      const baseDiff = batterChar?.swingDifficulties?.[localSwingType] ?? 5;
-      const countDisc = (b1?.count === '3-1') ? 2 : 0;
-      const effDiff = Math.max(1, baseDiff - countDisc);
-      const executes = localBeatCard ? (cardVal >= effDiff) : false;
+      const bRange = SWING_RANGES[localSwingType] || { min: 1, max: 10 };
+      const inRange = localBeatCard ? (cardVal >= bRange.min && cardVal <= bRange.max) : false;
 
       if (!localBeatCard) {
         lockBtnLabel = 'CHOOSE CARD';
-        lockBtnSub = `${localSwingType.toUpperCase()} ${localTargetZone.toUpperCase()} &bull; Diff ${effDiff}`;
+        lockBtnSub = `${localSwingType.toUpperCase()} &bull; Timing Range [${bRange.min}–${bRange.max}]`;
         lockBtnDisabled = true;
       } else {
         lockBtnLabel = 'LOCK IN SWING';
-        lockBtnSub = `${localSwingType.toUpperCase()} ${localTargetZone.toUpperCase()} &bull; [${cardVal}] vs Diff ${effDiff} (${executes ? 'BARRELED' : 'MISTIMED'})`;
+        lockBtnSub = `${localSwingType.toUpperCase()} &bull; Card [${cardVal}] ${inRange ? '✓ In Range' : '⚠ Out of Range'}`;
         lockBtnDisabled = false;
       }
     }
@@ -810,25 +792,25 @@ function renderPublicScoutingBar(pitcherChar, batterChar, charges, count = '0-0'
   const bName = batterChar?.name || 'Batter';
 
   const countBadgeClass = count === '0-2' ? 'count-pitcher' : count === '3-1' ? 'count-hitter' : count === '3-2' ? 'count-full' : 'count-duel';
-  const countLabel = count === '0-2' ? "-2 Diff" : count === '3-1' ? "-2 Diff" : count === '3-2' ? "Full Count" : "Duel";
+  const countLabel = count === '0-2' ? "Pitcher's Count" : count === '3-1' ? "Hitter's Count" : count === '3-2' ? "Full Count" : "Duel";
 
   return `
     <div class="scouting-report-bar">
-      <!-- Pitcher Repertoire & Diff Strip -->
+      <!-- Pitcher Repertoire Strip -->
       <div class="scout-card pitcher-card">
         <div class="scout-header">
           <span class="scout-avatar">⚾</span>
           <span class="scout-name">${pName}</span>
         </div>
         <div class="scout-chips">
-          <span class="scout-chip ${charges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball: Diff ${pDiffs.fastball}">
-            FB <b>${charges?.fastball ?? 0}</b> <small>(D${pDiffs.fastball})</small>
+          <span class="scout-chip ${charges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball: Velocity (6-10)">
+            FB <b>${charges?.fastball ?? 0}</b> <small>[6–10]</small>
           </span>
-          <span class="scout-chip ${charges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking: Diff ${pDiffs.breaking}">
-            BR <b>${charges?.breaking ?? 0}</b> <small>(D${pDiffs.breaking})</small>
+          <span class="scout-chip ${charges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking: Bite & Spin (3-7)">
+            BR <b>${charges?.breaking ?? 0}</b> <small>[3–7]</small>
           </span>
-          <span class="scout-chip ${charges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed: Diff ${pDiffs.offspeed}">
-            OFF <b>${charges?.offspeed ?? 0}</b> <small>(D${pDiffs.offspeed})</small>
+          <span class="scout-chip ${charges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed: Touch & Deception (1-5)">
+            OFF <b>${charges?.offspeed ?? 0}</b> <small>[1–5]</small>
           </span>
         </div>
       </div>
@@ -839,21 +821,18 @@ function renderPublicScoutingBar(pitcherChar, batterChar, charges, count = '0-0'
         <span class="count-tag">${countLabel}</span>
       </div>
 
-      <!-- Batter Tendencies & Diff Strip -->
+      <!-- Batter Tendencies Strip -->
       <div class="scout-card batter-card">
         <div class="scout-header">
           <span class="scout-avatar">🏏</span>
           <span class="scout-name">${bName}</span>
         </div>
         <div class="scout-chips">
-          <span class="scout-chip hot" title="Hot Zone">
-            HOT: <b>${bScout.hotZone.toUpperCase()}</b>
-          </span>
-          <span class="scout-chip cold" title="Cold Zone">
-            COLD: <b>${bScout.coldZone.toUpperCase()}</b>
+          <span class="scout-chip hot" title="Hitter Archetype">
+            STYLE: <b>${batterChar?.archetype || 'Hitter'}</b>
           </span>
           <span class="scout-chip fav" title="Favorite Pitch">
-            FAV: <b>${bScout.favoritePitch.toUpperCase().slice(0, 3)}</b>
+            ⭐ HUNTS: <b>${bScout.favoritePitch.toUpperCase()}</b>
           </span>
         </div>
       </div>
@@ -863,7 +842,7 @@ function renderPublicScoutingBar(pitcherChar, batterChar, charges, count = '0-0'
 // ─────────────────────────────────────────────────────────────────────────────
 // PITCHER PAYOFF DECK (BEAT 2)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj, b1Data) {
+function renderPitcherPayoffDeck(charges, localPitchType, bScout, pDiffs, count, cardObj, b1Data) {
   const isOffspeedLocked = (count === '3-1') || (b1Data?.lockedOption === 'offspeed');
   if (isOffspeedLocked && localPitchType === 'offspeed') {
     localPitchType = 'fastball';
@@ -875,11 +854,6 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
     { key: 'offspeed', name: 'Offspeed', icon: '⏱️', range: '1–5 Touch',  min: 1, max: 5, locked: isOffspeedLocked },
   ];
 
-  const locations = [
-    { key: 'high', label: 'HIGH', icon: '⬆️', isHot: bScout.hotZone === 'high', isCold: bScout.coldZone === 'high' },
-    { key: 'low',  label: 'LOW',  icon: '⬇️', isHot: bScout.hotZone === 'low',  isCold: bScout.coldZone === 'low' },
-  ];
-
   const curRange = PITCH_RANGES[localPitchType] || { min: 1, max: 10, label: '1–10' };
   const cardVal = cardObj ? (cardObj.value || 0) : null;
   const inRange = cardVal !== null ? (cardVal >= curRange.min && cardVal <= curRange.max) : null;
@@ -888,7 +862,7 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
     <div class="payoff-controls-deck">
       <!-- 1. Pitch Selection -->
       <div class="control-section">
-        <div class="control-label">1. Pitch:</div>
+        <div class="control-label">1. Choose Pitch:</div>
         <div class="selection-tiles">
           ${pitches.map(p => {
             const countLeft = charges[p.key] ?? 0;
@@ -909,31 +883,9 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
         </div>
       </div>
 
-      <!-- 2. Location Selection -->
-      <div class="control-section">
-        <div class="control-label">2. Target Location:</div>
-        <div class="selection-tiles loc-tiles">
-          ${locations.map(l => {
-            const isSelected = (localPitchLocation === l.key);
-            const tagHtml = l.isHot
-              ? `<span class="intel-tag hot">⚠️ HOT</span>`
-              : (l.isCold ? `<span class="intel-tag cold">🎯 COLD</span>` : '');
-            return `
-              <button class="choice-tile loc ${isSelected ? 'active' : ''}"
-                      onclick="selectPitchLocation('${l.key}')">
-                <div class="ct-header">
-                  <span class="ct-icon">${l.icon}</span>
-                  ${tagHtml}
-                </div>
-                <div class="ct-name">${l.label}</div>
-              </button>`;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- 3. Range & Execution Feedback -->
+      <!-- 2. Range & Execution Feedback -->
       <div class="exec-quick-bar ${inRange === null ? 'waiting' : (inRange ? 'pass' : 'fail')}">
-        <span class="eq-label">${localPitchType.toUpperCase()} ${localPitchLocation.toUpperCase()}: Range <b>${curRange.label}</b></span>
+        <span class="eq-label">${localPitchType.toUpperCase()}: Range <b>${curRange.label}</b></span>
         <span class="eq-status">${cardVal === null ? 'Pick a card below' : (inRange ? `🟢 IN RANGE [Card ${cardVal}]` : `⚠️ OUT OF RANGE [Card ${cardVal}]`)}</span>
       </div>
     </div>`;
@@ -942,7 +894,7 @@ function renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bS
 // ─────────────────────────────────────────────────────────────────────────────
 // BATTER PAYOFF DECK (BEAT 2)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderBatterPayoffDeck(localSwingType, localTargetZone, localGuessPitch, bScout, bDiffs, count, cardObj, b1Data) {
+function renderBatterPayoffDeck(localSwingType, localGuessPitch, bScout, bDiffs, count, cardObj, b1Data) {
   const isPowerLocked = (count === '0-2') || (b1Data?.lockedOption === 'power');
   if (isPowerLocked && localSwingType === 'power') {
     localSwingType = 'balanced';
@@ -957,11 +909,6 @@ function renderBatterPayoffDeck(localSwingType, localTargetZone, localGuessPitch
     { key: 'fastball', name: 'Fastball', icon: '🔥', range: '6–10' },
     { key: 'breaking', name: 'Breaking', icon: '🌀', range: '3–7' },
     { key: 'offspeed', name: 'Offspeed', icon: '⏱️', range: '1–5', locked: isOffspeedLocked },
-  ];
-
-  const locations = [
-    { key: 'high', label: 'HIGH', icon: '⬆️', isHot: bScout.hotZone === 'high', isCold: bScout.coldZone === 'high' },
-    { key: 'low',  label: 'LOW',  icon: '⬇️', isHot: bScout.hotZone === 'low',  isCold: bScout.coldZone === 'low' },
   ];
 
   const swings = [
@@ -997,31 +944,9 @@ function renderBatterPayoffDeck(localSwingType, localTargetZone, localGuessPitch
         </div>
       </div>
 
-      <!-- 2. Target Location -->
+      <!-- 2. Swing Selection -->
       <div class="control-section">
-        <div class="control-label">2. Anticipate Location:</div>
-        <div class="selection-tiles loc-tiles">
-          ${locations.map(l => {
-            const isSelected = (localTargetZone === l.key);
-            const tagHtml = l.isHot
-              ? `<span class="intel-tag hot">🔥 HOT ZONE</span>`
-              : (l.isCold ? `<span class="intel-tag cold">❄️ COLD ZONE</span>` : '');
-            return `
-              <button class="choice-tile loc ${isSelected ? 'active' : ''}"
-                      onclick="selectTargetZone('${l.key}')">
-                <div class="ct-header">
-                  <span class="ct-icon">${l.icon}</span>
-                  ${tagHtml}
-                </div>
-                <div class="ct-name">${l.label}</div>
-              </button>`;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- 3. Swing Selection -->
-      <div class="control-section">
-        <div class="control-label">3. Swing Approach:</div>
+        <div class="control-label">2. Swing Approach:</div>
         <div class="selection-tiles">
           ${swings.map(s => {
             const isSelected = (localSwingType === s.key);
@@ -1041,9 +966,9 @@ function renderBatterPayoffDeck(localSwingType, localTargetZone, localGuessPitch
         </div>
       </div>
 
-      <!-- 4. Timing & Range Feedback -->
+      <!-- 3. Timing & Range Feedback -->
       <div class="exec-quick-bar ${inRange === null ? 'waiting' : (inRange ? 'pass' : 'fail')}">
-        <span class="eq-label">Looking <b>${localGuessPitch.toUpperCase()} ${localTargetZone.toUpperCase()}</b> &bull; ${localSwingType.toUpperCase()} [${curRange.label}]</span>
+        <span class="eq-label">Looking <b>${localGuessPitch.toUpperCase()}</b> &bull; ${localSwingType.toUpperCase()} [${curRange.label}]</span>
         <span class="eq-status">${cardVal === null ? 'Pick a card below' : (inRange ? `🟢 IN RANGE [Card ${cardVal}]` : `⚠️ OUT OF RANGE [Card ${cardVal}]`)}</span>
       </div>
     </div>`;
@@ -1104,28 +1029,28 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           <div class="payoff-clash-card">
             <div class="clash-matchup-header">
               <span class="cm-tag">💥 PAYOFF PITCH</span>
-              <span class="cm-loc ${z2.sameLocation ? 'match' : 'diff'}">${z2.sameLocation ? '🎯 LOCATION MATCHED' : '❌ LOCATION MISSED'}</span>
+              <span class="cm-loc ${z2.pitchMatched ? 'match' : 'diff'}">${z2.pitchMatched ? '🎯 PITCH ANTICIPATED' : '❌ FOOLED ON PITCH'}</span>
             </div>
 
             <div class="clash-teams-row">
               <div class="clash-side pitcher">
                 <div class="cs-label">⚾ Pitcher</div>
-                <div class="cs-action">${(z2.pitchType || 'fastball').toUpperCase()} &bull; ${(z2.pitchLocation || 'high').toUpperCase()}</div>
+                <div class="cs-action">${(z2.pitchType || 'fastball').toUpperCase()}</div>
                 <div class="cs-exec ${z2.pitcherExecuted ? 'pass' : 'fail'}">
                   ${z2.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
                 </div>
-                <div class="cs-card">Card: [${pPayoffCard?.value ?? z2.pitcherCardValue ?? '—'}]</div>
+                <div class="cs-card">Card: [${pPayoffCard?.value ?? z2.pitcherCardVal ?? '—'}]</div>
               </div>
 
               <div class="clash-vs-divider">VS</div>
 
               <div class="clash-side batter">
                 <div class="cs-label">🏏 Batter</div>
-                <div class="cs-action">${(z2.swingType || 'balanced').toUpperCase()} &bull; ${(z2.targetZone || 'high').toUpperCase()}</div>
+                <div class="cs-action">${(z2.swingType || 'balanced').toUpperCase()} (Looking ${(z2.guessPitch || 'fastball').toUpperCase()})</div>
                 <div class="cs-exec ${z2.batterExecuted ? 'pass' : 'fail'}">
                   ${z2.batterExecuted ? '🟢 BARRELED' : '🔴 MISTIMED'}
                 </div>
-                <div class="cs-card">Card: [${bPayoffCard?.value ?? z2.batterCardValue ?? '—'}]</div>
+                <div class="cs-card">Card: [${bPayoffCard?.value ?? z2.batterCardVal ?? '—'}]</div>
               </div>
             </div>
 
@@ -1233,8 +1158,8 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
         <div class="b2-controls-wrapper">
           ${!iAmBatting
-            ? renderPitcherPayoffDeck(charges, localPitchType, localPitchLocation, bScout, pDiffs, count, cardObj, b1Data)
-            : renderBatterPayoffDeck(localSwingType, localTargetZone, localGuessPitch, bScout, bDiffs, count, cardObj, b1Data)}
+            ? renderPitcherPayoffDeck(charges, localPitchType, bScout, pDiffs, count, cardObj, b1Data)
+            : renderBatterPayoffDeck(localSwingType, localGuessPitch, bScout, bDiffs, count, cardObj, b1Data)}
         </div>
 
         <div class="b2-exec-slot-row">
@@ -1410,8 +1335,8 @@ function commitPlacement() {
     const myBeatPlacement = (currentBeat === 'beat1')
       ? { cardId: localBeatCard }
       : (iAmPitching
-          ? { pitchType: localPitchType, pitchLocation: localPitchLocation, cardId: localBeatCard }
-          : { swingType: localSwingType, targetZone: localTargetZone, guessPitch: localGuessPitch, cardId: localBeatCard });
+          ? { pitchType: localPitchType, cardId: localBeatCard }
+          : { swingType: localSwingType, guessPitch: localGuessPitch, cardId: localBeatCard });
 
     const updates = {
       [`currentPA/beatPlacements/${currentBeat}/${myRole}`]: myBeatPlacement,
@@ -1458,8 +1383,8 @@ function commitPlacement() {
           const botPlay = executeBotPlayBeat(liveGS, 'guest', 'beat2', localBeatCard);
           const botIsPitching = (liveGS.half === 'bottom');
           const botBeatPlacement = botIsPitching
-            ? { pitchType: botPlay.pitchType, pitchLocation: botPlay.pitchLocation, cardId: botPlay.cardId }
-            : { swingType: botPlay.swingType, targetZone: botPlay.targetZone, guessPitch: botPlay.guessPitch, cardId: botPlay.cardId };
+            ? { pitchType: botPlay.pitchType, cardId: botPlay.cardId }
+            : { swingType: botPlay.swingType, guessPitch: botPlay.guessPitch, cardId: botPlay.cardId };
 
           const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
           if (botPlay.cardId) {
@@ -1569,11 +1494,9 @@ function resolveBeatStep(beat) {
         const beat1Result = pa.beatResults?.beat1 || {};
         const pitcherCardId = pPlacements.cardId || null;
         const pitchType = pPlacements.pitchType || 'fastball';
-        const pitchLocation = pPlacements.pitchLocation || 'high';
 
         const batterCardId = bPlacements.cardId || null;
         const swingType = bPlacements.swingType || 'balanced';
-        const targetZone = bPlacements.targetZone || 'high';
         const guessPitch = bPlacements.guessPitch || 'fastball';
 
         // Deduct pitch charge
@@ -1592,11 +1515,9 @@ function resolveBeatStep(beat) {
           beat1Winner: beat1Result.winner || 'tie',
           z1Winner: beat1Result.winner || 'tie',
           pitchType,
-          pitchLocation,
           pitcherCardId,
           guessPitch,
           swingType,
-          targetZone,
           batterCardId,
           pitcherChar,
           batterChar,
@@ -1844,10 +1765,8 @@ function nextPA() {
         localBeatCard    = null;
         selectedCard     = null;
         localPitchType   = 'fastball';
-        localPitchLocation = 'high';
         localGuessPitch  = 'fastball';
         localSwingType   = 'balanced';
-        localTargetZone  = 'high';
         localPlacement   = { z1:[], z2:[] };
       }).catch(err => {
         console.error('nextPA update error:', err);
@@ -2173,13 +2092,11 @@ function renderOutcomeOverlay(res, isBatting = false) {
   const pCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : (z1?.pitcherCards?.[0] ? getCard(z1.pitcherCards[0]) : null);
   const pVal = pCard?.value ?? z2?.pitcherCardVal ?? z1?.pitcherTotal ?? '—';
   const pPitch = z2?.pitchType ? z2.pitchType.toUpperCase() : 'FASTBALL';
-  const pLoc = z2?.pitchLocation ? z2.pitchLocation.toUpperCase() : 'HIGH';
 
   // Batter recap
   const bCard = z2?.batterCardId ? getCard(z2.batterCardId) : (z1?.batterCards?.[0] ? getCard(z1.batterCards[0]) : null);
   const bVal = bCard?.value ?? z2?.batterCardVal ?? z1?.batterTotal ?? '—';
   const bSwing = z2?.swingType ? z2.swingType.toUpperCase() : 'BALANCED';
-  const bZone = z2?.targetZone ? z2.targetZone.toUpperCase() : 'HIGH';
   const bGuess = z2?.guessPitch ? z2.guessPitch.toUpperCase() : 'FASTBALL';
 
   const timingDelta = z2?.timingDelta ?? (typeof pVal === 'number' && typeof bVal === 'number' ? Math.abs(pVal - bVal) : 0);
@@ -2194,21 +2111,12 @@ function renderOutcomeOverlay(res, isBatting = false) {
     timingBadgeHtml = `<span class="timing-badge miss">⚡ DELTA ${timingDelta} &bull; MISTIMED</span>`;
   }
 
-  const matchTier = z2?.matchTier || (z2?.sameLocation ? 'partial' : 'whiff');
-  const pitchMatched = Boolean(z2?.pitchMatched);
-  const locMatched = Boolean(z2?.locationMatched ?? z2?.sameLocation);
-
+  const pitchMatched = Boolean(z2?.pitchMatched ?? (z2?.matchTier === 'matched'));
   let deductionBadgeHtml = '';
-  if (matchTier === 'full') {
-    deductionBadgeHtml = `<span class="deduction-badge full">🎯 READ LIKE A BOOK (PITCH &amp; ZONE)</span>`;
-  } else if (matchTier === 'partial') {
-    if (pitchMatched) {
-      deductionBadgeHtml = `<span class="deduction-badge partial">🔍 PITCH TIMED (${pPitch}) &bull; ZONE MISSED</span>`;
-    } else {
-      deductionBadgeHtml = `<span class="deduction-badge partial">🔍 ZONE READ (${pLoc}) &bull; FOOLED BY PITCH</span>`;
-    }
+  if (pitchMatched) {
+    deductionBadgeHtml = `<span class="deduction-badge full">🎯 PITCH ANTICIPATED (${pPitch})</span>`;
   } else {
-    deductionBadgeHtml = `<span class="deduction-badge whiff">❌ COMPLETELY FOOLED (WRONG PITCH &amp; ZONE)</span>`;
+    deductionBadgeHtml = `<span class="deduction-badge whiff">❌ FOOLED ON PITCH (Threw ${pPitch}, Anticipated ${bGuess})</span>`;
   }
 
   return `
@@ -2223,11 +2131,11 @@ function renderOutcomeOverlay(res, isBatting = false) {
         <div class="rm-clash-recap">
           <div class="recap-row anticipate-p-action">
             <span class="recap-label">⚾ Pitch:</span>
-            <span class="recap-val"><b>${pPitch} &bull; ${pLoc}</b> [Card ${pVal}]</span>
+            <span class="recap-val"><b>${pPitch}</b> [Card ${pVal}]</span>
           </div>
           <div class="recap-row anticipate-b-action">
             <span class="recap-label">🏏 Swing:</span>
-            <span class="recap-val"><b>${bSwing}</b> [Card ${bVal}] (Anticipated <b>${bGuess} ${bZone}</b>)</span>
+            <span class="recap-val"><b>${bSwing}</b> [Card ${bVal}] (Anticipated <b>${bGuess}</b>)</span>
           </div>
           ${z2 ? `
             <div class="recap-row anticipate-timing">

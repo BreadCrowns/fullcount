@@ -239,3 +239,71 @@ As of Commit `f04f6d2`:
 > 2. The options explored and trade-offs weighed.
 > 3. The decision and technical implementation.
 > 4. Verification test results and simulation impact.
+
+---
+
+## Entry 8: Streamlining the Duel — Removing Location to Focus on Pitch & Timing
+
+### The Problem: Cognitive Overload & Decision Fatigue in Beat 2
+Following the implementation of overlapping timing ranges, the game gained immense strategic depth. A card of value 4 was no longer just "4 points"—it was the snap of a sweeping slider or the fading tumble of a changeup.
+
+However, this mechanical depth immediately exposed an interface and cognitive flaw. The user observed:
+> *"The pitch selection needs to be simpler now that we've implemented the overlapping pitches. I want to pick a pitch type and a number card. Choosing location is too much."*
+
+In the previous design, resolving Beat 2 required an overwhelming number of concurrent decisions:
+- **Pitcher**: Pick Pitch Type (`fastball`, `breaking`, `offspeed`) + Pick Location (`high`, `low`) + Pick Number Card (1–10). *(3 selections)*
+- **Batter**: Anticipate Pitch (`fastball`, `breaking`, `offspeed`) + Anticipate Location (`high`, `low`) + Choose Swing Approach (`contact`, `balanced`, `power`) + Pick Number Card (1–10). *(4 selections)*
+
+For the batter, making four distinct choices on every single payoff pitch was exhausting. It diluted the psychological focus of the duel. Instead of asking the quintessential baseball question—*"Is he bringing the heater or dropping the curveball, and can I time it?"*—the player was bogged down in a 50/50 high/low coin toss that felt like mechanical clutter.
+
+### Options Explored
+
+1. **Option 1: Retain Location as a Passive Modifier or Trait Bonus**
+   - *Concept*: Keep high/low location as an optional guess that provides a minor +1 timing forgiveness if guessed correctly.
+   - *Why Rejected*: It would preserve the visual clutter and UI buttons without adding compelling gameplay. It would fail to solve the user's direct directive: *"Choosing location is too much."*
+
+2. **Option 2: Tie Pitch Types to Fixed Zones**
+   - *Concept*: Dictate that fastballs are always high and breaking balls are always low.
+   - *Why Rejected*: Artificial and rigid. It eliminates agency without making the decision-making cleaner, and turns scouting reports into predictable scripts.
+
+3. **Option 3 (Chosen): Eliminate Location Completely — Focus on Pitch Deduction & Timing Delta**
+   - *Pitcher selects*: **Pitch Type** + **Number Card**.
+   - *Batter selects*: **Anticipated Pitch** + **Swing Approach** + **Number Card**.
+   - *Why it succeeds*:
+     - **Purity of Deduction**: The batter either correctly reads the pitch type (`matched`) or is fooled (`whiff`).
+     - **Intuitive Execution**: The pitch type dictates the required timing window (Offspeed [1–5], Breaking [3–7], Fastball [6–10]).
+     - **Snappy UI**: The interface drops an entire section of tiles from both sides. The player can look at the count, pick their pitch/swing, tap a card, and lock in within seconds.
+
+### Technical Implementation
+
+1. **Resolution Engine (`js/resolution.js`)**:
+   - Stripped `pitchLocation` and `targetZone` from `resolveBeat2`.
+   - Deduction simplified to a crisp binary check:
+     $$\text{pitchMatched} = (\text{effectiveGuessPitch} === \text{pitchType})$$
+   - Resolution matrix streamlined:
+     - **Pitch Anticipated**:
+       - $\Delta = 0$ (Squared Up): Crushed Home Run on Power swing, gap double on Balanced, clean single on Contact.
+       - $\Delta \le 2$ (Solid Timing): Wall-ball doubles, clean singles, or home runs if hunting the batter's favorite pitch (`scoutingReport.favoritePitch`).
+       - $\Delta \le 4$ (Off-Balance): Protected by the correct pitch read; contact swings find holes for singles, power swings fly out to the warning track.
+       - $\Delta \ge 5$ (Mistimed): Even with the pitch read, massive timing error leads to strikeouts on power swings.
+     - **Fooled on Pitch (`whiff`)**:
+       - Pitcher heavily favored!
+       - $\Delta \le 2$: Weak contact only (popouts and routine grounders); barrel HRs are impossible when fooled.
+       - $\Delta \ge 3$: Swinging strikeouts dominate unless the batter choked up on a defensive Contact swing.
+   - Preserved `locationMatched: pitchMatched` and `sameLocation: pitchMatched` in return objects for backward compatibility.
+   - Updated `resolveSequentialPA` and `executeBotPlayBeat` to remove all zone/location logic.
+
+2. **User Interface (`js/app.js`)**:
+   - Removed Section 2 Location selection tiles from `renderPitcherPayoffDeck` and `renderBatterPayoffDeck`.
+   - Updated the Action Lock button subtext to display dynamic timing range validation (`✓ In Timing Range [min–max]` vs `⚠ Out of Range`).
+   - Cleaned up the public scouting bar: replaced obsolete Hot/Cold zone chips with the Batter's Archetype style and their Favorite Pitch (`⭐ HUNTS: [PITCH]`), plus pitcher pitch timing brackets (`[6–10]`, `[3–7]`, `[1–5]`).
+   - Streamlined the outcome overlay to display clear deduction badges: `🎯 PITCH ANTICIPATED` vs `❌ FOOLED ON PITCH`.
+
+3. **Test Suites & Verification**:
+   - Updated Section 13 of `tests/test_resolution.html` to validate all timing delta outcomes without location parameters.
+   - Updated `tests/sim_games.html` and headless test runners.
+
+### Verification Results
+- **Automated Unit Tests**: 120 of 120 browser tests pass (`run-tests.ps1`).
+- **Game Simulation**: 10-game simulation (`run-sim.ps1`) completed 260 PAs with realistic baseball totals (5.70 runs/game, 94 total hits, 5 home wins, 5 away wins).
+- **Player Experience**: Beat 2 now feels electric, focused, and fast-paced. Pitcher and batter engage in an uncluttered mind game of pitch selection and timing execution.
