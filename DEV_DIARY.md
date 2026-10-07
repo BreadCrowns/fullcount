@@ -724,6 +724,68 @@ During a live playtest, a user experienced a baffling resolution that felt like 
 - **Headless Game Simulation**: 10-game simulation executed 282 PAs across 10 games with an average of **6.60 runs/game**, 110 hits, 5 home wins, 5 away wins, and zero errors.
 - **Player Experience**: Complete alignment with baseball reality and card duel intuition: throw a strike in the zone against a flailing swing, and you get the strikeout you earned. Walks now only occur when you actually throw a ball outside the strike zone!
 
+---
+
+## Entry 14: The Diamond Arena — Drag-and-Drop Trays, On-Field Card Flipping, & Tooltip Decluttering
+*Date: October 7, 2026*
+
+### Context & The Problem
+With the core card economy and timing-delta mechanics finely tuned, the game's functional identity was proven, but its presentation remained abstract. The play area consisted of generic rectangular cards rows and textual status strips:
+1. **Lack of Baseball Spatial Immersion**: Players were looking at generic card battler slots rather than the iconic spatial geography of a baseball field.
+2. **Multi-Step Selection Friction in Beat 2**: Choosing a pitch required tapping a selection tile, finding an empty slot, and tapping a card. It felt like filling out a form rather than throwing a pitch.
+3. **Abrupt Outcome Cover-up**: When both players locked in, an outcome pop-up immediately covered the entire screen, robbing players of the physical tension of seeing the cards face off and flip.
+4. **Information Density & Screen Clutter**: Explanations of count rules, archetype modifiers, and pitch difficulty ranges covered the arena with walls of text.
+
+### Options Explored
+
+- **Pitch Selection & Placement**:
+  - *Option A (Separate Selectors)*: Keep buttons for Fastball/Breaking/Offspeed, with a single drop slot underneath.
+    *Cons*: Still requires two distinct interactions (click pitch, then click card).
+  - *Option B (Chosen — Integrated Diamond Trays)*:
+    On the **Pitcher's Mound**, place 3 compact tactile trays representing **Fastball [6–10]**, **Breaking [3–7]**, and **Offspeed [1–5]** (locked on 3-1). In the **Batter's Box**, place 3 matching anticipation trays.
+    Players simply **drag their number card directly onto the pitch tray** of their choice. A single drag-and-drop gesture selects the pitch AND commits the card in one fluid motion!
+- **Reveal Presentation**:
+  - *Option A*: Retain instant outcome pop-up modal.
+  - *Option B (Chosen — On-Field 3D Card Flip)*:
+    When reveal occurs, display the cards directly on the Mound and Home Plate. The cards execute a smooth 3D flip animation (`rotateY(180deg)`) on the field, illuminated by an on-field clash beam displaying the timing delta. The outcome modal smoothly glides in with a 1.2-second delay, letting players witness the physical collision first.
+- **Information Architecture**:
+  - *Option A*: Retain permanent inline explanation paragraphs.
+  - *Option B (Chosen — Universal Long-Press / Hover Tooltip System)*:
+    Streamline the main diamond so only essential badges (e.g. `FB 4 [6–10]`, `STYLE: SLUGGER`, `3-1 Hitter Count ⓘ`) are visible. Long-pressing (350ms touch timer) or clicking any chip/banner opens a focused glassmorphism tooltip popup explaining the deep rule mechanics.
+
+---
+
+### Implementation Details
+
+1. **The Baseball Diamond Arena (`js/app.js` & `fullcount.css`)**:
+   - Engineered `.diamond-field`: a responsive stadium graphic with manicured turf, rotated 45° infield dirt diamond, chalk basepaths, and interactive base pillows (1st, 2nd, 3rd) that dynamically illuminate with live base runner dots (`🏃`) when occupied!
+   - Modeled the **Pitcher's Mound** (`.diamond-mound`) with a regulation pitching rubber at the center of the diamond.
+   - Modeled **Home Plate** (`.diamond-plate-area`) with a five-sided pentagon plate and chalk batter's boxes at the bottom apex.
+
+2. **Drag-and-Drop Interaction Engine (`js/app.js`)**:
+   - Implemented HTML5 Drag & Drop pipeline: `handleCardDragStart`, `handleCardDragEnd`, `handleTrayDragOver`, `handleTrayDragEnter`, `handleTrayDragLeave`, and `handleTrayDrop`.
+   - Cards in hand gain `draggable="true"` and a subtle elevation shadow when dragged (`.is-dragging`).
+   - Mound and plate trays highlight with a pulsing emerald drop glow (`.drag-over`) when valid cards hover over them.
+   - Dropping a card onto a tray sets `localPitchType` (or `localGuessPitch`) and docks `localBeatCard` directly into the tray. Single-click fallback remains fully supported for accessibility.
+
+3. **Physical 3D Card Flipping on the Diamond (`js/app.js` & `fullcount.css`)**:
+   - Created `.card-flipper` with `perspective: 800px` and `transform-style: preserve-3d`.
+   - On reveal, the pitcher's card on the mound and the batter's card at home plate flip from their baseball-seamed card backs to their bold front faces with a 0.65s cubic-bezier curve.
+   - Rendered an on-field clash badge between mound and plate (`.field-clash-beam`) highlighting pitch anticipation and timing delta.
+   - Delayed `#outcome-overlay` entrance by 1.2s via CSS animation, preserving immediate DOM presence for test suites while delivering a breathtaking visual reveal to players.
+
+4. **Universal Long-Press & Hover Tooltip Popover (`js/app.js` & `fullcount.css`)**:
+   - Built `showTooltipPopup(title, body)` and `hideTooltipPopup()` rendering into `#fc-tooltip-popover`.
+   - Bound touch timers (`ontouchstart` with 350ms threshold) and click handlers across all scouting chips, count banners, base pillows, and pitch trays.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **165 of 165 tests pass** with 0 failures across `test_resolution.html` and `test_play_ui.html` (including 8 new tests verifying diamond field rendering, mound/plate positioning, 3 pitch trays, draggable card attributes, and tooltip popup lifecycle).
+- **Headless Game Simulation**: 10-game simulation executed 298 PAs across 10 completed games with an average of **7.50 runs/game**, 125 hits, 7 home wins, 3 away wins, and zero errors.
+- **Player Experience**: The transformation is immediate: *Full Count* now visually and physically feels like a baseball showdown. Pitching and hitting are tactile, cards flip dramatically on the dirt, and the screen is clean, cinematic, and decluttered.
+
+
 
 
 

@@ -4644,3 +4644,583 @@ body {
 .rmg-item b {
   color: var(--text);
 }
+
+/* ==========================================================================
+   THE BASEBALL DIAMOND PLAY AREA & DRAG-AND-DROP TRAYS
+   ========================================================================== */
+
+.diamond-arena {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  gap: 6px;
+}
+
+.diamond-field {
+  width: 100%;
+  flex: 1;
+  min-height: 270px;
+  max-height: 420px;
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 50% 50%, #1e4a24 0%, #15381a 60%, #0d2411 100%);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.75), 0 8px 30px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+/* Infield Dirt Diamond */
+.infield-dirt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 210px;
+  height: 210px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: radial-gradient(circle at 50% 50%, #875731 0%, #6d4423 70%, #523117 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.5), inset 0 0 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+/* Basepaths Chalk Lines */
+.basepath-lines {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 206px;
+  height: 206px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+/* Bases Pillows */
+.diamond-base {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diamond-base.base-second {
+  top: 14%;
+  left: 50%;
+}
+
+.diamond-base.base-third {
+  top: 50%;
+  left: 14%;
+}
+
+.diamond-base.base-first {
+  top: 50%;
+  left: 86%;
+}
+
+.diamond-base.occupied {
+  background: var(--gold-bright);
+  border-color: #fff;
+  box-shadow: 0 0 14px var(--gold-glow), 0 0 6px #fff;
+  animation: basePulse 1.8s infinite ease-in-out;
+}
+
+@keyframes basePulse {
+  0%, 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+  50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.2); }
+}
+
+.runner-dot {
+  font-size: 0.75rem;
+  transform: rotate(-45deg);
+}
+
+/* Pitcher's Mound (Center) */
+.diamond-mound {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 5px 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  width: 100%;
+  max-width: 98%;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+}
+
+.diamond-mound.mine-territory {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+}
+
+.mound-rubber {
+  width: 38px;
+  height: 4px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  margin-bottom: 3px;
+}
+
+.mound-title, .plate-title {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+/* Home Plate / Batter's Box (Bottom) */
+.diamond-plate-area {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 5px 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  width: 100%;
+  max-width: 98%;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+}
+
+.diamond-plate-area.mine-territory {
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+.home-plate-pentagon {
+  width: 18px;
+  height: 12px;
+  background: #fff;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 50% 100%, 0% 50%);
+  margin-bottom: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* Pitch & Batter Trays */
+.pitch-trays-container, .batter-trays-container {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  width: 100%;
+}
+
+.pitch-tray {
+  flex: 1;
+  min-width: 78px;
+  max-width: 110px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+  padding: 4px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  user-select: none;
+}
+
+.pitch-tray:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(30, 41, 59, 0.95);
+}
+
+.pitch-tray.active {
+  border-color: var(--gold) !important;
+  background: rgba(245, 176, 39, 0.14) !important;
+  box-shadow: 0 0 14px var(--gold-glow);
+}
+
+.pitch-tray.drag-over {
+  border-color: #2ed573 !important;
+  background: rgba(46, 213, 115, 0.22) !important;
+  box-shadow: 0 0 18px rgba(46, 213, 115, 0.55) !important;
+  transform: scale(1.04);
+}
+
+.pitch-tray.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.pitch-tray .pt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.pitch-tray .pt-icon {
+  font-size: 0.75rem;
+}
+
+.pitch-tray .pt-name {
+  font-weight: 800;
+  color: #fff;
+  font-size: 0.65rem;
+}
+
+.pitch-tray .pt-charges {
+  font-size: 0.58rem;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: var(--gold-bright);
+}
+
+.pitch-tray .pt-fav-tag {
+  font-size: 0.55rem;
+  background: rgba(245, 176, 39, 0.2);
+  color: var(--gold-bright);
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-weight: 900;
+}
+
+.pitch-tray .pt-range {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.tray-empty-hint {
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 2px 4px;
+  margin-top: 2px;
+  width: 100%;
+  text-align: center;
+}
+
+.tray-locked-hint {
+  font-size: 0.52rem;
+  color: #ff6b6b;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+/* Placed Mini Card inside Tray */
+.pitch-tray .placed-number-card {
+  width: 34px;
+  height: 44px;
+  margin: 1px 0 0 0;
+  font-size: 1.15rem;
+  border-width: 2px;
+}
+
+/* Drag State for Number Cards */
+.number-card.is-dragging {
+  opacity: 0.4;
+  transform: scale(0.95);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+/* Beat 1 Diamond Row Layout */
+.diamond-b1-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin: auto 0;
+  z-index: 25;
+}
+
+.diamond-b1-row .b1-card-slot {
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  min-width: 90px;
+}
+
+.diamond-b1-row .b1-card-slot.mine {
+  border-color: rgba(96, 165, 250, 0.6);
+}
+
+.diamond-b1-row .b1-card-slot.drag-over {
+  border-color: #2ed573 !important;
+  background: rgba(46, 213, 115, 0.22) !important;
+  box-shadow: 0 0 18px rgba(46, 213, 115, 0.55) !important;
+  transform: scale(1.05);
+}
+
+/* 3D Card Flipper for Diamond Reveal */
+.field-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-flipper {
+  width: 44px;
+  height: 58px;
+  position: relative;
+  perspective: 800px;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-flipper.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-flipper .card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+.card-flipper .card-face.card-back {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  transform: rotateY(0deg);
+  font-size: 1.2rem;
+}
+
+.card-flipper .card-face.card-front {
+  background: linear-gradient(135deg, #253348, #182234);
+  border: 2px solid #60a5fa;
+  color: #fff;
+  transform: rotateY(180deg);
+  font-size: 1.5rem;
+}
+
+.field-card-tag {
+  font-size: 0.55rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.field-card-tag.pass {
+  background: rgba(46, 213, 115, 0.2);
+  color: #2ed573;
+  border: 1px solid rgba(46, 213, 115, 0.4);
+}
+.field-card-tag.fail {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.4);
+}
+
+/* On-Field Clash Beam */
+.field-clash-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.fcb-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 16, 28, 0.9);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 4px 10px;
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.fcb-badge.match {
+  border-color: #2ed573;
+  box-shadow: 0 0 16px rgba(46, 213, 115, 0.4);
+}
+.fcb-badge.whiff {
+  border-color: #ff4757;
+  box-shadow: 0 0 16px rgba(255, 71, 87, 0.4);
+}
+
+.fcb-title {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.fcb-delta {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+}
+
+.diamond-outcome-tag {
+  margin-top: 4px;
+}
+
+/* Diamond Execution Pill */
+.diamond-exec-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.diamond-exec-pill.pass {
+  border-color: rgba(46, 213, 115, 0.4);
+  color: #2ed573;
+}
+.diamond-exec-pill.fail {
+  border-color: rgba(255, 71, 87, 0.4);
+  color: #ff4757;
+}
+.diamond-exec-pill.waiting {
+  color: var(--text-muted);
+}
+
+/* Delayed Outcome Overlay (Allows Watching Diamond Card Flip First) */
+#outcome-overlay {
+  animation: outcomeOverlayDelayedEnter 0.35s ease-out 1.2s both !important;
+}
+
+@keyframes outcomeOverlayDelayedEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Universal Floating Tooltip Popover */
+.fc-tooltip-popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(4, 7, 14, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.fc-tooltip-popover.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ttp-card {
+  width: 100%;
+  max-width: 320px;
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border: 1.5px solid var(--gold);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: modalPopIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.25);
+}
+
+.ttp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.ttp-title {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+}
+
+.ttp-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.ttp-close:hover {
+  color: #fff;
+}
+
+.ttp-body {
+  font-size: 0.72rem;
+  color: #e2e8f0;
+  line-height: 1.45;
+}
+
+.adv-info-icon {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-left: 4px;
+  cursor: pointer;
+}
+

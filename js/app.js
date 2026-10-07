@@ -109,6 +109,176 @@ function removeBeatCard() {
 }
 window.removeBeatCard = removeBeatCard;
 
+// ── DRAG AND DROP & SELECTION STATE ──────────────────────────────────────────
+let draggedCardId = null;
+
+function handleCardDragStart(e, cardId) {
+  draggedCardId = cardId;
+  selectedCard = cardId;
+  if (e.dataTransfer) {
+    e.dataTransfer.setData('text/plain', cardId);
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  const el = e.currentTarget;
+  if (el) el.classList.add('is-dragging');
+}
+window.handleCardDragStart = handleCardDragStart;
+
+function handleCardDragEnd(e) {
+  draggedCardId = null;
+  const el = e.currentTarget;
+  if (el) el.classList.remove('is-dragging');
+  document.querySelectorAll('.tray-drop-target, .pitch-tray, .b1-card-slot').forEach(t => {
+    t.classList.remove('drag-over');
+  });
+}
+window.handleCardDragEnd = handleCardDragEnd;
+
+function handleTrayDragOver(e) {
+  e.preventDefault();
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move';
+  }
+}
+window.handleTrayDragOver = handleTrayDragOver;
+
+function handleTrayDragEnter(e) {
+  e.preventDefault();
+  const el = e.currentTarget;
+  if (el && !el.classList.contains('locked') && !el.classList.contains('disabled')) {
+    el.classList.add('drag-over');
+  }
+}
+window.handleTrayDragEnter = handleTrayDragEnter;
+
+function handleTrayDragLeave(e) {
+  const el = e.currentTarget;
+  if (el) el.classList.remove('drag-over');
+}
+window.handleTrayDragLeave = handleTrayDragLeave;
+
+function handleTrayDrop(e, pitchType, zoneType) {
+  e.preventDefault();
+  const el = e.currentTarget;
+  if (el) el.classList.remove('drag-over');
+  if (el && (el.classList.contains('locked') || el.classList.contains('disabled'))) return;
+
+  const cardId = draggedCardId || (e.dataTransfer ? e.dataTransfer.getData('text/plain') : null) || selectedCard;
+  if (!cardId) return;
+
+  const g = window._lastGameState;
+  const currentBeat = g?.currentPA?.beat || 'beat1';
+  const half = g?.gameState?.half || 'top';
+  const pitchingRole = half === 'top' ? 'host' : 'guest';
+  const iAmPitching = (myRole === pitchingRole);
+
+  if (currentBeat === 'beat2' && pitchType) {
+    if (iAmPitching) {
+      localPitchType = pitchType;
+    } else {
+      localGuessPitch = pitchType;
+    }
+  }
+
+  localBeatCard = cardId;
+  selectedCard = null;
+  draggedCardId = null;
+
+  if (g) renderPlay(g);
+}
+window.handleTrayDrop = handleTrayDrop;
+
+function handleTrayClick(pitchType, zoneType) {
+  const g = window._lastGameState;
+  const currentBeat = g?.currentPA?.beat || 'beat1';
+  const half = g?.gameState?.half || 'top';
+  const pitchingRole = half === 'top' ? 'host' : 'guest';
+  const iAmPitching = (myRole === pitchingRole);
+
+  if (currentBeat === 'beat2' && pitchType) {
+    if (iAmPitching) {
+      localPitchType = pitchType;
+    } else {
+      localGuessPitch = pitchType;
+    }
+  }
+
+  if (selectedCard) {
+    localBeatCard = selectedCard;
+    selectedCard = null;
+  }
+  if (g) renderPlay(g);
+}
+window.handleTrayClick = handleTrayClick;
+
+// ── TOOLTIP & LONG-PRESS POPUP SYSTEM ────────────────────────────────────────
+let tooltipTimer = null;
+
+function showTooltipPopup(title, body) {
+  let el = document.getElementById('fc-tooltip-popover');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'fc-tooltip-popover';
+    el.className = 'fc-tooltip-popover';
+    el.onclick = function(e) {
+      if (e.target === el) hideTooltipPopup();
+    };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div class="ttp-card" onclick="event.stopPropagation()">
+      <div class="ttp-header">
+        <span class="ttp-title">${title}</span>
+        <button class="ttp-close" onclick="hideTooltipPopup()">&times;</button>
+      </div>
+      <div class="ttp-body">${body}</div>
+    </div>
+  `;
+  el.classList.add('visible');
+}
+window.showTooltipPopup = showTooltipPopup;
+
+function hideTooltipPopup() {
+  const el = document.getElementById('fc-tooltip-popover');
+  if (el) el.classList.remove('visible');
+}
+window.hideTooltipPopup = hideTooltipPopup;
+
+function handleTooltipClick(e, title, body) {
+  if (e) e.stopPropagation();
+  showTooltipPopup(title, body);
+}
+window.handleTooltipClick = handleTooltipClick;
+
+function handleTooltipTouchStart(e, title, body) {
+  if (tooltipTimer) clearTimeout(tooltipTimer);
+  tooltipTimer = setTimeout(() => {
+    showTooltipPopup(title, body);
+  }, 350);
+}
+window.handleTooltipTouchStart = handleTooltipTouchStart;
+
+function handleTooltipTouchEnd(e) {
+  if (tooltipTimer) clearTimeout(tooltipTimer);
+}
+window.handleTooltipTouchEnd = handleTooltipTouchEnd;
+
+function getArchetypeTooltip(archetype) {
+  switch((archetype || '').toLowerCase()) {
+    case 'slugger':
+      return 'Slugger: Enormous raw power. Barreled Delta 0 contacts on high cards (7+) produce Home Runs. Warning track power on Delta 2.';
+    case 'contact':
+    case 'contact hitter':
+      return 'Contact Hitter: Elite bat control. Avoids strikeouts on fooled pitches and beats out infield singles on off-balance swings (Delta 3–4).';
+    case 'speedster':
+      return 'Speedster: High agility on the bases. Converts bloop hits into extra bases and stretches singles.';
+    default:
+      return 'Balanced: Solid all-around hitter capable of driving balls into the gaps.';
+  }
+}
+window.getArchetypeTooltip = getArchetypeTooltip;
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT
@@ -589,16 +759,36 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
     // Opponent is Pitcher
     oppScoutChips = `
       <div class="opp-scout-chips">
-        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
-        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
-        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Fastball', 'Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Fastball', 'Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Breaking', 'Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Breaking', 'Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Offspeed', 'Execution window: [1–5 Touch]. Offspeed changeup. (Locked on 3-1 count). Remaining: ${pCharges?.offspeed ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Offspeed', 'Execution window: [1–5 Touch]. Offspeed changeup. (Locked on 3-1 count). Remaining: ${pCharges?.offspeed ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
       </div>`;
   } else {
     // Opponent is Batter
     oppScoutChips = `
       <div class="opp-scout-chips">
-        <span class="scout-chip hot" title="Archetype">STYLE: <b>${oppChar?.archetype || 'Hitter'}</b></span>
-        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+        <span class="scout-chip hot"
+              onclick="handleTooltipClick(event, 'Hitter Archetype: ${oppChar?.archetype || 'Hitter'}', '${getArchetypeTooltip(oppChar?.archetype)}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Hitter Archetype: ${oppChar?.archetype || 'Hitter'}', '${getArchetypeTooltip(oppChar?.archetype)}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Archetype">STYLE: <b>${oppChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav"
+              onclick="handleTooltipClick(event, 'Favorite Pitch: ${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}', 'When anticipating their favorite pitch, barreled timing produces extra bases (HR/2B)!')"
+              ontouchstart="handleTooltipTouchStart(event, 'Favorite Pitch: ${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}', 'When anticipating their favorite pitch, barreled timing produces extra bases (HR/2B)!')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Favorite Pitch">⭐ HUNTS: <b>${(oppChar?.scoutingReport?.favoritePitch || bScout?.favoritePitch || 'fastball').toUpperCase()}</b></span>
       </div>`;
   }
 
@@ -608,16 +798,36 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
     // User is Pitcher
     myScoutChips = `
       <div class="my-scout-chips">
-        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}" title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
-        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}" title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
-        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}" title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
+        <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Fastball', 'Your fastball window is [6–10 Heat]. Remaining charges: ${pCharges?.fastball ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Fastball', 'Your fastball window is [6–10 Heat]. Remaining charges: ${pCharges?.fastball ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+        <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Breaking', 'Your breaking window is [3–7 Bite]. Remaining charges: ${pCharges?.breaking ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Breaking', 'Your breaking window is [3–7 Bite]. Remaining charges: ${pCharges?.breaking ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+        <span class="scout-chip ${pCharges?.offspeed > 0 ? '' : 'exhausted'}"
+              onclick="handleTooltipClick(event, 'Pitch Repertoire: Offspeed', 'Your offspeed window is [1–5 Touch]. Locked on 3-1 count! Remaining: ${pCharges?.offspeed ?? 0}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Offspeed', 'Your offspeed window is [1–5 Touch]. Locked on 3-1 count! Remaining: ${pCharges?.offspeed ?? 0}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Offspeed (1-5)">OFF <b>${pCharges?.offspeed ?? 0}</b> <small>[1–5]</small></span>
       </div>`;
   } else {
     // User is Batter
     myScoutChips = `
       <div class="my-scout-chips">
-        <span class="scout-chip hot" title="Archetype">STYLE: <b>${myChar?.archetype || 'Hitter'}</b></span>
-        <span class="scout-chip fav" title="Favorite Pitch">⭐ HUNTS: <b>${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}</b></span>
+        <span class="scout-chip hot"
+              onclick="handleTooltipClick(event, 'Your Archetype: ${myChar?.archetype || 'Hitter'}', '${getArchetypeTooltip(myChar?.archetype)}')"
+              ontouchstart="handleTooltipTouchStart(event, 'Your Archetype: ${myChar?.archetype || 'Hitter'}', '${getArchetypeTooltip(myChar?.archetype)}')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Archetype">STYLE: <b>${myChar?.archetype || 'Hitter'}</b></span>
+        <span class="scout-chip fav"
+              onclick="handleTooltipClick(event, 'Favorite Pitch: ${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}', 'You hunt this pitch! Barreled timing produces towering extra bases!')"
+              ontouchstart="handleTooltipTouchStart(event, 'Favorite Pitch: ${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}', 'You hunt this pitch! Barreled timing produces towering extra bases!')"
+              ontouchend="handleTooltipTouchEnd(event)"
+              title="Favorite Pitch">⭐ HUNTS: <b>${(myChar?.scoutingReport?.favoritePitch || 'fastball').toUpperCase()}</b></span>
       </div>`;
   }
 
@@ -1068,6 +1278,9 @@ function renderBeat2AdvantageBanner(b1Data, iAmBatting, iAmPitching) {
 // ─────────────────────────────────────────────────────────────────────────────
 // ZONE BOARD RENDERING (2-BEAT FLOW: COUNT DUEL & PAYOFF PITCH)
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// ZONE BOARD RENDERING (BASEBALL DIAMOND ARENA: COUNT DUEL & PAYOFF PITCH)
+// ─────────────────────────────────────────────────────────────────────────────
 function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, batterChar, gs) {
   const myKey  = myRole;
   const oppKey = opponentRole();
@@ -1087,11 +1300,13 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
   const oppCommitted = Boolean(pa?.committed?.[oppKey]);
   const cardObj = localBeatCard ? getCard(localBeatCard) : null;
+  const bases = gs?.bases || { first: false, second: false, third: false };
+  const iAmPitching = !iAmBatting;
 
   let mainContentHtml = '';
 
   if (revealed && res) {
-    // ── REVEALED AT-BAT CLASH BREAKDOWN ──
+    // ── REVEALED AT-BAT CLASH ON THE BASEBALL DIAMOND ──
     const z1 = res.z1 || b1Data;
     const z2 = res.z2;
 
@@ -1102,53 +1317,62 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     const pPayoffCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : null;
     const bPayoffCard = z2?.batterCardId ? getCard(z2.batterCardId) : null;
 
+    const pCardVal = pPayoffCard?.value ?? z2?.pitcherCardVal ?? '—';
+    const bCardVal = bPayoffCard?.value ?? z2?.batterCardVal ?? '—';
+
+    const pPitchType = (z2?.pitchType || 'fastball').toUpperCase();
+    const bGuessPitch = (z2?.guessPitch || 'fastball').toUpperCase();
+
+    const isMatch = Boolean(z2?.pitchMatched);
+    const delta = z2?.timingDelta ?? 0;
+
     const myZ1Val = iAmBatting ? (bCardObj?.value ?? z1?.batterTotal ?? 0) : (pCardObj?.value ?? z1?.pitcherTotal ?? 0);
     const oppZ1Val = iAmBatting ? (pCardObj?.value ?? z1?.pitcherTotal ?? 0) : (bCardObj?.value ?? z1?.batterTotal ?? 0);
     const myZ1Label = iAmBatting ? 'You (B)' : 'You (P)';
     const oppZ1Label = iAmBatting ? 'Opp (P)' : 'Opp (B)';
 
-    const mySideHtml = iAmBatting ? `
-      <div class="clash-side batter">
-        <div class="cs-label">🏏 You (Batter)</div>
-        <div class="cs-action">LOOKING ${(z2?.guessPitch || 'fastball').toUpperCase()}</div>
-        <div class="cs-exec ${z2?.batterExecuted ? 'pass' : 'fail'}">
-          ${z2?.batterExecuted ? '🟢 IN RANGE' : '🔴 OUT OF RANGE'}
+    // Mound Content (Pitcher 3D Card Flip)
+    const moundHtml = `
+      <div class="mound-rubber"></div>
+      <div class="mound-title">⚾ PITCHER: ${pPitchType}</div>
+      <div class="field-card-container">
+        <div class="card-flipper is-flipped">
+          <div class="card-face card-back"><span class="card-back-icon">⚾</span></div>
+          <div class="card-face card-front"><span class="card-hero-num">${pCardVal}</span></div>
         </div>
-        <div class="cs-card">Card: [${bPayoffCard?.value ?? z2?.batterCardVal ?? '—'}]</div>
-      </div>
-    ` : `
-      <div class="clash-side pitcher">
-        <div class="cs-label">⚾ You (Pitcher)</div>
-        <div class="cs-action">${(z2?.pitchType || 'fastball').toUpperCase()}</div>
-        <div class="cs-exec ${z2?.pitcherExecuted ? 'pass' : 'fail'}">
+        <div class="field-card-tag ${z2?.pitcherExecuted ? 'pass' : 'fail'}">
           ${z2?.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
         </div>
-        <div class="cs-card">Card: [${pPayoffCard?.value ?? z2?.pitcherCardVal ?? '—'}]</div>
       </div>
     `;
 
-    const oppSideHtml = iAmBatting ? `
-      <div class="clash-side pitcher">
-        <div class="cs-label">⚾ Opponent (Pitcher)</div>
-        <div class="cs-action">${(z2?.pitchType || 'fastball').toUpperCase()}</div>
-        <div class="cs-exec ${z2?.pitcherExecuted ? 'pass' : 'fail'}">
-          ${z2?.pitcherExecuted ? '🟢 SPOT ON' : '🔴 HANGER'}
+    // Plate Content (Batter 3D Card Flip)
+    const plateHtml = `
+      <div class="home-plate-pentagon"></div>
+      <div class="plate-title">🏏 BATTER: LOOKING ${bGuessPitch}</div>
+      <div class="field-card-container">
+        <div class="card-flipper is-flipped">
+          <div class="card-face card-back"><span class="card-back-icon">🏏</span></div>
+          <div class="card-face card-front"><span class="card-hero-num">${bCardVal}</span></div>
         </div>
-        <div class="cs-card">Card: [${pPayoffCard?.value ?? z2?.pitcherCardVal ?? '—'}]</div>
-      </div>
-    ` : `
-      <div class="clash-side batter">
-        <div class="cs-label">🏏 Opponent (Batter)</div>
-        <div class="cs-action">LOOKING ${(z2?.guessPitch || 'fastball').toUpperCase()}</div>
-        <div class="cs-exec ${z2?.batterExecuted ? 'pass' : 'fail'}">
+        <div class="field-card-tag ${z2?.batterExecuted ? 'pass' : 'fail'}">
           ${z2?.batterExecuted ? '🟢 IN RANGE' : '🔴 OUT OF RANGE'}
         </div>
-        <div class="cs-card">Card: [${bPayoffCard?.value ?? z2?.batterCardVal ?? '—'}]</div>
+      </div>
+    `;
+
+    // Center Clash Beam
+    const centerBeamHtml = `
+      <div class="field-clash-beam">
+        <div class="fcb-badge ${isMatch ? 'match' : 'whiff'}">
+          <span class="fcb-title">${isMatch ? '🎯 PITCH ANTICIPATED' : '❌ FOOLED ON PITCH'}</span>
+          <span class="fcb-delta">&Delta; ${delta}</span>
+        </div>
       </div>
     `;
 
     mainContentHtml = `
-      <div class="battlefield-clash-board">
+      <div class="diamond-arena revealed-arena">
         <div class="clash-beat-header">
           <span class="cbh-tag">BEAT 1: ${b1WinnerLabel}</span>
           <div class="cbh-cards">
@@ -1158,39 +1382,49 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           </div>
         </div>
 
-        ${z2 ? `
-          <div class="payoff-clash-card">
-            <div class="clash-matchup-header">
-              <span class="cm-tag">💥 PAYOFF PITCH</span>
-              <span class="cm-loc ${z2.pitchMatched ? 'match' : 'diff'}">${z2.pitchMatched ? '🎯 PITCH ANTICIPATED' : '❌ FOOLED ON PITCH'}</span>
-            </div>
+        <div class="diamond-field">
+          <div class="infield-dirt"></div>
+          <div class="basepath-lines"></div>
 
-            <div class="clash-teams-row">
-              ${mySideHtml}
-              <div class="clash-vs-divider">VS</div>
-              ${oppSideHtml}
-            </div>
+          <!-- Bases -->
+          <div class="diamond-base base-second ${bases.second ? 'occupied' : ''}" title="2nd Base" onclick="handleTooltipClick(event, 'Second Base', '${bases.second ? 'Runner on 2nd base!' : 'Second base is empty.'}')">
+            ${bases.second ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-third ${bases.third ? 'occupied' : ''}" title="3rd Base" onclick="handleTooltipClick(event, 'Third Base', '${bases.third ? 'Runner on 3rd base!' : 'Third base is empty.'}')">
+            ${bases.third ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-first ${bases.first ? 'occupied' : ''}" title="1st Base" onclick="handleTooltipClick(event, 'First Base', '${bases.first ? 'Runner on 1st base!' : 'First base is empty.'}')">
+            ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
 
-            <div class="clash-outcome-badge">
-              <span class="cob-title">${z2.outcomeDisplay || res.outcome?.display || 'Outcome Resolved'}</span>
-            </div>
+          <!-- Pitcher on Mound -->
+          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${moundHtml}
           </div>
-        ` : `
-          <div class="payoff-clash-card">
-            <div class="clash-outcome-badge">
-              <span class="cob-title">${res.outcome?.display || 'At-Bat Complete'}</span>
-            </div>
+
+          <!-- Center Clash Beam -->
+          ${centerBeamHtml}
+
+          <!-- Batter at Plate -->
+          <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${plateHtml}
           </div>
-        `}
-      </div>`;
+        </div>
+
+        <!-- Outcome Headline on Field -->
+        <div class="clash-outcome-badge diamond-outcome-tag">
+          <span class="cob-title">${z2?.outcomeDisplay || res.outcome?.display || 'Outcome Resolved'}</span>
+        </div>
+      </div>
+    `;
 
   } else if (currentBeat === 'beat1') {
-    // ── BEAT 1: THE COUNT BATTLE (SETUP) ──
+    // ── BEAT 1: THE COUNT BATTLE ON THE BASEBALL DIAMOND ──
     const myPlacedCardHtml = localBeatCard
       ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted)
       : (!myCommitted
           ? `<div class="empty-drop-slot" onclick="if(selectedCard) selectBeatCard(selectedCard)">
-               <span class="drop-hint">+ Pick a card below</span>
+               <span class="drop-hint">+ Drag or tap card</span>
              </div>`
           : '<div class="empty-drop-slot" style="opacity:0.3;">—</div>');
 
@@ -1198,36 +1432,77 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
       ? `<div class="hidden-opponent-card"><span class="mystery-mark">✓ READY</span></div>`
       : `<div class="hidden-opponent-card waiting"><span class="mystery-mark">⏳ DECIDING…</span></div>`;
 
+    // Drop slot on user territory, opponent slot on opp territory
+    const mySlotEl = `
+      <div class="b1-card-slot mine tray-drop-target"
+           ondragover="handleTrayDragOver(event)"
+           ondragenter="handleTrayDragEnter(event)"
+           ondragleave="handleTrayDragLeave(event)"
+           ondrop="handleTrayDrop(event, null, 'b1')"
+           onclick="handleTrayClick(null, 'b1')">
+        <span class="slot-role-tag">${iAmBatting ? '🏏 Your Batter Card' : '⚾ Your Pitcher Card'}</span>
+        ${myPlacedCardHtml}
+      </div>
+    `;
+
+    const oppSlotEl = `
+      <div class="b1-card-slot opp">
+        <span class="slot-role-tag">${iAmBatting ? '⚾ Opponent Pitcher Card' : '🏏 Opponent Batter Card'}</span>
+        ${oppSlotHtml}
+      </div>
+    `;
+
     mainContentHtml = `
-      <div class="beat1-arena">
-        <div class="beat1-banner">
-          <span class="b1-title">BEAT 1: THE COUNT BATTLE</span>
-          <span class="b1-subtitle">High card wins count advantage &bull; Tie is 3-2 full count</span>
+      <div class="beat1-arena diamond-arena">
+        <div class="beat1-banner" onclick="handleTooltipClick(event, 'Beat 1: The Count Battle', 'Both players clash with a single card. The higher card wins count advantage (0-2 for pitcher, 3-1 for batter). A tie establishes a neutral 3-2 full count!')" title="Tap for info">
+          <span class="b1-title">BEAT 1: THE COUNT DUEL <span class="adv-info-icon">ⓘ</span></span>
+          <span class="b1-subtitle">Mound vs Plate &bull; High card wins count leverage</span>
         </div>
 
-        <div class="b1-cards-row">
-          <div class="b1-card-slot mine">
-            <span class="slot-role-tag">${iAmBatting ? '🏏 Your Card' : '⚾ Your Card'}</span>
-            ${myPlacedCardHtml}
+        <div class="diamond-field">
+          <div class="infield-dirt"></div>
+          <div class="basepath-lines"></div>
+
+          <!-- Bases -->
+          <div class="diamond-base base-second ${bases.second ? 'occupied' : ''}" title="2nd Base" onclick="handleTooltipClick(event, 'Second Base', '${bases.second ? 'Runner on 2nd base!' : 'Second base is empty.'}')">
+            ${bases.second ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-third ${bases.third ? 'occupied' : ''}" title="3rd Base" onclick="handleTooltipClick(event, 'Third Base', '${bases.third ? 'Runner on 3rd base!' : 'Third base is empty.'}')">
+            ${bases.third ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-first ${bases.first ? 'occupied' : ''}" title="1st Base" onclick="handleTooltipClick(event, 'First Base', '${bases.first ? 'Runner on 1st base!' : 'First base is empty.'}')">
+            ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
           </div>
 
-          <div class="b1-vs-badge">VS</div>
-
-          <div class="b1-card-slot opp">
-            <span class="slot-role-tag">${iAmBatting ? '⚾ Opponent Card' : '🏏 Opponent Card'}</span>
-            ${oppSlotHtml}
+          <!-- Left-Side User Rule & Test Compatibility: .b1-cards-row contains mine then opp -->
+          <div class="b1-cards-row diamond-b1-row">
+            ${mySlotEl}
+            <div class="b1-vs-badge">VS</div>
+            ${oppSlotEl}
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
 
   } else {
-    // ── BEAT 2: THE PAYOFF PITCH ──
+    // ── BEAT 2: THE PAYOFF PITCH ON THE BASEBALL DIAMOND ──
     const isDominant = Boolean(b1Data?.isDominant);
     const disAdvSide = b1Data?.revealCardFirst;
     const battingRole = (pitchingRole === 'host') ? 'guest' : 'host';
     const disAdvRole = (disAdvSide === 'pitcher') ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null);
     const isOppDisadvantaged = Boolean(disAdvRole && disAdvRole === oppKey);
     const amIDisadvantaged = Boolean(disAdvRole && disAdvRole === myKey);
+
+    const isOffspeedLocked = (count === '3-1') || (b1Data?.lockedOption === 'offspeed');
+    if (isOffspeedLocked) {
+      if (!iAmBatting && localPitchType === 'offspeed') localPitchType = 'fastball';
+      if (iAmBatting && localGuessPitch === 'offspeed') localGuessPitch = 'fastball';
+    }
+
+    const curPitch = !iAmBatting ? localPitchType : localGuessPitch;
+    const curRange = PITCH_RANGES[curPitch] || { min: 1, max: 10, label: '1–10' };
+    const cardVal = cardObj ? (cardObj.value || 0) : null;
+    const inRange = cardVal !== null ? (cardVal >= curRange.min && cardVal <= curRange.max) : null;
 
     let oppSlotHtml = '';
     if (isDominant && isOppDisadvantaged && oppCommitted) {
@@ -1240,9 +1515,8 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             <span class="card-hero-num">${oppVal}</span>
           </div>
           <div class="revealed-info">
-            <span class="revealed-intel-badge">👁️ REVEALED INTEL &bull; FACE-UP</span>
-            <span class="ri-title">${iAmBatting ? 'Pitcher' : 'Batter'} committed Card [${oppVal}]</span>
-            <span class="ri-sub">You have complete information advantage!</span>
+            <span class="revealed-intel-badge">👁️ FACE-UP INTEL</span>
+            <span class="ri-title">${iAmBatting ? 'Pitcher' : 'Batter'} committed [${oppVal}]</span>
           </div>
         </div>`;
     } else if (isDominant && isOppDisadvantaged && !oppCommitted) {
@@ -1257,34 +1531,201 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
       ? `<div class="disadvantaged-notice-banner">⚠️ DOMINANT COUNT DISADVANTAGE: You must lock in your execution card FIRST. Your card value will be visible to your opponent!</div>`
       : '';
 
-    const myPlacedCardHtml = localBeatCard
-      ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted)
-      : (!myCommitted
-          ? `<div class="empty-drop-slot" onclick="if(selectedCard) selectBeatCard(selectedCard)">
-               <span class="drop-hint">+ Pick execution card below</span>
-             </div>`
-          : '<div class="empty-drop-slot" style="opacity:0.3;">—</div>');
+    // Mound Content
+    let moundContent = '';
+    if (!iAmBatting) {
+      // User is Pitching: 3 Pitch Trays on Mound
+      moundContent = `
+        <div class="mound-rubber"></div>
+        <div class="mound-title">⚾ PITCHER'S MOUND &bull; DRAG CARD TO PITCH</div>
+        <div class="pitch-trays-container selection-tiles">
+          <!-- Fastball -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'fastball' ? 'active' : ''} ${charges.fastball <= 0 ? 'disabled' : ''}"
+               ondragover="handleTrayDragOver(event)"
+               ondragenter="handleTrayDragEnter(event)"
+               ondragleave="handleTrayDragLeave(event)"
+               ondrop="handleTrayDrop(event, 'fastball', 'mound')"
+               onclick="handleTrayClick('fastball', 'mound')"
+               data-tooltip-title="Fastball [6–10 Heat]"
+               data-tooltip-body="Velocity heat. Target window is 6–10. Cards below 6 will result in a hung mistake pitch! Remaining: ${charges.fastball}">
+            <div class="pt-header">
+              <span class="pt-icon">🔥</span>
+              <span class="pt-name">Fastball</span>
+              <span class="pt-charges">${charges.fastball ?? 0}</span>
+            </div>
+            <div class="pt-range">[6–10 Heat]</div>
+            ${(localBeatCard && localPitchType === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+          </div>
 
-    mainContentHtml = `
-      <div class="beat2-arena">
-        ${renderBeat2AdvantageBanner(b1Data, iAmBatting, !iAmBatting)}
-        ${disAdvNoticeHtml}
-        <div class="b2-opp-strip">
-          <span class="opp-role-label">${iAmBatting ? '⚾ Pitcher Move:' : '🏏 Batter Move:'}</span>
+          <!-- Breaking -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'breaking' ? 'active' : ''} ${charges.breaking <= 0 ? 'disabled' : ''}"
+               ondragover="handleTrayDragOver(event)"
+               ondragenter="handleTrayDragEnter(event)"
+               ondragleave="handleTrayDragLeave(event)"
+               ondrop="handleTrayDrop(event, 'breaking', 'mound')"
+               onclick="handleTrayClick('breaking', 'mound')"
+               data-tooltip-title="Breaking Ball [3–7 Bite]"
+               data-tooltip-body="Spin and bite. Target window is 3–7. Effective against balanced swings. Remaining: ${charges.breaking}">
+            <div class="pt-header">
+              <span class="pt-icon">🌀</span>
+              <span class="pt-name">Breaking</span>
+              <span class="pt-charges">${charges.breaking ?? 0}</span>
+            </div>
+            <div class="pt-range">[3–7 Bite]</div>
+            ${(localBeatCard && localPitchType === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+          </div>
+
+          <!-- Offspeed -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'offspeed' ? 'active' : ''} ${isOffspeedLocked ? 'locked disabled' : (charges.offspeed <= 0 ? 'disabled' : '')}"
+               ondragover="${isOffspeedLocked ? '' : 'handleTrayDragOver(event)'}"
+               ondragenter="${isOffspeedLocked ? '' : 'handleTrayDragEnter(event)'}"
+               ondragleave="${isOffspeedLocked ? '' : 'handleTrayDragLeave(event)'}"
+               ondrop="${isOffspeedLocked ? '' : 'handleTrayDrop(event, \'offspeed\', \'mound\')'}"
+               onclick="${isOffspeedLocked ? '' : 'handleTrayClick(\'offspeed\', \'mound\')'}"
+               data-tooltip-title="Offspeed [1–5 Touch]"
+               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out due to 3-1 Hitter Count penalty!' : `Deception & touch. Target window is 1–5. Disables power bats. Remaining: ${charges.offspeed}`}">
+            <div class="pt-header">
+              <span class="pt-icon">${isOffspeedLocked ? '🔒' : '⏱️'}</span>
+              <span class="pt-name">Offspeed</span>
+              <span class="pt-charges">${isOffspeedLocked ? 'LOCKED' : (charges.offspeed ?? 0)}</span>
+            </div>
+            <div class="pt-range">${isOffspeedLocked ? '3-1 Lockout' : '[1–5 Touch]'}</div>
+            ${(localBeatCard && localPitchType === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
+          </div>
+        </div>
+      `;
+    } else {
+      // Opponent is Pitcher on Mound
+      moundContent = `
+        <div class="mound-rubber"></div>
+        <div class="mound-title">⚾ PITCHER'S MOUND &bull; OPPONENT</div>
+        <div class="opp-mound-status">
           ${oppSlotHtml}
         </div>
+      `;
+    }
 
-        <div class="b2-controls-wrapper">
-          ${!iAmBatting
-            ? renderPitcherPayoffDeck(charges, localPitchType, bScout, pDiffs, count, cardObj, b1Data)
-            : renderBatterPayoffDeck(localGuessPitch, bScout, count, cardObj, b1Data)}
+    // Plate Content
+    let plateContent = '';
+    if (iAmBatting) {
+      // User is Batting: 3 Anticipation Trays at Home Plate
+      plateContent = `
+        <div class="home-plate-pentagon"></div>
+        <div class="plate-title">🏏 HOME PLATE &bull; DRAG CARD TO GUESS PITCH</div>
+        <div class="batter-trays-container selection-tiles">
+          <!-- Fastball -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'fastball' ? 'active' : ''}"
+               ondragover="handleTrayDragOver(event)"
+               ondragenter="handleTrayDragEnter(event)"
+               ondragleave="handleTrayDragLeave(event)"
+               ondrop="handleTrayDrop(event, 'fastball', 'plate')"
+               onclick="handleTrayClick('fastball', 'plate')"
+               data-tooltip-title="Anticipate Fastball [6–10]"
+               data-tooltip-body="Anticipate high velocity. Target timing window is 6–10.${bScout.favoritePitch === 'fastball' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
+            <div class="pt-header">
+              <span class="pt-icon">🔥</span>
+              <span class="pt-name">Fastball</span>
+              ${bScout.favoritePitch === 'fastball' ? '<span class="pt-fav-tag">⭐ FAV</span>' : ''}
+            </div>
+            <div class="pt-range">[6–10]</div>
+            ${(localBeatCard && localGuessPitch === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+          </div>
+
+          <!-- Breaking -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'breaking' ? 'active' : ''}"
+               ondragover="handleTrayDragOver(event)"
+               ondragenter="handleTrayDragEnter(event)"
+               ondragleave="handleTrayDragLeave(event)"
+               ondrop="handleTrayDrop(event, 'breaking', 'plate')"
+               onclick="handleTrayClick('breaking', 'plate')"
+               data-tooltip-title="Anticipate Breaking [3–7]"
+               data-tooltip-body="Anticipate spin & break. Target timing window is 3–7.${bScout.favoritePitch === 'breaking' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
+            <div class="pt-header">
+              <span class="pt-icon">🌀</span>
+              <span class="pt-name">Breaking</span>
+              ${bScout.favoritePitch === 'breaking' ? '<span class="pt-fav-tag">⭐ FAV</span>' : ''}
+            </div>
+            <div class="pt-range">[3–7]</div>
+            ${(localBeatCard && localGuessPitch === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+          </div>
+
+          <!-- Offspeed -->
+          <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'offspeed' ? 'active' : ''} ${isOffspeedLocked ? 'locked disabled' : ''}"
+               ondragover="${isOffspeedLocked ? '' : 'handleTrayDragOver(event)'}"
+               ondragenter="${isOffspeedLocked ? '' : 'handleTrayDragEnter(event)'}"
+               ondragleave="${isOffspeedLocked ? '' : 'handleTrayDragLeave(event)'}"
+               ondrop="${isOffspeedLocked ? '' : 'handleTrayDrop(event, \'offspeed\', \'plate\')'}"
+               onclick="${isOffspeedLocked ? '' : 'handleTrayClick(\'offspeed\', \'plate\')'}"
+               data-tooltip-title="Anticipate Offspeed [1–5]"
+               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out on 3-1 count!' : `Anticipate touch & changeup. Target timing window is 1–5.${bScout.favoritePitch === 'offspeed' ? ' ⭐ Favorite pitch!' : ''}`}">
+            <div class="pt-header">
+              <span class="pt-icon">${isOffspeedLocked ? '🔒' : '⏱️'}</span>
+              <span class="pt-name">Offspeed</span>
+              ${isOffspeedLocked ? '<span class="pt-fav-tag">LOCKED</span>' : (bScout.favoritePitch === 'offspeed' ? '<span class="pt-fav-tag">⭐ FAV</span>' : '')}
+            </div>
+            <div class="pt-range">${isOffspeedLocked ? '3-1 Lockout' : '[1–5]'}</div>
+            ${(localBeatCard && localGuessPitch === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
+          </div>
+        </div>
+      `;
+    } else {
+      // Opponent is Batter at Home Plate
+      plateContent = `
+        <div class="home-plate-pentagon"></div>
+        <div class="plate-title">🏏 HOME PLATE &bull; OPPONENT</div>
+        <div class="opp-plate-status">
+          ${oppSlotHtml}
+        </div>
+      `;
+    }
+
+    // Execution range feedback
+    const execFeedbackHtml = (cardVal !== null) ? `
+      <div class="diamond-exec-pill ${inRange ? 'pass' : 'fail'}">
+        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}]</span>
+        <span>${inRange ? `🟢 IN RANGE [Card ${cardVal}]` : `⚠️ OUT OF RANGE [Card ${cardVal}]`}</span>
+      </div>
+    ` : `
+      <div class="diamond-exec-pill waiting">
+        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}]</span>
+        <span>Drag a card to a tray</span>
+      </div>
+    `;
+
+    mainContentHtml = `
+      <div class="beat2-arena diamond-arena">
+        ${renderBeat2AdvantageBanner(b1Data, iAmBatting, !iAmBatting)}
+        ${disAdvNoticeHtml}
+
+        <div class="diamond-field">
+          <div class="infield-dirt"></div>
+          <div class="basepath-lines"></div>
+
+          <!-- Bases -->
+          <div class="diamond-base base-second ${bases.second ? 'occupied' : ''}" title="2nd Base" onclick="handleTooltipClick(event, 'Second Base', '${bases.second ? 'Runner on 2nd base!' : 'Second base is empty.'}')">
+            ${bases.second ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-third ${bases.third ? 'occupied' : ''}" title="3rd Base" onclick="handleTooltipClick(event, 'Third Base', '${bases.third ? 'Runner on 3rd base!' : 'Third base is empty.'}')">
+            ${bases.third ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+          <div class="diamond-base base-first ${bases.first ? 'occupied' : ''}" title="1st Base" onclick="handleTooltipClick(event, 'First Base', '${bases.first ? 'Runner on 1st base!' : 'First base is empty.'}')">
+            ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
+          </div>
+
+          <!-- Pitcher's Mound (Center) -->
+          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${moundContent}
+          </div>
+
+          <!-- Home Plate / Batter's Box (Bottom) -->
+          <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${plateContent}
+          </div>
         </div>
 
-        <div class="b2-exec-slot-row">
-          <div class="exec-slot-label">${amIDisadvantaged ? '⚠️ Face-Up Execution Card:' : 'Execution Card:'}</div>
-          ${myPlacedCardHtml}
-        </div>
-      </div>`;
+        ${execFeedbackHtml}
+      </div>
+    `;
   }
 
   return `
@@ -1337,8 +1778,11 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
 
         return `
           <div class="number-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''}"
+               draggable="${isActive ? 'true' : 'false'}"
+               ondragstart="${isActive ? `handleCardDragStart(event, '${id}')` : ''}"
+               ondragend="${isActive ? `handleCardDragEnd(event)` : ''}"
                onclick="${isActive ? `selectCard('${id}')` : ''}"
-               title="${isActive ? `Value: ${card.value}` : 'Cannot play this card'}">
+               title="${isActive ? `Value: ${card.value} (Drag to diamond tray or tap)` : 'Cannot play this card'}">
             <span class="card-hero-num">${card.value}</span>
           </div>`;
       }).join('')}
