@@ -217,90 +217,93 @@
         assert(b1Tie.isDominant === false, `Tie has no dominant advantage`);
         assert(b1Tie.revealCardFirst === null, `Tie does not force card reveal`);
 
-        // 13. Sequential Beat 2 Tests (Intent & Execution Clash)
+        // 13. Sequential Beat 2 Tests (Timing Delta & Deduction Clash)
         // Scenario A: FULL MATCH (Both Pitch Type & Location read)
-        // Harmon Fastball Diff 3, Boomer Power Diff 8. Both execute clean in High Fastball!
+        // Pitcher Fastball High (P14 val 6 in 6-10), Batter Power High (B26 val 6 in 6-10) -> Delta 0 (Squared Up Barrel!)
         const b2HR = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14', // val 6 >= 3
+          pitcherCardId: 'P14', // val 6 in 6-10
           guessPitch: 'fastball',
           swingType: 'power',
           targetZone: 'high',
-          batterCardId: 'B18',  // val 9 >= 8
+          batterCardId: 'B26',  // val 6 in 6-10 -> Delta 0!
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2HR.pitcherExecuted === true, `Pitcher executes fastball clean (6 >= 3)`);
-        assert(b2HR.batterExecuted === true, `Batter executes power swing clean (9 >= 8)`);
+        assert(b2HR.pitcherExecuted === true, `Pitcher executes fastball in range 6-10 (6)`);
+        assert(b2HR.batterExecuted === true, `Batter executes power swing in range 6-10 (6)`);
+        assert(b2HR.timingDelta === 0, `Timing Delta is 0 (Squared Up Barrel)`);
         assert(b2HR.matchTier === 'full', `Batter anticipated both pitch and location (full match)`);
-        assert(b2HR.outcomeType === 'homerun', `Full match + barreled power swing produces Home Run`);
+        assert(b2HR.outcomeType === 'homerun', `Full match + Delta 0 barrel produces Home Run`);
 
-        // Full Match with mistimed contact swing: Batter had pitch read perfectly, gets infield single
+        // Full Match with off-balance contact swing: Batter had pitch read perfectly, gets infield single
         const b2FullContactMistimed = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14', // val 6 >= 3
+          pitcherCardId: 'P14', // val 6
           guessPitch: 'fastball',
           swingType: 'contact',
           targetZone: 'high',
-          batterCardId: 'B14',  // val 2 < 3
+          batterCardId: 'B14',  // val 2 in 1-5 contact range, Delta 4
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2FullContactMistimed.matchTier === 'full', `Full match on contact stroke`);
+        assert(b2FullContactMistimed.timingDelta === 4, `Timing Delta is 4 (off-balance contact)`);
         assert(b2FullContactMistimed.outcomeType === 'single', `Full match contact stroke finds a hole even when mistimed`);
 
         // Scenario B: PARTIAL MATCH (Guessed Pitch Type OR Location)
-        // Pitcher clean in high zone, batter timed the fastball but looked low
+        // Pitcher clean in high zone, batter timed the fastball but looked low (Delta 2)
         const b2Flyout = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14', // val 6 >= 3
+          pitcherCardId: 'P14', // val 6
           guessPitch: 'fastball',
           swingType: 'power',
           targetZone: 'low',    // Zone missed
-          batterCardId: 'B18',  // val 9 >= 8
+          batterCardId: 'B27',  // val 8 (Delta 2)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2Flyout.matchTier === 'partial', `Partial match: timed pitch, wrong location`);
         assert(b2Flyout.outcomeType === 'flyout', `Clean pitch in unpredicted zone produces Flyout`);
 
-        // Partial match: Pitcher hangs mistake offspeed (val 1 < 8), batter read offspeed and punishes it!
-        const b2Hanger = resolveBeat2({
+        // Partial match: Pitcher throws fastball low (P14 val 6), batter read fastball high and barrels it (B26 val 6, Delta 0)
+        const b2SquaredPartial = resolveBeat2({
           count: '3-2',
-          pitchType: 'offspeed',
+          pitchType: 'fastball',
           pitchLocation: 'low',
-          pitcherCardId: 'P19', // val 1 < 8 (Hanger)
-          guessPitch: 'offspeed',
+          pitcherCardId: 'P14', // val 6
+          guessPitch: 'fastball',
           swingType: 'power',
           targetZone: 'high',   // Zone missed, but pitch timed
-          batterCardId: 'B18',  // val 9 >= 8
+          batterCardId: 'B26',  // val 6 (Delta 0 barrel!)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Hanger.pitcherExecuted === false, `Pitcher fails execution on offspeed with low card (1 < 8)`);
-        assert(b2Hanger.matchTier === 'partial', `Partial match on anticipated pitch`);
-        assert(b2Hanger.outcomeType === 'homerun', `Hanging mistake pitch punished for Home Run`);
+        assert(b2SquaredPartial.timingDelta === 0, `Barrel timing Delta is 0`);
+        assert(b2SquaredPartial.matchTier === 'partial', `Partial match on anticipated pitch`);
+        assert(b2SquaredPartial.outcomeType === 'homerun', `Hanging mistake pitch punished for Home Run`);
 
         // Partial match: Pitcher executes clean, batter mistimes power swing -> Strikeout
         const b2Strikeout = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14', // val 6 >= 3
+          pitcherCardId: 'P14', // val 6
           guessPitch: 'breaking', // Pitch wrong
           swingType: 'power',
           targetZone: 'high',     // Zone right
-          batterCardId: 'B13',  // val 1 < 8
+          batterCardId: 'B13',  // val 1 (Delta 5)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Strikeout.batterExecuted === false, `Batter fails execution on power swing with low card (1 < 8)`);
+        assert(b2Strikeout.batterExecuted === false, `Batter fails execution on power swing with low card (1 < 6)`);
+        assert(b2Strikeout.timingDelta === 5, `Timing Delta is 5 (badly mistimed)`);
         assert(b2Strikeout.outcomeType === 'k', `Mistimed power swing on clean pitch results in Strikeout`);
 
         // Partial match: Contact swing chokes up and avoids strikeout, producing groundout
@@ -308,43 +311,44 @@
           count: '3-2',
           pitchType: 'fastball',
           pitchLocation: 'high',
-          pitcherCardId: 'P14', // val 6 >= 3
+          pitcherCardId: 'P14', // val 6
           guessPitch: 'breaking', // Pitch wrong
           swingType: 'contact',
           targetZone: 'high',     // Zone right
-          batterCardId: 'B14',  // val 2 < 3
+          batterCardId: 'B14',  // val 2
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2ContactProtect.outcomeType === 'groundout', `Contact swing chokes up and avoids strikeout, producing groundout`);
 
         // Scenario C: WHIFF (Neither Pitch Type NOR Location guessed)
-        // User rule: Batter guessed incorrectly -> even with good swing, must favor the pitcher!
+        // User rule: Batter guessed incorrectly -> even with good swing / low Delta, must favor the pitcher!
         const b2WhiffGoodSwing = resolveBeat2({
           count: '3-2',
           pitchType: 'breaking',
           pitchLocation: 'low',
-          pitcherCardId: 'P19', // Val 1 < 5 (Pitcher hangs mistake)
+          pitcherCardId: 'P14', // Val 6 (in 3-7 breaking range)
           guessPitch: 'fastball', // WRONG
           swingType: 'power',
           targetZone: 'high',     // WRONG
-          batterCardId: 'B18',  // Val 9 >= 8 (Good swing execution!)
+          batterCardId: 'B26',  // Val 6 (Delta 0 collision, but completely fooled!)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2WhiffGoodSwing.matchTier === 'whiff', `Batter guessed neither pitch nor location`);
+        assert(b2WhiffGoodSwing.timingDelta === 0, `Timing Delta is 0`);
         assert(b2WhiffGoodSwing.outcomeType === 'flyout', `Completely fooled batter cannot hit HR even on hanging pitch (produces popout)`);
 
-        // Whiff when pitcher executes clean -> Swinging Strikeout!
+        // Whiff when pitcher executes clean and timing is off (Delta 3) -> Swinging Strikeout!
         const b2WhiffCleanPitch = resolveBeat2({
           count: '3-2',
           pitchType: 'breaking',
           pitchLocation: 'low',
-          pitcherCardId: 'P14', // Val 6 >= 5 (Clean)
-          guessPitch: 'fastball',
-          swingType: 'balanced',
-          targetZone: 'high',
-          batterCardId: 'B18',
+          pitcherCardId: 'P14', // Val 6 (in 3-7 breaking range)
+          guessPitch: 'fastball', // WRONG
+          swingType: 'power',
+          targetZone: 'high',     // WRONG
+          batterCardId: 'B18',  // Val 9 (Delta 3)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
