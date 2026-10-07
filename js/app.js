@@ -1452,19 +1452,27 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
           </div>
 
-          <!-- Pitcher on Mound (Center) -->
-          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+          <!-- 1. Purple Box: Pitcher Stats (Top) -->
+          <div class="diamond-pitcher-stats ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${renderFieldPitcherInfo(pitcherChar, charges, staminaState?.isFatigued, !iAmBatting, count)}
+          </div>
+
+          <!-- 2. Green Box: Pitcher Card Tray / Mound (Center) -->
+          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${moundHtml}
           </div>
 
           <!-- Center Clash Beam -->
           ${centerBeamHtml}
 
-          <!-- Batter at Plate (Bottom) -->
+          <!-- 3. Orange Box: Batter Card Tray / Home Plate (Bottom) -->
           <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
-            ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
             ${plateHtml}
+          </div>
+
+          <!-- 4. Red Box: Batter Stats (Bottom) -->
+          <div class="diamond-batter-stats ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
           </div>
         </div>
 
@@ -1533,20 +1541,28 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
           </div>
 
-          <!-- Pitcher on Mound (Center) -->
-          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+          <!-- 1. Purple Box: Pitcher Stats (Top) -->
+          <div class="diamond-pitcher-stats ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${renderFieldPitcherInfo(pitcherChar, charges, staminaState?.isFatigued, !iAmBatting, count)}
           </div>
 
-          <!-- Left-Side User Rule & Test Compatibility: .b1-cards-row contains mine then opp -->
-          <div class="b1-cards-row diamond-b1-row">
-            ${mySlotEl}
-            <div class="b1-vs-badge">VS</div>
-            ${oppSlotEl}
+          <!-- 2. Green Box: Pitcher Card Tray / Mound (Center) -->
+          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            <div class="mound-rubber"></div>
+            ${!iAmBatting ? mySlotEl : oppSlotEl}
           </div>
 
-          <!-- Batter at Plate (Bottom) -->
+          <!-- Infield VS Clash Badge -->
+          <div class="diamond-b1-vs-badge">VS</div>
+
+          <!-- 3. Orange Box: Batter Card Tray / Home Plate (Bottom) -->
           <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            <div class="home-plate-pentagon"></div>
+            ${iAmBatting ? mySlotEl : oppSlotEl}
+          </div>
+
+          <!-- 4. Red Box: Batter Stats (Bottom) -->
+          <div class="diamond-batter-stats ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
           </div>
         </div>
@@ -1789,16 +1805,24 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
           </div>
 
-          <!-- Pitcher's Mound (Center) -->
-          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+          <!-- 1. Purple Box: Pitcher Stats (Top) -->
+          <div class="diamond-pitcher-stats ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${renderFieldPitcherInfo(pitcherChar, charges, staminaState?.isFatigued, !iAmBatting, count)}
+          </div>
+
+          <!-- 2. Green Box: Pitcher Card Tray / Mound (Center) -->
+          <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             ${moundContent}
           </div>
 
-          <!-- Home Plate / Batter's Box (Bottom) -->
+          <!-- 3. Orange Box: Batter Card Tray / Home Plate (Bottom) -->
           <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
-            ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
             ${plateContent}
+          </div>
+
+          <!-- 4. Red Box: Batter Stats (Bottom) -->
+          <div class="diamond-batter-stats ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
           </div>
         </div>
 

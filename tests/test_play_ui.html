@@ -138,9 +138,13 @@
       const hasLegacyDesc = document.querySelector('.hc-desc') !== null;
       report(!hasLegacyDesc, 'Hand cards contain no legacy text descriptions or modifiers');
 
-      // Verify Player card is on the left in Beat 1 placing arena
-      const slots = document.querySelectorAll('.b1-cards-row .b1-card-slot');
-      report(slots.length === 2 && slots[0].classList.contains('mine') && slots[1].classList.contains('opp'), 'Beat 1 placing places user card on left side and opponent on right');
+      // Verify Beat 1 placing places pitcher card on mound and batter card at home plate
+      const slots = document.querySelectorAll('.b1-card-slot');
+      report(slots.length === 2, 'Beat 1 placing renders exactly 2 card slots (mound and plate)');
+      const pSlot = document.querySelector('.diamond-mound .b1-card-slot');
+      const bSlot = document.querySelector('.diamond-plate-area .b1-card-slot');
+      report(pSlot !== null && bSlot !== null, 'Beat 1 placing places pitcher card on mound and batter card at plate');
+      report(pSlot.classList.contains('mine') && bSlot.classList.contains('opp'), 'Beat 1 placing places active user card on mound (mine) and opponent at plate (opp)');
 
       // 3. Test Beat 1 Result Modal phase
       soloPlayState.currentPA.phase = 'beat1_result';
@@ -241,13 +245,13 @@
       report(document.querySelector('.beat2-advantage-banner.count-hitter') !== null, 'Beat 2 advantage banner reflects 3-1 count leverage');
       report(document.querySelector('.opponent-bar .opp-scout-chips') === null, 'Opponent scouting chips removed from top opponent bar');
       report(document.querySelector('.player-bar .my-scout-chips') === null, 'User scouting chips removed from bottom player dock');
-      report(document.querySelector('.diamond-mound .field-scout-chips') !== null, 'Pitcher scouting stats display directly on the pitcher mound');
-      report(document.querySelector('.diamond-plate-area .field-scout-chips') !== null, 'Batter scouting stats display directly at home plate');
+      report(document.querySelector('.diamond-pitcher-stats .field-scout-chips') !== null, 'Pitcher scouting stats display in top pitcher stats box (purple)');
+      report(document.querySelector('.diamond-batter-stats .field-scout-chips') !== null, 'Batter scouting stats display in bottom batter stats box (red)');
 
       // 4b. Test Baseball Diamond & Drag Trays
       report(document.querySelector('.diamond-field') !== null, 'Play area renders Baseball Diamond field');
-      report(document.querySelector('.diamond-mound') !== null, 'Pitcher mound is positioned on the diamond');
-      report(document.querySelector('.diamond-plate-area') !== null, 'Home plate is positioned on the diamond');
+      report(document.querySelector('.diamond-mound') !== null, 'Pitcher card tray is positioned on pitcher mound (green)');
+      report(document.querySelector('.diamond-plate-area') !== null, 'Batter card tray is positioned at home plate (orange)');
       const trays = document.querySelectorAll('.pitch-tray');
       report(trays.length === 3, `Beat 2 renders exactly 3 pitch selection trays (found ${trays.length})`);
       const draggableCards = document.querySelectorAll('.number-card[draggable="true"]');

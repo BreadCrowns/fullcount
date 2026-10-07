@@ -848,6 +848,57 @@ Following the initial introduction of the Baseball Diamond Arena and pitch trays
 - **Headless Game Simulation**: 10-game simulation executed 331 PAs across 10 completed games with an average of **7.00 runs/game**, 134 hits, 7 home wins, 3 away wins, and zero errors.
 - **Player Experience**: Drag-and-drop feels buttery smooth and instantaneous across mobile, tablet, and desktop. Player stats live naturally where the action is happening on the field, and the diamond geometry accurately reflects baseball spatial structure.
 
+---
+
+## Entry 16: Four-Tier Diamond Hierarchy — Decoupling Player Stats and Card Trays
+*Date: October 7, 2026*
+
+### Context & The Problem
+In Entry 15, player scouting stats were moved onto the field to eliminate eye darting between distant screen borders. However, mounting pitcher stats inside `.diamond-mound` and batter stats inside `.diamond-plate-area` crammed scouting information and interactive card drop targets into the same physical containers. In Beat 1, the duel cards were also clustered in a central horizontal row across the dirt diamond.
+
+User feedback highlighted that this spatial overcrowding created visual friction:
+1. **Interactive Tray Congestion**: Dropping or tapping a card onto the mound or home plate was complicated by text headers, scout chips, and repertoire counts competing for space inside the active drop target.
+2. **Beat 1 Spatial Disconnect**: In Beat 1, cards were arranged side-by-side across the middle rather than utilizing the natural baseball showdown between Pitcher on the Mound and Batter at Home Plate.
+3. **Target Layout Specification**: The user provided an annotated mockup specifying a 4-tier vertical breakdown:
+   - **Purple Box (Top)**: Pitcher stats.
+   - **Green Box (Mound)**: Pitcher card tray.
+   - **Orange Box (Home Plate)**: Batter card tray.
+   - **Red Box (Bottom)**: Batter player stats.
+
+### Options Explored
+- **Option A (Sub-tabs or collapsible dropdowns within trays)**:
+  *Why Discarded*: Adds extra taps to view vital repertoire charges (Fastball/Breaking/Offspeed counts) or batter archetypes, disrupting the fast-paced card battle rhythm.
+- **Option B (Chosen — 4-Tier Vertical Spatial Decoupling)**:
+  Completely decouple player scouting cards from the active card drop trays into 4 dedicated, vertically stacked tiers across the diamond:
+  1. **Tier 1 (Top / Purple)**: `.diamond-pitcher-stats` (`top: 5px; left: 50%`) displays pitcher role, name, fatigue alert, and live FB/BR/OFF charges.
+  2. **Tier 2 (Mound / Green)**: `.diamond-mound` (`top: 31%; left: 50%`) dedicated exclusively to the pitcher's card tray. In Beat 1, it holds the pitcher's card slot. In Beat 2, it holds the 3 pitch selection trays (or opponent pitcher status). In Reveal, it hosts the pitcher's 3D flipping card.
+  3. **Tier 3 (Home Plate / Orange)**: `.diamond-plate-area` (`bottom: 44px; left: 50%`) dedicated exclusively to the batter's card tray. In Beat 1, it holds the batter's card slot. In Beat 2, it holds the 3 anticipation trays (or opponent batter status). In Reveal, it hosts the batter's 3D flipping card.
+  4. **Tier 4 (Bottom / Red)**: `.diamond-batter-stats` (`bottom: 5px; left: 50%`) displays batter role, name, archetype chip (`STYLE`), and hunted pitch indicator (`⭐ HUNTS`).
+
+### Implementation Details
+
+1. **Structural Decoupling in Zone Board (`js/app.js`)**:
+   - Refactored `renderZoneBoard()` across Reveal, Beat 1, and Beat 2 phases to generate the exact 4-tier hierarchy.
+   - In Beat 1, replaced the floating horizontal card row with physical diamond positioning: Pitcher card on the mound rubber, Batter card at the home plate pentagon, with a sleek `.diamond-b1-vs-badge` centered on the infield dirt between them.
+   - Mound and plate card slots in Beat 1 preserve full drag-and-drop targeting (`data-zone="b1"`) and single-tap placement.
+
+2. **Glassmorphism Stadium Styling (`fullcount.css`)**:
+   - Styled `.diamond-pitcher-stats` (purple zone) and `.diamond-batter-stats` (red zone) with glassmorphic slate backdrops, rounded borders, and dynamic territory lighting (`mine-territory` / `opp-territory`).
+   - Repositioned `.diamond-mound` to `top: 31%` and `.diamond-plate-area` to `bottom: 44px`, with `.diamond-field` expanded to `395px` height for generous vertical clearance.
+   - Shifted second base pillow to `top: 13%`, resting cleanly between the top pitcher stats box and the mound.
+
+3. **Automated Verification (`tests/test_play_ui.html`)**:
+   - Updated DOM assertions to verify the presence and positioning of `.diamond-pitcher-stats`, `.diamond-batter-stats`, `.diamond-mound`, and `.diamond-plate-area`.
+   - Verified that hand cards retain full draggable capabilities and all interactive tooltips remain responsive.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **170 of 170 tests pass (100%)** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 254 PAs across 10 completed games with an average of **6.20 runs/game**, 93 hits, 7 home wins, 3 away wins, and zero errors.
+- **Player Experience**: The baseball diamond is now clear, spacious, and natural. Player scouting information is instantly legible at a glance without cluttering the card drop trays, and the physical showdown between the mound and home plate feels authentic in every beat.
+
+
 
 
 
