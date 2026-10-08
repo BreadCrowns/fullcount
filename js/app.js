@@ -2362,7 +2362,11 @@ function commitPlacement() {
       localBeatCard = null;
       selectedCard  = null;
       if (shouldResolve && myRole === 'host') {
-        resolveBeatStep(currentBeat);
+        if (!window._resolvingBeat) {
+          window._resolvingBeat = true;
+          resolveBeatStep(currentBeat);
+          setTimeout(() => { window._resolvingBeat = false; }, 500);
+        }
       }
     }).catch(err => {
       console.error('commitPlacement update error:', err);
@@ -2462,7 +2466,10 @@ function resolveBeatStep(beat) {
           'gameState/pitcherRatings': currentRatings,
         };
 
-        gameRef().update(updates);
+        gameRef().update(updates).catch(err => {
+          console.error('Beat 1 resolution update error:', err);
+          showError('Beat 1 resolution failed: ' + err.message);
+        });
 
       } else if (beat === 'beat2') {
         const beat1Result = pa.beatResults?.beat1 || {};

@@ -208,6 +208,58 @@
       const brPlacedCard = document.querySelector('.pitch-tray[data-pitch="breaking"] .placed-number-card');
       report(brPlacedCard !== null, 'Card P21 stays placed inside Breaking tray after drop');
 
+      // Test commitPlacement() in Solo match
+      let commitUpdates = null;
+      let mockSnapState = JSON.parse(JSON.stringify(soloPlayState));
+      window.db = {
+        ref: () => ({
+          once: (evt, cb) => {
+            const snap = { val: () => mockSnapState };
+            cb(snap);
+            return Promise.resolve(snap);
+          },
+          update: (u) => {
+            commitUpdates = u;
+            // Apply updates to mockSnapState
+            for (let k in u) {
+              const parts = k.split('/');
+              let cur = mockSnapState;
+              for (let i = 0; i < parts.length - 1; i++) {
+                if (!cur[parts[i]]) cur[parts[i]] = {};
+                cur = cur[parts[i]];
+              }
+              cur[parts[parts.length - 1]] = u[k];
+            }
+            return Promise.resolve();
+          }
+        })
+      };
+
+      localPitchType = 'fastball';
+      localBeatCard = 'P11';
+      commitPlacement();
+
+      report(commitUpdates !== null, 'commitPlacement executed gameRef.update()');
+      report(commitUpdates?.['currentPA/committed/host'] === true, 'commitPlacement marks host as committed');
+      report(commitUpdates?.['currentPA/committed/guest'] === true, 'commitPlacement marks bot guest as committed');
+      report(Boolean(commitUpdates?.['currentPA/beatPlacements/beat1/guest']?.cardId), 'Bot selected card for Beat 1');
+      report(Boolean(commitUpdates?.['currentPA/beatPlacements/beat1/guest']?.guessPitch), 'Bot selected pitch for Beat 1');
+
+      // Verify no undefined fields in commit updates
+      let commitHasUndefined = false;
+      for (const [k, v] of Object.entries(commitUpdates || {})) {
+        if (v === undefined) commitHasUndefined = true;
+        if (typeof v === 'object' && v !== null) {
+          for (const [subK, subV] of Object.entries(v)) {
+            if (subV === undefined) commitHasUndefined = true;
+          }
+        }
+      }
+      report(!commitHasUndefined, 'commitPlacement updates payload contains zero undefined fields');
+
+      // Restore mock db
+      window.db = undefined;
+
       // Clean up local placement for subsequent tests
       localPitchType = null;
       localBeatCard = null;
