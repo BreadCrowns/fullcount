@@ -1484,6 +1484,17 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
         <div class="clash-outcome-badge diamond-outcome-tag">
           <span class="cob-title">${z2?.outcomeDisplay || res.outcome?.display || 'Outcome Resolved'}</span>
         </div>
+
+        ${renderOutcomeNumberLine({
+          pitchType: z2?.pitchType || 'fastball',
+          beat: res.z3 ? 'beat3' : 'beat2',
+          count: z1?.count || '3-2',
+          batterBonus: z2?.batterBaseBonus ?? 0,
+          pitcherBonus: z2?.pitcherBaseBonus ?? 0,
+          launchAngle: launchAngle,
+          pitchMatched: isMatch,
+          extraClass: 'diamond-number-line'
+        })}
       </div>
     `;
 
@@ -1692,6 +1703,18 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
           </div>
         </div>
+
+        ${renderOutcomeNumberLine({
+          pitchType: !iAmBatting ? localPitchType : localGuessPitch,
+          beat: 'beat1',
+          count: '0-0',
+          batterBonus: batterRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0,
+          pitcherBonus: pitcherRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0,
+          launchAngle: cardObj ? ((cardObj.value || 0) + (!iAmBatting ? (pitcherRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0) : 0) + 3) : null,
+          projected: true,
+          pitchMatched: true,
+          extraClass: 'diamond-number-line'
+        })}
       </div>
     `;
 
@@ -1961,6 +1984,18 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
         </div>
 
         ${execFeedbackHtml}
+
+        ${renderOutcomeNumberLine({
+          pitchType: curPitch,
+          beat: isBeat3 ? 'beat3' : 'beat2',
+          count: count,
+          batterBonus: batterRatings[curPitch] ?? 0,
+          pitcherBonus: pitcherRatings[curPitch] ?? 0,
+          launchAngle: (cardVal !== null ? (!iAmBatting ? (cardVal + (pitcherRatings[curPitch] ?? 0) + (isOppDisadvantaged && oppCommitted && pa?.beatPlacements?.beat2?.[oppKey]?.cardId ? (getCard(pa?.beatPlacements?.beat2?.[oppKey]?.cardId)?.value || 3) : 3)) : (cardVal + (pitcherRatings[curPitch] ?? 0) + 3)) : null),
+          projected: true,
+          pitchMatched: true,
+          extraClass: 'diamond-number-line'
+        })}
       </div>
     `;
   }
@@ -2955,6 +2990,166 @@ function toggleOverlayPeek() {
 }
 window.toggleOverlayPeek = toggleOverlayPeek;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COLOR-CODED OUTCOME NUMBER LINE COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
+function renderOutcomeNumberLine(opts = {}) {
+  const pitchType = opts.pitchType || 'fastball';
+  const beat = opts.beat || 'beat1';
+  const count = opts.count || '3-2';
+  const pitchMatched = (opts.pitchMatched !== undefined) ? opts.pitchMatched : true;
+  const launchAngle = (typeof opts.launchAngle === 'number') ? opts.launchAngle : null;
+  const isProjected = Boolean(opts.projected);
+  const extraClass = opts.extraClass || '';
+
+  const sweetSpotInfo = (typeof PITCH_SWEET_SPOTS !== 'undefined' && PITCH_SWEET_SPOTS[pitchType])
+    ? PITCH_SWEET_SPOTS[pitchType]
+    : { center: pitchType === 'offspeed' ? 6 : (pitchType === 'breaking' ? 9 : 12) };
+  const center = sweetSpotInfo.center;
+
+  const batterBonus = opts.batterBonus || 0;
+  let expansion = 0;
+  if (pitchMatched) {
+    expansion = Math.max(1, Math.min(3, Math.floor(((batterBonus || 0) + 1) / 2)));
+  }
+
+  const barrelMin = center - expansion;
+  const barrelMax = center + expansion;
+  const lineDriveMin = barrelMin - 2;
+  const lineDriveMax = barrelMin - 1;
+
+  // Discrete numbers to display:
+  let minNum = Math.max(1, lineDriveMin - 2);
+  let maxNum = Math.min(18, center + 5);
+  if (launchAngle !== null) {
+    if (launchAngle < minNum) minNum = Math.max(1, launchAngle);
+    if (launchAngle > maxNum) maxNum = Math.min(20, launchAngle);
+  }
+
+  let cellsHtml = '';
+
+  for (let n = minNum; n <= maxNum; n++) {
+    const isCenter = (n === center);
+    let outcomeClass = '';
+    let outcomeLabel = '';
+
+    if (pitchMatched && n >= barrelMin && n <= barrelMax) {
+      outcomeClass = 'sweet-spot';
+      if (beat === 'beat1') {
+        outcomeLabel = isCenter ? '🎯 3-1' : '3-1';
+      } else if (beat === 'beat2') {
+        outcomeLabel = (count === '0-2') ? '2B' : 'HR';
+      } else {
+        outcomeLabel = isCenter ? 'HR' : '2B';
+      }
+    } else if (pitchMatched && n >= lineDriveMin && n <= lineDriveMax) {
+      outcomeClass = 'line-drive';
+      if (beat === 'beat1') {
+        outcomeLabel = '3-2';
+      } else if (beat === 'beat2') {
+        outcomeLabel = (count === '0-2') ? '3-2 ⚡' : '1B';
+      } else {
+        outcomeLabel = '1B';
+      }
+    } else if (!pitchMatched) {
+      // Fooled on pitch type
+      if (n >= center + 3) {
+        outcomeClass = 'high-heat';
+        outcomeLabel = 'K';
+      } else {
+        outcomeClass = 'low-contact';
+        outcomeLabel = (beat === 'beat1' ? '0-2' : (count === '3-1' ? '3-2 ⚡' : 'OUT'));
+      }
+    } else if (n < lineDriveMin) {
+      outcomeClass = 'low-contact';
+      if (beat === 'beat1') {
+        outcomeLabel = '0-2';
+      } else if (beat === 'beat2') {
+        outcomeLabel = (count === '3-1') ? '3-2 ⚡' : 'OUT';
+      } else {
+        outcomeLabel = 'OUT';
+      }
+    } else {
+      // High Heat (n > barrelMax)
+      outcomeClass = 'high-heat';
+      if (beat === 'beat1') {
+        outcomeLabel = '0-2';
+      } else if (beat === 'beat2') {
+        if (count === '3-1') {
+          outcomeLabel = '3-2 ⚡';
+        } else if (count === '0-2') {
+          outcomeLabel = 'K';
+        } else {
+          outcomeLabel = (n >= center + 3) ? 'K' : 'OUT';
+        }
+      } else {
+        outcomeLabel = (n >= center + 3) ? 'K' : 'OUT';
+      }
+    }
+
+    const isNeedleTarget = (launchAngle !== null && n === launchAngle);
+
+    cellsHtml += `
+      <div class="nl-cell ${outcomeClass} ${isCenter ? 'center-spot' : ''} ${isNeedleTarget ? 'highlight-needle' : ''}" data-val="${n}">
+        ${isNeedleTarget ? `
+          <div class="nl-needle-pin">
+            <span class="nl-needle-label">${isProjected ? 'EST ' : 'TOTAL '}${launchAngle}</span>
+            <div class="nl-needle-arrow"></div>
+          </div>
+        ` : ''}
+        <span class="nl-outcome-badge">${outcomeLabel}</span>
+        <div class="nl-num-box">${n}</div>
+      </div>
+    `;
+  }
+
+  const pitchIcon = pitchType === 'fastball' ? '🔥' : (pitchType === 'breaking' ? '🌀' : '⏱️');
+  const pitchName = pitchType.toUpperCase();
+
+  let contextSubtitle = '';
+  if (!pitchMatched) {
+    contextSubtitle = `<b>Fooled on Pitch Type</b> &bull; Roll Over/Popout (&le;${center + 2}) &bull; Overpowered Strikeout (${center + 3}+)`;
+  } else if (beat === 'beat1') {
+    contextSubtitle = 'Sweet Spot &rarr; <b>3-1 Count</b> &bull; Line Drive &rarr; <b>3-2</b> &bull; Outside &rarr; <b>0-2</b>';
+  } else if (beat === 'beat2') {
+    contextSubtitle = (count === '0-2')
+      ? '0-2 Count &bull; Sweet Spot &rarr; <b>2B</b> &bull; Line Drive &rarr; <b>3-2 Battle Back</b> &bull; Outside &rarr; <b>Strikeout</b>'
+      : (count === '3-1')
+        ? '3-1 Count &bull; Sweet Spot &rarr; <b>HR</b> &bull; Line Drive &rarr; <b>1B</b> &bull; Outside &rarr; <b>Pitcher Battles Back</b>'
+        : '3-2 Count &bull; Sweet Spot &rarr; <b>HR</b> &bull; Line Drive &rarr; <b>1B</b> &bull; Outside &rarr; <b>Out/K</b>';
+  } else {
+    contextSubtitle = '3-2 Showdown &bull; Sweet Spot &rarr; <b>HR / 2B</b> &bull; Line Drive &rarr; <b>1B</b> &bull; Outside &rarr; <b>Out/K</b>';
+  }
+
+  const legendHtml = pitchMatched ? `
+    <div class="nl-legend">
+      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Barrel</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> Line Drive</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> Outside</span>
+    </div>
+  ` : `
+    <div class="nl-legend">
+      <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> Fooled: Out / K</span>
+    </div>
+  `;
+
+  return `
+    <div class="outcome-number-line-container ${extraClass}">
+      <div class="nl-header-row">
+        <span class="nl-pitch-badge">${pitchIcon} ${pitchName} (Center ${center})</span>
+        ${legendHtml}
+      </div>
+      <div class="nl-track">
+        ${cellsHtml}
+      </div>
+      <div class="nl-footer-note">
+        ${contextSubtitle}
+      </div>
+    </div>
+  `;
+}
+window.renderOutcomeNumberLine = renderOutcomeNumberLine;
+
 function renderBeat1ResultModal(b1, isPitcherMe) {
   if (!b1) return '';
   const winner = b1.winner || 'tie';
@@ -3046,6 +3241,16 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
             <div class="rm-eff-calc">${oppStatLabel}</div>
           </div>
         </div>
+
+        ${renderOutcomeNumberLine({
+          pitchType: b1.pitchType || 'fastball',
+          beat: 'beat1',
+          count: count,
+          batterBonus: bBonus,
+          pitcherBonus: pBonus,
+          launchAngle: launchAngle,
+          pitchMatched: (b1.pitchMatched !== undefined) ? b1.pitchMatched : true
+        })}
 
         <div class="rm-count-banner ${bannerClass} anticipate-banner">
           <div class="rm-count-num">${count}</div>
@@ -3195,6 +3400,16 @@ function renderBattleBackModal(b2, isPitcherMe) {
             <div class="rm-eff-calc">Card ${oppVal} [${oppStatLabel}] = <b>${oppEff}</b></div>
           </div>
         </div>
+
+        ${renderOutcomeNumberLine({
+          pitchType: b2.pitchType || 'fastball',
+          beat: 'beat2',
+          count: b2.count || '0-2',
+          batterBonus: bBonus,
+          pitcherBonus: pBonus,
+          launchAngle: (typeof b2.launchAngle === 'number') ? b2.launchAngle : ((typeof b2.total === 'number') ? b2.total : null),
+          pitchMatched: (b2.pitchMatched !== undefined) ? b2.pitchMatched : true
+        })}
 
         <div class="rm-count-banner count-full anticipate-banner">
           <div class="rm-count-num">3-2</div>
@@ -3512,6 +3727,16 @@ function renderOutcomeOverlay(res, isBatting = false) {
           <span class="rre-icon">💡</span>
           <div class="rre-text">${ruleReason}</div>
         </div>
+
+        ${renderOutcomeNumberLine({
+          pitchType: z2?.pitchType || 'fastball',
+          beat: isBeat3 ? 'beat3' : 'beat2',
+          count: isBeat3 ? '3-2' : (z1?.count || '3-2'),
+          batterBonus: z2?.batterBaseBonus ?? 0,
+          pitcherBonus: z2?.pitcherBaseBonus ?? 0,
+          launchAngle: launchAngle,
+          pitchMatched: pitchMatched
+        })}
 
         <div class="rm-outcome-banner hero anticipate-outcome">
           <div class="rm-outcome-title">${o.display || 'At-Bat Complete'}</div>

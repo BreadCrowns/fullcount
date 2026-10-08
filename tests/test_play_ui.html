@@ -394,6 +394,30 @@
       report(b3LockBtn !== null, 'Lock-in button exists in Beat 3');
       report(b3LockBtn?.textContent.includes('SHOWDOWN'), 'Lock-in button reflects SHOWDOWN context');
 
+      // 9. Test Outcome Number Line Component
+      report(typeof window.renderOutcomeNumberLine === 'function', 'renderOutcomeNumberLine helper is defined');
+      
+      const fbNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat1', launchAngle: 12, batterBonus: 3, pitchMatched: true });
+      report(fbNl.includes('outcome-number-line-container'), 'Number line renders container element');
+      report(fbNl.includes('FASTBALL (Center 12)'), 'Fastball number line displays Fastball and Center 12');
+      report(fbNl.includes('center-spot') && fbNl.includes('sweet-spot'), 'Center 12 is styled as center-spot and sweet-spot');
+      report(fbNl.includes('nl-needle-pin') && fbNl.includes('TOTAL 12'), 'Needle pin displays TOTAL 12 on needle target');
+
+      const bbNl = window.renderOutcomeNumberLine({ pitchType: 'breaking', beat: 'beat2', launchAngle: 7, batterBonus: 2, pitchMatched: true });
+      report(bbNl.includes('BREAKING (Center 9)'), 'Breaking number line displays Breaking and Center 9');
+      report(bbNl.includes('line-drive'), 'Breaking number line includes line-drive band');
+
+      const offNl = window.renderOutcomeNumberLine({ pitchType: 'offspeed', beat: 'beat3', launchAngle: 6, batterBonus: 1, pitchMatched: true, projected: true });
+      report(offNl.includes('OFFSPEED (Center 6)'), 'Offspeed number line displays Offspeed and Center 6');
+      report(offNl.includes('EST 6'), 'Projected needle displays EST 6 prefix');
+
+      const fooledNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat2', launchAngle: 16, batterBonus: 2, pitchMatched: false });
+      report(fooledNl.includes('Fooled on Pitch Type'), 'Fooled number line explains fooled pitch type');
+      report(!fooledNl.includes('nl-cell sweet-spot'), 'Fooled number line negates sweet-spot barrel band');
+
+      // Verify number line in active modals and field
+      report(document.querySelector('.diamond-number-line') !== null, 'Diamond battlefield renders live color-coded number line');
+
     } catch(e) {
       const p = document.createElement('p');
       p.className = 'fail';
