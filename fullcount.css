@@ -3669,6 +3669,63 @@ body {
   transform: scale(1.04);
 }
 
+/* Special Cards: WP (Wild Pitch) & K (Strikeout) */
+.number-card.wp-card {
+  border-color: #ff9f43;
+  background: linear-gradient(150deg, #382012 0%, #1a0f08 100%);
+}
+.number-card.wp-card .card-hero-num {
+  color: #ff9f43;
+  font-size: 1.85rem;
+  letter-spacing: -1px;
+}
+.number-card.k-card {
+  border-color: #ff4757;
+  background: linear-gradient(150deg, #381216 0%, #1a080a 100%);
+}
+.number-card.k-card .card-hero-num {
+  color: #ff4757;
+  font-size: 1.95rem;
+}
+
+.card-special-badge {
+  position: absolute;
+  bottom: 4px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.wp-card .card-special-badge {
+  background: rgba(255, 159, 67, 0.25);
+  color: #ff9f43;
+}
+.k-card .card-special-badge {
+  background: rgba(255, 71, 87, 0.25);
+  color: #ff4757;
+}
+
+.placed-number-card.wp-card {
+  border-color: #ff9f43;
+  box-shadow: 0 0 14px rgba(255, 159, 67, 0.45);
+}
+.placed-number-card.wp-card .pnc-num {
+  color: #ff9f43;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+.placed-number-card.k-card {
+  border-color: #ff4757;
+  box-shadow: 0 0 14px rgba(255, 71, 87, 0.45);
+}
+.placed-number-card.k-card .pnc-num {
+  color: #ff4757;
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
 .placed-number-card .pnc-num {
   font-size: 1.85rem;
   font-weight: 900;

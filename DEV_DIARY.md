@@ -969,10 +969,53 @@ $$\text{Batter Effective Value} = \text{Card Value} + (\text{Batter Rating if pi
 
 ---
 
+## Entry 18: Special Cards (WP & K), Effective Timing Delta, and Elimination of Pitch Ranges
+**Date**: October 7, 2026
+**Commit**: Pending
+**Goal**: Overhaul the payoff resolution matrix with true effective value timing deltas, eliminate arbitrary pitch card ranges ([6–10], [3–7], [1–5]), remove redundant binary favorite pitches, and transform Card 1 into strategic role-specific cards (Pitcher WP and Batter K).
+
+---
+
+### Key Motivations & Insights
+1. **Timing Delta Discrepancy Fix**: Previously, when Pitcher played Card 4 (+3 Arm = 7) and Batter anticipated with Card 4 (+2 Vision = 6), the timing delta was mistakenly calculated from raw cards ($|4 - 4| = 0$) rather than effective values ($|7 - 6| = 1$), causing UI mismatches (`[4+3] vs [4+2] • Δ 0`). Timing $\Delta$ is now strictly computed as $|\text{Pitcher Effective} - \text{Batter Effective}|$.
+2. **Elimination of Arbitrary Number Ranges**: The artificial brackets (`[6–10]` Fastball, `[3–7]` Breaking, `[1–5]` Offspeed) constricted player agency and produced confusing "out-of-range" states. By removing ranges, players can play any card on any pitch. Pitch differentiation is governed naturally by character ratings (+Arm, +Spin, +Touch / +Pow, +Vis, +Dis), remaining pitch charges, and anticipation.
+3. **Removal of Redundant "Favorite Pitch"**: The binary favorite pitch mechanism (`HUNTS: FASTBALL`) was rendered obsolete by the introduction of nuanced pitch ratings. Removing it decluttered the diamond trays and scouting displays.
+4. **Role-Specific Special Cards (WP & K for Card 1)**: Card 1 is now a dramatic hand management decision:
+   - Pitcher Card 1 = **WP (Wild Pitch in the dirt)**: On 0-2 counts, advances runners and resets count to 3-2; on 3-1 and 3-2 counts, results in a Ball Four Walk; in Beat 1, acts as raw value 1.
+   - Batter Card 1 = **K (Automatic Strikeout)**: An automatic whiff swinging strikeout in payoff beats; in Beat 1, acts as raw value 1.
+   - Both play Card 1: Strikeout on wild pitch in dirt (Out recorded, runners advance 1 base).
+   - Card faces and placed cards dynamically render with `WP` (orange flame) and `K` (purple thunder) badges, turning hand management into high-stakes poker where players deliberately discard 1s during low-leverage Beat 1 counts.
+
+---
+
+### Implementation Details
+1. **Card Display & Data Model (`js/data.js`)**:
+   - Implemented `getCardDisplay(cardOrVal, isPitching)`: Dynamically displays `'WP'` for pitcher Card 1, `'K'` for batter Card 1, and string values for cards 2–10. Exported to browser window and Node modules.
+   - Removed legacy `favoritePitch` fields from all 12 batter rosters.
+
+2. **Resolution Engine Overhaul (`js/resolution.js`)**:
+   - `resolveBeat2`: Computes `timingDelta = Math.abs(pitcherEffectiveVal - batterEffectiveVal)`. Integrated branches for `isPitcherWP` (0-2 wild pitch reset, 3-1 walk) and `isBatterK` (automatic strikeout). Applied universal timing thresholds ($\Delta = 0$ barrel, $\Delta = 1$ clean single, $\Delta = 2$ 0-2 battle-back/sharp out, $\Delta \in [3,4]$ 3-1 battle-back/routine out, $\Delta \ge 5$ whiff strikeout).
+   - `resolveBeat3`: Evaluates 3-2 full count showdown with margin standoff Walk, barrel HRs, and WP/K special outcomes.
+   - `executeBotPlayBeat`: Updated AI to avoid burning WP and K cards in high-leverage payoff moments when non-1 cards are available.
+
+3. **Diamond UI & Visuals (`fullcount.css` & `js/app.js`)**:
+   - Added styles for `.number-card.wp-card`, `.number-card.k-card`, and `.card-special-badge`.
+   - Updated `renderHand`, `renderMiniPlacedCard`, and `renderOutcomeOverlay` to display role-specific WP/K cards and badges.
+   - Stripped all `[6–10]`, `[3–7]`, and `[1–5]` range labels and favorite pitch tags from the diamond mound and home plate trays.
+   - Replaced "In Range / Out of Range" feedback with live effective value math: `Card [X] + Base [Y] = [Z] Effective Value`.
+   - Updated collapsible matrix guide in outcome overlays to reflect the new timing delta tiers and special 1-cards.
+
+4. **Automated Verification**:
+   - `tests/test_resolution.html`: Updated all timing delta, battle-back, and showdown tests to verify effective deltas, WP/K mechanics, and eliminated ranges.
+   - `tests/test_play_ui.html`: Added tests for `getCardDisplay`, `WP` and `K` rendering in hand and diamond drop trays, and confirmed complete removal of `.pt-range` and `.pt-fav-tag` elements.
+
+---
+
 ### Verification Results
-- **Automated Unit Tests**: **204 of 204 tests pass (100%)** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
-- **Headless Game Simulation**: 10-game simulation executed 294 PAs across 10 completed games with an average of **6.60 runs/game**, 104 hits, 5 home wins, 5 away wins, and zero errors.
-- **Player Experience**: Every pitch decision now carries meaningful, character-driven strategy. The 3-beat momentum creates authentic baseball drama: battling back with 2 strikes and forcing a 3-2 full count showdown feels earned and exhilarating.
+- **Automated Unit Tests**: **212 of 212 tests pass (100%)** across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 392 PAs across 10 completed games with zero errors, 80 hits, and 32 runs scored.
+- **Player Experience**: Pitch selection is no longer constrained by arbitrary brackets. Hand management now requires deliberate forethought: deciding whether to dump a volatile WP or K card in Beat 1 or hold it makes every hand feel tactical and authentic to baseball psychology.
+
 
 
 

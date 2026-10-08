@@ -181,7 +181,7 @@ const PITCHER_CHARACTERS = {
 const BATTER_CHARACTERS = {
   'BC01':{ id:'BC01', name:'"The Bear" Mackintosh'      , archetype:'Slugger'            , color:'#c44b4b',
     pitchRatings:{ fastball:5, breaking:2, offspeed:1 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:3, balanced:5, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -198,7 +198,7 @@ const BATTER_CHARACTERS = {
     specialText:'Slugger. vs Fastball +5 Power, vs Breaking +2, vs Offspeed +1.' },
   'BC02':{ id:'BC02', name:'"Slick" Torres'             , archetype:'Contact Hitter'     , color:'#4b8bc4',
     pitchRatings:{ fastball:2, breaking:3, offspeed:5 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'offspeed' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:2, balanced:5, power:9 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -213,7 +213,7 @@ const BATTER_CHARACTERS = {
     specialText:'Contact Master. vs Offspeed +5, vs Breaking +3, vs Fastball +2.' },
   'BC03':{ id:'BC03', name:'"The Professor" Nakamura'   , archetype:'Disciplined Hitter' , color:'#8855cc',
     pitchRatings:{ fastball:2, breaking:5, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'breaking' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:3, balanced:4, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -228,7 +228,7 @@ const BATTER_CHARACTERS = {
     specialText:'Disciplined Eye. vs Breaking +5 Vision, vs Offspeed +3, vs Fastball +2.' },
   'BC04':{ id:'BC04', name:'"Boom Boom" Barrett'        , archetype:'Free Swinger'       , color:'#e0a020',
     pitchRatings:{ fastball:5, breaking:1, offspeed:1 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:4, balanced:5, power:7 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -244,7 +244,7 @@ const BATTER_CHARACTERS = {
     specialText:'Free Swinger. vs Fastball +5 Power, vs Breaking +1, vs Offspeed +1.' },
   'BC05':{ id:'BC05', name:'"El Rayo" Fuentes'          , archetype:'Speed Specialist'   , color:'#4baa5a',
     pitchRatings:{ fastball:3, breaking:2, offspeed:4 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:2, balanced:5, power:9 },
     battedBallSpectrum: [
       { min:0, max:7, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -259,7 +259,7 @@ const BATTER_CHARACTERS = {
     specialText:'Speedster. vs Offspeed +4 Touch, vs Fastball +3, vs Breaking +2.' },
   'BC06':{ id:'BC06', name:'"Ice" Peterson'             , archetype:'Clutch Hitter'      , color:'#4b99aa',
     pitchRatings:{ fastball:3, breaking:4, offspeed:3 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'breaking' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:3, balanced:5, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -275,7 +275,7 @@ const BATTER_CHARACTERS = {
     specialText:'Clutch Performer. vs Breaking +4, vs Fastball +3, vs Offspeed +3.' },
   'BC07':{ id:'BC07', name:'"Scrappy" Olsen'            , archetype:'Utility Hitter'     , color:'#888888',
     pitchRatings:{ fastball:3, breaking:3, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'offspeed' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:3, balanced:5, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -290,7 +290,7 @@ const BATTER_CHARACTERS = {
     specialText:'Reliable Utility. Balanced vs Fastball +3, vs Breaking +3, vs Offspeed +3.' },
   'BC08':{ id:'BC08', name:'"Lightning" Jackson'        , archetype:'Power Hitter'       , color:'#e8b84b',
     pitchRatings:{ fastball:5, breaking:2, offspeed:2 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:3, balanced:5, power:7 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -306,7 +306,7 @@ const BATTER_CHARACTERS = {
     specialText:'Pure Power. vs Fastball +5 Heat Hunter, vs Breaking +2, vs Offspeed +2.' },
   'BC09':{ id:'BC09', name:'"The Captain" Reyes'        , archetype:'Complete Hitter'    , color:'#cc5599',
     pitchRatings:{ fastball:4, breaking:4, offspeed:3 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'breaking' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:3, balanced:4, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -322,7 +322,7 @@ const BATTER_CHARACTERS = {
     specialText:'Complete Leader. vs Fastball +4, vs Breaking +4, vs Offspeed +3.' },
   'BC10':{ id:'BC10', name:'"Ghost" Yamamoto'           , archetype:'Switch Hitter'      , color:'#5599dd',
     pitchRatings:{ fastball:3, breaking:3, offspeed:4 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'offspeed' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:3, balanced:5, power:8 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -338,7 +338,7 @@ const BATTER_CHARACTERS = {
     specialText:'Switch Hitter. vs Offspeed +4, vs Fastball +3, vs Breaking +3.' },
   'BC11':{ id:'BC11', name:'"The Wall" Dubois'          , archetype:'Defensive Specialist', color:'#44aa88',
     pitchRatings:{ fastball:4, breaking:2, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'low', coldZone:'high' },
     swingDifficulties:{ contact:2, balanced:5, power:9 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -353,7 +353,7 @@ const BATTER_CHARACTERS = {
     specialText:'Lead-off Table Setter. vs Fastball +4, vs Offspeed +3, vs Breaking +2.' },
   'BC12':{ id:'BC12', name:'"The Bricks" Murphy'        , archetype:'Designated Hitter'  , color:'#aa4444',
     pitchRatings:{ fastball:5, breaking:1, offspeed:2 },
-    scoutingReport:{ hotZone:'high', coldZone:'low', favoritePitch:'fastball' },
+    scoutingReport:{ hotZone:'high', coldZone:'low' },
     swingDifficulties:{ contact:4, balanced:5, power:7 },
     battedBallSpectrum: [
       { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
@@ -459,6 +459,21 @@ function getBatterPitchRating(batterChar, pitchType) {
   return batterChar.pitchRatings?.[pitchType] ?? 0;
 }
 
+function getCardDisplay(cardOrVal, isPitching = false) {
+  if (cardOrVal === null || cardOrVal === undefined) return '—';
+  const val = (typeof cardOrVal === 'object') ? cardOrVal?.value : Number(cardOrVal);
+  if (val === 1) {
+    return isPitching ? 'WP' : 'K';
+  }
+  return isNaN(val) ? '—' : String(val);
+}
+
+if (typeof window !== 'undefined') {
+  window.getPitcherPitchRating = getPitcherPitchRating;
+  window.getBatterPitchRating  = getBatterPitchRating;
+  window.getCardDisplay        = getCardDisplay;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     ACTION_CARDS,
@@ -473,5 +488,6 @@ if (typeof module !== 'undefined' && module.exports) {
     getDeckPreset,
     getPitcherPitchRating,
     getBatterPitchRating,
+    getCardDisplay,
   };
 }

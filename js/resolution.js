@@ -1088,7 +1088,9 @@ function resolveBeat2(opts) {
   const pCardVal = pCard ? (pCard.value || 0) : 0;
   const bCard = getCard(batterCardId);
   const bCardVal = bCard ? (bCard.value || 0) : 0;
-  const timingDelta = Math.abs(pCardVal - bCardVal);
+
+  const isPitcherWP = (pCardVal === 1);
+  const isBatterK   = (bCardVal === 1);
 
   const pitcherBonus = (typeof getPitcherPitchRating === 'function')
     ? getPitcherPitchRating(pitcherChar, pitchType)
@@ -1101,6 +1103,7 @@ function resolveBeat2(opts) {
 
   const pitcherEffectiveVal = pCardVal + pitcherBonus;
   const batterEffectiveVal = bCardVal + batterBonus;
+  const timingDelta = Math.abs(pitcherEffectiveVal - batterEffectiveVal);
   const effectiveMargin = batterEffectiveVal - pitcherEffectiveVal;
 
   let timingQuality = 'miss';
@@ -1114,15 +1117,6 @@ function resolveBeat2(opts) {
     timingQuality = 'miss';    // ⚡ Whiff / Completely Mistimed
   }
 
-  // Range validation
-  const pRange = PITCH_RANGES[pitchType] || { min: 1, max: 10 };
-  const bRange = PITCH_RANGES[effectiveGuessPitch] || { min: 1, max: 10 };
-  const pitcherExecuted = (pCardVal >= pRange.min && pCardVal <= pRange.max);
-  const batterExecuted = (bCardVal >= bRange.min && bCardVal <= bRange.max);
-
-  // Batter Favorite Pitch & Archetype Matchup
-  const favPitch = batterChar?.scoutingReport?.favoritePitch || 'fastball';
-  const isFavoritePitch = (pitchType === favPitch);
   const isSlugger = (batterChar?.archetype === 'Slugger' || batterChar?.archetype === 'Free Swinger');
   const isContactHitter = (batterChar?.archetype === 'Contact Hitter' || batterChar?.archetype === 'Speed Specialist');
 
@@ -1136,103 +1130,83 @@ function resolveBeat2(opts) {
   // ═════════════════════════════════════════════════════════════════════════
   // TIMING-DELTA & DEDUCTION OUTCOME RESOLUTION MATRIX
   // ═════════════════════════════════════════════════════════════════════════
-  if (!pitcherExecuted) {
-    // ── MISTAKE PITCH / HANGER: Pitcher failed execution window! ──
-    // e.g., Fastball (6-10) thrown with Card 1-5, or Offspeed (1-5) thrown with 6-10.
-    if (pitchMatched) {
-      if (batterExecuted) {
-        // Punished mistake pitch! Batter anticipated the pitch and properly timed the zone.
-        if (isSlugger || isFavoritePitch || bCardVal >= 7) {
-          outcomeType = 'homerun';
-          outcomeDisplay = '💥 CRUSHED HOME RUN (MISTAKE PITCH PUNISHED)!';
-          ruleReason = `Pitcher failed execution (Card [${pCardVal}] outside ${pitchType.toUpperCase()} [${pRange.min}–${pRange.max}]) against batter's timed read (Card [${bCardVal}]). Grooved meatball crushed for a Home Run!`;
-        } else {
-          outcomeType = 'double';
-          outcomeDisplay = '⚡ WALL-BALL DOUBLE (HANGER CRUSHED)!';
-          ruleReason = `Pitcher hung an out-of-range mistake pitch. Batter anticipated and drove it off the wall for a Double!`;
-        }
-      } else {
-        // Both pitcher and batter missed their execution windows
-        outcomeType = 'groundout';
-        outcomeDisplay = '⚾ WEAK DRIBBLER (BOTH SIDES MIS-TIMED)';
-        ruleReason = `Both pitcher and batter missed their target execution windows. Uncontrolled contact resulted in a weak groundout.`;
-      }
+
+  // ── SPECIAL CARDS: WP (Wild Pitch) & K (Automatic Strikeout) ──
+  if (isPitcherWP && isBatterK) {
+    // Both played their special card! Strikeout on wild pitch in dirt.
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ STRIKEOUT ON WILD PITCH IN DIRT!';
+    ruleReason = 'Batter swung and missed (K) on a wild pitch (WP) in the dirt! Strikeout recorded, base runners advance 1 base on the wild pitch.';
+    isWildPitchReset = true;
+
+  } else if (isPitcherWP) {
+    // Pitcher threw a Wild Pitch in the dirt!
+    if (effectiveCount === '0-2') {
+      outcomeType = 'wild_pitch';
+      isWildPitchReset = true;
+      outcomeDisplay = '⚡ WILD PITCH IN THE DIRT (BALL / RUNNERS ADVANCE)!';
+      ruleReason = '0-2 Count: Pitcher threw a wild pitch (WP) in the dirt (Ball). Runners advance 1 base and count resets to 3-2 Full Count!';
+    } else if (effectiveCount === '3-1' || effectiveCount === '3-2') {
+      outcomeType = 'walk';
+      outcomeDisplay = '🚶 WALK (BALL FOUR — WILD PITCH IN THE DIRT)!';
+      ruleReason = `${effectiveCount} Count: Pitcher threw a wild pitch (WP) into the dirt for Ball Four Walk!`;
     } else {
-      // Pitcher missed execution, but batter guessed the wrong pitch
-      if (effectiveCount === '0-2') {
-        // Option 3: Wild Pitch / Ball in the dirt!
-        outcomeType = 'wild_pitch';
-        isWildPitchReset = true;
-        outcomeDisplay = '⚡ WILD PITCH IN THE DIRT (BALL / RUNNERS ADVANCE)!';
-        ruleReason = `0-2 Count: Pitcher threw an out-of-range delivery into the dirt (Ball). Any runners advance on the wild pitch, and count resets to a neutral 3-2 Full Count!`;
-      } else if (effectiveCount === '3-1' || effectiveCount === '3-2') {
-        outcomeType = 'walk';
-        outcomeDisplay = '🚶 WALK (BALL FOUR - UNEXECUTED PITCH MISSED ZONE)!';
-        ruleReason = `${effectiveCount} Count: Pitcher's out-of-range delivery missed the strike zone for ball four Walk.`;
-      } else {
-        outcomeType = pitchType === 'fastball' ? 'flyout' : 'groundout';
-        outcomeDisplay = '🧤 WEAK CONTACT OUT (FOOLED ON MISTAKE PITCH)';
-        ruleReason = `Pitcher threw an out-of-range mistake, but batter was looking for ${effectiveGuessPitch.toUpperCase()}. Fluke weak contact recorded an out.`;
-      }
+      outcomeType = 'wild_pitch';
+      isWildPitchReset = true;
+      outcomeDisplay = '⚡ WILD PITCH IN THE DIRT (RUNNERS ADVANCE)!';
+      ruleReason = 'Pitcher threw a wild pitch (WP) in the dirt. Runners advance 1 base and count resets to 3-2 Full Count!';
     }
 
+  } else if (isBatterK) {
+    // Batter played K card: automatic swinging strikeout
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ AUTOMATIC STRIKEOUT (K CARD WHIFF)!';
+    ruleReason = 'Batter played K card and swung through the delivery for an automatic Strikeout!';
+
   } else if (pitchMatched) {
-    // ── PITCH READ: Batter anticipated the Pitch Type & Pitcher Executed! ──
+    // ── PITCH READ: Batter anticipated the Pitch Type! ──
     if (timingDelta === 0) {
       // 🎯 PERFECT TIMING COLLISION (DELTA 0 - SQUARED UP BARREL)
       if (effectiveCount === '0-2') {
         outcomeType = 'double';
         outcomeDisplay = '⚡ CLUTCH DOUBLE OFF THE WALL (TWO-STRIKE BARREL)!';
-        ruleReason = `Squared-up barrel collision (Delta 0), but 0-2 two-strike plate protection capped the hit at a Double!`;
-      } else if (isFavoritePitch) {
+        ruleReason = `Squared-up barrel collision (Delta 0, Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}), but 0-2 two-strike plate protection capped the hit at a Double!`;
+      } else if (isSlugger || bCardVal >= 8) {
         outcomeType = 'homerun';
-        outcomeDisplay = '💥 CRUSHED MOONSHOT HOME RUN (FAVORITE PITCH BARRELED)!';
-        ruleReason = `Batter hunted their favorite pitch (${pitchType.toUpperCase()}) with perfect Delta 0 timing for a moonshot Home Run!`;
-      } else if (isSlugger && (pitchType === 'fastball' || bCardVal >= 7)) {
-        outcomeType = 'homerun';
-        outcomeDisplay = '💥 NO-DOUBTER HOME RUN (SLUGGER SQUARED UP HEAT)!';
-        ruleReason = `Slugger barreled up spot-on pitch with Delta 0 timing for a towering Home Run!`;
-      } else if (pitchType === 'fastball' && bCardVal >= 9) {
-        outcomeType = 'homerun';
-        outcomeDisplay = '💥 CRUSHED HOME RUN OVER THE WALL!';
-        ruleReason = `High fastball squared up with Delta 0 timing drives it over the wall!`;
+        outcomeDisplay = '💥 NO-DOUBTER HOME RUN (SQUARED UP BARREL)!';
+        ruleReason = `Squared-up sweet spot collision (Delta 0, Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) crushed for a towering Home Run!`;
       } else {
         outcomeType = 'double';
         outcomeDisplay = '⚡ ROCKET DOUBLE INTO THE GAP (SWEET SPOT BARREL)!';
-        ruleReason = `Perfect Delta 0 sweet-spot collision ripped into the gap for a Double!`;
+        ruleReason = `Perfect Delta 0 sweet-spot collision (Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) ripped into the gap for a Double!`;
       }
 
-    } else if (timingDelta <= 2) {
-      // 🏏 SOLID TIMING (DELTA 1–2)
+    } else if (timingDelta === 1) {
+      // 🏏 CLEAN LINE DRIVE (DELTA 1)
+      outcomeType = 'single';
+      outcomeDisplay = '🏏 CLEAN LINE DRIVE SINGLE!';
+      ruleReason = `Pitch anticipated with Delta 1 contact (Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) produced a clean line drive Single!`;
+
+    } else if (timingDelta === 2) {
+      // ⚾ SOLID IN-PLAY CONTACT (DELTA 2)
       if (effectiveCount === '0-2') {
         // BATTER BATTLES BACK ON 0-2!
         outcomeType = 'battle_back';
         isBattleBack = true;
         outcomeDisplay = '⚾ BATTLED BACK! FOUL BALL (COUNT RUNS TO 3-2)!';
-        ruleReason = `0-2 Count: Batter fought off pitcher's put-away pitch with sharp two-strike contact (Delta ${timingDelta})! The count runs full to 3-2 for Beat 3!`;
-      } else if (isFavoritePitch) {
-        outcomeType = isSlugger ? 'homerun' : 'double';
-        outcomeDisplay = isSlugger ? '🔥 HOME RUN (FAVORITE PITCH HUNTED)!' : '⚡ SHARP DOUBLE DOWN THE LINE!';
-        ruleReason = `Batter anticipated their favorite pitch with solid timing (Delta ${timingDelta}) for extra bases!`;
-      } else if (timingDelta === 1) {
+        ruleReason = `0-2 Count: Batter fought off pitcher's put-away pitch with sharp two-strike contact (Delta 2)! The count runs full to 3-2 for Beat 3!`;
+      } else if (effectiveCount === '3-1') {
         outcomeType = 'single';
-        outcomeDisplay = '🏏 CLEAN LINE DRIVE SINGLE!';
-        ruleReason = `Pitch anticipated with Delta 1 solid contact produced a clean line drive Single!`;
+        outcomeDisplay = '🏏 SHARP SINGLE THROUGH THE HOLE!';
+        ruleReason = `3-1 Hitter's count leverage: Solid Delta 2 contact (Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) found a hole for a Single.`;
+      } else if (isContactHitter) {
+        outcomeType = 'single';
+        outcomeDisplay = '⚡ INFIELD CHOPPER SINGLE!';
+        ruleReason = `Contact Hitter chopped solid Delta 2 contact and beat the throw for an infield Single!`;
       } else {
-        // Delta 2: solid contact, but pitch was executed spot-on
-        if (effectiveCount === '3-1') {
-          outcomeType = 'single';
-          outcomeDisplay = '🏏 SHARP SINGLE THROUGH THE HOLE!';
-          ruleReason = `3-1 Hitter's count leverage: Solid Delta 2 contact found a hole for a Single.`;
-        } else if (isSlugger) {
-          outcomeType = 'flyout';
-          outcomeDisplay = '🧤 DEEP FLYOUT (WARNING TRACK POWER)!';
-          ruleReason = `Solid Delta 2 contact driven deep to the warning track, caught for an out.`;
-        } else {
-          outcomeType = 'groundout';
-          outcomeDisplay = '⚾ SHARP GROUNDOUT TO SECOND';
-          ruleReason = `Pitcher's spot-on execution handled solid Delta 2 contact for a sharp groundout.`;
-        }
+        outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
+        outcomeDisplay = (pitchType === 'fastball') ? '🧤 SHARP LINEOUT TO OUTFIELD' : '⚾ HARD GROUNDOUT TO SECOND';
+        ruleReason = `Pitcher's stuff handled solid Delta 2 contact (Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) for a sharp out.`;
       }
 
     } else if (timingDelta <= 4) {
@@ -1242,57 +1216,43 @@ function resolveBeat2(opts) {
           outcomeType = 'battle_back';
           isBattleBack = true;
           outcomeDisplay = '⚾ CONTACT SPOIL! BATTLED TO 3-2!';
-          ruleReason = `0-2 Count: Contact Hitter archetype spoiled the pitch to stay alive! Count runs full to 3-2 for Beat 3!`;
+          ruleReason = '0-2 Count: Contact Hitter archetype spoiled the pitch to stay alive! Count runs full to 3-2 for Beat 3!';
         } else {
           outcomeType = 'k';
           outcomeDisplay = '⚡ STRIKEOUT SWINGING (PUT-AWAY PUNCHOUT)!';
-          ruleReason = `0-2 Count: Pitcher put away the hitter with dominant execution on off-balance swing (Delta ${timingDelta})! Strikeout!`;
+          ruleReason = `0-2 Count: Pitcher put away the hitter with dominant stuff (Delta ${timingDelta}, Effective ${pitcherEffectiveVal} vs ${batterEffectiveVal})! Strikeout!`;
         }
       } else if (effectiveCount === '3-1') {
         // PITCHER BATTLES BACK ON 3-1!
         outcomeType = 'battle_back';
         isBattleBack = true;
         outcomeDisplay = '🔥 CLUTCH STRIKE! PITCHER FIGHTS BACK TO 3-2!';
-        ruleReason = `3-1 Count: Pitcher challenged the hitter with a clutch strike! The count runs full to 3-2 for Beat 3!`;
-      } else if (isContactHitter) {
-        outcomeType = 'single';
-        outcomeDisplay = '🏏 CHOPPER INFIELD SINGLE (BEATS THE THROW)!';
-        ruleReason = `Contact Hitter archetype chopped an off-balance pitch and beat the throw for an infield Single.`;
-      } else if (isSlugger) {
-        outcomeType = 'flyout';
-        outcomeDisplay = '🧤 DEEP FLYOUT (PITCH CAUGHT ON END OF BAT)!';
-        ruleReason = `Pitch anticipated, but off-balance timing (Delta ${timingDelta}) caught the ball on the end of the bat for a flyout.`;
+        ruleReason = `3-1 Count: Pitcher challenged the hitter with a clutch strike (Delta ${timingDelta})! The count runs full to 3-2 for Beat 3!`;
       } else {
-        outcomeType = 'groundout';
-        outcomeDisplay = '⚾ ROUTINE GROUNDOUT (OFF-BALANCE TIMING)';
-        ruleReason = `Off-balance timing (Delta ${timingDelta}) produced a routine groundout.`;
+        outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
+        outcomeDisplay = (pitchType === 'fastball') ? '🧤 ROUTINE FLYOUT (OFF-BALANCE SWING)' : '⚾ ROUTINE GROUNDOUT (OFF-BALANCE TIMING)';
+        ruleReason = `Off-balance timing (Delta ${timingDelta}, Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) produced a routine out.`;
       }
 
     } else {
       // ⚡ BADLY MISTIMED (DELTA 5+)
       outcomeType = 'k';
       outcomeDisplay = '⚡ SWINGING STRIKEOUT ON NASTY STUFF!';
-      ruleReason = `Pitch anticipated, but massive timing mismatch (Delta ${timingDelta}) resulted in a swinging Strikeout on spot-on stuff!`;
+      ruleReason = `Pitch anticipated, but massive timing mismatch (Delta ${timingDelta}, Effective ${batterEffectiveVal} vs ${pitcherEffectiveVal}) resulted in a swinging Strikeout!`;
     }
 
   } else {
-    // ── WHIFF / FOOLED: Batter anticipated the wrong pitch against executed delivery! ──
+    // ── WHIFF / FOOLED: Batter anticipated the wrong pitch! ──
     if (timingDelta <= 2) {
       // Fluke timing on wrong pitch -> weak contact out
-      if (pitchType === 'fastball') {
-        outcomeType = 'flyout';
-        outcomeDisplay = '🧤 MILE-HIGH POPOUT (OFF-BALANCE SWING ON WRONG PITCH)';
-        ruleReason = `Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}). Fluke timing popped it straight up for an out.`;
-      } else {
-        outcomeType = 'groundout';
-        outcomeDisplay = '⚾ WEAK ROLLOVER GROUNDOUT (FOOLED ON PITCH)';
-        ruleReason = `Batter fooled on pitch type rolled over for a routine groundout.`;
-      }
+      outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
+      outcomeDisplay = (pitchType === 'fastball') ? '🧤 POPUP TO INFIELD (FOOLED ON PITCH)' : '⚾ WEAK ROLLOVER GROUNDOUT (FOOLED ON PITCH)';
+      ruleReason = `Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}). Fluke timing popped/grounded it out.`;
     } else if (timingDelta <= 4) {
       if (effectiveCount === '0-2') {
         outcomeType = 'k';
         outcomeDisplay = '⚡ STRIKEOUT SWINGING (PUNCHOUT ON PUT-AWAY PITCH)!';
-        ruleReason = `0-2 Count: Pitcher put away the fooled batter with a spot-on punchout Strikeout!`;
+        ruleReason = '0-2 Count: Pitcher put away the fooled batter with a spot-on punchout Strikeout!';
       } else if (effectiveCount === '3-1') {
         // PITCHER BATTLES BACK ON 3-1!
         outcomeType = 'battle_back';
@@ -1302,11 +1262,11 @@ function resolveBeat2(opts) {
       } else if (isContactHitter) {
         outcomeType = 'groundout';
         outcomeDisplay = '⚾ SLOW ROLLER TO FIRST (AVOIDS K)';
-        ruleReason = `Contact Hitter archetype spoiled the fooled pitch to avoid a strikeout, grounded out to first.`;
+        ruleReason = 'Contact Hitter archetype spoiled the fooled pitch to avoid a strikeout, grounded out to first.';
       } else {
         outcomeType = 'k';
         outcomeDisplay = '⚡ SWINGING STRIKEOUT (COMPLETELY FOOLED)!';
-        ruleReason = `Batter completely fooled on pitch type against spot-on delivery (Delta ${timingDelta}). Swinging Strikeout.`;
+        ruleReason = `Batter completely fooled on pitch type (Delta ${timingDelta}). Swinging Strikeout.`;
       }
     } else {
       outcomeType = 'k';
@@ -1417,8 +1377,8 @@ function resolveBeat2(opts) {
     pitchMatched,
     locationMatched: pitchMatched, // backward compat
     matchTier,
-    pitcherExecuted,
-    batterExecuted,
+    pitcherExecuted: !isPitcherWP,
+    batterExecuted: !isBatterK,
     pitcherCardVal: pCardVal,
     batterCardVal: bCardVal,
     pitcherBaseBonus: pitcherBonus,
@@ -1426,10 +1386,12 @@ function resolveBeat2(opts) {
     pitcherEffectiveVal,
     batterEffectiveVal,
     effectiveMargin,
-    pitcherRange: pRange,
-    swingRange: bRange,
+    pitcherRange: { min: 1, max: 10, label: '1–10' },
+    swingRange: { min: 1, max: 10, label: '1–10' },
     sameLocation: pitchMatched, // backward compat
-    isFavoritePitch,
+    isFavoritePitch: false,
+    isPitcherWP,
+    isBatterK,
     count: effectiveCount,
     pitcherTotal: pitcherEffectiveVal,
     batterTotal: batterEffectiveVal,
@@ -1466,6 +1428,9 @@ function resolveBeat3(opts) {
   const bCard = getCard(batterCardId);
   const bCardVal = bCard ? (bCard.value || 0) : 0;
 
+  const isPitcherWP = (pCardVal === 1);
+  const isBatterK   = (bCardVal === 1);
+
   const pitcherBonus = (typeof getPitcherPitchRating === 'function')
     ? getPitcherPitchRating(pitcherChar, pitchType)
     : (pitcherChar?.pitchRatings?.[pitchType] ?? 0);
@@ -1478,10 +1443,8 @@ function resolveBeat3(opts) {
   const pitcherEffectiveVal = pCardVal + pitcherBonus;
   const batterEffectiveVal = bCardVal + batterBonus;
   const margin = batterEffectiveVal - pitcherEffectiveVal;
-  const timingDelta = Math.abs(pCardVal - bCardVal);
+  const timingDelta = Math.abs(pitcherEffectiveVal - batterEffectiveVal);
 
-  const favPitch = batterChar?.scoutingReport?.favoritePitch || 'fastball';
-  const isFavoritePitch = (pitchType === favPitch);
   const isSlugger = (batterChar?.archetype === 'Slugger' || batterChar?.archetype === 'Free Swinger');
   const isContactHitter = (batterChar?.archetype === 'Contact Hitter' || batterChar?.archetype === 'Speed Specialist');
 
@@ -1489,11 +1452,23 @@ function resolveBeat3(opts) {
   let outcomeDisplay = 'Out';
   let ruleReason = '';
 
-  if (pitchMatched) {
-    if (margin >= 4 || (margin >= 2 && (isSlugger || isFavoritePitch))) {
+  if (isPitcherWP && isBatterK) {
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ 3-2 FULL COUNT: STRIKEOUT ON WILD PITCH IN DIRT!';
+    ruleReason = 'Full Count Showdown: Batter swung through a wild pitch (WP) in the dirt! Strikeout recorded, base runners advance 1 base.';
+  } else if (isPitcherWP) {
+    outcomeType = 'walk';
+    outcomeDisplay = '🚶 3-2 FULL COUNT: BALL FOUR WALK (WILD PITCH IN DIRT)!';
+    ruleReason = 'Full Count Showdown: Pitcher threw a wild pitch (WP) into the dirt for Ball Four Walk!';
+  } else if (isBatterK) {
+    outcomeType = 'k';
+    outcomeDisplay = '⚡ 3-2 FULL COUNT: AUTOMATIC STRIKEOUT (K CARD WHIFF)!';
+    ruleReason = 'Full Count Showdown: Batter played K card and swung through the delivery for an automatic Strikeout!';
+  } else if (pitchMatched) {
+    if (margin >= 4 || (margin >= 2 && isSlugger)) {
       outcomeType = 'homerun';
       outcomeDisplay = '💥 3-2 FULL COUNT: NO-DOUBTER HOME RUN!';
-      ruleReason = `Full Count Showdown: Batter hunted ${pitchType.toUpperCase()} (+${batterBonus} Power vs +${pitcherBonus} Heat) and crushed a towering Home Run!`;
+      ruleReason = `Full Count Showdown: Batter anticipated ${pitchType.toUpperCase()} (+${batterBonus} Power vs +${pitcherBonus} Heat) and crushed a towering Home Run!`;
     } else if (margin >= 2) {
       outcomeType = 'double';
       outcomeDisplay = '⚡ 3-2 FULL COUNT: ROCKET DOUBLE INTO THE GAP!';
@@ -1813,58 +1788,24 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
         : ['fastball', 'breaking', 'offspeed'][Math.floor(Math.random() * 3)];
       pitchCall = pitchType;
 
-      // 2. Pick Execution Card within pitch's timing range
-      let range = PITCH_RANGES[pitchType] || { min: 1, max: 10 };
+      // 2. Pick Execution Card: avoid WP (value 1) if possible
       if (botHand.length > 0) {
-        let inRangeIndices = [];
+        let nonWPIndices = [];
         botHand.forEach((id, idx) => {
           const v = getCard(id)?.value || 0;
-          if (v >= range.min && v <= range.max) inRangeIndices.push(idx);
+          if (v > 1) nonWPIndices.push(idx);
         });
 
-        // If no card in range, switch pitch to match available cards in hand
-        if (inRangeIndices.length === 0) {
-          const possiblePitches = Object.keys(PITCH_RANGES).filter(pKey => {
-            if (pKey === 'offspeed' && (lockedOption === 'offspeed' || (charges.offspeed || 0) <= 0)) return false;
-            if ((charges[pKey] || 0) <= 0) return false;
-            const r = PITCH_RANGES[pKey];
-            return botHand.some(id => {
-              const v = getCard(id)?.value || 0;
-              return v >= r.min && v <= r.max;
-            });
-          });
-          if (possiblePitches.length > 0) {
-            pitchType = possiblePitches[0];
-            pitchCall = pitchType;
-            range = PITCH_RANGES[pitchType];
-            botHand.forEach((id, idx) => {
-              const v = getCard(id)?.value || 0;
-              if (v >= range.min && v <= range.max) inRangeIndices.push(idx);
-            });
-          }
-        }
-
-        let chosenIdx = 0;
-        if (inRangeIndices.length > 0) {
-          // Offspeed prefers lowest card (1-2)
-          // Fastball prefers highest card (8-10)
-          // Breaking prefers middle card (4-6)
-          if (pitchType === 'offspeed') {
-            inRangeIndices.sort((a, b) => (getCard(botHand[a])?.value || 0) - (getCard(botHand[b])?.value || 0));
-          } else if (pitchType === 'fastball') {
-            inRangeIndices.sort((a, b) => (getCard(botHand[b])?.value || 0) - (getCard(botHand[a])?.value || 0));
-          } else {
-            inRangeIndices.sort((a, b) => Math.abs((getCard(botHand[a])?.value || 0) - 5) - Math.abs((getCard(botHand[b])?.value || 0) - 5));
-          }
-          chosenIdx = inRangeIndices[0];
-        }
+        const pool = (nonWPIndices.length > 0) ? nonWPIndices : botHand.map((_, i) => i);
+        // Sort descending to play strongest execution card
+        pool.sort((a, b) => (getCard(botHand[b])?.value || 0) - (getCard(botHand[a])?.value || 0));
+        const chosenIdx = pool[0];
         [cardId] = botHand.splice(chosenIdx, 1);
       }
 
     } else {
       // Bot is Batter
       const pCharges = gameState?.arsenalCharges?.[oppRole] || charges;
-      const bFav = batterChar?.scoutingReport?.favoritePitch || 'fastball';
 
       const pitchPool = [];
       if (lockedOption !== 'offspeed' && (pCharges.offspeed || 0) > 0) pitchPool.push('offspeed');
@@ -1872,14 +1813,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
       if ((pCharges.fastball || 0) > 0) pitchPool.push('fastball', 'fastball', 'fastball');
 
       guessPitch = 'fastball';
-      if (oppRevealedVal !== null) {
-        if (oppRevealedVal <= 2) guessPitch = 'offspeed';
-        else if (oppRevealedVal >= 8) guessPitch = 'fastball';
-        else if (oppRevealedVal <= 5) guessPitch = (Math.random() < 0.5) ? 'offspeed' : 'breaking';
-        else guessPitch = (Math.random() < 0.5) ? 'breaking' : 'fastball';
-      } else if (pitchPool.includes(bFav) && Math.random() < 0.4) {
-        guessPitch = bFav;
-      } else if (pitchPool.length > 0) {
+      if (pitchPool.length > 0) {
         guessPitch = pitchPool[Math.floor(Math.random() * pitchPool.length)];
       } else {
         guessPitch = ['fastball', 'breaking', 'offspeed'][Math.floor(Math.random() * 3)];
@@ -1887,32 +1821,32 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
 
       batterGuess = guessPitch;
 
-      // Select card in target pitch timing range, targeting lowest timing delta
-      const range = PITCH_RANGES[guessPitch] || { min: 1, max: 10 };
+      // Select card: avoid K (value 1) if possible, and target Delta 0 if opponent card revealed
       if (botHand.length > 0) {
-        let inRangeIndices = [];
+        let nonKIndices = [];
         botHand.forEach((id, idx) => {
           const v = getCard(id)?.value || 0;
-          if (v >= range.min && v <= range.max) inRangeIndices.push(idx);
+          if (v > 1) nonKIndices.push(idx);
         });
 
-        let chosenIdx = 0;
-        if (inRangeIndices.length > 0) {
-          if (oppRevealedVal !== null) {
-            // Target Delta 0 against revealed card!
-            inRangeIndices.sort((a, b) => Math.abs((getCard(botHand[a])?.value || 0) - oppRevealedVal) - Math.abs((getCard(botHand[b])?.value || 0) - oppRevealedVal));
-          } else {
-            const mid = Math.round((range.min + range.max) / 2);
-            inRangeIndices.sort((a, b) => Math.abs((getCard(botHand[a])?.value || 0) - mid) - Math.abs((getCard(botHand[b])?.value || 0) - mid));
-          }
-          chosenIdx = inRangeIndices[0];
+        const pool = (nonKIndices.length > 0) ? nonKIndices : botHand.map((_, i) => i);
+
+        if (oppRevealedVal !== null) {
+          const oppPitcherRating = getPitcherPitchRating(pitcherChar, guessPitch);
+          const oppEff = oppRevealedVal + oppPitcherRating;
+          const myBatterRating = getBatterPitchRating(batterChar, guessPitch);
+          // Target Delta 0 against revealed effective value
+          pool.sort((a, b) => {
+            const effA = (getCard(botHand[a])?.value || 0) + myBatterRating;
+            const effB = (getCard(botHand[b])?.value || 0) + myBatterRating;
+            return Math.abs(effA - oppEff) - Math.abs(effB - oppEff);
+          });
         } else {
-          // If no card strictly in range, pick card closest to target range mid
-          const mid = Math.round((range.min + range.max) / 2);
-          const allIndices = botHand.map((_, i) => i);
-          allIndices.sort((a, b) => Math.abs((getCard(botHand[a])?.value || 0) - mid) - Math.abs((getCard(botHand[b])?.value || 0) - mid));
-          chosenIdx = allIndices[0];
+          // Play highest card to maximize effective value
+          pool.sort((a, b) => (getCard(botHand[b])?.value || 0) - (getCard(botHand[a])?.value || 0));
         }
+
+        const chosenIdx = pool[0];
         [cardId] = botHand.splice(chosenIdx, 1);
       }
     }

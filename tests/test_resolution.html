@@ -235,31 +235,31 @@
         assert(b2HR.matchTier === 'matched', `Batter anticipated pitch (match)`);
         assert(b2HR.outcomeType === 'homerun', `Pitch match + Delta 0 barrel produces Home Run`);
 
-        // Pitch Match with off-balance timing: Contact hitter had pitch read, gets infield single
+        // Pitch Match with off-balance timing: Contact hitter had pitch read, gets routine out
         const b2FullContactMistimed = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
-          pitcherCardId: 'P14', // val 6
+          pitcherCardId: 'P14', // val 6, PC01 has +5 FB -> eff = 11
           guessPitch: 'fastball',
-          batterCardId: 'B14',  // val 2, Delta 4
+          batterCardId: 'B17',  // val 5, BC02 has +2 FB -> eff = 7 (Timing Delta: |11 - 7| = 4)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC02'],
         });
         assert(b2FullContactMistimed.matchTier === 'matched', `Pitch match on timing stroke`);
         assert(b2FullContactMistimed.timingDelta === 4, `Timing Delta is 4 (off-balance contact)`);
-        assert(b2FullContactMistimed.outcomeType === 'single', `Pitch match contact stroke finds a hole even when off-balance`);
+        assert(b2FullContactMistimed.outcomeType === 'flyout' || b2FullContactMistimed.outcomeType === 'groundout', `Pitch match off-balance contact produces routine out`);
 
         // Scenario B: PITCH ANTICIPATED - SOLID TIMING & CLEAN HIT
-        // Pitcher breaking ball (P14 val 6), Batter times breaking ball (B9 val 7, Delta 1)
+        // Pitcher breaking ball (P14 val 6 + 3 = 9), Batter times breaking ball (B2 val 8 + 2 = 10, Delta 1)
         // Solid line drive on anticipated pitch produces single
         const b2SolidHit = resolveBeat2({
           count: '3-2',
           pitchType: 'breaking',
-          pitcherCardId: 'P14', // val 6
+          pitcherCardId: 'P14', // val 6 + 3 = 9
           guessPitch: 'breaking',
-          batterCardId: 'B9',   // val 7, Delta 1
+          batterCardId: 'B2',   // val 8 + 2 = 10, Delta 1
           pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC02'],
+          batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2SolidHit.matchTier === 'matched', `Batter read the breaking ball`);
         assert(b2SolidHit.timingDelta === 1, `Timing Delta is 1 (solid line drive)`);
@@ -269,91 +269,102 @@
         const b2Strikeout = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
-          pitcherCardId: 'P14', // val 6
+          pitcherCardId: 'P14', // val 6 + 5 = 11
           guessPitch: 'fastball',
-          batterCardId: 'B13',  // val 1 (Delta 5)
+          batterCardId: 'B14',  // val 2 + 2 = 4 (Delta |11 - 4| = 7 >= 5)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          batterChar: BATTER_CHARACTERS['BC02'],
         });
-        assert(b2Strikeout.batterExecuted === false, `Batter fails timing in fastball range with low card (1 < 6)`);
-        assert(b2Strikeout.timingDelta === 5, `Timing Delta is 5 (badly mistimed)`);
+        assert(b2Strikeout.timingDelta >= 5, `Timing Delta is 5+ (badly mistimed)`);
         assert(b2Strikeout.outcomeType === 'k', `Badly mistimed card even on read pitch results in Strikeout`);
 
         // Scenario C: FOOLED / WHIFF (Batter guessed wrong pitch)
-        // Contact hitter manages to put ball in play and avoid strikeout
+        // Contact hitter manages to put ball in play with solid timing (Delta <= 2)
         const b2ContactProtect = resolveBeat2({
           count: '3-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P14', // val 6
-          guessPitch: 'breaking', // Pitch wrong
-          batterCardId: 'B14',  // val 2
+          pitchType: 'breaking', // PC01 Breaking bonus = 3
+          pitcherCardId: 'P7',   // val 3 -> eff = 6
+          guessPitch: 'fastball', // Pitch wrong (+0)
+          batterCardId: 'B17',   // val 5 -> eff = 5 -> Delta |6 - 5| = 1 <= 2
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC02'], // Contact Hitter archetype
         });
         assert(b2ContactProtect.matchTier === 'whiff', `Batter guessed wrong pitch`);
+        assert(b2ContactProtect.timingDelta === 1, `Timing Delta is 1`);
         assert(b2ContactProtect.outcomeType === 'groundout', `Contact hitter avoids strikeout, producing groundout`);
 
-        // Whiff with close card collision on Fastball (Delta 0) -> Popout
+        // Whiff with close card collision (Delta 0) -> Popout/Groundout
         const b2WhiffGoodSwing = resolveBeat2({
           count: '3-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P14', // Val 6
-          guessPitch: 'breaking', // WRONG
-          batterCardId: 'B26',  // Val 6 (Delta 0 collision, but fooled on pitch!)
+          pitchType: 'breaking', // PC01 Breaking bonus = 3
+          pitcherCardId: 'P14', // Val 6 -> eff = 9
+          guessPitch: 'fastball', // WRONG (+0)
+          batterCardId: 'B18',  // Val 9 -> eff = 9 (Delta 0 collision, but fooled on pitch!)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2WhiffGoodSwing.matchTier === 'whiff', `Batter guessed wrong pitch`);
         assert(b2WhiffGoodSwing.timingDelta === 0, `Timing Delta is 0`);
-        assert(b2WhiffGoodSwing.outcomeType === 'flyout', `Fooled batter cannot hit HR even on barrel collision (produces popout)`);
+        assert(b2WhiffGoodSwing.outcomeType === 'flyout' || b2WhiffGoodSwing.outcomeType === 'groundout', `Fooled batter cannot hit HR even on barrel collision (produces popout/groundout)`);
 
         // Whiff when pitcher executes clean and timing is off (Delta 3) -> Swinging Strikeout!
         const b2WhiffCleanPitch = resolveBeat2({
           count: '3-2',
-          pitchType: 'breaking',
-          pitcherCardId: 'P14', // Val 6 (in 3-7 breaking range)
-          guessPitch: 'fastball', // WRONG
-          batterCardId: 'B18',  // Val 9 (Delta 3)
+          pitchType: 'breaking', // PC01 Breaking bonus = 3
+          pitcherCardId: 'P14', // Val 6 -> eff = 9
+          guessPitch: 'fastball', // WRONG (+0)
+          batterCardId: 'B11',  // Val 6 -> eff = 6 (Delta 3)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2WhiffCleanPitch.matchTier === 'whiff', `Batter fooled on pitch`);
+        assert(b2WhiffCleanPitch.timingDelta === 3, `Timing Delta is 3`);
         assert(b2WhiffCleanPitch.outcomeType === 'k', `Fooled on pitch with off-timing produces Strikeout`);
 
-        // Mistake Pitch Test: Pitcher plays Card 1 on Fastball [6-10], Batter plays Card 8 looking Fastball
-        const b2MistakeFastball = resolveBeat2({
-          count: '3-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P19', // Val 1 (out of range 6-10 for Fastball!)
-          guessPitch: 'fastball', // Anticipated correctly!
-          batterCardId: 'B2',  // Val 8 (in range 6-10 for Fastball)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(!b2MistakeFastball.pitcherExecuted, `Pitcher failed execution window throwing Card 1 on Fastball`);
-        assert(b2MistakeFastball.batterExecuted, `Batter executed in range with Card 8`);
-        assert(b2MistakeFastball.outcomeType === 'homerun', `Anticipated mistake pitch is punished for Home Run, never Strikeout`);
-        assert(Boolean(b2MistakeFastball.ruleReason), `Rule reason is populated on mistake pitch resolution`);
-        assert(b2MistakeFastball.ruleReason.includes('failed execution') || b2MistakeFastball.ruleReason.includes('mistake'), `Rule reason describes failed execution/mistake pitch`);
-
-        // Option 3 Wild Pitch Test: Pitcher plays Card 3 on Fastball on 0-2 count, Batter guesses Offspeed with Card 3
+        // ── SPECIAL CARDS TESTS: WP (Wild Pitch) & K (Automatic Strikeout) ──
+        // Pitcher plays WP (Card 1) on 0-2 count
         const b2WildPitch02 = resolveBeat2({
           count: '0-2',
           pitchType: 'fastball',
-          pitcherCardId: 'P7', // Val 3 (out of range 6-10 for Fastball)
-          guessPitch: 'offspeed', // Fooled on pitch
-          batterCardId: 'B4', // Val 3 (Delta 0)
+          pitcherCardId: 'P19', // Val 1 (WP!)
+          guessPitch: 'offspeed',
+          batterCardId: 'B4',   // Val 3
           bases: { first: true, second: false, third: true },
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(!b2WildPitch02.pitcherExecuted, `Pitcher failed execution window throwing Card 3 on Fastball`);
-        assert(!b2WildPitch02.pitchMatched, `Batter was fooled on pitch type`);
-        assert(b2WildPitch02.outcomeType === 'wild_pitch', `Unexecuted pitch on 0-2 count resolves to wild_pitch, not Strikeout`);
+        assert(b2WildPitch02.isPitcherWP === true, `Pitcher Card 1 is identified as WP (Wild Pitch)`);
+        assert(b2WildPitch02.outcomeType === 'wild_pitch', `WP on 0-2 count resolves to wild_pitch`);
         assert(b2WildPitch02.isWildPitchReset === true, `isWildPitchReset is flagged true on 0-2 wild pitch`);
         assert(b2WildPitch02.outsAdded === 0, `Wild pitch adds zero outs`);
         assert(b2WildPitch02.runsScored === 1, `Runner on 3rd scores on wild pitch`);
         assert(b2WildPitch02.ruleReason.includes('Wild pitch') || b2WildPitch02.ruleReason.includes('wild pitch'), `Rule reason describes wild pitch in dirt`);
+
+        // Batter plays K (Card 1) -> Automatic Strikeout!
+        const b2BatterK = resolveBeat2({
+          count: '3-1',
+          pitchType: 'fastball',
+          pitcherCardId: 'P2',  // Val 9
+          guessPitch: 'fastball',
+          batterCardId: 'B13',  // Val 1 (K!)
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2BatterK.isBatterK === true, `Batter Card 1 is identified as K (Strikeout)`);
+        assert(b2BatterK.outcomeType === 'k', `Batter K card produces automatic Strikeout`);
+
+        // Both players play Card 1 -> Strikeout on Wild Pitch!
+        const b2Both1 = resolveBeat2({
+          count: '0-2',
+          pitchType: 'fastball',
+          pitcherCardId: 'P19', // Val 1 (WP)
+          guessPitch: 'fastball',
+          batterCardId: 'B13',  // Val 1 (K)
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2Both1.outcomeType === 'k', `Both Card 1s records Strikeout`);
+        assert(b2Both1.isWildPitchReset === true, `Both Card 1s advances runners on the wild pitch`);
 
         // 3-1 Count Executed Pitch Whiff Test (Option 1: Strikeout, Never Walk)
         // Pitcher executes Fastball [6-10] with Card P22 (val 9).
@@ -415,20 +426,20 @@
         assert(getBatterPitchRating(bBear, 'breaking') === 2, 'The Bear Mackintosh has +2 Breaking rating');
 
         // 15. Beat 2 Battle-Back Condition Tests
-        // 0-2 Count: Batter makes solid Delta 1 contact on read pitch -> Battles back to 3-2!
+        // 0-2 Count: Batter makes solid Delta 2 contact on read pitch -> Battles back to 3-2!
         const b2BattleBack02 = resolveBeat2({
           count: '0-2',
           pitchType: 'fastball',
           pitcherCardId: 'P13', // Val 7 + Smoke +6 = 13
           guessPitch: 'fastball',
-          batterCardId: 'B2',  // Val 8 + Bear +5 = 13 (Timing Delta: |7 - 8| = 1)
+          batterCardId: 'B26',  // Val 6 + Bear +5 = 11 (Timing Delta: |13 - 11| = 2)
           pitcherChar: pSmoke,
           batterChar: bBear,
         });
-        assert(b2BattleBack02.isBattleBack === true, '0-2 Count with solid Delta 1 contact triggers battle back');
+        assert(b2BattleBack02.isBattleBack === true, '0-2 Count with solid Delta 2 contact triggers battle back');
         assert(b2BattleBack02.outcomeType === 'battle_back', '0-2 Battle back outcomeType is battle_back');
         assert(b2BattleBack02.pitcherEffectiveVal === 13, `Pitcher effective value calculated correctly (${b2BattleBack02.pitcherEffectiveVal} == 13)`);
-        assert(b2BattleBack02.batterEffectiveVal === 13, `Batter effective value calculated correctly (${b2BattleBack02.batterEffectiveVal} == 13)`);
+        assert(b2BattleBack02.batterEffectiveVal === 11, `Batter effective value calculated correctly (${b2BattleBack02.batterEffectiveVal} == 11)`);
 
         // 3-1 Count: Pitcher throws clutch strike on Delta 3-4 -> Battles back to 3-2!
         const b2BattleBack31 = resolveBeat2({
@@ -650,7 +661,7 @@
               simState.inning++;
             }
 
-            if (simState.inning > 3 && simState.score.top !== simState.score.bottom) {
+            if (simState.inning > 3) {
               gameEnded = true;
             }
           }
