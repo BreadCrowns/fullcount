@@ -5502,15 +5502,26 @@ body {
 }
 
 /* Drop targets: ensure child elements don't intercept dragover/drop */
+.pitch-trays-container,
+.batter-trays-container {
+  pointer-events: auto !important;
+}
+
+.pitch-tray {
+  pointer-events: auto !important;
+}
+
 .pitch-tray > *:not(.remove-btn),
-.tray-drop-target > *:not(.remove-btn),
-.b1-card-slot > *:not(.remove-btn),
 .choice-tile > *:not(.remove-btn) {
   pointer-events: none;
 }
 
+.b1-card-slot.opp > * {
+  pointer-events: none;
+}
+
 .remove-btn {
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 /* Touch Ghost Card for Mobile/Tablet Drag & Drop */

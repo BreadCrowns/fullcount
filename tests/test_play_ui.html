@@ -175,6 +175,45 @@
       report(lockBtnReady?.disabled === false, 'Lock-in button is enabled when both pitch and card are selected');
       selectCard('P1'); // deselect
 
+      // Test pointer-events on Beat 1 pitch trays (must not be 'none')
+      const moundTrays = document.querySelectorAll('.diamond-mound .pitch-tray');
+      report(moundTrays.length === 3, `Found 3 mound pitch trays in Beat 1`);
+      let allPeAuto = true;
+      moundTrays.forEach(t => {
+        if (window.getComputedStyle(t).pointerEvents !== 'auto') allPeAuto = false;
+      });
+      report(allPeAuto, 'All Beat 1 mound pitch trays have pointer-events auto (interactive for clicks and drops)');
+
+      // Test dragging and dropping a card directly onto Fastball tray
+      const startEvt = new Event('dragstart', { bubbles: true });
+      handleCardDragStart(startEvt, 'P11');
+      const dropEvt = new Event('drop', { bubbles: true });
+      handleTrayDrop(dropEvt, 'fastball', 'mound');
+      handleCardDragEnd(new Event('dragend', { bubbles: true }));
+
+      report(localPitchType === 'fastball', `Dropping card on Fastball selects Fastball pitch (is: ${localPitchType})`);
+      report(localBeatCard === 'P11', `Dropping card on Fastball places card P11 (is: ${localBeatCard})`);
+      const fbPlacedCard = document.querySelector('.pitch-tray[data-pitch="fastball"] .placed-number-card');
+      report(fbPlacedCard !== null, 'Card P11 stays placed inside Fastball tray after drop');
+      const fbActiveTray = document.querySelector('.pitch-tray.active');
+      report(fbActiveTray?.getAttribute('data-pitch') === 'fastball', 'Fastball tray is highlighted active after drop');
+
+      // Test dragging another card onto Breaking tray switches pitch and placed card
+      handleCardDragStart(startEvt, 'P21');
+      handleTrayDrop(dropEvt, 'breaking', 'mound');
+      handleCardDragEnd(new Event('dragend', { bubbles: true }));
+
+      report(localPitchType === 'breaking', `Dropping card on Breaking switches pitch to Breaking (is: ${localPitchType})`);
+      report(localBeatCard === 'P21', `Dropping card on Breaking updates placed card to P21 (is: ${localBeatCard})`);
+      const brPlacedCard = document.querySelector('.pitch-tray[data-pitch="breaking"] .placed-number-card');
+      report(brPlacedCard !== null, 'Card P21 stays placed inside Breaking tray after drop');
+
+      // Clean up local placement for subsequent tests
+      localPitchType = null;
+      localBeatCard = null;
+      selectedCard = null;
+      handleGameState(soloPlayState);
+
       // 2b. Test Special Card Display (WP for Pitcher 1, K for Batter 1)
       report(getCardDisplay(1, true) === 'WP', 'getCardDisplay returns WP for Pitcher card 1');
       report(getCardDisplay(1, false) === 'K', 'getCardDisplay returns K for Batter card 1');
