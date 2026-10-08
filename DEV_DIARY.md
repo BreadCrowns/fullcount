@@ -1050,3 +1050,56 @@ During mobile playtesting on GitHub Pages (`breadcrowns.github.io`), a user reac
 3. **Automated Verification**:
    - Added test in `tests/test_resolution.html` asserting that fooled pitch with $\Delta = 1$ in Beat 3 resolves to `groundout`, not `k`.
    - All 214 tests pass (100%).
+
+---
+
+## Entry 20: Overhauling Payoff Clash from Timing Delta to the Combined Total (Sum) & Bell Curve Launch Angle Model
+*Date: October 7, 2026*
+
+### Context & User Feedback
+During playtesting of the Beat 2 Payoff Clash, the user observed a fundamental disconnect between the recently agreed game design and the live UI:
+> *"I thought the outcome was a result of the sum of pitcher plus batter to align with the bell curve. However, this screen still shows an outcome defined by the Delta"*
+
+A screenshot captured the clash modal presenting:
+- Timing Badge: `DELTA 4 • OFF-BALANCE CONTACT`
+- Step 2 Breakdown: `2. EXECUTION & Δ: You: [8+5=13] vs Opp: [5+4=9] • Δ 4`
+- Outcome Text: `0-2 Count: Pitcher put away the hitter with dominant stuff (Delta 4, Effective 13 vs 9)! Strikeout!`
+- Collapsible Guide: Rows documenting $\Delta 0$, $\Delta 1\text{–}2$, $\Delta 3\text{–}4$, $\Delta 5+$
+- Diamond Center Beam: `&Delta; 4`
+
+While stamina degradation had been implemented on the backend, the presentation and rule text were still calculating, labeling, and displaying $\Delta = |\text{Pitcher} - \text{Batter}|$.
+
+### Mathematical & Design Alignment: The Bell Curve Launch Angle Spectrum
+Under the Bell Curve model, the confrontation is governed by the **Combined Total (Sum)** of Delivery + Swing:
+$$\text{Combined Total} = \text{Pitcher Delivery} + \text{Batter Swing}$$
+Where:
+- $\text{Pitcher Delivery} = \text{pCardVal} + \text{pitcherBonus}$ (diminished by stamina erosion across Beat 2 & 3).
+- $\text{Batter Swing} = \text{bCardVal} + (\text{batterBonus if anticipated})$.
+
+When combined, the sum naturally forms a triangular/bell-shaped probability distribution with 4 distinct launch angle bands:
+1. **Low Contact Band ($\le 8$)**: Sinker in the dirt $\rightarrow$ routine groundout. In 3-1 count, battles back to 3-2 (`battle_back`).
+2. **Line Drive Band ($9\text{–}10$)**: Clean contact $\rightarrow$ line drive Single. In 0-2 count, two-strike foul spoil battles back to 3-2 (`battle_back`).
+3. **Sweet Spot / Barrel Band ($11\text{–}14$)**: Squared-up collision $\rightarrow$ Moonshot Home Run / Gap Double (capped at Double on 0-2 count).
+4. **High Heat Band ($15+$)**: High velocity/blown-away delivery $\rightarrow$ Popout or Put-Away Punchout Strikeout on 0-2 (battles back to 3-2 on 3-1 count).
+5. **Fooled on Pitch Type**: Batter guessed the wrong pitch $\rightarrow$ weak groundouts/popouts ($\le 14$) or swinging strikeouts on high heat ($15+$).
+6. **Special Cards**: Pitcher WP [1] throws wild pitch in dirt; Batter K [1] automatic swinging strikeout.
+
+### Implementation Details
+1. **At-Bat Outcome Overlay (`js/app.js`)**:
+   - Replaced `timingBadgeHtml` with `launchAngleBadgeHtml` displaying `TOTAL [X] • [BAND NAME]`.
+   - Changed label from `⏱️ Timing:` to `📐 Combined Total:`.
+   - Changed Step 2 from `2. EXECUTION & Δ:` to `2. COMBINED TOTAL (SUM): You: [13] + Opp: [9] = TOTAL 22`.
+   - Overhauled collapsible `rm-matrix-guide` to document the 4 Bell Curve bands, Fooled pitches, and WP/K cards.
+2. **Baseball Diamond Clash Beam (`js/app.js`)**:
+   - Replaced center clash beam label `&Delta; ${delta}` with `TOTAL ${launchAngle}`.
+3. **Resolution Engine Rule Explanations (`js/resolution.js`)**:
+   - Updated `resolveBeat2` and `resolveBeat3` to calculate `launchAngle = pitcherEffectiveVal + (pitchMatched ? batterEffectiveVal : bCardVal)`.
+   - Scrubbed all references to `Delta` in `ruleReason` strings across Beat 2 and Beat 3, clearly articulating outcomes in terms of `Total ${launchAngle}` and the Bell Curve bands.
+   - Updated `rng.odds` to report `Total ${launchAngle} on Bell Curve`.
+4. **Tooltips & Leverage Banners (`js/app.js`)**:
+   - Updated archetype tooltips (`Slugger`, `Contact Hitter`) and count leverage banners (`0-2`, `3-1`) to remove legacy Delta references.
+
+### Verification Results
+- **Automated Unit Tests**: **215 of 215 tests pass (100%)** with zero errors across `tests/test_resolution.html` and `tests/test_play_ui.html`.
+- **Headless 10-Game Simulation**: Completed 262 PAs across 10 full games with **2.70 runs/game**, 45 hits, 7 home wins, 3 away wins, and zero runtime errors.
+- **Result**: The UI and resolution engine are now 100% unified under the Combined Total / Bell Curve Launch Angle model, completely eliminating the Delta paradox.

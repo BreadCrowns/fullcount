@@ -257,8 +257,8 @@
       handleGameState(soloPlayState);
       const b2Html = document.getElementById('app').innerHTML;
       report(b2Html.length > 100, `Beat 2 placing rendered successfully (${b2Html.length} chars)`);
-      const lockedOffspeed = document.querySelector('.choice-tile.locked');
-      report(lockedOffspeed !== null && lockedOffspeed.textContent.includes('Offspeed'), 'Beat 2 locks out Offspeed pitch on 3-1 count');
+      const lockedTiles = document.querySelectorAll('.choice-tile.locked');
+      report(lockedTiles.length === 0, 'All 3 pitch trays remain unlocked without artificial lockout on 3-1 count');
       report(document.querySelector('.beat2-advantage-banner') !== null, 'Beat 2 advantage banner renders in Beat 2 arena');
       report(document.querySelector('.beat2-advantage-banner.count-hitter') !== null, 'Beat 2 advantage banner reflects 3-1 count leverage');
       report(document.querySelector('.opponent-bar .opp-scout-chips') === null, 'Opponent scouting chips removed from top opponent bar');
@@ -301,7 +301,7 @@
           sameLocation: true,
           isHotZone: true,
           outcomeDisplay: 'Home Run',
-          ruleReason: 'Fastball was squared up with Delta 0 timing for a Home Run.'
+          ruleReason: 'Fastball was squared up on Total 12 Sweet Spot barrel for a Home Run.'
         }
       };
       handleGameState(soloPlayState);
