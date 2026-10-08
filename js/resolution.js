@@ -1029,7 +1029,26 @@ function resolveBeat1(opts) {
   let staminaPen = (staminaMod && staminaMod.z1) ? staminaMod.z1 : 0;
 
   const pitcherDelivery = Math.max(0, pCardVal + pBonus + staminaPen);
-  const batterReaction = bCardVal + (pitchMatched ? bBonus : 0);
+  const batterReaction = bCardVal;
+  const launchAngle = pitcherDelivery + bCardVal;
+
+  const sweetSpotInfo = PITCH_SWEET_SPOTS[effPitchType] || PITCH_SWEET_SPOTS.fastball;
+  const center = sweetSpotInfo.center; // Offspeed = 6, Breaking = 9, Fastball = 12
+
+  let barrelMin, barrelMax, lineDriveMin, lineDriveMax;
+  let expansion = 0;
+  if (pitchMatched) {
+    expansion = Math.max(1, Math.min(3, Math.floor((bBonus + 1) / 2)));
+    barrelMin = center - expansion;
+    barrelMax = center + expansion;
+    lineDriveMin = barrelMin - 2;
+    lineDriveMax = barrelMin - 1;
+  } else {
+    barrelMin = center - 1;
+    barrelMax = center + 1;
+    lineDriveMin = barrelMin - 1;
+    lineDriveMax = barrelMin - 1;
+  }
 
   let winner = 'tie';
   let count = '3-2';
@@ -1039,7 +1058,7 @@ function resolveBeat1(opts) {
   let lockedOption = null;
   let revealCardFirst = null;
   let isDominant = false;
-  let margin = Math.abs(pitcherDelivery - batterReaction);
+  let margin = Math.abs(launchAngle - center);
   let isWildPitch = false;
 
   // 1. Special Cards Check: WP (Wild Pitch) & K (Swinging Whiff)
@@ -1072,38 +1091,47 @@ function resolveBeat1(opts) {
     isDominant = true;
     revealCardFirst = 'batter';
   } else {
-    // 2. Standard Pitch 1 Resolution: Pitcher Delivery vs Batter Reaction
-    margin = Math.abs(pitcherDelivery - batterReaction);
-    isDominant = margin >= 4;
-
-    if (pitcherDelivery > batterReaction) {
-      winner = 'pitcher';
-      count = '0-2';
-      cascadeEffect = 'count_0_2';
-      advantageSide = 'pitcher';
-      if (isDominant) {
-        revealCardFirst = 'batter';
-        countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Two-Strike Protection + Batter Plays Face-Up First)";
-      } else {
-        countDisplay = "0-2 Pitcher's Count (Two-Strike Protection: Home Runs Capped at Doubles)";
-      }
-    } else if (batterReaction > pitcherDelivery) {
+    // 2. Standard Pitch 1 Resolution: Sweet Spot Collision
+    if (pitchMatched && launchAngle >= barrelMin && launchAngle <= barrelMax) {
+      // 🎯 SWEET SPOT BARREL: Batter anticipated pitch and timed it on the sweet spot! -> 3-1 Hitter's Count
       winner = 'batter';
       count = '3-1';
       cascadeEffect = 'count_3_1';
       advantageSide = 'batter';
+      margin = Math.abs(launchAngle - center);
+      isDominant = (margin <= 1 || expansion >= 3);
       if (isDominant) {
         revealCardFirst = 'pitcher';
-        countDisplay = "3-1 Hitter's Count (DOMINANT ADVANTAGE: Any Strike Battles Back + Pitcher Plays Face-Up First)";
+        countDisplay = `3-1 Hitter's Count (DOMINANT SWEET SPOT: Total ${launchAngle} in [${barrelMin}–${barrelMax}], Pitcher Plays Face-Up First)`;
       } else {
-        countDisplay = "3-1 Hitter's Count (Hitter's Count: Any Strike Battles Back to 3-2)";
+        countDisplay = `3-1 Hitter's Count (Sweet Spot Barrel: Total ${launchAngle} in [${barrelMin}–${barrelMax}])`;
       }
-    } else {
+
+    } else if (pitchMatched && launchAngle >= lineDriveMin && launchAngle <= lineDriveMax) {
+      // 🏏 LINE DRIVE BAND: Solid contact near barrel -> 3-2 Full Count
       winner = 'tie';
       count = '3-2';
       cascadeEffect = 'count_3_2';
       advantageSide = 'neutral';
-      countDisplay = '3-2 Full Count (Even Battle - All Options Available)';
+      isDominant = false;
+      revealCardFirst = null;
+      margin = Math.abs(launchAngle - center);
+      countDisplay = `3-2 Full Count (Solid Contact Near Barrel: Total ${launchAngle} in [${lineDriveMin}–${lineDriveMax}])`;
+
+    } else {
+      // ⚡ OUTSIDE SWEET SPOT / FOOLED: High heat, low rollover, or fooled on pitch -> 0-2 Pitcher's Count
+      winner = 'pitcher';
+      count = '0-2';
+      cascadeEffect = 'count_0_2';
+      advantageSide = 'pitcher';
+      margin = Math.abs(launchAngle - center);
+      isDominant = (!pitchMatched && margin >= 2) || (launchAngle >= center + 3);
+      if (isDominant) {
+        revealCardFirst = 'batter';
+        countDisplay = `0-2 Pitcher's Count (DOMINANT OUTSIDE: Total ${launchAngle} vs Sweet Spot ${center}, Batter Plays Face-Up First)`;
+      } else {
+        countDisplay = `0-2 Pitcher's Count (Outside Sweet Spot: Total ${launchAngle} vs Sweet Spot ${center})`;
+      }
     }
   }
 
@@ -1125,6 +1153,13 @@ function resolveBeat1(opts) {
     batterTotal: batterReaction,
     pitcherDelivery,
     batterReaction,
+    launchAngle,
+    center,
+    barrelMin,
+    barrelMax,
+    lineDriveMin,
+    lineDriveMax,
+    timingDelta: Math.abs(launchAngle - center),
     pitcherCardVal: pCardVal,
     batterCardVal: bCardVal,
     pitcherBaseBonus: pBonus,
@@ -1896,12 +1931,21 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
       pitchCall = pitchType;
 
       if (botHand.length > 0) {
-        let midIdx = botHand.findIndex(id => {
+        let nonWPIndices = [];
+        botHand.forEach((id, idx) => {
           const v = getCard(id)?.value || 0;
-          return v >= 3 && v <= 5;
+          if (v > 1) nonWPIndices.push(idx);
         });
-        if (midIdx === -1) midIdx = 0;
-        [cardId] = botHand.splice(midIdx, 1);
+        const pool = (nonWPIndices.length > 0) ? nonWPIndices : botHand.map((_, i) => i);
+        const center = PITCH_SWEET_SPOTS[pitchType]?.center || 12;
+        const myRating = liveRatings[pitchType] || 0;
+        if (myRating >= 4) {
+          pool.sort((a, b) => (getCard(botHand[b])?.value || 0) - (getCard(botHand[a])?.value || 0));
+        } else {
+          pool.sort((a, b) => (getCard(botHand[a])?.value || 0) - (getCard(botHand[b])?.value || 0));
+        }
+        const chosenIdx = pool[0];
+        [cardId] = botHand.splice(chosenIdx, 1);
       }
     } else {
       const oppRatings = gameState?.pitcherRatings?.[oppRole] || { fastball: 3, breaking: 2, offspeed: 1 };
@@ -1916,12 +1960,25 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
       batterGuess = guessPitch;
 
       if (botHand.length > 0) {
-        let midIdx = botHand.findIndex(id => {
+        let nonKIndices = [];
+        botHand.forEach((id, idx) => {
           const v = getCard(id)?.value || 0;
-          return v >= 3 && v <= 5;
+          if (v > 1) nonKIndices.push(idx);
         });
-        if (midIdx === -1) midIdx = 0;
-        [cardId] = botHand.splice(midIdx, 1);
+        const pool = (nonKIndices.length > 0) ? nonKIndices : botHand.map((_, i) => i);
+        const oppRating = oppRatings[guessPitch] || 0;
+        const oppDeliveryEst = 3 + oppRating;
+        const center = PITCH_SWEET_SPOTS[guessPitch]?.center || 12;
+        const idealCardVal = Math.max(1, Math.min(6, center - oppDeliveryEst));
+
+        pool.sort((a, b) => {
+          const diffA = Math.abs((getCard(botHand[a])?.value || 0) - idealCardVal);
+          const diffB = Math.abs((getCard(botHand[b])?.value || 0) - idealCardVal);
+          return diffA - diffB;
+        });
+
+        const chosenIdx = pool[0];
+        [cardId] = botHand.splice(chosenIdx, 1);
       }
     }
 

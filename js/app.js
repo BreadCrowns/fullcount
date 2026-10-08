@@ -1647,9 +1647,9 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
     mainContentHtml = `
       <div class="beat1-arena diamond-arena">
-        <div class="beat1-banner" onclick="handleTooltipClick(event, 'Pitch 1: The Setup Pitch', 'Pitcher throws pitch type &amp; card while batter anticipates pitch type &amp; card. Higher collision sets count leverage: 0-2 (Pitcher), 3-1 (Hitter), or 3-2 (Full Count)!')" title="Tap for info">
+        <div class="beat1-banner" onclick="handleTooltipClick(event, 'Pitch 1: The Setup Pitch', 'Pitcher throws pitch type &amp; card while batter anticipates pitch type &amp; card. Sweet spot collision sets count leverage: Sweet Spot &rarr; 3-1 (Hitter), Line Drive &rarr; 3-2 (Full Count), Outside/Fooled &rarr; 0-2 (Pitcher)!')" title="Tap for info">
           <span class="b1-title">PITCH 1: THE SETUP PITCH <span class="adv-info-icon">ⓘ</span></span>
-          <span class="b1-subtitle">Mound vs Plate &bull; Pitcher delivery vs Batter anticipation</span>
+          <span class="b1-subtitle">Mound vs Plate &bull; Sweet Spot &rarr; 3-1 | Line Drive &rarr; 3-2 | Outside &rarr; 0-2</span>
         </div>
 
         <div class="diamond-field">
@@ -2961,14 +2961,24 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
   const count = b1.count || (winner === 'pitcher' ? '0-2' : (winner === 'batter' ? '3-1' : '3-2'));
   const pCard = b1.pitcherCards?.[0] ? getCard(b1.pitcherCards[0]) : null;
   const bCard = b1.batterCards?.[0] ? getCard(b1.batterCards[0]) : null;
-  const pVal = pCard?.value ?? b1.pitcherTotal ?? 0;
-  const bVal = bCard?.value ?? b1.batterTotal ?? 0;
-  const margin = b1.margin ?? Math.abs(pVal - bVal);
-  const isDominant = Boolean(b1.isDominant || margin >= 5);
+  const pVal = pCard?.value ?? b1.pitcherCardVal ?? b1.pitcherTotal ?? 0;
+  const bVal = bCard?.value ?? b1.batterCardVal ?? b1.batterTotal ?? 0;
+  const pPitch = (b1.pitchType || 'fastball').toUpperCase();
+  const bGuess = (b1.guessPitch || 'fastball').toUpperCase();
+  const pBonus = b1.pitcherBaseBonus ?? 0;
+  const bBonus = b1.batterBaseBonus ?? 0;
+  const launchAngle = b1.launchAngle ?? (pVal + pBonus + bVal);
+  const center = b1.center ?? (PITCH_SWEET_SPOTS[b1.pitchType]?.center || 12);
+  const barrelMin = b1.barrelMin ?? (center - 1);
+  const barrelMax = b1.barrelMax ?? (center + 1);
+  const lineDriveMin = b1.lineDriveMin ?? (barrelMin - 2);
+  const lineDriveMax = b1.lineDriveMax ?? (barrelMin - 1);
+  const margin = b1.margin ?? Math.abs(launchAngle - center);
+  const isDominant = Boolean(b1.isDominant || margin >= 4);
 
   let countTitle = '3-2 FULL COUNT';
   let bannerClass = 'count-full';
-  let explanation = 'Both cards had equal value. Even battle &mdash; all pitch and swing options available for the payoff pitch.';
+  let explanation = `Solid contact near the barrel (Total <b>${launchAngle}</b> in [${lineDriveMin}–${lineDriveMax}]). 3-2 Full Count established &mdash; even battle for Pitch 2!`;
   let winnerTag = '⚖️ COUNT TIED';
 
   if (winner === 'pitcher') {
@@ -2977,12 +2987,12 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
     winnerTag = isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
     if (isDominant) {
       explanation = isPitcherMe
-        ? `🔥 <b>Dominant Win (+${margin})!</b> 0-2 Count established &mdash; two-strike plate protection in effect, and Batter must commit their execution card <b>FACE-UP FIRST</b>!`
-        : `⚠️ <b>Dominant Loss (+${margin})!</b> 0-2 Count against you &mdash; two-strike plate protection in effect, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+        ? `🔥 <b>Dominant Beat!</b> Total <b>${launchAngle}</b> beat the sweet spot (Center ${center})! 0-2 Count established &mdash; two-strike plate protection in effect, and Batter must commit their execution card <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Beat!</b> Total <b>${launchAngle}</b> missed the sweet spot (Center ${center})! 0-2 Count against you &mdash; two-strike plate protection in effect, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
     } else {
       explanation = isPitcherMe
-        ? `Pitcher won the count battle! 0-2 Count established &mdash; two-strike plate protection in effect (home runs capped at doubles, elevated strikeout danger).`
-        : `Opponent won the count battle! 0-2 Count against you &mdash; two-strike plate protection in effect (home runs capped at doubles).`;
+        ? `Pitcher beat the sweet spot (Total <b>${launchAngle}</b> vs Center ${center})! 0-2 Count established &mdash; two-strike plate protection in effect (home runs capped at doubles).`
+        : `Opponent beat the sweet spot (Total <b>${launchAngle}</b> vs Center ${center})! 0-2 Count against you &mdash; two-strike plate protection in effect (home runs capped at doubles).`;
     }
   } else if (winner === 'batter') {
     countTitle = "3-1 HITTER'S COUNT";
@@ -2990,17 +3000,21 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
     winnerTag = !isPitcherMe ? '🎉 YOU WON COUNT' : '⚠️ OPPONENT WON COUNT';
     if (isDominant) {
       explanation = !isPitcherMe
-        ? `🔥 <b>Dominant Win (+${margin})!</b> Pitcher's <b>Offspeed pitch is LOCKED OUT</b>, and Pitcher must commit their execution card <b>FACE-UP FIRST</b>!`
-        : `⚠️ <b>Dominant Loss (+${margin})!</b> Your <b>Offspeed pitch is LOCKED OUT</b>, and you must commit your execution card <b>FACE-UP FIRST</b>!`;
+        ? `🔥 <b>Dominant Sweet Spot Barrel!</b> Total <b>${launchAngle}</b> squared up the sweet spot [${barrelMin}–${barrelMax}]! 3-1 Hitter's Count established &mdash; Pitcher must throw Pitch 2 <b>FACE-UP FIRST</b>!`
+        : `⚠️ <b>Dominant Sweet Spot Barrel!</b> Opponent squared up the sweet spot [${barrelMin}–${barrelMax}]! 3-1 Hitter's Count established &mdash; you must throw Pitch 2 <b>FACE-UP FIRST</b>!`;
     } else {
       explanation = !isPitcherMe
-        ? `Batter won the count battle! Pitcher's <b>Offspeed pitch is LOCKED OUT</b> (forced to challenge with Fastball or Breaking).`
-        : `Opponent won the count battle! Your <b>Offspeed pitch is LOCKED OUT</b> (changeups eliminated).`;
+        ? `Batter timed the delivery into the sweet spot barrel (Total <b>${launchAngle}</b> in [${barrelMin}–${barrelMax}])! 3-1 Hitter's Count established &mdash; any strike in Pitch 2 battles back to 3-2.`
+        : `Opponent timed the delivery into the sweet spot barrel (Total <b>${launchAngle}</b> in [${barrelMin}–${barrelMax}])! 3-1 Hitter's Count established &mdash; any strike in Pitch 2 battles back to 3-2.`;
     }
   }
 
-  const myCardVal = isPitcherMe ? pVal : bVal;
-  const oppCardVal = isPitcherMe ? bVal : pVal;
+  const myVal = isPitcherMe ? pVal : bVal;
+  const oppVal = isPitcherMe ? bVal : pVal;
+  const myPitchLabel = isPitcherMe ? `Threw <b>${pPitch}</b>` : `Looking <b>${bGuess}</b>`;
+  const myStatLabel = isPitcherMe ? `+${pBonus} Arm` : `+${bBonus} ${b1.pitchMatched ? 'Plate Cov' : 'Bonus'}`;
+  const oppPitchLabel = isPitcherMe ? `Looking <b>${bGuess}</b>` : `Threw <b>${pPitch}</b>`;
+  const oppStatLabel = isPitcherMe ? `+${bBonus} ${b1.pitchMatched ? 'Plate Cov' : 'Bonus'}` : `+${pBonus} Arm`;
   const myRoleTag = isPitcherMe ? '⚾ You (Pitcher)' : '🏏 You (Batter)';
   const oppRoleTag = isPitcherMe ? '🏏 Opponent (Batter)' : '⚾ Opponent (Pitcher)';
 
@@ -3009,7 +3023,7 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
       <div class="result-modal-card">
         <div class="rm-header">
           <span class="rm-tag">BEAT 1 RESULT &bull; THE COUNT</span>
-          <span class="rm-suspense-label">⚡ COUNT DUEL REVEAL</span>
+          <span class="rm-suspense-label">⚡ SETUP PITCH CLASH</span>
           <span class="rm-winner-pill ${bannerClass}">${winnerTag}</span>
         </div>
 
@@ -3017,15 +3031,19 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
           <div class="rm-player-box mine anticipate-flip-p">
             <span class="rm-role">${myRoleTag}</span>
             <div class="number-card sm selected">
-              <span class="card-hero-num">${myCardVal}</span>
+              <span class="card-hero-num">${myVal}</span>
             </div>
+            <div class="rm-card-meta">${myPitchLabel}</div>
+            <div class="rm-eff-calc">${myStatLabel}</div>
           </div>
           <div class="rm-vs anticipate-vs">VS</div>
           <div class="rm-player-box opp anticipate-flip-b">
             <span class="rm-role">${oppRoleTag}</span>
             <div class="number-card sm selected">
-              <span class="card-hero-num">${oppCardVal}</span>
+              <span class="card-hero-num">${oppVal}</span>
             </div>
+            <div class="rm-card-meta">${oppPitchLabel}</div>
+            <div class="rm-eff-calc">${oppStatLabel}</div>
           </div>
         </div>
 
@@ -3034,14 +3052,17 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
           <div class="rm-count-label">${countTitle}</div>
         </div>
 
-        ${isDominant ? `<div class="rm-dominant-tag anticipate-dominant">🔥 DOMINANT BEAT (+${margin}) &bull; COMBINED ADVANTAGE</div>` : ''}
+        ${isDominant ? `<div class="rm-dominant-tag anticipate-dominant">🔥 DOMINANT SETUP &bull; FACE-UP CARD REVEAL IN PITCH 2</div>` : ''}
 
         <div class="rm-explanation anticipate-explain">
+          <div style="font-size:0.8rem;margin-bottom:6px;color:var(--text-secondary);">
+            Collision Total: <b>${launchAngle}</b> &bull; Sweet Spot Center: <b>${center}</b> (Barrel [${barrelMin}&ndash;${barrelMax}])
+          </div>
           ${explanation}
         </div>
 
         <button class="btn-primary rm-btn anticipate-btn" onclick="proceedToBeat2()">
-          Continue to Payoff Pitch &rarr;
+          Continue to Attack Pitch &rarr;
         </button>
       </div>
     </div>`;

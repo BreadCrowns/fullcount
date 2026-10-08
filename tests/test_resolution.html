@@ -165,57 +165,76 @@
           assert(totalPitches === 9, `Pitcher ${p.name} has exactly 9 pitch charges (${totalPitches})`);
         });
 
-        // 12. Sequential Beat 1 Tests (Count Battle & Economy)
-        // Pitcher P1 (val 10) vs Batter B13 (val 1) -> Dominant 0-2 Pitcher Count (margin 9 >= 5)
+        // 12. Sequential Beat 1 Tests (Setup Pitch Sweet Spot Resolution)
+        // A. Pitcher plays Card 1 (WP in dirt) -> 3-1 Count + Runners advance
+        const b1PitcherWP = resolveBeat1({
+          pitcherCardId: 'P19', // Val 1 (WP)
+          batterCardId: 'B4',
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b1PitcherWP.winner === 'batter', `Pitch 1 WP awards 3-1 count`);
+        assert(b1PitcherWP.count === '3-1', `Pitch 1 WP establishes 3-1 count`);
+        assert(b1PitcherWP.isWildPitch === true, `Pitch 1 WP is flagged as wild pitch`);
+
+        // B. Batter plays Card 1 (K whiff) -> 0-2 Pitcher Count
         const b1PitcherWins = resolveBeat1({
           pitcherCardId: 'P1',
-          batterCardId: 'B13',
+          pitchType: 'fastball',
+          batterCardId: 'B13', // Val 1 (K!)
+          guessPitch: 'fastball',
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b1PitcherWins.winner === 'pitcher', `Beat 1 higher pitcher card awards pitcher advantage`);
-        assert(b1PitcherWins.count === '0-2', `Beat 1 pitcher win establishes 0-2 Pitcher's Count`);
+        assert(b1PitcherWins.winner === 'pitcher', `Beat 1 batter K awards pitcher advantage`);
+        assert(b1PitcherWins.count === '0-2', `Beat 1 batter K establishes 0-2 Pitcher's Count`);
         assert(b1PitcherWins.lockedOption === null, `No artificial option lockouts on pitcher win`);
-        assert(b1PitcherWins.isDominant === true, `Margin 9 establishes dominant count advantage`);
+        assert(b1PitcherWins.isDominant === true, `Batter K establishes dominant count advantage`);
         assert(b1PitcherWins.revealCardFirst === 'batter', `Batter must play execution card face-up first on dominant pitcher win`);
 
-        // Batter B6 (val 9) vs Pitcher P6 (val 2) -> Dominant 3-1 Hitter Count (margin 7 >= 5)
+        // C. Sweet Spot Barrel: Batter anticipates Fastball and squares up Center 12 -> 3-1 Count
         const b1BatterWins = resolveBeat1({
-          pitcherCardId: 'P6',
-          batterCardId: 'B6',
+          pitchType: 'fastball',
+          pitcherCardId: 'P24', // Val 3 + PC01 FB 5 = 8
+          guessPitch: 'fastball',
+          batterCardId: 'B8',   // Val 4 -> Total 12 (Squared up Center 12!)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b1BatterWins.winner === 'batter', `Beat 1 higher batter card awards batter advantage`);
-        assert(b1BatterWins.count === '3-1', `Beat 1 batter win establishes 3-1 Hitter's Count`);
+        assert(b1BatterWins.winner === 'batter', `Beat 1 sweet spot barrel awards batter advantage`);
+        assert(b1BatterWins.count === '3-1', `Beat 1 sweet spot establishes 3-1 Hitter's Count`);
         assert(b1BatterWins.lockedOption === null, `No artificial option lockouts on batter win`);
-        assert(b1BatterWins.isDominant === true, `Margin 7 establishes dominant count advantage`);
+        assert(b1BatterWins.isDominant === true, `Squared up sweet spot establishes dominant count advantage`);
         assert(b1BatterWins.revealCardFirst === 'pitcher', `Pitcher must throw execution card face-up first on dominant batter win`);
 
-        // Simple Win (margin 1): P14 (val 6) vs B17 (val 5) -> 0-2 Count without card reveal
-        const b1Simple = resolveBeat1({
-          pitcherCardId: 'P14',
-          batterCardId: 'B17',
+        // D. Outside Sweet Spot (High Heat 17 > 15): 0-2 Count
+        const b1HighHeat = resolveBeat1({
+          pitchType: 'fastball',
+          pitcherCardId: 'P1',  // Val 6 + FB 5 = 11
+          guessPitch: 'fastball',
+          batterCardId: 'B6',   // Val 6 -> Total 17 (above barrel max 15)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b1Simple.winner === 'pitcher', `Simple win awards pitcher win`);
-        assert(b1Simple.lockedOption === null, `No artificial option lockouts on simple win`);
-        assert(b1Simple.isDominant === false, `Margin 1 is simple win, not dominant`);
-        assert(b1Simple.revealCardFirst === null, `Simple win does not force card reveal`);
+        assert(b1HighHeat.winner === 'pitcher', `High heat outside sweet spot awards pitcher win`);
+        assert(b1HighHeat.count === '0-2', `High heat establishes 0-2 Pitcher's Count`);
+        assert(b1HighHeat.isDominant === true, `High heat establishes dominant count advantage`);
+        assert(b1HighHeat.revealCardFirst === 'batter', `Batter must play face-up first on dominant high heat`);
 
-        // Tie: P23 (val 5) vs B17 (val 5) -> 3-2 Full Count
+        // E. Line Drive Band ([6-7] on Breaking Center 9): 3-2 Full Count
         const b1Tie = resolveBeat1({
-          pitcherCardId: 'P23',
-          batterCardId: 'B17',
+          pitchType: 'breaking',
+          pitcherCardId: 'P25', // Val 2 + PC01 Breaking 3 = 5
+          guessPitch: 'breaking',
+          batterCardId: 'B1',   // Val 2 -> Total 7 (Line Drive Band [6-7])
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b1Tie.winner === 'tie', `Beat 1 equal cards results in tie`);
-        assert(b1Tie.count === '3-2', `Beat 1 tie establishes 3-2 Full Count`);
+        assert(b1Tie.winner === 'tie', `Line drive contact results in tie`);
+        assert(b1Tie.count === '3-2', `Beat 1 line drive establishes 3-2 Full Count`);
         assert(b1Tie.lockedOption === null, `3-2 Full count has no option lockouts`);
-        assert(b1Tie.isDominant === false, `Tie has no dominant advantage`);
-        assert(b1Tie.revealCardFirst === null, `Tie does not force card reveal`);
+        assert(b1Tie.isDominant === false, `Line drive has no dominant advantage`);
+        assert(b1Tie.revealCardFirst === null, `Line drive does not force card reveal`);
 
         // 13. Sequential Beat 2 Tests (Bell Curve Launch Angle Spectrum)
         // Scenario A: PITCH ANTICIPATED - SWEET SPOT BARREL (Center 9, Band [8-10]) -> HOME RUN
