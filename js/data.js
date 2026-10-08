@@ -1,85 +1,86 @@
 'use strict';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ACTION CARDS (70 cards) — Pure Number Cards (Values 1-10)
-// No bonuses, no modifiers, no special rules.
+// ACTION CARDS (70 cards) — Pure Number Cards (Values 1-6)
+// Card 1 = WP (Wild Pitch for Pitcher) / K (Strikeout for Batter).
+// Values 2-6 = Standard Pure Number Cards.
 // ─────────────────────────────────────────────────────────────────────────────
 const ACTION_CARDS = {
-  // Pitcher Number Cards (Values 1-10)
-  'P1' :{ id:'P1' , value:10, type:'pitcher' },
-  'P2' :{ id:'P2' , value:9 , type:'pitcher' },
-  'P3' :{ id:'P3' , value:9 , type:'pitcher' },
-  'P4' :{ id:'P4' , value:8 , type:'pitcher' },
-  'P5' :{ id:'P5' , value:5 , type:'pitcher' },
+  // Pitcher Number Cards (Values 1-6)
+  'P1' :{ id:'P1' , value:6 , type:'pitcher' },
+  'P2' :{ id:'P2' , value:5 , type:'pitcher' },
+  'P3' :{ id:'P3' , value:5 , type:'pitcher' },
+  'P4' :{ id:'P4' , value:5 , type:'pitcher' },
+  'P5' :{ id:'P5' , value:4 , type:'pitcher' },
   'P6' :{ id:'P6' , value:2 , type:'pitcher' },
   'P7' :{ id:'P7' , value:3 , type:'pitcher' },
-  'P8' :{ id:'P8' , value:6 , type:'pitcher' },
+  'P8' :{ id:'P8' , value:4 , type:'pitcher' },
   'P9' :{ id:'P9' , value:2 , type:'pitcher' },
   'P10':{ id:'P10', value:3 , type:'pitcher' },
   'P11':{ id:'P11', value:3 , type:'pitcher' },
-  'P12':{ id:'P12', value:10, type:'pitcher' },
-  'P13':{ id:'P13', value:7 , type:'pitcher' },
-  'P14':{ id:'P14', value:6 , type:'pitcher' },
-  'P15':{ id:'P15', value:9 , type:'pitcher' },
+  'P12':{ id:'P12', value:6 , type:'pitcher' },
+  'P13':{ id:'P13', value:5 , type:'pitcher' },
+  'P14':{ id:'P14', value:5 , type:'pitcher' },
+  'P15':{ id:'P15', value:5 , type:'pitcher' },
   'P16':{ id:'P16', value:2 , type:'pitcher' },
   'P17':{ id:'P17', value:2 , type:'pitcher' },
-  'P18':{ id:'P18', value:5 , type:'pitcher' },
-  'P19':{ id:'P19', value:1 , type:'pitcher' },
-  'P20':{ id:'P20', value:8 , type:'pitcher' },
+  'P18':{ id:'P18', value:4 , type:'pitcher' },
+  'P19':{ id:'P19', value:1 , type:'pitcher' }, // WP
+  'P20':{ id:'P20', value:5 , type:'pitcher' },
   'P21':{ id:'P21', value:2 , type:'pitcher' },
-  'P22':{ id:'P22', value:9 , type:'pitcher' },
-  'P23':{ id:'P23', value:5 , type:'pitcher' },
+  'P22':{ id:'P22', value:5 , type:'pitcher' },
+  'P23':{ id:'P23', value:4 , type:'pitcher' },
   'P24':{ id:'P24', value:3 , type:'pitcher' },
   'P25':{ id:'P25', value:2 , type:'pitcher' },
-  'P26':{ id:'P26', value:4 , type:'pitcher' },
-  'P27':{ id:'P27', value:4 , type:'pitcher' },
-  'P28':{ id:'P28', value:8 , type:'pitcher' },
-  'P29':{ id:'P29', value:5 , type:'pitcher' },
-  'P30':{ id:'P30', value:1 , type:'pitcher' },
+  'P26':{ id:'P26', value:3 , type:'pitcher' },
+  'P27':{ id:'P27', value:3 , type:'pitcher' },
+  'P28':{ id:'P28', value:5 , type:'pitcher' },
+  'P29':{ id:'P29', value:4 , type:'pitcher' },
+  'P30':{ id:'P30', value:1 , type:'pitcher' }, // WP
 
-  // Batter Number Cards (Values 1-10)
+  // Batter Number Cards (Values 1-6)
   'B1' :{ id:'B1' , value:2 , type:'batter' },
-  'B2' :{ id:'B2' , value:8 , type:'batter' },
+  'B2' :{ id:'B2' , value:5 , type:'batter' },
   'B3' :{ id:'B3' , value:2 , type:'batter' },
   'B4' :{ id:'B4' , value:3 , type:'batter' },
-  'B5' :{ id:'B5' , value:8 , type:'batter' },
-  'B6' :{ id:'B6' , value:9 , type:'batter' },
+  'B5' :{ id:'B5' , value:5 , type:'batter' },
+  'B6' :{ id:'B6' , value:6 , type:'batter' },
   'B7' :{ id:'B7' , value:2 , type:'batter' },
-  'B8' :{ id:'B8' , value:5 , type:'batter' },
-  'B9' :{ id:'B9' , value:7 , type:'batter' },
-  'B10':{ id:'B10', value:4 , type:'batter' },
-  'B11':{ id:'B11', value:6 , type:'batter' },
+  'B8' :{ id:'B8' , value:4 , type:'batter' },
+  'B9' :{ id:'B9' , value:5 , type:'batter' },
+  'B10':{ id:'B10', value:3 , type:'batter' },
+  'B11':{ id:'B11', value:4 , type:'batter' },
   'B12':{ id:'B12', value:2 , type:'batter' },
-  'B13':{ id:'B13', value:1 , type:'batter' },
+  'B13':{ id:'B13', value:1 , type:'batter' }, // K
   'B14':{ id:'B14', value:2 , type:'batter' },
-  'B15':{ id:'B15', value:8 , type:'batter' },
+  'B15':{ id:'B15', value:5 , type:'batter' },
   'B16':{ id:'B16', value:3 , type:'batter' },
-  'B17':{ id:'B17', value:5 , type:'batter' },
-  'B18':{ id:'B18', value:9 , type:'batter' },
-  'B19':{ id:'B19', value:4 , type:'batter' },
+  'B17':{ id:'B17', value:4 , type:'batter' },
+  'B18':{ id:'B18', value:6 , type:'batter' },
+  'B19':{ id:'B19', value:3 , type:'batter' },
   'B20':{ id:'B20', value:2 , type:'batter' },
-  'B21':{ id:'B21', value:7 , type:'batter' },
-  'B22':{ id:'B22', value:8 , type:'batter' },
-  'B23':{ id:'B23', value:9 , type:'batter' },
+  'B21':{ id:'B21', value:5 , type:'batter' },
+  'B22':{ id:'B22', value:5 , type:'batter' },
+  'B23':{ id:'B23', value:6 , type:'batter' },
   'B24':{ id:'B24', value:2 , type:'batter' },
-  'B25':{ id:'B25', value:1 , type:'batter' },
-  'B26':{ id:'B26', value:6 , type:'batter' },
-  'B27':{ id:'B27', value:8 , type:'batter' },
+  'B25':{ id:'B25', value:1 , type:'batter' }, // K
+  'B26':{ id:'B26', value:4 , type:'batter' },
+  'B27':{ id:'B27', value:5 , type:'batter' },
   'B28':{ id:'B28', value:3 , type:'batter' },
-  'B29':{ id:'B29', value:10, type:'batter' },
-  'B30':{ id:'B30', value:5 , type:'batter' },
+  'B29':{ id:'B29', value:6 , type:'batter' },
+  'B30':{ id:'B30', value:4 , type:'batter' },
 
-  // Universal Number Cards (Values 1-10)
-  'U1' :{ id:'U1' , value:5 , type:'universal' },
+  // Universal Number Cards (Values 1-6)
+  'U1' :{ id:'U1' , value:4 , type:'universal' },
   'U2' :{ id:'U2' , value:3 , type:'universal' },
-  'U3' :{ id:'U3' , value:8 , type:'universal' },
-  'U4' :{ id:'U4' , value:4 , type:'universal' },
+  'U3' :{ id:'U3' , value:5 , type:'universal' },
+  'U4' :{ id:'U4' , value:3 , type:'universal' },
   'U5' :{ id:'U5' , value:2 , type:'universal' },
   'U6' :{ id:'U6' , value:2 , type:'universal' },
-  'U7' :{ id:'U7' , value:8 , type:'universal' },
-  'U8' :{ id:'U8' , value:1 , type:'universal' },
-  'U9' :{ id:'U9' , value:9 , type:'universal' },
-  'U10':{ id:'U10', value:10, type:'universal' },
+  'U7' :{ id:'U7' , value:5 , type:'universal' },
+  'U8' :{ id:'U8' , value:1 , type:'universal' }, // WP / K
+  'U9' :{ id:'U9' , value:6 , type:'universal' },
+  'U10':{ id:'U10', value:6 , type:'universal' },
 };
 
 

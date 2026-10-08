@@ -171,7 +171,7 @@ function executeCardDrop(cardId, pitchType, zoneType) {
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const iAmPitching = (myRole === pitchingRole);
 
-  if (currentBeat === 'beat2' && pitchType) {
+  if ((currentBeat === 'beat1' || currentBeat === 'beat2' || currentBeat === 'beat3') && pitchType) {
     if (iAmPitching) {
       localPitchType = pitchType;
     } else {
@@ -284,7 +284,7 @@ function handleTrayClick(pitchType, zoneType) {
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const iAmPitching = (myRole === pitchingRole);
 
-  if (currentBeat === 'beat2' && pitchType) {
+  if ((currentBeat === 'beat1' || currentBeat === 'beat2' || currentBeat === 'beat3') && pitchType) {
     if (iAmPitching) {
       localPitchType = pitchType;
     } else {
@@ -1488,46 +1488,168 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     `;
 
   } else if (currentBeat === 'beat1') {
-    // ── BEAT 1: THE COUNT BATTLE ON THE BASEBALL DIAMOND ──
-    const myPlacedCardHtml = localBeatCard
-      ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted)
-      : (!myCommitted
-          ? `<div class="empty-drop-slot" onclick="if(selectedCard) selectBeatCard(selectedCard)">
-               <span class="drop-hint">+ Drag or tap card</span>
-             </div>`
-          : '<div class="empty-drop-slot" style="opacity:0.3;">—</div>');
+    // ── PITCH 1: THE SETUP PITCH ON THE BASEBALL DIAMOND ──
+    const pitcherRatings = gs?.pitcherRatings?.[pitchingRole] || pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+    const batterRatings = batterChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
 
-    const oppSlotHtml = oppCommitted
-      ? `<div class="hidden-opponent-card"><span class="mystery-mark">✓ READY</span></div>`
-      : `<div class="hidden-opponent-card waiting"><span class="mystery-mark">⏳ DECIDING…</span></div>`;
+    let moundSlotEl = '';
+    let plateSlotEl = '';
 
-    // Drop slot on user territory, opponent slot on opp territory
-    const mySlotEl = `
-      <div class="b1-card-slot mine tray-drop-target"
-           data-pitch=""
-           data-zone="b1"
-           ondragover="handleTrayDragOver(event)"
-           ondragenter="handleTrayDragEnter(event)"
-           ondragleave="handleTrayDragLeave(event)"
-           ondrop="handleTrayDrop(event, null, 'b1')"
-           onclick="handleTrayClick(null, 'b1')">
-        <span class="slot-role-tag">${iAmBatting ? '🏏 Your Batter Card' : '⚾ Your Pitcher Card'}</span>
-        ${myPlacedCardHtml}
-      </div>
-    `;
+    if (!iAmBatting) {
+      // User is Pitcher on Mound: 3 Pitch Selection Trays inside b1-card-slot.mine
+      moundSlotEl = `
+        <div class="b1-card-slot mine">
+          <div class="pitch-trays-container selection-tiles" data-zone="b1">
+            <!-- Fastball -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'fastball' ? 'active' : ''}"
+                 data-pitch="fastball"
+                 data-zone="mound"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'fastball', 'mound')"
+                 onclick="handleTrayClick('fastball', 'mound')"
+                 data-tooltip-title="Fastball (+${pitcherRatings.fastball} Arm)"
+                 data-tooltip-body="Live Arm Modifier: +${pitcherRatings.fastball}. High velocity fastball.">
+              <div class="pt-header">
+                <span class="pt-icon">🔥</span>
+                <span class="pt-name">Fastball</span>
+                <span class="pt-charges">+${pitcherRatings.fastball}</span>
+              </div>
+              <span class="pt-rating-badge">+${pitcherRatings.fastball} Arm</span>
+              ${(localBeatCard && localPitchType === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, true) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
 
-    const oppSlotEl = `
-      <div class="b1-card-slot opp">
-        <span class="slot-role-tag">${iAmBatting ? '⚾ Opponent Pitcher Card' : '🏏 Opponent Batter Card'}</span>
-        ${oppSlotHtml}
-      </div>
-    `;
+            <!-- Breaking -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'breaking' ? 'active' : ''}"
+                 data-pitch="breaking"
+                 data-zone="mound"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'breaking', 'mound')"
+                 onclick="handleTrayClick('breaking', 'mound')"
+                 data-tooltip-title="Breaking Ball (+${pitcherRatings.breaking} Spin)"
+                 data-tooltip-body="Live Spin Modifier: +${pitcherRatings.breaking}. Sharp breaking pitch.">
+              <div class="pt-header">
+                <span class="pt-icon">🌀</span>
+                <span class="pt-name">Breaking</span>
+                <span class="pt-charges">+${pitcherRatings.breaking}</span>
+              </div>
+              <span class="pt-rating-badge">+${pitcherRatings.breaking} Spin</span>
+              ${(localBeatCard && localPitchType === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, true) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
+
+            <!-- Offspeed -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localPitchType === 'offspeed' ? 'active' : ''}"
+                 data-pitch="offspeed"
+                 data-zone="mound"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'offspeed', 'mound')"
+                 onclick="handleTrayClick('offspeed', 'mound')"
+                 data-tooltip-title="Offspeed (+${pitcherRatings.offspeed} Touch)"
+                 data-tooltip-body="Live Touch Modifier: +${pitcherRatings.offspeed}. Deceptive changeup. Recovers +1 Fastball arm stamina!">
+              <div class="pt-header">
+                <span class="pt-icon">⏱️</span>
+                <span class="pt-name">Offspeed</span>
+                <span class="pt-charges">+${pitcherRatings.offspeed}</span>
+              </div>
+              <span class="pt-rating-badge">+${pitcherRatings.offspeed} Touch</span>
+              ${(localBeatCard && localPitchType === 'offspeed') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, true) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
+          </div>
+        </div>
+      `;
+
+      plateSlotEl = `
+        <div class="b1-card-slot opp">
+          <span class="slot-role-tag">🏏 Opponent Batter Card</span>
+          <div class="hidden-opponent-card ${oppCommitted ? '' : 'waiting'}">
+            <span class="mystery-mark">${oppCommitted ? '✓ READY' : '⏳ DECIDING…'}</span>
+          </div>
+        </div>
+      `;
+    } else {
+      moundSlotEl = `
+        <div class="b1-card-slot opp">
+          <span class="slot-role-tag">⚾ Opponent Pitcher Card</span>
+          <div class="hidden-opponent-card ${oppCommitted ? '' : 'waiting'}">
+            <span class="mystery-mark">${oppCommitted ? '✓ READY' : '⏳ DECIDING…'}</span>
+          </div>
+        </div>
+      `;
+
+      plateSlotEl = `
+        <div class="b1-card-slot mine">
+          <div class="batter-trays-container selection-tiles" data-zone="b1">
+            <!-- Fastball -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'fastball' ? 'active' : ''}"
+                 data-pitch="fastball"
+                 data-zone="plate"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'fastball', 'plate')"
+                 onclick="handleTrayClick('fastball', 'plate')"
+                 data-tooltip-title="Anticipate Fastball (+${batterRatings.fastball} Pow)"
+                 data-tooltip-body="Base Power: +${batterRatings.fastball}. Added to reaction when anticipating fastball.">
+              <div class="pt-header">
+                <span class="pt-icon">🔥</span>
+                <span class="pt-name">Fastball</span>
+              </div>
+              <span class="pt-rating-badge">+${batterRatings.fastball} Pow</span>
+              ${(localBeatCard && localGuessPitch === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, false) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
+
+            <!-- Breaking -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'breaking' ? 'active' : ''}"
+                 data-pitch="breaking"
+                 data-zone="plate"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'breaking', 'plate')"
+                 onclick="handleTrayClick('breaking', 'plate')"
+                 data-tooltip-title="Anticipate Breaking (+${batterRatings.breaking} Vis)"
+                 data-tooltip-body="Base Vision: +${batterRatings.breaking}. Added to reaction when anticipating breaking ball.">
+              <div class="pt-header">
+                <span class="pt-icon">🌀</span>
+                <span class="pt-name">Breaking</span>
+              </div>
+              <span class="pt-rating-badge">+${batterRatings.breaking} Vis</span>
+              ${(localBeatCard && localGuessPitch === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, false) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
+
+            <!-- Offspeed -->
+            <div class="pitch-tray choice-tile tray-drop-target ${localGuessPitch === 'offspeed' ? 'active' : ''}"
+                 data-pitch="offspeed"
+                 data-zone="plate"
+                 ondragover="handleTrayDragOver(event)"
+                 ondragenter="handleTrayDragEnter(event)"
+                 ondragleave="handleTrayDragLeave(event)"
+                 ondrop="handleTrayDrop(event, 'offspeed', 'plate')"
+                 onclick="handleTrayClick('offspeed', 'plate')"
+                 data-tooltip-title="Anticipate Offspeed (+${batterRatings.offspeed} Dis)"
+                 data-tooltip-body="Base Discipline: +${batterRatings.offspeed}. Added to reaction when anticipating changeup.">
+              <div class="pt-header">
+                <span class="pt-icon">⏱️</span>
+                <span class="pt-name">Offspeed</span>
+              </div>
+              <span class="pt-rating-badge">+${batterRatings.offspeed} Dis</span>
+              ${(localBeatCard && localGuessPitch === 'offspeed') ? renderMiniPlacedCard(localBeatCard, 'z1', !myCommitted, 0, false) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
     mainContentHtml = `
       <div class="beat1-arena diamond-arena">
-        <div class="beat1-banner" onclick="handleTooltipClick(event, 'Beat 1: The Count Battle', 'Both players clash with a single card. The higher card wins count advantage (0-2 for pitcher, 3-1 for batter). A tie establishes a neutral 3-2 full count!')" title="Tap for info">
-          <span class="b1-title">BEAT 1: THE COUNT DUEL <span class="adv-info-icon">ⓘ</span></span>
-          <span class="b1-subtitle">Mound vs Plate &bull; High card wins count leverage</span>
+        <div class="beat1-banner" onclick="handleTooltipClick(event, 'Pitch 1: The Setup Pitch', 'Pitcher throws pitch type &amp; card while batter anticipates pitch type &amp; card. Higher collision sets count leverage: 0-2 (Pitcher), 3-1 (Hitter), or 3-2 (Full Count)!')" title="Tap for info">
+          <span class="b1-title">PITCH 1: THE SETUP PITCH <span class="adv-info-icon">ⓘ</span></span>
+          <span class="b1-subtitle">Mound vs Plate &bull; Pitcher delivery vs Batter anticipation</span>
         </div>
 
         <div class="diamond-field">
@@ -1553,7 +1675,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           <!-- 2. Green Box: Pitcher Card Tray / Mound (Center) -->
           <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             <div class="mound-rubber"></div>
-            ${!iAmBatting ? mySlotEl : oppSlotEl}
+            ${moundSlotEl}
           </div>
 
           <!-- Infield VS Clash Badge -->
@@ -1562,7 +1684,7 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           <!-- 3. Orange Box: Batter Card Tray / Home Plate (Bottom) -->
           <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
             <div class="home-plate-pentagon"></div>
-            ${iAmBatting ? mySlotEl : oppSlotEl}
+            ${plateSlotEl}
           </div>
 
           <!-- 4. Red Box: Batter Stats (Bottom) -->
@@ -2031,11 +2153,9 @@ function commitPlacement() {
     const livePA = liveG.currentPA || {};
     const liveGS = liveG.gameState || {};
 
-    const myBeatPlacement = (currentBeat === 'beat1')
-      ? { cardId: localBeatCard }
-      : (iAmPitching
-          ? { pitchType: localPitchType, cardId: localBeatCard }
-          : { guessPitch: localGuessPitch, cardId: localBeatCard });
+    const myBeatPlacement = iAmPitching
+      ? { pitchType: localPitchType || 'fastball', cardId: localBeatCard }
+      : { guessPitch: localGuessPitch || 'fastball', cardId: localBeatCard };
 
     const updates = {
       [`currentPA/beatPlacements/${currentBeat}/${myRole}`]: myBeatPlacement,
@@ -2054,7 +2174,12 @@ function commitPlacement() {
           updatedBotPlacement.z1 = [botPlay.cardId];
         }
 
-        updates['currentPA/beatPlacements/beat1/guest'] = { cardId: botPlay.cardId || null };
+        const botIsPitching = (liveGS.half === 'top') ? false : true;
+        const botBeatPlacement = botIsPitching
+          ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
+          : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
+
+        updates['currentPA/beatPlacements/beat1/guest'] = botBeatPlacement;
         updates['currentPA/placement/guest']           = updatedBotPlacement;
         updates['currentPA/committed/guest']           = true;
         updates['gameState/hands/guest']               = botPlay.botHand || [];
@@ -2176,16 +2301,36 @@ function resolveBeatStep(beat) {
 
       if (beat === 'beat1') {
         const pitcherCardId = pPlacements.cardId || null;
+        const pitchType = pPlacements.pitchType || 'fastball';
         const batterCardId = bPlacements.cardId || null;
+        const guessPitch = bPlacements.guessPitch || 'fastball';
+
+        // Prepare live pitcher ratings
+        const currentRatings = {
+          host: { ...(gs.pitcherRatings?.host || getPitcher(gs.activePitcher?.host || g.rosters?.host?.startingPitcher)?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 }) },
+          guest: { ...(gs.pitcherRatings?.guest || getPitcher(gs.activePitcher?.guest || g.rosters?.guest?.startingPitcher)?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 }) }
+        };
 
         const beat1Result = resolveBeat1({
           pitcherCardId,
+          pitchType,
           batterCardId,
+          guessPitch,
+          batterGuess: guessPitch,
+          pitchCall: pitchType,
           pitcherChar,
           batterChar,
           pitcherPAsFaced,
-          isFirstPAOfInning: Boolean(pa.isFirstPAOfInning)
+          isFirstPAOfInning: Boolean(pa.isFirstPAOfInning),
+          pitcherRatings: currentRatings[pitchingRole],
+          bases,
+          outs,
         });
+
+        // Update pitcher live stamina on pitch thrown
+        if (typeof updatePitcherRatingsOnPitch === 'function') {
+          updatePitcherRatingsOnPitch(currentRatings, pitchingRole, pitcherChar, pitchType, beat1Result.pitcherCardVal);
+        }
 
         // Knockout check in Beat 1: Instant Walk or Called Strike 3
         if (beat1Result.cascadeEffect === 'walk' || beat1Result.cascadeEffect === 'called_k') {
@@ -2198,7 +2343,7 @@ function resolveBeatStep(beat) {
             outs,
             half
           });
-          finalizePA(g, res);
+          finalizePA(g, res, null, currentRatings);
           return;
         }
 
@@ -2211,6 +2356,7 @@ function resolveBeatStep(beat) {
           'currentPA/beatResults/beat1': beat1Result,
           [`currentPA/placement/${pitchingRole}/z1`]: pitcherCardId ? [pitcherCardId] : [],
           [`currentPA/placement/${battingRole}/z1`]:  batterCardId ? [batterCardId] : [],
+          'gameState/pitcherRatings': currentRatings,
         };
 
         gameRef().update(updates);
@@ -2248,8 +2394,10 @@ function resolveBeatStep(beat) {
           pitcherRatings: currentRatings[pitchingRole],
         });
 
-        // Deduct stamina modifier for this pitch type thrown in Beat 2/3 (floored at 0)
-        currentRatings[pitchingRole][pitchType] = Math.max(0, (currentRatings[pitchingRole][pitchType] || 0) - 1);
+        // Update pitcher live stamina on pitch thrown
+        if (typeof updatePitcherRatingsOnPitch === 'function') {
+          updatePitcherRatingsOnPitch(currentRatings, pitchingRole, pitcherChar, pitchType, beat2Result.pitcherCardVal);
+        }
 
         // Deduct pitch charge (backward compatibility)
         const charges = { ...(gs.arsenalCharges || {}) };
@@ -2363,8 +2511,10 @@ function resolveBeatStep(beat) {
           pitcherRatings: currentRatings[pitchingRole],
         });
 
-        // Deduct stamina modifier for this pitch type thrown in Beat 2/3 (floored at 0)
-        currentRatings[pitchingRole][pitchType] = Math.max(0, (currentRatings[pitchingRole][pitchType] || 0) - 1);
+        // Update pitcher live stamina on pitch thrown
+        if (typeof updatePitcherRatingsOnPitch === 'function') {
+          updatePitcherRatingsOnPitch(currentRatings, pitchingRole, pitcherChar, pitchType, beat3Result.pitcherCardVal);
+        }
 
         // Deduct pitch charge (backward compatibility)
         const charges = { ...(gs.arsenalCharges || {}) };
@@ -2417,6 +2567,29 @@ function finalizePA(g, res, updatedCharges, updatedRatings) {
   let newBases  = outcome.newBases || gs.bases || { first:false, second:false, third:false };
   const newScore = { ...(gs.score || { top:0, bottom:0 }) };
   newScore[half] = (newScore[half] || 0) + (outcome.runsScored || 0);
+
+  const pitcherChar = getPitcher(gs.activePitcher?.[pitchingRole] || g.rosters?.[pitchingRole]?.startingPitcher);
+  if (!updatedRatings) {
+    updatedRatings = {
+      host: { ...(gs.pitcherRatings?.host || getPitcher(gs.activePitcher?.host || g.rosters?.host?.startingPitcher)?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 }) },
+      guest: { ...(gs.pitcherRatings?.guest || getPitcher(gs.activePitcher?.guest || g.rosters?.guest?.startingPitcher)?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 }) }
+    };
+  }
+
+  // Stamina Recovery Mechanics:
+  // 1. Efficient Out / Strikeout Adrenaline Surge
+  const outsAdded = outcome.outsAdded || 0;
+  if (outsAdded > 0 && typeof updatePitcherRatingsOnOut === 'function') {
+    const isStrikeout = outcome.type === 'k' || outcome.type === 'called_strikeout' || outcome.outcomeType === 'k' || outcome.outcomeType === 'called_k';
+    const isQuickOut = !res.beat3; // Retired in <= 2 pitches
+    const pitchType = res.beat3?.pitchType || res.beat2?.pitchType || res.beat1?.pitchType || res.primaryPitchCall || 'fastball';
+    updatePitcherRatingsOnOut(updatedRatings, pitchingRole, pitcherChar, pitchType, isQuickOut, isStrikeout);
+  }
+
+  // 2. Inning Turnover: Bench / dugout rest (+2 to all pitch ratings)
+  if (newOuts >= 3 && typeof updatePitcherRatingsOnInningChange === 'function') {
+    updatePitcherRatingsOnInningChange(updatedRatings, pitchingRole, pitcherChar);
+  }
 
   const newBatterIndex = { ...(gs.batterIndex || { top:0, bottom:0 }), [half]: (gs.batterIndex?.[half] || 0) + 1 };
   const newPitcherPAs  = { ...(gs.pitcherPAs || { host:0, guest:0 }),  [pitchingRole]: (gs.pitcherPAs?.[pitchingRole] || 0) + 1 };
@@ -2875,6 +3048,8 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
 }
 
 function proceedToBeat2() {
+  localBeatCard = null;
+  selectedCard  = null;
   const btn = document.querySelector('#beat1-result-modal .rm-btn');
   if (btn) {
     btn.disabled = true;
@@ -3021,6 +3196,8 @@ function renderBattleBackModal(b2, isPitcherMe) {
 window.renderBattleBackModal = renderBattleBackModal;
 
 function proceedToBeat3() {
+  localBeatCard = null;
+  selectedCard  = null;
   const btn = document.querySelector('#battle-back-modal .rm-btn');
   if (btn) {
     btn.disabled = true;

@@ -57,11 +57,11 @@
         assert(batterCharKeys.length === 12, `12 Batter characters loaded (found ${batterCharKeys.length})`);
         assert(deckPresetKeys.length === 3, `3 Preset decks loaded (found ${deckPresetKeys.length})`);
 
-        // 2. Pure Number Cards: Full value everywhere
+        // 2. Pure Number Cards: Full value everywhere (Values 1-6)
         const fourSeam = getCard('P1');
-        assert(fourSeam && fourSeam.value === 10, `P1 card exists with value 10`);
-        assert(getZoneValue(fourSeam, 'z1') === 10, `P1 retains full value 10 in Beat 1`);
-        assert(getZoneValue(fourSeam, 'z2') === 10, `P1 retains full value 10 in Beat 2 without penalty`);
+        assert(fourSeam && fourSeam.value === 6, `P1 card exists with value 6`);
+        assert(getZoneValue(fourSeam, 'z1') === 6, `P1 retains full value 6 in Beat 1`);
+        assert(getZoneValue(fourSeam, 'z2') === 6, `P1 retains full value 6 in Beat 2 without penalty`);
 
         const allPureNumberCards = Object.values(ACTION_CARDS).every(c => typeof c.value === 'number' && !c.powerBadge && !c.outcomeEffect);
         assert(allPureNumberCards, `All 70 cards are pure number cards with no modifiers or bonuses`);
@@ -89,7 +89,7 @@
         const b1Card = getCard('B1');
         const p1Card = getCard('P1');
         assert(b1Card && b1Card.value === 2, `B1 card is pure number with value 2`);
-        assert(p1Card && p1Card.value === 10, `P1 card is pure number with value 10`);
+        assert(p1Card && p1Card.value === 6, `P1 card is pure number with value 6`);
         assert(!b1Card.counters && !p1Card.pitchCall, `Cards contain no counters or pitchCall modifiers`);
 
 
@@ -218,29 +218,29 @@
         assert(b1Tie.revealCardFirst === null, `Tie does not force card reveal`);
 
         // 13. Sequential Beat 2 Tests (Bell Curve Launch Angle Spectrum)
-        // Scenario A: PITCH ANTICIPATED - SWEET SPOT BARREL (11–14) -> HOME RUN
+        // Scenario A: PITCH ANTICIPATED - SWEET SPOT BARREL (Center 9, Band [8-10]) -> HOME RUN
         const b2HR = resolveBeat2({
           count: '3-2',
           pitchType: 'breaking',
           pitcherCardId: 'P24', // val 3 + PC01 Breaking 3 = 6
           guessPitch: 'breaking',
-          batterCardId: 'B8',   // val 5 + BC01 Breaking 2 = 7 -> Total 13 (Sweet Spot Barrel!)
+          batterCardId: 'B8',   // val 4 -> Total 10 (Sweet Spot Barrel!)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2HR.pitcherExecuted === true, `Pitcher executes delivery`);
         assert(b2HR.batterExecuted === true, `Batter executes swing in anticipated pitch`);
-        assert(b2HR.launchAngle === 13, `Launch Angle Total is 13 (Sweet Spot Barrel)`);
+        assert(b2HR.launchAngle === 10, `Launch Angle Total is 10 (Sweet Spot Barrel)`);
         assert(b2HR.matchTier === 'matched', `Batter anticipated pitch (match)`);
-        assert(b2HR.outcomeType === 'homerun', `Pitch match + Sweet Spot 13 produces Home Run`);
+        assert(b2HR.outcomeType === 'homerun', `Pitch match + Sweet Spot 10 produces Home Run`);
 
         // Pitch Match with High Heat (15+): Neutral count produces routine flyout
         const b2FullContactMistimed = resolveBeat2({
           count: '3-2',
           pitchType: 'fastball',
-          pitcherCardId: 'P14', // val 6, PC01 has +5 FB -> eff = 11
+          pitcherCardId: 'P1',  // val 6 + PC01 FB 5 = 11
           guessPitch: 'fastball',
-          batterCardId: 'B17',  // val 5, BC02 has +2 FB -> eff = 7 -> Total 18 (High Heat Band 15+)
+          batterCardId: 'B6',   // val 6 -> Total 17 (High Heat Band 15+)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC02'],
         });
@@ -248,27 +248,27 @@
         assert(b2FullContactMistimed.launchAngle >= 15, `Launch Angle is 15+ (high heat)`);
         assert(b2FullContactMistimed.outcomeType === 'flyout' || b2FullContactMistimed.outcomeType === 'groundout', `Pitch match high heat contact produces routine out`);
 
-        // Scenario B: PITCH ANTICIPATED - LINE DRIVE BAND (9–10) -> SINGLE
+        // Scenario B: PITCH ANTICIPATED - LINE DRIVE BAND ([6-7]) -> SINGLE
         const b2SolidHit = resolveBeat2({
           count: '3-2',
-          pitchType: 'offspeed',
-          pitcherCardId: 'P25', // val 2 + PC01 Offspeed 1 = 3
-          guessPitch: 'offspeed',
-          batterCardId: 'B8',   // val 5 + BC01 Offspeed 1 = 6 -> Total 9 (Line Drive Band)
+          pitchType: 'breaking',
+          pitcherCardId: 'P25', // val 2 + PC01 Breaking 3 = 5
+          guessPitch: 'breaking',
+          batterCardId: 'B1',   // val 2 -> Total 7 (Line Drive Band)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2SolidHit.matchTier === 'matched', `Batter read the offspeed pitch`);
-        assert(b2SolidHit.launchAngle === 9, `Launch Angle Total is 9 (line drive band)`);
+        assert(b2SolidHit.matchTier === 'matched', `Batter read the breaking pitch`);
+        assert(b2SolidHit.launchAngle === 7, `Launch Angle Total is 7 (line drive band)`);
         assert(b2SolidHit.outcomeType === 'single', `Line drive band on anticipated pitch produces single`);
 
         // Pitch Anticipated on 0-2 Count with High Heat (15+) -> Strikeout
         const b2Strikeout = resolveBeat2({
           count: '0-2',
           pitchType: 'fastball',
-          pitcherCardId: 'P14', // val 6 + 5 = 11
+          pitcherCardId: 'P1',  // val 6 + FB 5 = 11
           guessPitch: 'fastball',
-          batterCardId: 'B17',  // val 5 + 5 = 10 -> Total 21 (High Heat Band 15+)
+          batterCardId: 'B6',   // val 6 -> Total 17 (High Heat Band 15+)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -282,7 +282,7 @@
           pitchType: 'breaking', // PC01 Breaking bonus = 3
           pitcherCardId: 'P25',  // val 2 -> eff = 5
           guessPitch: 'fastball', // Pitch wrong (+0)
-          batterCardId: 'B10',   // val 4 -> Total 9 <= 14
+          batterCardId: 'B10',   // val 3 -> Total 8 <= 14
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC02'],
         });
@@ -296,7 +296,7 @@
           pitchType: 'breaking', // PC01 Breaking bonus = 3
           pitcherCardId: 'P25', // Val 2 -> eff = 5
           guessPitch: 'fastball', // WRONG (+0)
-          batterCardId: 'B17',  // Val 5 -> Total 10 <= 14
+          batterCardId: 'B17',  // Val 4 -> Total 9 <= 14
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -307,10 +307,10 @@
         // Whiff with High Heat (Total 15+) -> Swinging Strikeout!
         const b2WhiffCleanPitch = resolveBeat2({
           count: '3-2',
-          pitchType: 'breaking', // PC01 Breaking bonus = 3
-          pitcherCardId: 'P14', // Val 6 -> eff = 9
-          guessPitch: 'fastball', // WRONG (+0)
-          batterCardId: 'B18',  // Val 9 -> Total 18 >= 15
+          pitchType: 'fastball', // PC01 Fastball bonus = 5
+          pitcherCardId: 'P1',  // Val 6 -> eff = 11
+          guessPitch: 'offspeed', // WRONG (+0)
+          batterCardId: 'B6',   // Val 6 -> Total 17 >= 15
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -364,32 +364,32 @@
         assert(b2Both1.isWildPitchReset === true, `Both Card 1s advances runners on the wild pitch`);
 
         // 3-1 Count Executed Pitch Whiff Test (Pillar A: Pitcher battles back to 3-2, never immediate Strikeout)
-        // Pitcher executes Fastball [6-10] with Card P22 (val 9).
-        // Batter anticipates Fastball with Card B4 (val 3). Delta = 6 (Badly Mistimed Whiff).
+        // Pitcher challenges with Fastball using Card P1 (val 6 + FB 5 = 11).
+        // Batter anticipates Fastball with Card B6 (val 6). Launch Angle = 17 (above barrel max 15).
         const b2Executed31AnticipatedWhiff = resolveBeat2({
           count: '3-1',
           pitchType: 'fastball',
-          pitcherCardId: 'P22', // Val 9 (executed strike in 6-10)
+          pitcherCardId: 'P1',  // Val 6 (FB 5 = 11)
           guessPitch: 'fastball', // Anticipated
-          batterCardId: 'B4',   // Val 3 (Delta 6 whiff)
+          batterCardId: 'B6',   // Val 6 -> Launch Angle 17 (above barrel max 15)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
-        assert(b2Executed31AnticipatedWhiff.pitcherExecuted === true, `Pitcher executed Fastball with Card 9`);
-        assert(b2Executed31AnticipatedWhiff.timingDelta === 6, `Timing Delta is 6 (whiff)`);
+        assert(b2Executed31AnticipatedWhiff.pitcherExecuted === true, `Pitcher executed Fastball with Card 6`);
+        assert(b2Executed31AnticipatedWhiff.launchAngle >= 16, `Launch Angle is high heat above barrel (${b2Executed31AnticipatedWhiff.launchAngle})`);
         assert(b2Executed31AnticipatedWhiff.outcomeType === 'battle_back', `Executed strike with Delta 6 whiff on 3-1 count battles back to 3-2 Full Count`);
         assert(b2Executed31AnticipatedWhiff.isBattleBack === true, `isBattleBack is true on 3-1 executed strike`);
         assert(b2Executed31AnticipatedWhiff.outcomeType !== 'walk', `Executed strike cannot be a Walk`);
 
         // 3-1 Count Executed Pitch Fooled Whiff Test:
-        // Pitcher executes Fastball [6-10] with Card P22 (val 9).
-        // Batter fooled looking Offspeed with Card B4 (val 3). Delta = 6.
+        // Pitcher executes Fastball with Card P1 (val 6).
+        // Batter fooled looking Offspeed with Card B4 (val 3).
         const b2Executed31FooledWhiff = resolveBeat2({
           count: '3-1',
           pitchType: 'fastball',
-          pitcherCardId: 'P22', // Val 9 (executed strike in 6-10)
+          pitcherCardId: 'P1',  // Val 6
           guessPitch: 'offspeed', // Fooled
-          batterCardId: 'B4',   // Val 3 (Delta 6)
+          batterCardId: 'B4',   // Val 3
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -425,27 +425,27 @@
         assert(getBatterPitchRating(bBear, 'breaking') === 2, 'The Bear Mackintosh has +2 Breaking rating');
 
         // 15. Beat 2 Battle-Back Condition Tests
-        // 0-2 Count: Batter makes line drive contact (9–10) on read pitch -> Battles back to 3-2!
+        // 0-2 Count: Batter makes line drive contact ([6–7]) on read pitch -> Battles back to 3-2!
         const b2BattleBack02 = resolveBeat2({
           count: '0-2',
           pitchType: 'breaking',
           pitcherCardId: 'P25', // Val 2 + PC01 Breaking 3 = 5
           guessPitch: 'breaking',
-          batterCardId: 'B4',   // Val 3 + BC01 Breaking 2 = 5 -> Total 10 (Line Drive Band 9–10)
+          batterCardId: 'B1',   // Val 2 -> Total 7 (Line Drive Band [6–7])
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
         assert(b2BattleBack02.isBattleBack === true, '0-2 Count with line drive contact triggers battle back');
         assert(b2BattleBack02.outcomeType === 'battle_back', '0-2 Battle back outcomeType is battle_back');
-        assert(b2BattleBack02.launchAngle === 10, `Launch Angle is 10 (${b2BattleBack02.launchAngle} == 10)`);
+        assert(b2BattleBack02.launchAngle === 7, `Launch Angle is 7 (${b2BattleBack02.launchAngle} == 7)`);
 
-        // 3-1 Count: Pitcher throws clutch strike with high heat (15+) -> Battles back to 3-2!
+        // 3-1 Count: Pitcher throws clutch strike with high heat (16+) -> Battles back to 3-2!
         const b2BattleBack31 = resolveBeat2({
           count: '3-1',
           pitchType: 'fastball',
-          pitcherCardId: 'P2',  // Val 9 + PC01 FB 5 = 14
+          pitcherCardId: 'P1',  // Val 6 + PC01 FB 5 = 11
           guessPitch: 'fastball',
-          batterCardId: 'B11', // Val 6 + BC01 FB 5 = 11 -> Total 25 (High Heat 15+)
+          batterCardId: 'B6',   // Val 6 -> Total 17 (High Heat above barrel max 15)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
         });
@@ -531,7 +531,38 @@
         assert(botBeat3.guessPitch !== null, `Bot anticipates pitch for Beat 3 showdown (${botBeat3.guessPitch})`);
         assert(botBeat3.cardId !== null, `Bot selects card for Beat 3 showdown (${botBeat3.cardId})`);
 
-        // 16. Full 3-Inning Sequential 2-Beat Game Simulation
+        // 19. Pitcher Stamina Drain & Recovery Tests
+        const testRatings = { host: { fastball: 5, breaking: 3, offspeed: 1 } };
+        const testPitcher = { pitchRatings: { fastball: 5, breaking: 3, offspeed: 1 } };
+
+        // A. High-effort Fastball (cardVal >= 5) drains arm by 1
+        updatePitcherRatingsOnPitch(testRatings, 'host', testPitcher, 'fastball', 6);
+        assert(testRatings.host.fastball === 4, `High effort fastball (card 6) drains arm rating to 4`);
+
+        // B. Offspeed pitch gives arm a breather: recovers +1 Fastball
+        updatePitcherRatingsOnPitch(testRatings, 'host', testPitcher, 'offspeed', 3);
+        assert(testRatings.host.fastball === 5, `Offspeed pitch recovers +1 Fastball arm stamina`);
+
+        // C. High-effort Breaking ball (cardVal >= 5) drains breaking rating by 1
+        updatePitcherRatingsOnPitch(testRatings, 'host', testPitcher, 'breaking', 5);
+        assert(testRatings.host.breaking === 2, `High effort breaking ball (card 5) drains spin rating to 2`);
+
+        // D. Efficient out (<= 2 pitches) recovers pitch used
+        updatePitcherRatingsOnOut(testRatings, 'host', testPitcher, 'breaking', true, false);
+        assert(testRatings.host.breaking === 3, `Efficient out recovers +1 to pitch used`);
+
+        // E. Strikeout adrenaline surge recovers all fatigued ratings
+        testRatings.host.fastball = 3;
+        testRatings.host.breaking = 2;
+        updatePitcherRatingsOnOut(testRatings, 'host', testPitcher, 'fastball', false, true);
+        assert(testRatings.host.fastball === 4 && testRatings.host.breaking === 3, `Strikeout adrenaline surge recovers +1 to all fatigued ratings`);
+
+        // F. Inning changeover bench rest recovers +2 to all ratings
+        testRatings.host.fastball = 2;
+        updatePitcherRatingsOnInningChange(testRatings, 'host', testPitcher);
+        assert(testRatings.host.fastball === 4, `Inning turnover dugout rest recovers +2 to fatigued ratings`);
+
+        // 20. Full 3-Inning Sequential Game Simulation
         const simState = {
           inning: 1,
           half: 'top',

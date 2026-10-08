@@ -2,21 +2,50 @@
 // resolution.js — Pure game resolution logic. No side effects. No Firebase.
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PITCH & SWING OVERLAPPING TIMING RANGES
+// PITCH SWEET SPOT CENTERS & RANGES (Values 1-6)
+// Idea 3 & 4: Pitch Centers (Offspeed 6, Breaking 9, Fastball 12) + Plate Coverage Expansion
 // ─────────────────────────────────────────────────────────────────────────────
+const PITCH_SWEET_SPOTS = {
+  offspeed: {
+    center: 6,
+    baseBarrel: [5, 7],
+    lineDrive: [4, 4],
+    name: 'Offspeed',
+    icon: '⏱️',
+    desc: 'Touch & Deception (Sweet Spot Center: 6)'
+  },
+  breaking: {
+    center: 9,
+    baseBarrel: [8, 10],
+    lineDrive: [6, 7],
+    name: 'Breaking',
+    icon: '🌀',
+    desc: 'Bite & Spin (Sweet Spot Center: 9)'
+  },
+  fastball: {
+    center: 12,
+    baseBarrel: [11, 13],
+    lineDrive: [9, 10],
+    name: 'Fastball',
+    icon: '🔥',
+    desc: 'Velocity & Heat (Sweet Spot Center: 12)'
+  }
+};
+
 const PITCH_RANGES = {
-  offspeed: { min: 1, max: 5, label: '1–5 (Touch & Deception)', name: 'Offspeed', icon: '⏱️' },
-  breaking: { min: 3, max: 7, label: '3–7 (Bite & Spin)',        name: 'Breaking', icon: '🌀' },
-  fastball: { min: 6, max: 10, label: '6–10 (Velocity & Heat)',  name: 'Fastball', icon: '🔥' }
+  offspeed: { min: 1, max: 3, label: '1–3 (Touch & Deception)', name: 'Offspeed', icon: '⏱️' },
+  breaking: { min: 2, max: 5, label: '2–5 (Bite & Spin)',        name: 'Breaking', icon: '🌀' },
+  fastball: { min: 4, max: 6, label: '4–6 (Velocity & Heat)',  name: 'Fastball', icon: '🔥' }
 };
 
 const SWING_RANGES = {
-  contact:  { min: 1, max: 5, label: '1–5 (Choke Up / Wait Back)', name: 'Contact',  icon: '🛡️' },
-  balanced: { min: 3, max: 7, label: '3–7 (Controlled Timing)',    name: 'Balanced', icon: '⚖️' },
-  power:    { min: 6, max: 10, label: '6–10 (Turn on the Ball)',    name: 'Power',    icon: '💥' }
+  contact:  { min: 1, max: 3, label: '1–3 (Choke Up / Wait Back)', name: 'Contact',  icon: '🛡️' },
+  balanced: { min: 2, max: 5, label: '2–5 (Controlled Timing)',    name: 'Balanced', icon: '⚖️' },
+  power:    { min: 4, max: 6, label: '4–6 (Turn on the Ball)',    name: 'Power',    icon: '💥' }
 };
 
 if (typeof window !== 'undefined') {
+  window.PITCH_SWEET_SPOTS = PITCH_SWEET_SPOTS;
   window.PITCH_RANGES = PITCH_RANGES;
   window.SWING_RANGES = SWING_RANGES;
 }
@@ -953,34 +982,54 @@ function resolvePA(opts) {
 // Initiative: Loser of Beat 1 reveals first; Winner counters with open eyes!
 // ─────────────────────────────────────────────────────────────────────────────
 
-// BEAT 1: The Setup / Battle for the Count
+// BEAT 1: The Setup Pitch / Battle for the Count
 function resolveBeat1(opts) {
   const {
     pitcherCardId = null,
+    pitchType = 'fastball',
     batterCardId = null,
+    guessPitch = null,
+    batterGuess = guessPitch || opts.batterGuess || 'fastball',
+    pitchCall = pitchType || opts.pitchCall || 'fastball',
     pitcherChar = PITCHER_CHARACTERS['PC01'],
     batterChar = BATTER_CHARACTERS['BC01'],
     pitcherPAsFaced = 0,
     isFirstPAOfInning = false,
-    pitchCall = null,
-    batterGuess = null,
+    pitcherRatings = null,
+    bases = { first: false, second: false, third: false },
+    outs = 0,
   } = opts;
+
+  const effPitchType = pitchCall || pitchType || 'fastball';
+  const effBatterGuess = batterGuess || guessPitch || 'fastball';
+  const pitchMatched = (effBatterGuess === effPitchType);
 
   const pCard = pitcherCardId ? getCard(pitcherCardId) : null;
   const bCard = batterCardId ? getCard(batterCardId) : null;
 
-  let pitcherCardVal = pCard ? (pCard.value || 0) : 0;
-  let batterCardVal  = bCard ? (bCard.value || 0) : 0;
+  let pCardVal = pCard ? (pCard.value || 0) : 0;
+  let bCardVal = bCard ? (bCard.value || 0) : 0;
+
+  const isPitcherWP = (pCardVal === 1);
+  const isBatterK   = (bCardVal === 1);
+
+  // Live or base character ratings
+  const pBonus = (pitcherRatings && pitcherRatings[effPitchType] !== undefined)
+    ? pitcherRatings[effPitchType]
+    : ((typeof getPitcherPitchRating === 'function')
+      ? getPitcherPitchRating(pitcherChar, effPitchType)
+      : (pitcherChar?.pitchRatings?.[effPitchType] ?? 0));
+
+  const bBonus = (typeof getBatterPitchRating === 'function')
+    ? getBatterPitchRating(batterChar, effPitchType)
+    : (batterChar?.pitchRatings?.[effPitchType] ?? 0);
 
   // Stamina penalty if tiring / gassed
   const staminaMod = getStaminaMod(pitcherChar, pitcherPAsFaced);
-  if (staminaMod && staminaMod.z1) {
-    pitcherCardVal = Math.max(0, pitcherCardVal + staminaMod.z1);
-  }
+  let staminaPen = (staminaMod && staminaMod.z1) ? staminaMod.z1 : 0;
 
-
-  const margin = Math.abs(pitcherCardVal - batterCardVal);
-  const isDominant = margin >= 5;
+  const pitcherDelivery = Math.max(0, pCardVal + pBonus + staminaPen);
+  const batterReaction = bCardVal + (pitchMatched ? bBonus : 0);
 
   let winner = 'tie';
   let count = '3-2';
@@ -989,40 +1038,73 @@ function resolveBeat1(opts) {
   let advantageSide = 'neutral';
   let lockedOption = null;
   let revealCardFirst = null;
-  let pitcherDiscount = 0;
-  let batterDiscount = 0;
+  let isDominant = false;
+  let margin = Math.abs(pitcherDelivery - batterReaction);
+  let isWildPitch = false;
 
-  if (pitcherCardVal > batterCardVal) {
-    winner = 'pitcher';
-    count = '0-2';
-    lockedOption = null;
-    cascadeEffect = 'count_0_2';
-    advantageSide = 'pitcher';
-    if (isDominant) {
-      revealCardFirst = 'batter';
-      countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Two-Strike Protection + Batter Plays Face-Up First)";
-    } else {
-      countDisplay = "0-2 Pitcher's Count (Two-Strike Protection: Home Runs Capped at Doubles)";
-    }
-  } else if (batterCardVal > pitcherCardVal) {
-    winner = 'batter';
-    count = '3-1';
-    lockedOption = null;
-    cascadeEffect = 'count_3_1';
-    advantageSide = 'batter';
-    if (isDominant) {
-      revealCardFirst = 'pitcher';
-      countDisplay = "3-1 Hitter's Count (DOMINANT ADVANTAGE: Any Strike Battles Back + Pitcher Plays Face-Up First)";
-    } else {
-      countDisplay = "3-1 Hitter's Count (Hitter's Count: Any Strike Battles Back to 3-2)";
-    }
-  } else {
+  // 1. Special Cards Check: WP (Wild Pitch) & K (Swinging Whiff)
+  if (isPitcherWP && isBatterK) {
     winner = 'tie';
     count = '3-2';
-    countDisplay = '3-2 Full Count (Even Battle - All Options Available)';
+    countDisplay = '1-1 Count (Wild Pitch Whiff in Dirt — Runners Advance)';
     cascadeEffect = 'count_3_2';
     advantageSide = 'neutral';
-    lockedOption = null;
+    isWildPitch = true;
+  } else if (isPitcherWP) {
+    // Pitcher uncorked a wild pitch in the dirt! Ball One! Runners advance 1 base!
+    winner = 'batter';
+    count = '3-1';
+    countDisplay = "3-1 Hitter's Count (Wild Pitch in the Dirt — Ball One! Runners Advance)";
+    cascadeEffect = 'count_3_1';
+    advantageSide = 'batter';
+    isWildPitch = true;
+    margin = 5;
+    isDominant = true;
+    revealCardFirst = 'pitcher';
+  } else if (isBatterK) {
+    // Batter chased out of the zone / whiffed! Strike One!
+    winner = 'pitcher';
+    count = '0-2';
+    countDisplay = "0-2 Pitcher's Count (Batter Whiffed on Strike One!)";
+    cascadeEffect = 'count_0_2';
+    advantageSide = 'pitcher';
+    margin = 5;
+    isDominant = true;
+    revealCardFirst = 'batter';
+  } else {
+    // 2. Standard Pitch 1 Resolution: Pitcher Delivery vs Batter Reaction
+    margin = Math.abs(pitcherDelivery - batterReaction);
+    isDominant = margin >= 4;
+
+    if (pitcherDelivery > batterReaction) {
+      winner = 'pitcher';
+      count = '0-2';
+      cascadeEffect = 'count_0_2';
+      advantageSide = 'pitcher';
+      if (isDominant) {
+        revealCardFirst = 'batter';
+        countDisplay = "0-2 Pitcher's Count (DOMINANT ADVANTAGE: Two-Strike Protection + Batter Plays Face-Up First)";
+      } else {
+        countDisplay = "0-2 Pitcher's Count (Two-Strike Protection: Home Runs Capped at Doubles)";
+      }
+    } else if (batterReaction > pitcherDelivery) {
+      winner = 'batter';
+      count = '3-1';
+      cascadeEffect = 'count_3_1';
+      advantageSide = 'batter';
+      if (isDominant) {
+        revealCardFirst = 'pitcher';
+        countDisplay = "3-1 Hitter's Count (DOMINANT ADVANTAGE: Any Strike Battles Back + Pitcher Plays Face-Up First)";
+      } else {
+        countDisplay = "3-1 Hitter's Count (Hitter's Count: Any Strike Battles Back to 3-2)";
+      }
+    } else {
+      winner = 'tie';
+      count = '3-2';
+      cascadeEffect = 'count_3_2';
+      advantageSide = 'neutral';
+      countDisplay = '3-2 Full Count (Even Battle - All Options Available)';
+    }
   }
 
   const pitcherAdvantagePerk = (winner === 'pitcher' && pCard?.advantagePerk) ? pCard.advantagePerk : null;
@@ -1034,13 +1116,27 @@ function resolveBeat1(opts) {
     countDisplay,
     cascadeEffect,
     advantageSide,
-    lockedOption,
+    lockedOption: null,
     revealCardFirst,
     isDominant,
-    pitcherDiscount,
-    batterDiscount,
-    pitcherTotal: pitcherCardVal,
-    batterTotal: batterCardVal,
+    pitcherDiscount: 0,
+    batterDiscount: 0,
+    pitcherTotal: pitcherDelivery,
+    batterTotal: batterReaction,
+    pitcherDelivery,
+    batterReaction,
+    pitcherCardVal: pCardVal,
+    batterCardVal: bCardVal,
+    pitcherBaseBonus: pBonus,
+    batterBaseBonus: pitchMatched ? bBonus : 0,
+    pitchType: effPitchType,
+    guessPitch: effBatterGuess,
+    pitchCall: effPitchType,
+    batterGuess: effBatterGuess,
+    pitchMatched,
+    isPitcherWP,
+    isBatterK,
+    isWildPitch,
     margin,
     rawMargin: winner === 'batter' ? margin : -margin,
     pitcherCardId,
@@ -1049,15 +1145,13 @@ function resolveBeat1(opts) {
     batterCards: batterCardId ? [batterCardId] : [],
     pitcherAdvantagePerk,
     batterAdvantagePerk,
-    pitchCall: pitchCall || 'fastball',
-    batterGuess: batterGuess || 'fastball',
     isKnockout: false,
     strikeZone: pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 },
     sz: pitcherChar?.strikeZone || { low: 10, high: 16, bullseye: 13, wildBust: 20 },
   };
 }
 
-// BEAT 2: The Payoff Pitch (Timing Delta & Pitch Type Clash)
+// BEAT 2: The Attack Pitch (Sweet Spot Centers & Plate Coverage)
 function resolveBeat2(opts) {
   const {
     count = '3-2',
@@ -1099,24 +1193,44 @@ function resolveBeat2(opts) {
       ? getPitcherPitchRating(pitcherChar, pitchType)
       : (pitcherChar?.pitchRatings?.[pitchType] ?? 0));
 
-  const batterBonus = pitchMatched
-    ? ((typeof getBatterPitchRating === 'function')
-      ? getBatterPitchRating(batterChar, pitchType)
-      : (batterChar?.pitchRatings?.[pitchType] ?? 0))
-    : 0;
+  const batterBonus = (typeof getBatterPitchRating === 'function')
+    ? getBatterPitchRating(batterChar, pitchType)
+    : (batterChar?.pitchRatings?.[pitchType] ?? 0);
 
+  // Idea 3 & 4: Total = Pitcher Delivery (Card + Rating) + Batter Card.
+  // Batter pitch rating does NOT push total higher into out territory; it widens the Sweet Spot barrel window!
   const pitcherEffectiveVal = pCardVal + pitcherBonus;
-  const batterEffectiveVal = bCardVal + batterBonus;
-  const launchAngle = pitcherEffectiveVal + (pitchMatched ? batterEffectiveVal : bCardVal);
-  const timingDelta = Math.abs(pitcherEffectiveVal - batterEffectiveVal);
-  const effectiveMargin = batterEffectiveVal - pitcherEffectiveVal;
+  const batterEffectiveVal = bCardVal;
+  const launchAngle = pitcherEffectiveVal + bCardVal;
+
+  const sweetSpotInfo = PITCH_SWEET_SPOTS[pitchType] || PITCH_SWEET_SPOTS.fastball;
+  const center = sweetSpotInfo.center; // 6 for offspeed, 9 for breaking, 12 for fastball
+
+  // Barrel window calculation: plate coverage expands barrel when anticipated!
+  let barrelMin, barrelMax, lineDriveMin, lineDriveMax;
+  let expansion = 0;
+  if (pitchMatched) {
+    expansion = Math.max(1, Math.min(3, Math.floor((batterBonus + 1) / 2)));
+    barrelMin = center - expansion;
+    barrelMax = center + expansion;
+    lineDriveMin = barrelMin - 2;
+    lineDriveMax = barrelMin - 1;
+  } else {
+    barrelMin = center - 1;
+    barrelMax = center + 1;
+    lineDriveMin = barrelMin - 1;
+    lineDriveMax = barrelMin - 1;
+  }
+
+  const timingDelta = Math.abs(launchAngle - center);
+  const effectiveMargin = bCardVal - pitcherEffectiveVal;
 
   let timingQuality = 'miss';
   if (timingDelta === 0) {
     timingQuality = 'squared'; // 🎯 Squared Up Barrel
-  } else if (timingDelta <= 2) {
+  } else if (timingDelta <= (pitchMatched ? expansion : 1)) {
     timingQuality = 'solid';   // 🏏 Solid Timing
-  } else if (timingDelta <= 4) {
+  } else if (timingDelta <= (pitchMatched ? expansion + 2 : 2)) {
     timingQuality = 'weak';    // 🧤 Off-Balance Timing
   } else {
     timingQuality = 'miss';    // ⚡ Whiff / Completely Mistimed
@@ -1133,19 +1247,17 @@ function resolveBeat2(opts) {
   const perkLogs = [];
 
   // ═════════════════════════════════════════════════════════════════════════
-  // LAUNCH ANGLE SPECTRUM & COUNT LEVERAGE RESOLUTION MATRIX
+  // SWEET SPOT CENTERS & COUNT LEVERAGE RESOLUTION MATRIX
   // ═════════════════════════════════════════════════════════════════════════
 
   // ── SPECIAL CARDS: WP (Wild Pitch) & K (Automatic Strikeout) ──
   if (isPitcherWP && isBatterK) {
-    // Both played their special card! Strikeout on wild pitch in dirt.
     outcomeType = 'k';
     outcomeDisplay = '⚡ STRIKEOUT ON WILD PITCH IN DIRT!';
     ruleReason = 'Batter swung and missed (K) on a wild pitch (WP) in the dirt! Strikeout recorded, base runners advance 1 base on the wild pitch.';
     isWildPitchReset = true;
 
   } else if (isPitcherWP) {
-    // Pitcher threw a Wild Pitch in the dirt!
     if (effectiveCount === '0-2') {
       outcomeType = 'wild_pitch';
       isWildPitchReset = true;
@@ -1163,7 +1275,6 @@ function resolveBeat2(opts) {
     }
 
   } else if (isBatterK) {
-    // Batter played K card: automatic swinging strikeout
     if (effectiveCount === '3-1') {
       outcomeType = 'battle_back';
       isBattleBack = true;
@@ -1177,56 +1288,56 @@ function resolveBeat2(opts) {
 
   } else if (pitchMatched) {
     // ── PITCH READ: Batter anticipated the Pitch Type! ──
-    // Evaluated strictly via Bell Curve Launch Angle Spectrum (Total = Pitcher Delivery + Batter Swing)
-    if (launchAngle <= 8) {
-      // ⚾ LOW CONTACT BAND (<= 8): Sinker in dirt -> Groundout
-      if (effectiveCount === '3-1') {
-        outcomeType = 'battle_back';
-        isBattleBack = true;
-        outcomeDisplay = '🔥 CLUTCH STRIKE! PITCHER FIGHTS BACK TO 3-2!';
-        ruleReason = `3-1 Count: Pitcher induced a low ground ball (Total ${launchAngle} in <=8 Low Contact Band). In 3-1 count, any strike battles back to 3-2 for Beat 3!`;
+    // Evaluated via Sweet Spot Centers (Offspeed 6, Breaking 9, Fastball 12) + Plate Coverage Expansion
+    if (launchAngle >= barrelMin && launchAngle <= barrelMax) {
+      // 🎯 SWEET SPOT / BARREL BAND
+      if (effectiveCount === '0-2') {
+        outcomeType = 'double';
+        outcomeDisplay = '⚡ CLUTCH DOUBLE OFF THE WALL (TWO-STRIKE BARREL)!';
+        ruleReason = `Squared-up sweet spot barrel (Total ${launchAngle} in [${barrelMin}–${barrelMax}] Sweet Spot Band), but 0-2 two-strike plate protection capped the hit at a Double!`;
+      } else if (Math.abs(launchAngle - center) <= 1 || isSlugger || bCardVal >= 5) {
+        outcomeType = 'homerun';
+        outcomeDisplay = '💥 NO-DOUBTER HOME RUN (SQUARED UP BARREL)!';
+        ruleReason = `Squared-up sweet spot barrel (Total ${launchAngle} in [${barrelMin}–${barrelMax}] Sweet Spot Band, Center ${center}) crushed for a towering Home Run!`;
       } else {
-        outcomeType = 'groundout';
-        outcomeDisplay = '⚾ ROUTINE GROUNDOUT TO SHORT';
-        ruleReason = `Low contact (Total ${launchAngle} in <=8 Low Contact Band: Delivery ${pitcherEffectiveVal} + Swing ${batterEffectiveVal}) resulted in a routine groundout.`;
+        outcomeType = 'double';
+        outcomeDisplay = '⚡ ROCKET DOUBLE INTO THE GAP (SWEET SPOT BARREL)!';
+        ruleReason = `Perfect sweet spot collision (Total ${launchAngle} in [${barrelMin}–${barrelMax}] Sweet Spot Band) ripped into the gap for a Double!`;
       }
 
-    } else if (launchAngle >= 9 && launchAngle <= 10) {
-      // 🏏 LINE DRIVE BAND (9–10): Clean contact -> Single
+    } else if (launchAngle >= lineDriveMin && launchAngle <= lineDriveMax) {
+      // 🏏 LINE DRIVE BAND: Clean contact finding a hole
       if (effectiveCount === '0-2') {
         outcomeType = 'battle_back';
         isBattleBack = true;
         outcomeDisplay = '⚾ BATTLED BACK! FOUL BALL (COUNT RUNS TO 3-2)!';
-        ruleReason = `0-2 Count: Batter fought off pitcher's delivery with clean line drive contact (Total ${launchAngle} in 9–10 Line Drive Band)! The count runs full to 3-2 for Beat 3!`;
+        ruleReason = `0-2 Count: Batter fought off pitcher's delivery with clean line drive contact (Total ${launchAngle} in [${lineDriveMin}–${lineDriveMax}] Line Drive Band)! The count runs full to 3-2 for Beat 3!`;
       } else {
         outcomeType = 'single';
         outcomeDisplay = '🏏 CLEAN LINE DRIVE SINGLE!';
-        ruleReason = `Pitch anticipated with clean line drive contact (Total ${launchAngle} in 9–10 Line Drive Band) produced a Single!`;
+        ruleReason = `Pitch anticipated with clean line drive contact (Total ${launchAngle} in [${lineDriveMin}–${lineDriveMax}] Line Drive Band) produced a Single!`;
       }
 
-    } else if (launchAngle >= 11 && launchAngle <= 14) {
-      // 🎯 SWEET SPOT / BARREL BAND (11–14): Squared-up collision -> HR / Gap Double
-      if (effectiveCount === '0-2') {
-        outcomeType = 'double';
-        outcomeDisplay = '⚡ CLUTCH DOUBLE OFF THE WALL (TWO-STRIKE BARREL)!';
-        ruleReason = `Squared-up sweet spot barrel (Total ${launchAngle} in 11–14 Sweet Spot Band), but 0-2 two-strike plate protection capped the hit at a Double!`;
-      } else if (isSlugger || launchAngle === 12 || launchAngle === 13 || bCardVal >= 8) {
-        outcomeType = 'homerun';
-        outcomeDisplay = '💥 NO-DOUBTER HOME RUN (SQUARED UP BARREL)!';
-        ruleReason = `Squared-up sweet spot barrel (Total ${launchAngle} in 11–14 Sweet Spot Band) crushed for a towering Home Run!`;
-      } else {
-        outcomeType = 'double';
-        outcomeDisplay = '⚡ ROCKET DOUBLE INTO THE GAP (SWEET SPOT BARREL)!';
-        ruleReason = `Perfect sweet spot collision (Total ${launchAngle} in 11–14 Sweet Spot Band) ripped into the gap for a Double!`;
-      }
-
-    } else {
-      // ⚡ HIGH HEAT BAND (15+): High velocity/blown-away delivery
+    } else if (launchAngle < lineDriveMin) {
+      // ⚾ LOW CONTACT BAND: Sinker in dirt / rollover
       if (effectiveCount === '3-1') {
         outcomeType = 'battle_back';
         isBattleBack = true;
         outcomeDisplay = '🔥 CLUTCH STRIKE! PITCHER FIGHTS BACK TO 3-2!';
-        ruleReason = `3-1 Count: Pitcher challenged the hitter with high heat (Total ${launchAngle} in 15+ High Heat Band)! The count runs full to 3-2 for Beat 3!`;
+        ruleReason = `3-1 Count: Pitcher induced a low ground ball (Total ${launchAngle} below sweet spot). In 3-1 count, any strike battles back to 3-2 for Beat 3!`;
+      } else {
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ ROUTINE GROUNDOUT TO SHORT';
+        ruleReason = `Low contact (Total ${launchAngle} below sweet spot: Delivery ${pitcherEffectiveVal} + Swing ${bCardVal}) resulted in a routine groundout.`;
+      }
+
+    } else {
+      // ⚡ HIGH HEAT BAND: Blown away above barrel
+      if (effectiveCount === '3-1') {
+        outcomeType = 'battle_back';
+        isBattleBack = true;
+        outcomeDisplay = '🔥 CLUTCH STRIKE! PITCHER FIGHTS BACK TO 3-2!';
+        ruleReason = `3-1 Count: Pitcher challenged the hitter with high heat (Total ${launchAngle} above sweet spot)! The count runs full to 3-2 for Beat 3!`;
       } else if (effectiveCount === '0-2') {
         if (isContactHitter) {
           outcomeType = 'battle_back';
@@ -1236,12 +1347,12 @@ function resolveBeat2(opts) {
         } else {
           outcomeType = 'k';
           outcomeDisplay = '⚡ STRIKEOUT SWINGING (PUT-AWAY PUNCHOUT)!';
-          ruleReason = `0-2 Count: Pitcher blew high heat past the hitter (Total ${launchAngle} in 15+ High Heat Band) for a swinging Strikeout!`;
+          ruleReason = `0-2 Count: Pitcher blew high heat past the hitter (Total ${launchAngle} above sweet spot) for a swinging Strikeout!`;
         }
       } else {
         outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
         outcomeDisplay = (pitchType === 'fastball') ? '🧤 ROUTINE FLYOUT (HIGH HEAT)' : '⚾ ROUTINE GROUNDOUT';
-        ruleReason = `High delivery (Total ${launchAngle} in 15+ High Heat Band) produced a routine out.`;
+        ruleReason = `High delivery (Total ${launchAngle} above sweet spot) produced a routine out.`;
       }
     }
 
@@ -1258,15 +1369,15 @@ function resolveBeat2(opts) {
       outcomeDisplay = '⚡ STRIKEOUT SWINGING (PUNCHOUT ON PUT-AWAY PITCH)!';
       ruleReason = '0-2 Count: Pitcher put away the fooled batter with a spot-on punchout Strikeout!';
 
-    } else if (launchAngle <= 14) {
+    } else if (launchAngle >= center + 3) {
+      outcomeType = 'k';
+      outcomeDisplay = '⚡ SWINGING STRIKEOUT (COMPLETELY FOOLED ON HIGH HEAT)!';
+      ruleReason = `Batter completely fooled on pitch type with high heat (Total ${launchAngle} >= ${center + 3}). Swinging Strikeout.`;
+
+    } else {
       outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
       outcomeDisplay = (pitchType === 'fastball') ? '🧤 POPUP TO INFIELD (FOOLED ON PITCH)' : '⚾ WEAK ROLLOVER GROUNDOUT (FOOLED ON PITCH)';
       ruleReason = `Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}). Weak contact (Total ${launchAngle}) produced a routine out.`;
-
-    } else {
-      outcomeType = 'k';
-      outcomeDisplay = '⚡ SWINGING STRIKEOUT (COMPLETELY FOOLED ON HIGH HEAT)!';
-      ruleReason = `Batter completely fooled on pitch type with high heat (Total ${launchAngle} in 15+ Band). Swinging Strikeout.`;
     }
   }
 
@@ -1285,7 +1396,6 @@ function resolveBeat2(opts) {
     outsAdded = 0;
     runsScored = 0;
   } else if (outcomeType === 'wild_pitch') {
-    // Wild pitch in dirt: runner on 3rd scores, others advance 1 base!
     runsScored = bases.third ? 1 : 0;
     newBases = {
       first: false,
@@ -1379,12 +1489,12 @@ function resolveBeat2(opts) {
     pitcherCardVal: pCardVal,
     batterCardVal: bCardVal,
     pitcherBaseBonus: pitcherBonus,
-    batterBaseBonus: batterBonus,
+    batterBaseBonus: pitchMatched ? batterBonus : 0,
     pitcherEffectiveVal,
     batterEffectiveVal,
     effectiveMargin,
-    pitcherRange: { min: 1, max: 10, label: '1–10' },
-    swingRange: { min: 1, max: 10, label: '1–10' },
+    pitcherRange: { min: 1, max: 6, label: '1–6' },
+    swingRange: { min: 1, max: 6, label: '1–6' },
     sameLocation: pitchMatched, // backward compat
     isFavoritePitch: false,
     isPitcherWP,
@@ -1433,17 +1543,34 @@ function resolveBeat3(opts) {
     : ((typeof getPitcherPitchRating === 'function')
       ? getPitcherPitchRating(pitcherChar, pitchType)
       : (pitcherChar?.pitchRatings?.[pitchType] ?? 0));
-  const batterBonus = pitchMatched
-    ? ((typeof getBatterPitchRating === 'function')
-      ? getBatterPitchRating(batterChar, pitchType)
-      : (batterChar?.pitchRatings?.[pitchType] ?? 0))
-    : 0;
+  const batterBonus = (typeof getBatterPitchRating === 'function')
+    ? getBatterPitchRating(batterChar, pitchType)
+    : (batterChar?.pitchRatings?.[pitchType] ?? 0);
 
   const pitcherEffectiveVal = pCardVal + pitcherBonus;
-  const batterEffectiveVal = bCardVal + batterBonus;
-  const launchAngle = pitcherEffectiveVal + (pitchMatched ? batterEffectiveVal : bCardVal);
-  const margin = batterEffectiveVal - pitcherEffectiveVal;
-  const timingDelta = Math.abs(pitcherEffectiveVal - batterEffectiveVal);
+  const batterEffectiveVal = bCardVal;
+  const launchAngle = pitcherEffectiveVal + bCardVal;
+
+  const sweetSpotInfo = PITCH_SWEET_SPOTS[pitchType] || PITCH_SWEET_SPOTS.fastball;
+  const center = sweetSpotInfo.center;
+
+  let barrelMin, barrelMax, lineDriveMin, lineDriveMax;
+  let expansion = 0;
+  if (pitchMatched) {
+    expansion = Math.max(1, Math.min(3, Math.floor((batterBonus + 1) / 2)));
+    barrelMin = center - expansion;
+    barrelMax = center + expansion;
+    lineDriveMin = barrelMin - 2;
+    lineDriveMax = barrelMin - 1;
+  } else {
+    barrelMin = center - 1;
+    barrelMax = center + 1;
+    lineDriveMin = barrelMin - 1;
+    lineDriveMax = barrelMin - 1;
+  }
+
+  const margin = bCardVal - pitcherEffectiveVal;
+  const timingDelta = Math.abs(launchAngle - center);
 
   const isSlugger = (batterChar?.archetype === 'Slugger' || batterChar?.archetype === 'Free Swinger');
   const isContactHitter = (batterChar?.archetype === 'Contact Hitter' || batterChar?.archetype === 'Speed Specialist');
@@ -1466,53 +1593,49 @@ function resolveBeat3(opts) {
     ruleReason = 'Full Count Showdown: Batter played K card and swung through the delivery for an automatic Strikeout!';
   } else if (pitchMatched) {
     // ── PITCH READ: Batter anticipated the Pitch Type in 3-2 Showdown! ──
-    if (launchAngle <= 8) {
-      // ⚾ LOW CONTACT BAND (<= 8)
-      outcomeType = 'groundout';
-      outcomeDisplay = '⚾ 3-2 FULL COUNT: ROUTINE GROUNDOUT';
-      ruleReason = `Full Count Showdown: Low contact (Total ${launchAngle} in <=8 Low Contact Band) induced a routine groundout.`;
-
-    } else if (launchAngle >= 9 && launchAngle <= 10) {
-      // 🏏 LINE DRIVE BAND (9–10)
-      outcomeType = 'single';
-      outcomeDisplay = '🏏 3-2 FULL COUNT: CLUTCH LINE DRIVE SINGLE!';
-      ruleReason = `Full Count Showdown: Batter came through with clean line drive contact (Total ${launchAngle} in 9–10 Line Drive Band) for a clutch Single!`;
-
-    } else if (launchAngle >= 11 && launchAngle <= 14) {
-      // 🎯 SWEET SPOT / BARREL BAND (11–14)
-      if (launchAngle === 12 || launchAngle === 13 || isSlugger || bCardVal >= 8) {
+    if (launchAngle >= barrelMin && launchAngle <= barrelMax) {
+      if (Math.abs(launchAngle - center) <= 1 || isSlugger || bCardVal >= 5) {
         outcomeType = 'homerun';
         outcomeDisplay = '💥 3-2 FULL COUNT: NO-DOUBTER HOME RUN!';
-        ruleReason = `Full Count Showdown: Squared-up sweet spot barrel (Total ${launchAngle} in 11–14 Sweet Spot Band) crushed for a towering Home Run!`;
+        ruleReason = `Full Count Showdown: Squared-up sweet spot barrel (Total ${launchAngle} in [${barrelMin}–${barrelMax}] Sweet Spot Band, Center ${center}) crushed for a towering Home Run!`;
       } else {
         outcomeType = 'double';
         outcomeDisplay = '⚡ 3-2 FULL COUNT: ROCKET DOUBLE INTO THE GAP!';
-        ruleReason = `Full Count Showdown: Sweet spot barrel collision (Total ${launchAngle} in 11–14 Sweet Spot Band) ripped into the gap for a Double!`;
+        ruleReason = `Full Count Showdown: Sweet spot barrel collision (Total ${launchAngle} in [${barrelMin}–${barrelMax}] Sweet Spot Band) ripped into the gap for a Double!`;
       }
 
+    } else if (launchAngle >= lineDriveMin && launchAngle <= lineDriveMax) {
+      outcomeType = 'single';
+      outcomeDisplay = '🏏 3-2 FULL COUNT: CLUTCH LINE DRIVE SINGLE!';
+      ruleReason = `Full Count Showdown: Batter came through with clean line drive contact (Total ${launchAngle} in [${lineDriveMin}–${lineDriveMax}] Line Drive Band) for a clutch Single!`;
+
+    } else if (launchAngle < lineDriveMin) {
+      outcomeType = 'groundout';
+      outcomeDisplay = '⚾ 3-2 FULL COUNT: ROUTINE GROUNDOUT';
+      ruleReason = `Full Count Showdown: Low contact (Total ${launchAngle} below sweet spot) induced a routine groundout.`;
+
     } else {
-      // ⚡ HIGH HEAT BAND (15+)
-      if (launchAngle >= 18) {
+      if (launchAngle >= center + 3) {
         outcomeType = 'k';
         outcomeDisplay = '⚡ 3-2 FULL COUNT: PUNCHOUT STRIKEOUT (HIGH HEAT)!';
-        ruleReason = `Full Count Showdown: Pitcher overpowered the hitter with high heat (Total ${launchAngle} in 18+ Band) for a punchout Strikeout!`;
+        ruleReason = `Full Count Showdown: Pitcher overpowered the hitter with high heat (Total ${launchAngle} >= ${center + 3}) for a punchout Strikeout!`;
       } else {
         outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
         outcomeDisplay = (pitchType === 'fastball') ? '🧤 3-2 FULL COUNT: DEEP FLYOUT TO THE TRACK' : '⚾ 3-2 FULL COUNT: ROUTINE OUT';
-        ruleReason = `Full Count Showdown: High delivery (Total ${launchAngle} in 15–17 Band) resulted in a deep flyout.`;
+        ruleReason = `Full Count Showdown: High delivery (Total ${launchAngle}) resulted in a deep flyout.`;
       }
     }
 
   } else {
     // ── FOOLED ON PITCH TYPE (3-2 Showdown) ──
-    if (launchAngle <= 14) {
+    if (launchAngle >= center + 3) {
+      outcomeType = 'k';
+      outcomeDisplay = '⚡ 3-2 FULL COUNT: SWINGING STRIKEOUT (HIGH HEAT)!';
+      ruleReason = `Full Count Showdown: Pitcher fooled the batter with ${pitchType.toUpperCase()} (+${pitcherBonus}) on high heat (Total ${launchAngle}) for a swinging Strikeout!`;
+    } else {
       outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
       outcomeDisplay = (pitchType === 'fastball') ? '🧤 3-2 FULL COUNT: POPUP TO INFIELD (FOOLED ON PITCH)' : '⚾ 3-2 FULL COUNT: WEAK GROUNDOUT (FOOLED ON PITCH)';
       ruleReason = `Full Count Showdown: Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}), rolling over for a routine out (Total ${launchAngle}).`;
-    } else {
-      outcomeType = 'k';
-      outcomeDisplay = '⚡ 3-2 FULL COUNT: SWINGING STRIKEOUT (HIGH HEAT)!';
-      ruleReason = `Full Count Showdown: Pitcher fooled the batter with ${pitchType.toUpperCase()} (+${pitcherBonus}) on high heat (Total ${launchAngle} in 15+ Band) for a swinging Strikeout!`;
     }
   }
 
@@ -1583,20 +1706,21 @@ function resolveBeat3(opts) {
     runsScored,
     outsAdded,
     newBases,
+    isFoulBall: false,
     pitchType,
     guessPitch: effectiveGuessPitch,
     swingType,
     pitchMatched,
+    locationMatched: pitchMatched,
     matchTier,
-    pitcherExecuted: true,
-    batterExecuted: true,
+    pitcherExecuted: !isPitcherWP,
+    batterExecuted: !isBatterK,
     pitcherCardVal: pCardVal,
     batterCardVal: bCardVal,
     pitcherBaseBonus: pitcherBonus,
-    batterBaseBonus: batterBonus,
+    batterBaseBonus: pitchMatched ? batterBonus : 0,
     pitcherEffectiveVal,
     batterEffectiveVal,
-    margin,
     effectiveMargin: margin,
     count: '3-2',
     pitcherTotal: pitcherEffectiveVal,
@@ -1758,26 +1882,48 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
   let cardId = null;
 
   if (beat === 'beat1') {
-    // Beat 1: Hand management! Choose card to contest the Count.
-    // Try to win the count with an efficient card (value 4-7) saving 8-10 for Beat 2 execution!
-    if (botHand.length > 0) {
-      let midIdx = botHand.findIndex(id => {
-        const v = getCard(id)?.value || 0;
-        return v >= 4 && v <= 7;
-      });
-      if (midIdx === -1) {
-        let lowestIdx = 0;
-        let lowestVal = 999;
-        botHand.forEach((id, idx) => {
+    // Beat 1: Pitch 1 Setup Pitch! Both players contest the count with pitch type + card
+    if (botIsPitching) {
+      const liveRatings = gameState?.pitcherRatings?.[botRole] || pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+      const available = [];
+      const fbWeight = Math.max(1, liveRatings.fastball || 1);
+      const brWeight = Math.max(1, liveRatings.breaking || 1);
+      const offWeight = Math.max(1, liveRatings.offspeed || 1);
+      for (let i = 0; i < fbWeight; i++) available.push('fastball');
+      for (let i = 0; i < brWeight; i++) available.push('breaking');
+      for (let i = 0; i < offWeight; i++) available.push('offspeed');
+      pitchType = available[Math.floor(Math.random() * available.length)];
+      pitchCall = pitchType;
+
+      if (botHand.length > 0) {
+        let midIdx = botHand.findIndex(id => {
           const v = getCard(id)?.value || 0;
-          if (v < lowestVal) { lowestVal = v; lowestIdx = idx; }
+          return v >= 3 && v <= 5;
         });
-        midIdx = lowestIdx;
+        if (midIdx === -1) midIdx = 0;
+        [cardId] = botHand.splice(midIdx, 1);
       }
-      [cardId] = botHand.splice(midIdx, 1);
+    } else {
+      const oppRatings = gameState?.pitcherRatings?.[oppRole] || { fastball: 3, breaking: 2, offspeed: 1 };
+      const pitchPool = [];
+      const fbWeight = Math.max(1, oppRatings.fastball || 1);
+      const brWeight = Math.max(1, oppRatings.breaking || 1);
+      const offWeight = Math.max(1, oppRatings.offspeed || 1);
+      for (let i = 0; i < fbWeight; i++) pitchPool.push('fastball');
+      for (let i = 0; i < brWeight; i++) pitchPool.push('breaking');
+      for (let i = 0; i < offWeight; i++) pitchPool.push('offspeed');
+      guessPitch = pitchPool[Math.floor(Math.random() * pitchPool.length)];
+      batterGuess = guessPitch;
+
+      if (botHand.length > 0) {
+        let midIdx = botHand.findIndex(id => {
+          const v = getCard(id)?.value || 0;
+          return v >= 3 && v <= 5;
+        });
+        if (midIdx === -1) midIdx = 0;
+        [cardId] = botHand.splice(midIdx, 1);
+      }
     }
-    pitchCall = 'fastball';
-    batterGuess = 'fastball';
 
   } else if (beat === 'beat2' || beat === 'beat3') {
     const b1 = gameState?.currentPA?.beatResults?.beat1 || gameState?.beatResults?.beat1 || gameState?.beat1 || {};
@@ -1810,13 +1956,14 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
         });
 
         const pool = (nonWPIndices.length > 0) ? nonWPIndices : botHand.map((_, i) => i);
-        // Play card to push total away from the 11-14 sweet spot
+        const center = PITCH_SWEET_SPOTS[pitchType]?.center || 12;
         const myRating = liveRatings[pitchType] || 0;
+
         if (myRating >= 4) {
-          // Power delivery: play high cards to reach 18+ (high heat out/strikeout)
+          // High power: push delivery high above sweet spot
           pool.sort((a, b) => (getCard(botHand[b])?.value || 0) - (getCard(botHand[a])?.value || 0));
         } else {
-          // Low/soft delivery: play low cards to stay <= 8 (groundout)
+          // Low touch: push delivery low below sweet spot
           pool.sort((a, b) => (getCard(botHand[a])?.value || 0) - (getCard(botHand[b])?.value || 0));
         }
         const chosenIdx = pool[0];
@@ -1837,7 +1984,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
       guessPitch = pitchPool[Math.floor(Math.random() * pitchPool.length)];
       batterGuess = guessPitch;
 
-      // Select card: avoid K (value 1) if possible, and target Sweet Spot (13) on Launch Angle Spectrum
+      // Select card: avoid K (value 1) if possible, and target Sweet Spot Center
       if (botHand.length > 0) {
         let nonKIndices = [];
         botHand.forEach((id, idx) => {
@@ -1846,13 +1993,11 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
         });
 
         const pool = (nonKIndices.length > 0) ? nonKIndices : botHand.map((_, i) => i);
-
         const oppRating = oppRatings[guessPitch] || 0;
-        const oppDeliveryEst = (oppRevealedVal !== null) ? (oppRevealedVal + oppRating) : (5 + oppRating);
-        const targetSweetSpot = 13;
-        const idealCardVal = Math.max(1, Math.min(10, targetSweetSpot - oppDeliveryEst));
+        const oppDeliveryEst = (oppRevealedVal !== null) ? (oppRevealedVal + oppRating) : (3 + oppRating);
+        const center = PITCH_SWEET_SPOTS[guessPitch]?.center || 12;
+        const idealCardVal = Math.max(1, Math.min(6, center - oppDeliveryEst));
 
-        // Sort by closest to idealCardVal to hit sweet spot
         pool.sort((a, b) => {
           const diffA = Math.abs((getCard(botHand[a])?.value || 0) - idealCardVal);
           const diffB = Math.abs((getCard(botHand[b])?.value || 0) - idealCardVal);
@@ -1869,11 +2014,68 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     pitchCall,
     batterGuess,
     pitchType,
-    swingType: 'balanced', // backward compat
+    swingType: 'balanced',
     guessPitch: guessPitch || batterGuess || 'fastball',
     cardId,
     botHand
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PITCHER STAMINA DRAIN & RECOVERY MECHANICS
+// ─────────────────────────────────────────────────────────────────────────────
+function updatePitcherRatingsOnPitch(currentRatings, pitchingRole, pitcherChar, pitchType, cardVal) {
+  if (!currentRatings || !currentRatings[pitchingRole]) return;
+  const roleRatings = currentRatings[pitchingRole];
+  const baseRatings = pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+
+  if (pitchType === 'offspeed') {
+    // Offspeed recovers +1 Fastball arm stamina (capped at base character rating)
+    roleRatings.fastball = Math.min(baseRatings.fastball || 3, (roleRatings.fastball || 0) + 1);
+  } else if (pitchType === 'fastball') {
+    // High effort fastball (cardVal >= 5) drains Fastball arm rating by 1
+    if (cardVal >= 5) {
+      roleRatings.fastball = Math.max(0, (roleRatings.fastball || 0) - 1);
+    }
+  } else if (pitchType === 'breaking') {
+    // High effort breaking ball (cardVal >= 5) drains Breaking spin rating by 1
+    if (cardVal >= 5) {
+      roleRatings.breaking = Math.max(0, (roleRatings.breaking || 0) - 1);
+    }
+  }
+}
+
+function updatePitcherRatingsOnOut(currentRatings, pitchingRole, pitcherChar, pitchType, isQuickOut, isStrikeout) {
+  if (!currentRatings || !currentRatings[pitchingRole]) return;
+  const roleRatings = currentRatings[pitchingRole];
+  const baseRatings = pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+
+  if (isStrikeout) {
+    // Strikeout adrenaline surge: +1 to all fatigued ratings
+    for (const pt of ['fastball', 'breaking', 'offspeed']) {
+      roleRatings[pt] = Math.min(baseRatings[pt] || 0, (roleRatings[pt] || 0) + 1);
+    }
+  } else if (isQuickOut && pitchType) {
+    // Efficient out in <= 2 pitches: +1 recovery to pitch used
+    roleRatings[pitchType] = Math.min(baseRatings[pitchType] || 0, (roleRatings[pitchType] || 0) + 1);
+  }
+}
+
+function updatePitcherRatingsOnInningChange(currentRatings, pitchingRole, pitcherChar) {
+  if (!currentRatings || !currentRatings[pitchingRole]) return;
+  const roleRatings = currentRatings[pitchingRole];
+  const baseRatings = pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+
+  // Bench / dugout rest: recover +2 to all pitch ratings
+  for (const pt of ['fastball', 'breaking', 'offspeed']) {
+    roleRatings[pt] = Math.min(baseRatings[pt] || 0, (roleRatings[pt] || 0) + 2);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.updatePitcherRatingsOnPitch = updatePitcherRatingsOnPitch;
+  window.updatePitcherRatingsOnOut = updatePitcherRatingsOnOut;
+  window.updatePitcherRatingsOnInningChange = updatePitcherRatingsOnInningChange;
 }
 
 function buildResult(r) { return r; }
