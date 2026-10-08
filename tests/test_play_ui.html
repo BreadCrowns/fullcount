@@ -146,6 +146,35 @@
       report(pSlot !== null && bSlot !== null, 'Beat 1 placing places pitcher card on mound and batter card at plate');
       report(pSlot.classList.contains('mine') && bSlot.classList.contains('opp'), 'Beat 1 placing places active user card on mound (mine) and opponent at plate (opp)');
 
+      // Verify no pitch tray is highlighted by default
+      const activeTraysInitial = document.querySelectorAll('.pitch-tray.active');
+      report(activeTraysInitial.length === 0, `Beat 1 placing starts with no default pitch selected (found ${activeTraysInitial.length} active trays)`);
+
+      // Verify Lock-in button is disabled initially
+      const lockBtnInit = document.getElementById('lock-btn');
+      report(lockBtnInit !== null && lockBtnInit.disabled === true, 'Lock-in button is disabled initially when neither pitch nor card is chosen');
+
+      // Test selecting Breaking Ball
+      handleTrayClick('breaking', 'mound');
+      const breakingTray = document.querySelector('.pitch-tray[data-pitch="breaking"]');
+      const activeTraysAfterBreaking = document.querySelectorAll('.pitch-tray.active');
+      report(breakingTray?.classList.contains('active') && activeTraysAfterBreaking.length === 1, 'Clicking Breaking tray highlights Breaking as active pitch');
+
+      // Test selecting Offspeed switches pitch
+      handleTrayClick('offspeed', 'mound');
+      const offspeedTray = document.querySelector('.pitch-tray[data-pitch="offspeed"]');
+      report(offspeedTray?.classList.contains('active') && !document.querySelector('.pitch-tray[data-pitch="breaking"]')?.classList.contains('active'), 'Clicking Offspeed tray switches active pitch to Offspeed');
+
+      // Test lock-in button remains disabled if card not selected
+      const lockBtnWithPitchOnly = document.getElementById('lock-btn');
+      report(lockBtnWithPitchOnly?.disabled === true, 'Lock-in button remains disabled when only pitch is selected (card missing)');
+
+      // Test selecting a card enables lock-in button
+      selectCard('P1');
+      const lockBtnReady = document.getElementById('lock-btn');
+      report(lockBtnReady?.disabled === false, 'Lock-in button is enabled when both pitch and card are selected');
+      selectCard('P1'); // deselect
+
       // 2b. Test Special Card Display (WP for Pitcher 1, K for Batter 1)
       report(getCardDisplay(1, true) === 'WP', 'getCardDisplay returns WP for Pitcher card 1');
       report(getCardDisplay(1, false) === 'K', 'getCardDisplay returns K for Batter card 1');
@@ -414,6 +443,10 @@
       const fooledNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat2', launchAngle: 16, batterBonus: 2, pitchMatched: false });
       report(fooledNl.includes('Fooled on Pitch Type'), 'Fooled number line explains fooled pitch type');
       report(!fooledNl.includes('nl-cell sweet-spot'), 'Fooled number line negates sweet-spot barrel band');
+
+      const unselectedNl = window.renderOutcomeNumberLine({ pitchType: null });
+      report(unselectedNl.includes('SELECT PITCH TO PREVIEW BANDS'), 'Unselected number line displays SELECT PITCH TO PREVIEW BANDS badge');
+      report(unselectedNl.includes('unselected'), 'Unselected number line cells contain unselected class');
 
       // Verify number line in active modals and field
       report(document.querySelector('.diamond-number-line') !== null, 'Diamond battlefield renders live color-coded number line');

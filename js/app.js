@@ -30,8 +30,8 @@ let selectedCard     = null; // currently selected card ID from hand
 let localPitchChoice = null; // legacy alias
 let localGuessChoice = null; // legacy alias
 let localBeatCard    = null; // cardId placed in active beat (at most 1)
-let localPitchType     = 'fastball';  // 'fastball' | 'breaking' | 'offspeed'
-let localGuessPitch    = 'fastball';  // 'fastball' | 'breaking' | 'offspeed'
+let localPitchType     = null;        // 'fastball' | 'breaking' | 'offspeed' | null (no default highlight)
+let localGuessPitch    = null;        // 'fastball' | 'breaking' | 'offspeed' | null (no default highlight)
 let localSwingType     = 'balanced';  // 'contact' | 'balanced' | 'power'
 let gameListener     = null; // Firebase listener ref
 
@@ -165,14 +165,18 @@ function handleTrayDrop(e, pitchType, zoneType) {
 window.handleTrayDrop = handleTrayDrop;
 
 function executeCardDrop(cardId, pitchType, zoneType) {
+  if (!myRole && typeof window !== 'undefined' && window.myRole) {
+    myRole = window.myRole;
+  }
   const g = window._lastGameState;
   const currentBeat = g?.currentPA?.beat || 'beat1';
   const half = g?.gameState?.half || 'top';
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const iAmPitching = (myRole === pitchingRole);
+  const isPitching = (zoneType === 'mound') || (zoneType !== 'plate' && iAmPitching);
 
   if ((currentBeat === 'beat1' || currentBeat === 'beat2' || currentBeat === 'beat3') && pitchType) {
-    if (iAmPitching) {
+    if (isPitching) {
       localPitchType = pitchType;
     } else {
       localGuessPitch = pitchType;
@@ -278,14 +282,18 @@ function handleTouchDragEnd(e) {
 window.handleTouchDragEnd = handleTouchDragEnd;
 
 function handleTrayClick(pitchType, zoneType) {
+  if (!myRole && typeof window !== 'undefined' && window.myRole) {
+    myRole = window.myRole;
+  }
   const g = window._lastGameState;
   const currentBeat = g?.currentPA?.beat || 'beat1';
   const half = g?.gameState?.half || 'top';
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const iAmPitching = (myRole === pitchingRole);
+  const isPitching = (zoneType === 'mound') || (zoneType !== 'plate' && iAmPitching);
 
   if ((currentBeat === 'beat1' || currentBeat === 'beat2' || currentBeat === 'beat3') && pitchType) {
-    if (iAmPitching) {
+    if (isPitching) {
       localPitchType = pitchType;
     } else {
       localGuessPitch = pitchType;
@@ -745,6 +753,11 @@ function startGame(g) {
     isFirstPAOfInning: true,
   };
 
+  localBeatCard = null;
+  selectedCard = null;
+  localPitchType = null;
+  localGuessPitch = null;
+
   gameRef().update({ phase:'play', gameState: initialState, currentPA: paState });
 }
 
@@ -752,6 +765,7 @@ function startGame(g) {
 // MAIN GAME RENDER
 // ─────────────────────────────────────────────────────────────────────────────
 function renderPlay(g) {
+  window._lastGameState = g;
   if (!myRole && typeof window !== 'undefined' && window.myRole) {
     myRole = window.myRole;
   }
@@ -859,20 +873,35 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
   const pCharges = gs?.arsenalCharges?.[pitchingRole] || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
   const bScout = batterChar?.scoutingReport || { favoritePitch: 'fastball' };
 
+  const pitcherRatings = gs?.pitcherRatings?.[pitchingRole] || pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+  const batterRatings = batterChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+  const curPitch = iAmPitching ? localPitchType : localGuessPitch;
+
   // Lock In Button Configuration based on Active Beat
   let lockBtnLabel = 'LOCK IN';
   let lockBtnSub = '';
   let lockBtnDisabled = false;
 
   if (currentBeat === 'beat1') {
-    if (!localBeatCard) {
+    if (!curPitch && !localBeatCard) {
+      lockBtnLabel = iAmPitching ? 'CHOOSE PITCH & CARD' : 'ANTICIPATE PITCH & CARD';
+      lockBtnSub = iAmPitching ? 'Select pitch type & card' : 'Anticipate pitch type & card';
+      lockBtnDisabled = true;
+    } else if (!curPitch) {
+      lockBtnLabel = iAmPitching ? 'CHOOSE PITCH' : 'ANTICIPATE PITCH';
+      lockBtnSub = 'Select Fastball, Breaking, or Offspeed';
+      lockBtnDisabled = true;
+    } else if (!localBeatCard) {
       lockBtnLabel = 'CHOOSE CARD';
-      lockBtnSub = 'Pick 1 from hand';
+      lockBtnSub = `${curPitch.toUpperCase()} selected &bull; Pick 1 card from hand`;
       lockBtnDisabled = true;
     } else {
       const cardObj = getCard(localBeatCard);
+      const curBonus = iAmPitching ? (pitcherRatings[curPitch] ?? 0) : (batterRatings[curPitch] ?? 0);
       lockBtnLabel = 'LOCK IN COUNT';
-      lockBtnSub = `Card [${cardObj?.value ?? 0}]`;
+      lockBtnSub = iAmPitching
+        ? `${curPitch.toUpperCase()} (+${curBonus} Arm) &bull; Card [${cardObj?.value ?? 0}]`
+        : `LOOKING ${curPitch.toUpperCase()} (+${curBonus}) &bull; Card [${cardObj?.value ?? 0}]`;
       lockBtnDisabled = false;
     }
   } else if (currentBeat === 'beat2' || currentBeat === 'beat3') {
@@ -881,43 +910,58 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
     const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
     if (iAmPitching) {
-      const liveRatings = gs?.pitcherRatings?.[pitchingRole] || pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
-      const pBonus = (liveRatings[localPitchType] !== undefined)
-        ? liveRatings[localPitchType]
+      const pBonus = curPitch ? ((pitcherRatings[curPitch] !== undefined)
+        ? pitcherRatings[curPitch]
         : ((typeof getPitcherPitchRating === 'function')
-          ? getPitcherPitchRating(pitcherChar, localPitchType)
-          : (pitcherChar?.pitchRatings?.[localPitchType] ?? 0));
+          ? getPitcherPitchRating(pitcherChar, curPitch)
+          : (pitcherChar?.pitchRatings?.[curPitch] ?? 0))) : 0;
       const effVal = cardVal + pBonus;
 
-      if (!localBeatCard) {
-        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN PITCH' : 'CHOOSE CARD';
-        lockBtnSub = `${localPitchType.toUpperCase()} (+${pBonus} Arm)`;
+      if (!curPitch && !localBeatCard) {
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN PITCH & CARD' : 'CHOOSE PITCH & CARD';
+        lockBtnSub = 'Select pitch type & execution card';
+        lockBtnDisabled = true;
+      } else if (!curPitch) {
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN PITCH' : 'CHOOSE PITCH';
+        lockBtnSub = 'Select Fastball, Breaking, or Offspeed';
+        lockBtnDisabled = true;
+      } else if (!localBeatCard) {
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN CARD' : 'CHOOSE CARD';
+        lockBtnSub = `${curPitch.toUpperCase()} (+${pBonus} Arm) &bull; Pick 1 card from hand`;
         lockBtnDisabled = true;
       } else {
         lockBtnLabel = isBeat3 ? 'LOCK IN SHOWDOWN PITCH' : 'LOCK IN PITCH';
         if (cardVal === 1) {
-          lockBtnSub = `${localPitchType.toUpperCase()} (+${pBonus} Arm) &bull; ⚡ WILD PITCH in the dirt`;
+          lockBtnSub = `${curPitch.toUpperCase()} (+${pBonus} Arm) &bull; ⚡ WILD PITCH in the dirt`;
         } else {
-          lockBtnSub = `${localPitchType.toUpperCase()} (+${pBonus} Arm) &bull; Card [${cardVal}] + Base [${pBonus}] = [${effVal}] Effective Value`;
+          lockBtnSub = `${curPitch.toUpperCase()} (+${pBonus} Arm) &bull; Card [${cardVal}] + Base [${pBonus}] = [${effVal}] Effective Value`;
         }
         lockBtnDisabled = false;
       }
     } else {
-      const bBonus = (typeof getBatterPitchRating === 'function')
-        ? getBatterPitchRating(batterChar, localGuessPitch)
-        : (batterChar?.pitchRatings?.[localGuessPitch] ?? 0);
+      const bBonus = curPitch ? ((typeof getBatterPitchRating === 'function')
+        ? getBatterPitchRating(batterChar, curPitch)
+        : (batterChar?.pitchRatings?.[curPitch] ?? 0)) : 0;
       const effVal = cardVal + bBonus;
 
-      if (!localBeatCard) {
-        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN SWING' : 'CHOOSE CARD';
-        lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} (+${bBonus} Pow)`;
+      if (!curPitch && !localBeatCard) {
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN SWING & CARD' : 'CHOOSE SWING & CARD';
+        lockBtnSub = 'Anticipate pitch type & execution card';
+        lockBtnDisabled = true;
+      } else if (!curPitch) {
+        lockBtnLabel = isBeat3 ? 'ANTICIPATE SHOWDOWN PITCH' : 'ANTICIPATE PITCH';
+        lockBtnSub = 'Anticipate Fastball, Breaking, or Offspeed';
+        lockBtnDisabled = true;
+      } else if (!localBeatCard) {
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN CARD' : 'CHOOSE CARD';
+        lockBtnSub = `LOOKING ${curPitch.toUpperCase()} (+${bBonus}) &bull; Pick 1 card from hand`;
         lockBtnDisabled = true;
       } else {
         lockBtnLabel = isBeat3 ? 'LOCK IN SHOWDOWN SWING' : 'LOCK IN SWING';
         if (cardVal === 1) {
-          lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} (+${bBonus} Pow) &bull; ⚡ AUTOMATIC STRIKEOUT`;
+          lockBtnSub = `LOOKING ${curPitch.toUpperCase()} (+${bBonus}) &bull; ⚡ AUTOMATIC STRIKEOUT`;
         } else {
-          lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} (+${bBonus} Pow) &bull; Card [${cardVal}] + Base [${bBonus}] = [${effVal}] Effective Value`;
+          lockBtnSub = `LOOKING ${curPitch.toUpperCase()} (+${bBonus}) &bull; Card [${cardVal}] + Base [${bBonus}] = [${effVal}] Effective Value`;
         }
         lockBtnDisabled = false;
       }
@@ -1704,17 +1748,20 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           </div>
         </div>
 
-        ${renderOutcomeNumberLine({
-          pitchType: !iAmBatting ? localPitchType : localGuessPitch,
-          beat: 'beat1',
-          count: '0-0',
-          batterBonus: batterRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0,
-          pitcherBonus: pitcherRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0,
-          launchAngle: cardObj ? ((cardObj.value || 0) + (!iAmBatting ? (pitcherRatings[!iAmBatting ? localPitchType : localGuessPitch] ?? 0) : 0) + 3) : null,
-          projected: true,
-          pitchMatched: true,
-          extraClass: 'diamond-number-line'
-        })}
+        ${(() => {
+          const curPitch = !iAmBatting ? localPitchType : localGuessPitch;
+          return renderOutcomeNumberLine({
+            pitchType: curPitch,
+            beat: 'beat1',
+            count: '0-0',
+            batterBonus: curPitch ? (batterRatings[curPitch] ?? 0) : 0,
+            pitcherBonus: curPitch ? (pitcherRatings[curPitch] ?? 0) : 0,
+            launchAngle: (cardObj && curPitch) ? ((cardObj.value || 0) + (!iAmBatting ? (pitcherRatings[curPitch] ?? 0) : 0) + 3) : null,
+            projected: true,
+            pitchMatched: true,
+            extraClass: 'diamond-number-line'
+          });
+        })()}
       </div>
     `;
 
@@ -1918,22 +1965,37 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     }
 
     // Execution feedback
-    const curBonus = !iAmBatting ? (pitcherRatings[curPitch] ?? 0) : (batterRatings[curPitch] ?? 0);
-    const effVal = (cardVal !== null) ? cardVal + curBonus : null;
-    const bonusType = !iAmBatting ? (curPitch === 'fastball' ? 'Arm' : curPitch === 'breaking' ? 'Spin' : 'Touch') : (curPitch === 'fastball' ? 'Pow' : curPitch === 'breaking' ? 'Vis' : 'Dis');
+    const curBonus = curPitch ? (!iAmBatting ? (pitcherRatings[curPitch] ?? 0) : (batterRatings[curPitch] ?? 0)) : 0;
+    const effVal = (cardVal !== null && curPitch) ? cardVal + curBonus : null;
+    const bonusType = curPitch ? (!iAmBatting ? (curPitch === 'fastball' ? 'Arm' : curPitch === 'breaking' ? 'Spin' : 'Touch') : (curPitch === 'fastball' ? 'Pow' : curPitch === 'breaking' ? 'Vis' : 'Dis')) : '';
     const isWP = !iAmBatting && cardVal === 1;
     const isK  = iAmBatting  && cardVal === 1;
-    const execFeedbackHtml = (cardVal !== null) ? `
-      <div class="diamond-exec-pill pass">
-        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} (+${curBonus} ${bonusType})</span>
-        <span>${isWP ? '⚡ WILD PITCH in the dirt' : (isK ? '⚡ AUTOMATIC STRIKEOUT' : `Card [${cardVal}] + Base [${curBonus}] = [${effVal}] Effective Value`)}</span>
-      </div>
-    ` : `
-      <div class="diamond-exec-pill waiting">
-        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} (+${curBonus} ${bonusType})</span>
-        <span>Drag a card to a tray or tap</span>
-      </div>
-    `;
+    let execFeedbackHtml = '';
+    if (cardVal !== null && curPitch) {
+      execFeedbackHtml = `
+        <div class="diamond-exec-pill pass">
+          <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} (+${curBonus} ${bonusType})</span>
+          <span>${isWP ? '⚡ WILD PITCH in the dirt' : (isK ? '⚡ AUTOMATIC STRIKEOUT' : `Card [${cardVal}] + Base [${curBonus}] = [${effVal}] Effective Value`)}</span>
+        </div>`;
+    } else if (curPitch) {
+      execFeedbackHtml = `
+        <div class="diamond-exec-pill waiting">
+          <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} (+${curBonus} ${bonusType})</span>
+          <span>Drag a card to a tray or tap a card below</span>
+        </div>`;
+    } else if (cardVal !== null) {
+      execFeedbackHtml = `
+        <div class="diamond-exec-pill waiting">
+          <span>Card [${cardVal}] Selected</span>
+          <span>Choose Fastball, Breaking, or Offspeed above</span>
+        </div>`;
+    } else {
+      execFeedbackHtml = `
+        <div class="diamond-exec-pill waiting">
+          <span>${!iAmBatting ? 'CHOOSE PITCH & CARD' : 'ANTICIPATE PITCH & CARD'}</span>
+          <span>Select Fastball, Breaking, or Offspeed above</span>
+        </div>`;
+    }
 
     mainContentHtml = `
       <div class="${isBeat3 ? 'beat3-arena' : 'beat2-arena'} diamond-arena">
@@ -2143,7 +2205,12 @@ function commitPlacement() {
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const battingRole  = half === 'top' ? 'guest' : 'host';
   const iAmPitching  = (myRole === pitchingRole);
-  const isBot        = Boolean(g.isSolo || g.guest?.isBot);
+  const curPitch     = iAmPitching ? localPitchType : localGuessPitch;
+
+  if (!curPitch) {
+    alert(iAmPitching ? 'Please choose a pitch type (Fastball, Breaking, or Offspeed).' : 'Please anticipate a pitch type (Fastball, Breaking, or Offspeed).');
+    return;
+  }
 
   if (currentBeat === 'beat1') {
     if (!localBeatCard) {
@@ -2189,8 +2256,8 @@ function commitPlacement() {
     const liveGS = liveG.gameState || {};
 
     const myBeatPlacement = iAmPitching
-      ? { pitchType: localPitchType || 'fastball', cardId: localBeatCard }
-      : { guessPitch: localGuessPitch || 'fastball', cardId: localBeatCard };
+      ? { pitchType: curPitch, cardId: localBeatCard }
+      : { guessPitch: curPitch, cardId: localBeatCard };
 
     const updates = {
       [`currentPA/beatPlacements/${currentBeat}/${myRole}`]: myBeatPlacement,
@@ -2812,8 +2879,8 @@ function nextPA() {
         localGuessChoice = null;
         localBeatCard    = null;
         selectedCard     = null;
-        localPitchType   = 'fastball';
-        localGuessPitch  = 'fastball';
+        localPitchType   = null;
+        localGuessPitch  = null;
         localSwingType   = 'balanced';
         localPlacement   = { z1:[], z2:[], z3:[] };
       }).catch(err => {
@@ -2994,13 +3061,43 @@ window.toggleOverlayPeek = toggleOverlayPeek;
 // COLOR-CODED OUTCOME NUMBER LINE COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 function renderOutcomeNumberLine(opts = {}) {
-  const pitchType = opts.pitchType || 'fastball';
+  const pitchType = opts.pitchType || null;
   const beat = opts.beat || 'beat1';
   const count = opts.count || '3-2';
   const pitchMatched = (opts.pitchMatched !== undefined) ? opts.pitchMatched : true;
   const launchAngle = (typeof opts.launchAngle === 'number') ? opts.launchAngle : null;
   const isProjected = Boolean(opts.projected);
   const extraClass = opts.extraClass || '';
+
+  if (!pitchType) {
+    let cellsHtml = '';
+    for (let n = 1; n <= 18; n++) {
+      cellsHtml += `
+        <div class="nl-cell unselected" data-val="${n}">
+          <span class="nl-outcome-badge">—</span>
+          <div class="nl-num-box">${n}</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="outcome-number-line-container ${extraClass}">
+        <div class="nl-header-row">
+          <span class="nl-pitch-badge">🎯 SELECT PITCH TO PREVIEW BANDS</span>
+          <div class="nl-legend">
+            <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Barrel</span>
+            <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> Line Drive</span>
+            <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> Outside</span>
+          </div>
+        </div>
+        <div class="nl-track">
+          ${cellsHtml}
+        </div>
+        <div class="nl-footer-note">
+          Select Fastball, Breaking, or Offspeed above to view collision window &amp; sweet spot.
+        </div>
+      </div>
+    `;
+  }
 
   const sweetSpotInfo = (typeof PITCH_SWEET_SPOTS !== 'undefined' && PITCH_SWEET_SPOTS[pitchType])
     ? PITCH_SWEET_SPOTS[pitchType]
@@ -3274,8 +3371,10 @@ function renderBeat1ResultModal(b1, isPitcherMe) {
 }
 
 function proceedToBeat2() {
-  localBeatCard = null;
-  selectedCard  = null;
+  localPitchType  = null;
+  localGuessPitch = null;
+  localBeatCard   = null;
+  selectedCard    = null;
   const btn = document.querySelector('#beat1-result-modal .rm-btn');
   if (btn) {
     btn.disabled = true;
@@ -3432,8 +3531,10 @@ function renderBattleBackModal(b2, isPitcherMe) {
 window.renderBattleBackModal = renderBattleBackModal;
 
 function proceedToBeat3() {
-  localBeatCard = null;
-  selectedCard  = null;
+  localPitchType  = null;
+  localGuessPitch = null;
+  localBeatCard   = null;
+  selectedCard    = null;
   const btn = document.querySelector('#battle-back-modal .rm-btn');
   if (btn) {
     btn.disabled = true;
@@ -3536,6 +3637,10 @@ function renderWildPitchModal(res, isBatting = false) {
 }
 
 function proceedFromWildPitch() {
+  localPitchType  = null;
+  localGuessPitch = null;
+  localBeatCard   = null;
+  selectedCard    = null;
   const btn = document.querySelector('#wild-pitch-modal .rm-btn') || document.querySelector('.btn-wild-pitch-continue');
   if (btn) {
     btn.disabled = true;

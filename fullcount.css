@@ -2674,6 +2674,16 @@ body {
   border-color: #fc8181;
 }
 
+.nl-cell.unselected .nl-outcome-badge {
+  background: transparent;
+  color: #718096;
+}
+.nl-cell.unselected .nl-num-box {
+  background: rgba(45, 55, 72, 0.4);
+  color: #718096;
+  border-color: rgba(74, 85, 104, 0.2);
+}
+
 /* Needle / Marker Pin */
 .nl-needle-pin {
   position: absolute;
