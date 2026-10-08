@@ -3747,11 +3747,37 @@ body {
    BEAT 1 & BEAT 2 ARENAS
    ========================================================================== */
 .beat1-arena,
-.beat2-arena {
+.beat2-arena,
+.beat3-arena {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
+}
+
+.beat3-banner {
+  background: linear-gradient(135deg, rgba(120, 83, 10, 0.6), rgba(15, 23, 42, 0.85));
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 0 14px var(--gold-glow);
+  cursor: pointer;
+}
+
+.beat3-banner .b1-title {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--gold-bright);
+  letter-spacing: 0.5px;
+}
+
+.beat3-banner .b1-subtitle {
+  font-size: 0.56rem;
+  color: #fde68a;
 }
 
 .beat1-banner {
@@ -4011,6 +4037,25 @@ body {
   font-size: 0.65rem;
   font-weight: 800;
   color: var(--text-muted);
+}
+
+.rm-card-meta {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.rm-card-meta b {
+  color: #fff;
+}
+
+.rm-eff-calc {
+  font-size: 0.58rem;
+  color: #38ef7d;
+  background: rgba(56, 239, 125, 0.12);
+  border: 1px solid rgba(56, 239, 125, 0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-top: 2px;
 }
 
 .rm-vs {
@@ -5123,6 +5168,18 @@ body {
   font-size: 0.55rem;
   font-weight: 800;
   color: var(--text-dim);
+}
+
+.pitch-tray .pt-rating-badge {
+  font-size: 0.54rem;
+  font-weight: 900;
+  color: #38ef7d;
+  background: rgba(56, 239, 125, 0.16);
+  border: 1px solid rgba(56, 239, 125, 0.35);
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin-top: 1px;
+  letter-spacing: 0.2px;
 }
 
 .tray-empty-hint {

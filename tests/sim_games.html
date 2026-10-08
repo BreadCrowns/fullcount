@@ -284,9 +284,37 @@
           batterAdvantagePerk: b1.batterAdvantagePerk
         });
 
+        let b3 = null;
+        if (b2.isBattleBack) {
+          simState.currentPA = { beatResults: { beat1: b1, beat2: b2 } };
+          const pitcherPlay3 = executeBotPlayBeat(simState, pitchingRole, 'beat3');
+          simState.hands[pitchingRole] = pitcherPlay3.botHand;
+          const batterPlay3 = executeBotPlayBeat(simState, battingRole, 'beat3');
+          simState.hands[battingRole] = batterPlay3.botHand;
+
+          const chosenPitch3 = pitcherPlay3.pitchType || 'fastball';
+          if (simState.arsenalCharges[pitchingRole][chosenPitch3] > 0) {
+            simState.arsenalCharges[pitchingRole][chosenPitch3]--;
+          }
+          pitcherStats.pitches[chosenPitch3] = (pitcherStats.pitches[chosenPitch3] || 0) + 1;
+
+          b3 = resolveBeat3({
+            pitchType: pitcherPlay3.pitchType || 'fastball',
+            pitcherCardId: pitcherPlay3.cardId,
+            guessPitch: batterPlay3.guessPitch || 'fastball',
+            batterCardId: batterPlay3.cardId,
+            pitcherChar,
+            batterChar,
+            bases: simState.bases,
+            outs: simState.outs,
+            score: { batting: simState.score[half], pitching: simState.score[half === 'top' ? 'bottom' : 'top'] },
+          });
+        }
+
         const paResult = resolveSequentialPA({
           beat1: b1,
           beat2: b2,
+          beat3: b3,
           bases: simState.bases,
           pitcherChar,
           batterChar,

@@ -313,6 +313,67 @@
       report(wpModal?.textContent.includes('WILD PITCH IN THE DIRT'), 'Wild Pitch modal shows correct title');
       report(wpModal?.querySelector('.btn-wild-pitch-continue') !== null, 'Wild Pitch modal provides continue button');
 
+      // 7. Test Battle Back Result Modal (Beat 2 Battle-Back forcing Beat 3 Showdown)
+      soloPlayState.currentPA.phase = 'battle_back_result';
+      soloPlayState.currentPA.beat = 'beat3';
+      soloPlayState.currentPA.beatResults.beat2 = {
+        isBattleBack: true,
+        pitchType: 'fastball',
+        guessPitch: 'fastball',
+        pitchMatched: true,
+        pitcherCardVal: 7,
+        batterCardVal: 7,
+        pitcherBaseBonus: 6,
+        batterBaseBonus: 6,
+        pitcherEffectiveVal: 13,
+        batterEffectiveVal: 13,
+        timingDelta: 1,
+        ruleReason: 'Batter fouled off 2-strike pitch to battle back! Count runs full to 3-2!'
+      };
+      handleGameState(soloPlayState);
+      const bbModal = document.getElementById('battle-back-modal');
+      report(bbModal !== null, 'Battle Back modal renders in battle_back_result phase');
+      report(bbModal?.textContent.includes('BATTLED BACK!'), 'Battle Back modal shows dramatic battle back header');
+      report(bbModal?.textContent.includes('FULL COUNT SHOWDOWN FORCED!'), 'Battle Back modal highlights 3-2 Full Count showdown');
+      report(bbModal?.querySelector('.btn-battle-back-continue') !== null, 'Battle Back modal provides continue to showdown button');
+
+      // 7b. Test proceedToBeat3()
+      let bbUpdates = null;
+      window.db = {
+        ref: () => ({
+          once: (evt, cb) => {
+            const snap = { val: () => soloPlayState };
+            cb(snap);
+            return Promise.resolve(snap);
+          },
+          update: (updates) => {
+            bbUpdates = updates;
+            return Promise.resolve();
+          }
+        })
+      };
+      proceedToBeat3();
+      report(bbUpdates !== null, 'proceedToBeat3 executed gameRef.update()');
+      report(bbUpdates?.['currentPA/phase'] === 'placing', 'proceedToBeat3 transitions phase to placing');
+      report(bbUpdates?.['currentPA/beat'] === 'beat3', 'proceedToBeat3 transitions beat to beat3');
+      report(bbUpdates?.['currentPA/committed/host'] === false, 'proceedToBeat3 resets host committed status');
+      report(bbUpdates?.['currentPA/committed/guest'] === false, 'proceedToBeat3 resets guest committed status');
+      window.db = undefined;
+
+      // 8. Test Beat 3 Full Count Showdown placing
+      soloPlayState.currentPA.phase = 'placing';
+      soloPlayState.currentPA.beat = 'beat3';
+      handleGameState(soloPlayState);
+      const b3Html = document.getElementById('app').innerHTML;
+      report(b3Html.length > 100, `Beat 3 placing rendered successfully (${b3Html.length} chars)`);
+      report(document.querySelector('.beat3-banner') !== null, 'Beat 3 Full Count Showdown banner renders');
+      report(document.querySelector('.beat3-arena') !== null, 'Beat 3 arena class applied to battlefield');
+      const ratingBadges = document.querySelectorAll('.pt-rating-badge');
+      report(ratingBadges.length >= 3, `Base pitch rating badges render on diamond trays (found ${ratingBadges.length})`);
+      const b3LockBtn = document.getElementById('lock-btn');
+      report(b3LockBtn !== null, 'Lock-in button exists in Beat 3');
+      report(b3LockBtn?.textContent.includes('SHOWDOWN'), 'Lock-in button reflects SHOWDOWN context');
+
     } catch(e) {
       const p = document.createElement('p');
       p.className = 'fail';

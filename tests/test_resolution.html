@@ -404,20 +404,93 @@
 
 
 
-        // 14. Sequential 2-Beat PA Resolution
-        const seqPAResult = resolveSequentialPA({
-          beat1: b1PitcherWins,
-          beat2: b2HR,
-          bases: { first:false, second:false, third:false },
+        // 14. Character Base Pitch Ratings Tests
+        assert(typeof getPitcherPitchRating === 'function', 'getPitcherPitchRating helper is defined');
+        assert(typeof getBatterPitchRating === 'function', 'getBatterPitchRating helper is defined');
+        const pSmoke = PITCHER_CHARACTERS['PC04']; // Smoke Williams
+        const bBear = BATTER_CHARACTERS['BC01'];   // The Bear Mackintosh
+        assert(getPitcherPitchRating(pSmoke, 'fastball') === 6, 'Smoke Williams has +6 Fastball rating');
+        assert(getPitcherPitchRating(pSmoke, 'breaking') === 3, 'Smoke Williams has +3 Breaking rating');
+        assert(getBatterPitchRating(bBear, 'fastball') === 5, 'The Bear Mackintosh has +5 Fastball rating');
+        assert(getBatterPitchRating(bBear, 'breaking') === 2, 'The Bear Mackintosh has +2 Breaking rating');
+
+        // 15. Beat 2 Battle-Back Condition Tests
+        // 0-2 Count: Batter makes solid Delta 1 contact on read pitch -> Battles back to 3-2!
+        const b2BattleBack02 = resolveBeat2({
+          count: '0-2',
+          pitchType: 'fastball',
+          pitcherCardId: 'P13', // Val 7 + Smoke +6 = 13
+          guessPitch: 'fastball',
+          batterCardId: 'B2',  // Val 8 + Bear +5 = 13 (Timing Delta: |7 - 8| = 1)
+          pitcherChar: pSmoke,
+          batterChar: bBear,
+        });
+        assert(b2BattleBack02.isBattleBack === true, '0-2 Count with solid Delta 1 contact triggers battle back');
+        assert(b2BattleBack02.outcomeType === 'battle_back', '0-2 Battle back outcomeType is battle_back');
+        assert(b2BattleBack02.pitcherEffectiveVal === 13, `Pitcher effective value calculated correctly (${b2BattleBack02.pitcherEffectiveVal} == 13)`);
+        assert(b2BattleBack02.batterEffectiveVal === 13, `Batter effective value calculated correctly (${b2BattleBack02.batterEffectiveVal} == 13)`);
+
+        // 3-1 Count: Pitcher throws clutch strike on Delta 3-4 -> Battles back to 3-2!
+        const b2BattleBack31 = resolveBeat2({
+          count: '3-1',
+          pitchType: 'fastball',
+          pitcherCardId: 'P2',  // Val 9 (in range 6-10)
+          guessPitch: 'fastball',
+          batterCardId: 'B11', // Val 6 (in range 6-10, Timing Delta: |9 - 6| = 3)
           pitcherChar: PITCHER_CHARACTERS['PC01'],
           batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b2BattleBack31.isBattleBack === true, '3-1 Count with clutch strike Delta 3 triggers battle back');
+        assert(b2BattleBack31.outcomeType === 'battle_back', '3-1 Battle back outcomeType is battle_back');
+
+        // 16. Beat 3 Full Count Showdown (resolveBeat3) Tests
+        const b3ShowdownHR = resolveBeat3({
+          pitchType: 'fastball',
+          pitcherCardId: 'P8',  // Val 6 + Smoke +6 = 12
+          guessPitch: 'fastball',
+          batterCardId: 'B29', // Val 10 + Bear +5 = 15 (Margin: 15 - 12 = +3, Slugger bonus -> HR)
+          pitcherChar: pSmoke,
+          batterChar: bBear,
+        });
+        assert(b3ShowdownHR.outcomeType === 'homerun', `3-2 Full Count showdown barreled by slugger produces Home Run (${b3ShowdownHR.outcomeType})`);
+        assert(b3ShowdownHR.count === '3-2', 'Beat 3 count is 3-2');
+
+        const b3ShowdownWalk = resolveBeat3({
+          pitchType: 'fastball',
+          pitcherCardId: 'P13', // Val 7 + Smoke +6 = 13
+          guessPitch: 'fastball',
+          batterCardId: 'B2',  // Val 8 + Bear +5 = 13 (Margin: 0 -> Ball Four Walk)
+          pitcherChar: pSmoke,
+          batterChar: bBear,
+        });
+        assert(b3ShowdownWalk.outcomeType === 'walk', `3-2 Full Count showdown standoff (Margin 0) produces Walk`);
+
+        const b3ShowdownStrikeout = resolveBeat3({
+          pitchType: 'breaking',
+          pitcherCardId: 'P2',  // Val 9
+          guessPitch: 'fastball', // Fooled on pitch type
+          batterCardId: 'B1',  // Val 2
+          pitcherChar: PITCHER_CHARACTERS['PC01'],
+          batterChar: BATTER_CHARACTERS['BC01'],
+        });
+        assert(b3ShowdownStrikeout.outcomeType === 'k', `3-2 Full Count showdown fooled low card produces Strikeout`);
+
+        // 17. Sequential 3-Beat PA Resolution
+        const seq3BeatResult = resolveSequentialPA({
+          beat1: b1PitcherWins,
+          beat2: b2BattleBack02,
+          beat3: b3ShowdownHR,
+          bases: { first:false, second:false, third:false },
+          pitcherChar: pSmoke,
+          batterChar: bBear,
           score: { batting:0, pitching:0 },
           outs: 0,
           half: 'top'
         });
-        assert(seqPAResult && seqPAResult.outcome && seqPAResult.outcome.display, `Sequential PA resolves full outcome (${seqPAResult?.outcome?.display})`);
+        assert(seq3BeatResult && seq3BeatResult.z3 !== undefined, 'Sequential PA preserves Beat 3 outcome in z3');
+        assert(seq3BeatResult.outcome.type === 'homerun', 'Final PA outcome is governed by Beat 3 result');
 
-        // 15. Beat-Specific Solo Bot Decision Tests
+        // 18. Beat-Specific Solo Bot Decision Tests
         const botState = {
           half: 'top',
           arsenalCharges: { host: { fastball: 4, breaking: 2, offspeed: 1 } },
@@ -429,6 +502,10 @@
         const botBeat2 = executeBotPlayBeat(botState, 'guest', 'beat2');
         assert(botBeat2.guessPitch !== null, `Bot anticipates pitch for Beat 2 (${botBeat2.guessPitch})`);
         assert(botBeat2.cardId !== null, `Bot selects card for Beat 2 execution (${botBeat2.cardId})`);
+
+        const botBeat3 = executeBotPlayBeat(botState, 'guest', 'beat3');
+        assert(botBeat3.guessPitch !== null, `Bot anticipates pitch for Beat 3 showdown (${botBeat3.guessPitch})`);
+        assert(botBeat3.cardId !== null, `Bot selects card for Beat 3 showdown (${botBeat3.cardId})`);
 
         // 16. Full 3-Inning Sequential 2-Beat Game Simulation
         const simState = {
@@ -515,9 +592,36 @@
             batterAdvantagePerk: b1.batterAdvantagePerk,
           });
 
+          let b3 = null;
+          if (b2.isBattleBack) {
+            simState.currentPA = { beatResults: { beat1: b1, beat2: b2 } };
+            const pitcherPlay3 = executeBotPlayBeat(simState, pitchingRole, 'beat3');
+            simState.hands[pitchingRole] = pitcherPlay3.botHand;
+            const batterPlay3 = executeBotPlayBeat(simState, battingRole, 'beat3');
+            simState.hands[battingRole] = batterPlay3.botHand;
+
+            const chosenPitch3 = pitcherPlay3.pitchType || 'fastball';
+            if (simState.arsenalCharges[pitchingRole][chosenPitch3] > 0) {
+              simState.arsenalCharges[pitchingRole][chosenPitch3]--;
+            }
+
+            b3 = resolveBeat3({
+              pitchType: pitcherPlay3.pitchType || 'fastball',
+              pitcherCardId: pitcherPlay3.cardId,
+              guessPitch: batterPlay3.guessPitch || 'fastball',
+              batterCardId: batterPlay3.cardId,
+              pitcherChar,
+              batterChar,
+              bases: simState.bases,
+              outs: simState.outs,
+              score: { batting: simState.score[half], pitching: simState.score[half==='top'?'bottom':'top'] },
+            });
+          }
+
           const paResult = resolveSequentialPA({
             beat1: b1,
             beat2: b2,
+            beat3: b3,
             bases: simState.bases,
             pitcherChar,
             batterChar,

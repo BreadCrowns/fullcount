@@ -24,7 +24,7 @@ let myRole;      // 'host' | 'guest'
 let myUid;       // Simple UID
 
 // Local placement (not pushed until committed)
-let localPlacement   = { z1:[], z2:[] };
+let localPlacement   = { z1:[], z2:[], z3:[] };
 let localHand        = [];  // card IDs currently in hand
 let selectedCard     = null; // currently selected card ID from hand
 let localPitchChoice = null; // legacy alias
@@ -750,12 +750,13 @@ function startGame(g) {
     secondPlayerRole:  null,
     beatPlacements:    {
       beat1: { host:{}, guest:{} },
-      beat2: { host:{}, guest:{} }
+      beat2: { host:{}, guest:{} },
+      beat3: { host:{}, guest:{} }
     },
-    beatResults:       { beat1:null, beat2:null },
+    beatResults:       { beat1:null, beat2:null, beat3:null },
     placement: {
-      host:  { z1:[], z2:[] },
-      guest: { z1:[], z2:[] },
+      host:  { z1:[], z2:[], z3:[] },
+      guest: { z1:[], z2:[], z3:[] },
     },
     resolution:        null,
     isFirstPAOfInning: true,
@@ -833,6 +834,7 @@ function renderPlay(g) {
   switch(pa.phase) {
     case 'placing':           renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
     case 'beat1_result':      renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
+    case 'battle_back_result': renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
     case 'wild_pitch_result': renderPlacing(g, gs, pa, iAmBatting, iAmPitching, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
     case 'reveal':            renderReveal(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
     case 'resolved':          renderResolved(g, gs, pa, myPitcherChar, currentBatterChar, pitchingRole, battingRole, half); break;
@@ -879,35 +881,43 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
       lockBtnSub = `Card [${cardObj?.value ?? 0}]`;
       lockBtnDisabled = false;
     }
-  } else if (currentBeat === 'beat2') {
-    const b1 = pa?.beatResults?.beat1;
+  } else if (currentBeat === 'beat2' || currentBeat === 'beat3') {
+    const isBeat3 = (currentBeat === 'beat3');
     const cardObj = localBeatCard ? getCard(localBeatCard) : null;
     const cardVal = cardObj ? (cardObj.value || 0) : 0;
 
     if (iAmPitching) {
       const pRange = PITCH_RANGES[localPitchType] || { min: 1, max: 10 };
       const inRange = localBeatCard ? (cardVal >= pRange.min && cardVal <= pRange.max) : false;
+      const pBonus = (typeof getPitcherPitchRating === 'function')
+        ? getPitcherPitchRating(pitcherChar, localPitchType)
+        : (pitcherChar?.pitchRatings?.[localPitchType] ?? 0);
+      const effVal = cardVal + pBonus;
 
       if (!localBeatCard) {
-        lockBtnLabel = 'CHOOSE CARD';
-        lockBtnSub = `${localPitchType.toUpperCase()} &bull; Timing Range [${pRange.min}–${pRange.max}]`;
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN PITCH' : 'CHOOSE CARD';
+        lockBtnSub = `${localPitchType.toUpperCase()} (+${pBonus} Arm) &bull; Timing Range [${pRange.min}–${pRange.max}]`;
         lockBtnDisabled = true;
       } else {
-        lockBtnLabel = 'LOCK IN PITCH';
-        lockBtnSub = `${localPitchType.toUpperCase()} &bull; Card [${cardVal}] ${inRange ? '✓ In Timing Range' : '⚠ Out of Range'}`;
+        lockBtnLabel = isBeat3 ? 'LOCK IN SHOWDOWN PITCH' : 'LOCK IN PITCH';
+        lockBtnSub = `${localPitchType.toUpperCase()} (+${pBonus} Arm) &bull; Card [${cardVal}] = [${effVal}] ${inRange ? '✓ In Timing Range' : '⚠ Out of Range'}`;
         lockBtnDisabled = false;
       }
     } else {
       const bRange = PITCH_RANGES[localGuessPitch] || { min: 1, max: 10 };
       const inRange = localBeatCard ? (cardVal >= bRange.min && cardVal <= bRange.max) : false;
+      const bBonus = (typeof getBatterPitchRating === 'function')
+        ? getBatterPitchRating(batterChar, localGuessPitch)
+        : (batterChar?.pitchRatings?.[localGuessPitch] ?? 0);
+      const effVal = cardVal + bBonus;
 
       if (!localBeatCard) {
-        lockBtnLabel = 'CHOOSE CARD';
-        lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} &bull; Timing Range [${bRange.min}–${bRange.max}]`;
+        lockBtnLabel = isBeat3 ? 'CHOOSE SHOWDOWN SWING' : 'CHOOSE CARD';
+        lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} (+${bBonus} Pow) &bull; Timing Range [${bRange.min}–${bRange.max}]`;
         lockBtnDisabled = true;
       } else {
-        lockBtnLabel = 'LOCK IN SWING';
-        lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} &bull; Card [${cardVal}] ${inRange ? '✓ In Timing Range' : '⚠ Out of Range'}`;
+        lockBtnLabel = isBeat3 ? 'LOCK IN SHOWDOWN SWING' : 'LOCK IN SWING';
+        lockBtnSub = `LOOKING ${localGuessPitch.toUpperCase()} (+${bBonus} Pow) &bull; Card [${cardVal}] = [${effVal}] ${inRange ? '✓ In Timing Range' : '⚠ Out of Range'}`;
         lockBtnDisabled = false;
       }
     }
@@ -952,7 +962,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
             </div>
           </div>
           <div class="dock-controls-row">
-            <span class="placed-indicator">Beat <b>${currentBeat === 'beat1' ? '1' : '2'}</b> &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1</span>
+            <span class="placed-indicator">Beat <b>${currentBeat === 'beat1' ? '1' : (currentBeat === 'beat2' ? '2' : '3')}</b> &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1</span>
             ${canSub ? `<button class="btn-relief" onclick="substitutePitcher('${reliefId}')">Relief</button>` : ''}
           </div>
         </div>
@@ -980,6 +990,9 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
 
       <!-- BEAT 1 RESULT MODAL POP-UP (WHEN IN BEAT 1 RESULT PHASE) -->
       ${pa.phase === 'beat1_result' ? renderBeat1ResultModal(pa.beatResults?.beat1, pitchingRole === myRole) : ''}
+
+      <!-- BATTLE BACK RESULT MODAL POP-UP (WHEN IN BATTLE BACK RESULT PHASE) -->
+      ${pa.phase === 'battle_back_result' ? renderBattleBackModal(pa.beatResults?.beat2, pitchingRole === myRole) : ''}
 
       <!-- WILD PITCH MODAL POP-UP (WHEN IN WILD PITCH RESULT PHASE) -->
       ${pa.phase === 'wild_pitch_result' ? renderWildPitchModal(pa.resolution, battingRole === myRole) : ''}
@@ -1272,6 +1285,7 @@ function renderBeat2AdvantageBanner(b1Data, iAmBatting, iAmPitching) {
 // ── ON-FIELD PLAYER STATS & SCOUTING REPORT BADGES ─────────────────────────
 function renderFieldPitcherInfo(pitcherChar, charges, isFatigued, isUserPitching, count) {
   const pCharges = charges || pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 };
+  const pRatings = pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
   const name = pitcherChar?.name || 'Pitcher';
   const label = isUserPitching ? 'YOU' : 'OPP';
   const isOffspeedLocked = (count === '3-1');
@@ -1286,20 +1300,20 @@ function renderFieldPitcherInfo(pitcherChar, charges, isFatigued, isUserPitching
         </div>
         <div class="field-scout-chips">
           <span class="scout-chip ${pCharges?.fastball > 0 ? '' : 'exhausted'}"
-                onclick="handleTooltipClick(event, 'Pitch Repertoire: Fastball', 'Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
-                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Fastball', 'Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
+                onclick="handleTooltipClick(event, 'Pitch Repertoire: Fastball', 'Base Arm: +${pRatings.fastball}. Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
+                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Fastball', 'Base Arm: +${pRatings.fastball}. Execution window: [6–10 Heat]. High velocity pitch. Remaining: ${pCharges?.fastball ?? 0}')"
                 ontouchend="handleTooltipTouchEnd(event)"
-                title="Fastball (6-10)">FB <b>${pCharges?.fastball ?? 0}</b> <small>[6–10]</small></span>
+                title="Fastball (+${pRatings.fastball} Arm, 6-10)">FB <b>+${pRatings.fastball}</b> <small>[${pCharges?.fastball ?? 0}]</small></span>
           <span class="scout-chip ${pCharges?.breaking > 0 ? '' : 'exhausted'}"
-                onclick="handleTooltipClick(event, 'Pitch Repertoire: Breaking', 'Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
-                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Breaking', 'Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
+                onclick="handleTooltipClick(event, 'Pitch Repertoire: Breaking', 'Base Spin: +${pRatings.breaking}. Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
+                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Breaking', 'Base Spin: +${pRatings.breaking}. Execution window: [3–7 Bite]. Sharp breaking pitch. Remaining: ${pCharges?.breaking ?? 0}')"
                 ontouchend="handleTooltipTouchEnd(event)"
-                title="Breaking (3-7)">BR <b>${pCharges?.breaking ?? 0}</b> <small>[3–7]</small></span>
+                title="Breaking (+${pRatings.breaking} Spin, 3-7)">BR <b>+${pRatings.breaking}</b> <small>[${pCharges?.breaking ?? 0}]</small></span>
           <span class="scout-chip ${isOffspeedLocked ? 'locked' : (pCharges?.offspeed > 0 ? '' : 'exhausted')}"
-                onclick="handleTooltipClick(event, 'Pitch Repertoire: Offspeed', '${isOffspeedLocked ? 'Offspeed locked out due to 3-1 Hitter Count advantage!' : `Execution window: [1–5 Touch]. Offspeed changeup. Remaining: ${pCharges?.offspeed ?? 0}`}')"
-                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Offspeed', '${isOffspeedLocked ? 'Offspeed locked out due to 3-1 Hitter Count advantage!' : `Execution window: [1–5 Touch]. Offspeed changeup. Remaining: ${pCharges?.offspeed ?? 0}`}')"
+                onclick="handleTooltipClick(event, 'Pitch Repertoire: Offspeed', '${isOffspeedLocked ? 'Offspeed locked out due to 3-1 Hitter Count advantage!' : `Base Touch: +${pRatings.offspeed}. Execution window: [1–5 Touch]. Offspeed changeup. Remaining: ${pCharges?.offspeed ?? 0}`}')"
+                ontouchstart="handleTooltipTouchStart(event, 'Pitch Repertoire: Offspeed', '${isOffspeedLocked ? 'Offspeed locked out due to 3-1 Hitter Count advantage!' : `Base Touch: +${pRatings.offspeed}. Execution window: [1–5 Touch]. Offspeed changeup. Remaining: ${pCharges?.offspeed ?? 0}`}')"
                 ontouchend="handleTooltipTouchEnd(event)"
-                title="Offspeed (1-5)">OFF <b>${isOffspeedLocked ? 'LOCKED' : (pCharges?.offspeed ?? 0)}</b> <small>${isOffspeedLocked ? '🔒' : '[1–5]'}</small></span>
+                title="Offspeed (+${pRatings.offspeed} Touch, 1-5)">OFF <b>+${pRatings.offspeed}</b> <small>${isOffspeedLocked ? '🔒' : `[${pCharges?.offspeed ?? 0}]`}</small></span>
         </div>
       </div>
     </div>`;
@@ -1309,6 +1323,7 @@ function renderFieldBatterInfo(batterChar, isUserBatting, count) {
   const name = batterChar?.name || 'Batter';
   const bScout = batterChar?.scoutingReport || { favoritePitch: 'fastball' };
   const fav = (bScout.favoritePitch || 'fastball').toUpperCase();
+  const bRatings = batterChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
   const label = isUserBatting ? 'YOU' : 'OPP';
   return `
     <div class="field-player-card batter-info-card">
@@ -1329,6 +1344,15 @@ function renderFieldBatterInfo(batterChar, isUserBatting, count) {
                 ontouchstart="handleTooltipTouchStart(event, 'Favorite Pitch: ${fav}', 'When anticipating their favorite pitch, barreled timing produces extra bases (HR/2B)!')"
                 ontouchend="handleTooltipTouchEnd(event)"
                 title="Favorite Pitch">⭐ HUNTS: <b>${fav}</b></span>
+          <span class="scout-chip"
+                onclick="handleTooltipClick(event, 'Batter Power vs Fastball', 'Base Fastball Power: +${bRatings.fastball}. Added to card value when anticipating fastball.')"
+                title="Fastball Power (+${bRatings.fastball})">FB <b>+${bRatings.fastball}</b></span>
+          <span class="scout-chip"
+                onclick="handleTooltipClick(event, 'Batter Vision vs Breaking', 'Base Breaking Vision: +${bRatings.breaking}. Added to card value when anticipating breaking ball.')"
+                title="Breaking Vision (+${bRatings.breaking})">BR <b>+${bRatings.breaking}</b></span>
+          <span class="scout-chip"
+                onclick="handleTooltipClick(event, 'Batter Discipline vs Offspeed', 'Base Offspeed Discipline: +${bRatings.offspeed}. Added to card value when anticipating changeup.')"
+                title="Offspeed Discipline (+${bRatings.offspeed})">OFF <b>+${bRatings.offspeed}</b></span>
         </div>
       </div>
     </div>`;
@@ -1570,15 +1594,20 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     `;
 
   } else {
-    // ── BEAT 2: THE PAYOFF PITCH ON THE BASEBALL DIAMOND ──
-    const isDominant = Boolean(b1Data?.isDominant);
-    const disAdvSide = b1Data?.revealCardFirst;
+    // ── BEAT 2 / BEAT 3: THE PAYOFF PITCH ON THE BASEBALL DIAMOND ──
+    const isBeat3 = (currentBeat === 'beat3');
+    const placedZone = isBeat3 ? 'z3' : 'z2';
+    const pitcherRatings = pitcherChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+    const batterRatings = batterChar?.pitchRatings || { fastball: 3, breaking: 2, offspeed: 1 };
+
+    const isDominant = !isBeat3 && Boolean(b1Data?.isDominant);
+    const disAdvSide = !isBeat3 ? b1Data?.revealCardFirst : null;
     const battingRole = (pitchingRole === 'host') ? 'guest' : 'host';
     const disAdvRole = (disAdvSide === 'pitcher') ? pitchingRole : (disAdvSide === 'batter' ? battingRole : null);
     const isOppDisadvantaged = Boolean(disAdvRole && disAdvRole === oppKey);
     const amIDisadvantaged = Boolean(disAdvRole && disAdvRole === myKey);
 
-    const isOffspeedLocked = (count === '3-1') || (b1Data?.lockedOption === 'offspeed');
+    const isOffspeedLocked = !isBeat3 && ((count === '3-1') || (b1Data?.lockedOption === 'offspeed'));
     if (isOffspeedLocked) {
       if (!iAmBatting && localPitchType === 'offspeed') localPitchType = 'fastball';
       if (iAmBatting && localGuessPitch === 'offspeed') localGuessPitch = 'fastball';
@@ -1640,7 +1669,8 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
               <span class="pt-charges">${charges.fastball ?? 0}</span>
             </div>
             <div class="pt-range">[6–10 Heat]</div>
-            ${(localBeatCard && localPitchType === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            <span class="pt-rating-badge">+${pitcherRatings.fastball} Arm</span>
+            ${(localBeatCard && localPitchType === 'fastball') ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
           </div>
 
           <!-- Breaking -->
@@ -1653,14 +1683,15 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
                ondrop="handleTrayDrop(event, 'breaking', 'mound')"
                onclick="handleTrayClick('breaking', 'mound')"
                data-tooltip-title="Breaking Ball [3–7 Bite]"
-               data-tooltip-body="Spin and bite. Target window is 3–7. Effective against balanced swings. Remaining: ${charges.breaking}">
+               data-tooltip-body="Base Spin: +${pitcherRatings.breaking}. Target window is 3–7. Effective against balanced swings. Remaining: ${charges.breaking}">
             <div class="pt-header">
               <span class="pt-icon">🌀</span>
               <span class="pt-name">Breaking</span>
               <span class="pt-charges">${charges.breaking ?? 0}</span>
             </div>
             <div class="pt-range">[3–7 Bite]</div>
-            ${(localBeatCard && localPitchType === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            <span class="pt-rating-badge">+${pitcherRatings.breaking} Spin</span>
+            ${(localBeatCard && localPitchType === 'breaking') ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
           </div>
 
           <!-- Offspeed -->
@@ -1673,14 +1704,15 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
                ondrop="${isOffspeedLocked ? '' : 'handleTrayDrop(event, \'offspeed\', \'mound\')'}"
                onclick="${isOffspeedLocked ? '' : 'handleTrayClick(\'offspeed\', \'mound\')'}"
                data-tooltip-title="Offspeed [1–5 Touch]"
-               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out due to 3-1 Hitter Count penalty!' : `Deception & touch. Target window is 1–5. Disables power bats. Remaining: ${charges.offspeed}`}">
+               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out due to 3-1 Hitter Count penalty!' : `Base Touch: +${pitcherRatings.offspeed}. Target window is 1–5. Disables power bats. Remaining: ${charges.offspeed}`}">
             <div class="pt-header">
               <span class="pt-icon">${isOffspeedLocked ? '🔒' : '⏱️'}</span>
               <span class="pt-name">Offspeed</span>
               <span class="pt-charges">${isOffspeedLocked ? 'LOCKED' : (charges.offspeed ?? 0)}</span>
             </div>
             <div class="pt-range">${isOffspeedLocked ? '3-1 Lockout' : '[1–5 Touch]'}</div>
-            ${(localBeatCard && localPitchType === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
+            <span class="pt-rating-badge">+${pitcherRatings.offspeed} Touch</span>
+            ${(localBeatCard && localPitchType === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
           </div>
         </div>
       `;
@@ -1711,14 +1743,15 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
                ondrop="handleTrayDrop(event, 'fastball', 'plate')"
                onclick="handleTrayClick('fastball', 'plate')"
                data-tooltip-title="Anticipate Fastball [6–10]"
-               data-tooltip-body="Anticipate high velocity. Target timing window is 6–10.${bScout.favoritePitch === 'fastball' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
+               data-tooltip-body="Base Power: +${batterRatings.fastball}. Target timing window is 6–10.${bScout.favoritePitch === 'fastball' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
             <div class="pt-header">
               <span class="pt-icon">🔥</span>
               <span class="pt-name">Fastball</span>
               ${bScout.favoritePitch === 'fastball' ? '<span class="pt-fav-tag">⭐ FAV</span>' : ''}
             </div>
             <div class="pt-range">[6–10]</div>
-            ${(localBeatCard && localGuessPitch === 'fastball') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            <span class="pt-rating-badge">+${batterRatings.fastball} Pow</span>
+            ${(localBeatCard && localGuessPitch === 'fastball') ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
           </div>
 
           <!-- Breaking -->
@@ -1731,14 +1764,15 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
                ondrop="handleTrayDrop(event, 'breaking', 'plate')"
                onclick="handleTrayClick('breaking', 'plate')"
                data-tooltip-title="Anticipate Breaking [3–7]"
-               data-tooltip-body="Anticipate spin & break. Target timing window is 3–7.${bScout.favoritePitch === 'breaking' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
+               data-tooltip-body="Base Vision: +${batterRatings.breaking}. Target timing window is 3–7.${bScout.favoritePitch === 'breaking' ? ' ⭐ Favorite pitch: barreled contact produces extra bases!' : ''}">
             <div class="pt-header">
               <span class="pt-icon">🌀</span>
               <span class="pt-name">Breaking</span>
               ${bScout.favoritePitch === 'breaking' ? '<span class="pt-fav-tag">⭐ FAV</span>' : ''}
             </div>
             <div class="pt-range">[3–7]</div>
-            ${(localBeatCard && localGuessPitch === 'breaking') ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
+            <span class="pt-rating-badge">+${batterRatings.breaking} Vis</span>
+            ${(localBeatCard && localGuessPitch === 'breaking') ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : '<div class="tray-empty-hint">+ Drop Card</div>'}
           </div>
 
           <!-- Offspeed -->
@@ -1751,14 +1785,15 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
                ondrop="${isOffspeedLocked ? '' : 'handleTrayDrop(event, \'offspeed\', \'plate\')'}"
                onclick="${isOffspeedLocked ? '' : 'handleTrayClick(\'offspeed\', \'plate\')'}"
                data-tooltip-title="Anticipate Offspeed [1–5]"
-               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out on 3-1 count!' : `Anticipate touch & changeup. Target timing window is 1–5.${bScout.favoritePitch === 'offspeed' ? ' ⭐ Favorite pitch!' : ''}`}">
+               data-tooltip-body="${isOffspeedLocked ? 'Offspeed is locked out on 3-1 count!' : `Base Discipline: +${batterRatings.offspeed}. Target timing window is 1–5.${bScout.favoritePitch === 'offspeed' ? ' ⭐ Favorite pitch!' : ''}`}">
             <div class="pt-header">
               <span class="pt-icon">${isOffspeedLocked ? '🔒' : '⏱️'}</span>
               <span class="pt-name">Offspeed</span>
               ${isOffspeedLocked ? '<span class="pt-fav-tag">LOCKED</span>' : (bScout.favoritePitch === 'offspeed' ? '<span class="pt-fav-tag">⭐ FAV</span>' : '')}
             </div>
             <div class="pt-range">${isOffspeedLocked ? '3-1 Lockout' : '[1–5]'}</div>
-            ${(localBeatCard && localGuessPitch === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, 'z2', !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
+            <span class="pt-rating-badge">+${batterRatings.offspeed} Dis</span>
+            ${(localBeatCard && localGuessPitch === 'offspeed' && !isOffspeedLocked) ? renderMiniPlacedCard(localBeatCard, placedZone, !myCommitted) : (isOffspeedLocked ? '<div class="tray-locked-hint">🔒 Locked</div>' : '<div class="tray-empty-hint">+ Drop Card</div>')}
           </div>
         </div>
       `;
@@ -1773,22 +1808,32 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
     }
 
     // Execution range feedback
+    const curBonus = !iAmBatting ? (pitcherRatings[curPitch] ?? 0) : (batterRatings[curPitch] ?? 0);
+    const effVal = (cardVal !== null) ? cardVal + curBonus : null;
+    const bonusType = !iAmBatting ? (curPitch === 'fastball' ? 'Arm' : curPitch === 'breaking' ? 'Spin' : 'Touch') : (curPitch === 'fastball' ? 'Pow' : curPitch === 'breaking' ? 'Vis' : 'Dis');
     const execFeedbackHtml = (cardVal !== null) ? `
       <div class="diamond-exec-pill ${inRange ? 'pass' : 'fail'}">
-        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}]</span>
-        <span>${inRange ? `🟢 IN RANGE [Card ${cardVal}]` : `⚠️ OUT OF RANGE [Card ${cardVal}]`}</span>
+        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}] (+${curBonus} ${bonusType})</span>
+        <span>${inRange ? `🟢 IN RANGE [Card ${cardVal} + ${curBonus} = ${effVal}]` : `⚠️ OUT OF RANGE [Card ${cardVal} + ${curBonus} = ${effVal}]`}</span>
       </div>
     ` : `
       <div class="diamond-exec-pill waiting">
-        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}]</span>
+        <span>${!iAmBatting ? curPitch.toUpperCase() : `LOOKING ${curPitch.toUpperCase()}`} [${curRange.label}] (+${curBonus} ${bonusType})</span>
         <span>Drag a card to a tray</span>
       </div>
     `;
 
     mainContentHtml = `
-      <div class="beat2-arena diamond-arena">
-        ${renderBeat2AdvantageBanner(b1Data, iAmBatting, !iAmBatting)}
-        ${disAdvNoticeHtml}
+      <div class="${isBeat3 ? 'beat3-arena' : 'beat2-arena'} diamond-arena">
+        ${isBeat3 ? `
+          <div class="beat3-banner count-full" onclick="handleTooltipClick(event, 'Beat 3: 3-2 Full Count Showdown', 'Both players battled to a full count! All pitch options and swings are live in this climactic final payoff showdown.')">
+            <span class="b1-title">⚡ BEAT 3: 3-2 FULL COUNT SHOWDOWN <span class="adv-info-icon">ⓘ</span></span>
+            <span class="b1-subtitle">Disadvantaged player fought back! Climactic payoff pitch &amp; swing</span>
+          </div>
+        ` : `
+          ${renderBeat2AdvantageBanner(b1Data, iAmBatting, !iAmBatting)}
+          ${disAdvNoticeHtml}
+        `}
 
         <div class="diamond-field">
           <div class="infield-dirt"></div>
@@ -1905,7 +1950,7 @@ function isCardActiveForRole(card, iAmBatting, iAmPitching) {
 
 function isInPlacement(cardId) {
   if (localBeatCard === cardId) return true;
-  return ['z1','z2'].some(z => (localPlacement[z] || []).includes(cardId));
+  return ['z1','z2','z3'].some(z => (localPlacement[z] || []).includes(cardId));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1972,6 +2017,11 @@ function commitPlacement() {
       alert('Please choose an execution card from your hand for the Payoff Pitch.');
       return;
     }
+  } else if (currentBeat === 'beat3') {
+    if (!localBeatCard) {
+      alert('Please choose an execution card from your hand for the 3-2 Full Count Showdown.');
+      return;
+    }
   }
 
   const btn = document.getElementById('lock-btn');
@@ -1988,8 +2038,8 @@ function commitPlacement() {
   }
   localHand = newHand;
 
-  const targetZone = (currentBeat === 'beat1') ? 'z1' : 'z2';
-  const updatedLocalPlacement = { ...(pa.placement?.[myRole] || { z1:[], z2:[] }) };
+  const targetZone = (currentBeat === 'beat1') ? 'z1' : (currentBeat === 'beat2' ? 'z2' : 'z3');
+  const updatedLocalPlacement = { ...(pa.placement?.[myRole] || { z1:[], z2:[], z3:[] }) };
   if (localBeatCard) {
     updatedLocalPlacement[targetZone] = [localBeatCard];
   }
@@ -2018,7 +2068,7 @@ function commitPlacement() {
     if (currentBeat === 'beat1') {
       if (isBot && myRole === 'host') {
         const botPlay = executeBotPlayBeat({ ...liveGS, currentPA: livePA }, 'guest', 'beat1');
-        const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
+        const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[], z3:[] }) };
         if (botPlay.cardId) {
           updatedBotPlacement.z1 = [botPlay.cardId];
         }
@@ -2054,12 +2104,38 @@ function commitPlacement() {
             ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
             : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
 
-          const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[] }) };
+          const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[], z3:[] }) };
           if (botPlay.cardId) {
             updatedBotPlacement.z2 = [botPlay.cardId];
           }
 
           updates['currentPA/beatPlacements/beat2/guest'] = botBeatPlacement;
+          updates['currentPA/placement/guest']           = updatedBotPlacement;
+          updates['currentPA/committed/guest']           = true;
+          updates['gameState/hands/guest']               = botPlay.botHand || [];
+        }
+        shouldResolve = true;
+      } else {
+        const oppRole = opponentRole();
+        if (livePA.committed?.[oppRole]) {
+          shouldResolve = true;
+        }
+      }
+    } else if (currentBeat === 'beat3') {
+      if (isBot && myRole === 'host') {
+        if (!livePA.committed?.guest) {
+          const botPlay = executeBotPlayBeat({ ...liveGS, currentPA: livePA }, 'guest', 'beat3');
+          const botIsPitching = (liveGS.half === 'bottom');
+          const botBeatPlacement = botIsPitching
+            ? { pitchType: botPlay.pitchType || 'fastball', cardId: botPlay.cardId || null }
+            : { guessPitch: botPlay.guessPitch || 'fastball', cardId: botPlay.cardId || null };
+
+          const updatedBotPlacement = { ...(livePA.placement?.guest || { z1:[], z2:[], z3:[] }) };
+          if (botPlay.cardId) {
+            updatedBotPlacement.z3 = [botPlay.cardId];
+          }
+
+          updates['currentPA/beatPlacements/beat3/guest'] = botBeatPlacement;
           updates['currentPA/placement/guest']           = updatedBotPlacement;
           updates['currentPA/committed/guest']           = true;
           updates['gameState/hands/guest']               = botPlay.botHand || [];
@@ -2195,6 +2271,22 @@ function resolveBeatStep(beat) {
           batterAdvantagePerk: beat1Result.batterAdvantagePerk,
         });
 
+        // Battle Back: disadvantaged player battles back to force 3-2 Full Count!
+        if (beat2Result.isBattleBack) {
+          const updates = {
+            'currentPA/phase': 'battle_back_result',
+            'currentPA/beat': 'beat3',
+            'currentPA/committed/host': false,
+            'currentPA/committed/guest': false,
+            'currentPA/beatResults/beat2': beat2Result,
+            [`currentPA/placement/${pitchingRole}/z2`]: pitcherCardId ? [pitcherCardId] : [],
+            [`currentPA/placement/${battingRole}/z2`]:  batterCardId ? [batterCardId] : [],
+            'gameState/arsenalCharges': charges,
+          };
+          gameRef().update(updates);
+          return;
+        }
+
         // Spoil It: fouls off an out, resetting Beat 2
         if (beat2Result.isFoulBall) {
           const updates = {
@@ -2240,6 +2332,51 @@ function resolveBeatStep(beat) {
         const res = resolveSequentialPA({
           beat1: beat1Result,
           beat2: beat2Result,
+          bases,
+          pitcherChar,
+          batterChar,
+          score,
+          outs,
+          half
+        });
+        finalizePA(g, res, charges);
+
+      } else if (beat === 'beat3') {
+        const beat1Result = pa.beatResults?.beat1 || {};
+        const beat2Result = pa.beatResults?.beat2 || {};
+        const pitcherCardId = pPlacements.cardId || null;
+        const pitchType = pPlacements.pitchType || 'fastball';
+
+        const batterCardId = bPlacements.cardId || null;
+        const guessPitch = bPlacements.guessPitch || 'fastball';
+
+        // Deduct pitch charge
+        const charges = { ...(gs.arsenalCharges || {}) };
+        if (!charges[pitchingRole]) {
+          charges[pitchingRole] = { ...(pitcherChar?.repertoire || { fastball: 4, breaking: 3, offspeed: 2 }) };
+        } else {
+          charges[pitchingRole] = { ...charges[pitchingRole] };
+        }
+        if ((charges[pitchingRole][pitchType] || 0) > 0) {
+          charges[pitchingRole][pitchType]--;
+        }
+
+        const beat3Result = resolveBeat3({
+          pitchType,
+          pitcherCardId,
+          guessPitch,
+          batterCardId,
+          pitcherChar,
+          batterChar,
+          bases,
+          outs,
+          score,
+        });
+
+        const res = resolveSequentialPA({
+          beat1: beat1Result,
+          beat2: beat2Result,
+          beat3: beat3Result,
           bases,
           pitcherChar,
           batterChar,
@@ -2377,14 +2514,14 @@ function nextPA() {
       if (!Array.isArray(gs.batterDiscards.guest)) gs.batterDiscards.guest = [];
 
       const playedCards = { host: [], guest: [] };
-      ['beat1', 'beat2'].forEach(b => {
+      ['beat1', 'beat2', 'beat3'].forEach(b => {
         ['host', 'guest'].forEach(r => {
           const cId = pa.beatPlacements?.[b]?.[r]?.cardId;
           if (cId && !playedCards[r].includes(cId)) playedCards[r].push(cId);
         });
       });
       ['host', 'guest'].forEach(r => {
-        ['z1', 'z2'].forEach(z => {
+        ['z1', 'z2', 'z3'].forEach(z => {
           (pa.placement?.[r]?.[z] || []).forEach(cId => {
             if (!playedCards[r].includes(cId)) playedCards[r].push(cId);
           });
@@ -2444,10 +2581,10 @@ function nextPA() {
         updates['currentPA/firstRevealedCard'] = null;
         updates['currentPA/firstPlayerRole']   = null;
         updates['currentPA/secondPlayerRole']  = null;
-        updates['currentPA/beatPlacements']    = { beat1: { host:{}, guest:{} }, beat2: { host:{}, guest:{} } };
-        updates['currentPA/beatResults']       = { beat1: null, beat2: null };
-        updates['currentPA/placement/host']    = { z1:[], z2:[] };
-        updates['currentPA/placement/guest']   = { z1:[], z2:[] };
+        updates['currentPA/beatPlacements']    = { beat1: { host:{}, guest:{} }, beat2: { host:{}, guest:{} }, beat3: { host:{}, guest:{} } };
+        updates['currentPA/beatResults']       = { beat1: null, beat2: null, beat3: null };
+        updates['currentPA/placement/host']    = { z1:[], z2:[], z3:[] };
+        updates['currentPA/placement/guest']   = { z1:[], z2:[], z3:[] };
         updates['currentPA/resolution']        = null;
         updates['currentPA/isFirstPAOfInning'] = false;
       }
@@ -2460,7 +2597,7 @@ function nextPA() {
         localPitchType   = 'fastball';
         localGuessPitch  = 'fastball';
         localSwingType   = 'balanced';
-        localPlacement   = { z1:[], z2:[] };
+        localPlacement   = { z1:[], z2:[], z3:[] };
       }).catch(err => {
         console.error('nextPA update error:', err);
         showError('Next batter error: ' + err.message);
@@ -2795,6 +2932,119 @@ function proceedToBeat2() {
 }
 window.proceedToBeat2 = proceedToBeat2;
 
+function renderBattleBackModal(b2, isPitcherMe) {
+  if (!b2) return '';
+  const pCard = b2.pitcherCardId ? getCard(b2.pitcherCardId) : null;
+  const bCard = b2.batterCardId ? getCard(b2.batterCardId) : null;
+  const pVal = pCard?.value ?? b2.pitcherCardVal ?? '—';
+  const bVal = bCard?.value ?? b2.batterCardVal ?? '—';
+  const pPitch = (b2.pitchType || 'fastball').toUpperCase();
+  const bGuess = (b2.guessPitch || 'fastball').toUpperCase();
+  const pBonus = b2.pitcherBaseBonus ?? 0;
+  const bBonus = b2.batterBaseBonus ?? 0;
+  const pEff = b2.pitcherEffectiveVal ?? pVal;
+  const bEff = b2.batterEffectiveVal ?? bVal;
+
+  const myRoleTag = isPitcherMe ? '⚾ You (Pitcher)' : '🏏 You (Batter)';
+  const oppRoleTag = isPitcherMe ? '🏏 Opponent (Batter)' : '⚾ Opponent (Pitcher)';
+
+  const myVal = isPitcherMe ? pVal : bVal;
+  const myPitchLabel = isPitcherMe ? `Threw <b>${pPitch}</b>` : `Looking <b>${bGuess}</b>`;
+  const myStatLabel = isPitcherMe ? `+${pBonus} Arm` : `+${bBonus} ${b2.pitchMatched ? 'Power' : 'Bonus'}`;
+  const myEff = isPitcherMe ? pEff : bEff;
+
+  const oppVal = isPitcherMe ? bVal : pVal;
+  const oppPitchLabel = isPitcherMe ? `Looking <b>${bGuess}</b>` : `Threw <b>${pPitch}</b>`;
+  const oppStatLabel = isPitcherMe ? `+${bBonus} ${b2.pitchMatched ? 'Power' : 'Bonus'}` : `+${pBonus} Arm`;
+  const oppEff = isPitcherMe ? bEff : pEff;
+
+  const reason = b2.ruleReason || b2.outcome?.ruleReason || 'Disadvantaged player fought back to stay alive! The count runs full to 3-2!';
+
+  return `
+    <div class="result-modal-overlay" id="battle-back-modal">
+      <div class="result-modal-card">
+        <div class="rm-header">
+          <span class="rm-tag">BEAT 2 RESULT &bull; THE CLASH</span>
+          <span class="rm-suspense-label">⚡ BATTLED BACK!</span>
+          <span class="rm-winner-pill count-full">⚖️ COUNT TIED 3-2</span>
+        </div>
+
+        <div class="rm-cards-compare">
+          <div class="rm-player-box mine anticipate-flip-p">
+            <span class="rm-role">${myRoleTag}</span>
+            <div class="number-card sm selected">
+              <span class="card-hero-num">${myVal}</span>
+            </div>
+            <div class="rm-card-meta">${myPitchLabel}</div>
+            <div class="rm-eff-calc">Card ${myVal} [${myStatLabel}] = <b>${myEff}</b></div>
+          </div>
+          <div class="rm-vs anticipate-vs">VS</div>
+          <div class="rm-player-box opp anticipate-flip-b">
+            <span class="rm-role">${oppRoleTag}</span>
+            <div class="number-card sm selected">
+              <span class="card-hero-num">${oppVal}</span>
+            </div>
+            <div class="rm-card-meta">${oppPitchLabel}</div>
+            <div class="rm-eff-calc">Card ${oppVal} [${oppStatLabel}] = <b>${oppEff}</b></div>
+          </div>
+        </div>
+
+        <div class="rm-count-banner count-full anticipate-banner">
+          <div class="rm-count-num">3-2</div>
+          <div class="rm-count-label">FULL COUNT SHOWDOWN FORCED!</div>
+        </div>
+
+        <div class="rm-explanation anticipate-explain">
+          <div class="rre-text">${reason}</div>
+          <div style="margin-top:8px;font-size:0.75rem;color:var(--text-secondary);">
+            Both players now advance to <b>Beat 3: 3-2 Full Count Showdown</b>! All pitches and anticipation are back in play.
+          </div>
+        </div>
+
+        <button class="btn-primary rm-btn btn-battle-back-continue anticipate-btn" onclick="proceedToBeat3()">
+          Proceed to 3-2 Full Count Showdown &rarr;
+        </button>
+      </div>
+    </div>`;
+}
+window.renderBattleBackModal = renderBattleBackModal;
+
+function proceedToBeat3() {
+  const btn = document.querySelector('#battle-back-modal .rm-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-icon">⏳</span> Proceeding to Showdown…';
+  }
+
+  gameRef().once('value', snap => {
+    const g = snap.val();
+    if (!g) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Proceed to 3-2 Full Count Showdown &rarr;';
+      }
+      return;
+    }
+
+    const updates = {
+      'currentPA/phase': 'placing',
+      'currentPA/beat': 'beat3',
+      'currentPA/committed/host': false,
+      'currentPA/committed/guest': false,
+      'currentPA/firstRevealedCard': null,
+    };
+
+    gameRef().update(updates).catch(err => {
+      console.error('proceedToBeat3 error:', err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Proceed to 3-2 Full Count Showdown &rarr;';
+      }
+    });
+  });
+}
+window.proceedToBeat3 = proceedToBeat3;
+
 function renderWildPitchModal(res, isBatting = false) {
   if (!res?.outcome) return '';
   const o = res.outcome;
@@ -2935,7 +3185,8 @@ function renderOutcomeOverlay(res, isBatting = false) {
   if (!res?.outcome) return '';
   const o = res.outcome;
   const z1 = res.z1;
-  const z2 = res.z2;
+  const z2 = res.z3 || res.z2;
+  const isBeat3 = Boolean(res.z3);
 
   const runsScored = o.runsScored || 0;
   const outsAdded = o.outsAdded || 0;
@@ -2944,11 +3195,15 @@ function renderOutcomeOverlay(res, isBatting = false) {
   const pCard = z2?.pitcherCardId ? getCard(z2.pitcherCardId) : (z1?.pitcherCards?.[0] ? getCard(z1.pitcherCards[0]) : null);
   const pVal = pCard?.value ?? z2?.pitcherCardVal ?? z1?.pitcherTotal ?? '—';
   const pPitch = z2?.pitchType ? z2.pitchType.toUpperCase() : 'FASTBALL';
+  const pBonus = z2?.pitcherBaseBonus ?? 0;
+  const pEff = z2?.pitcherEffectiveVal ?? pVal;
 
   // Batter recap
   const bCard = z2?.batterCardId ? getCard(z2.batterCardId) : (z1?.batterCards?.[0] ? getCard(z1.batterCards[0]) : null);
   const bVal = bCard?.value ?? z2?.batterCardVal ?? z1?.batterTotal ?? '—';
   const bGuess = z2?.guessPitch ? z2.guessPitch.toUpperCase() : 'FASTBALL';
+  const bBonus = z2?.batterBaseBonus ?? 0;
+  const bEff = z2?.batterEffectiveVal ?? bVal;
 
   const timingDelta = z2?.timingDelta ?? (typeof pVal === 'number' && typeof bVal === 'number' ? Math.abs(pVal - bVal) : 0);
   let timingBadgeHtml = '';
@@ -2980,16 +3235,20 @@ function renderOutcomeOverlay(res, isBatting = false) {
   const myRoleTag = isBatting ? '🏏 You (Batter)' : '⚾ You (Pitcher)';
   const oppRoleTag = isBatting ? '⚾ Opponent (Pitcher)' : '🏏 Opponent (Batter)';
 
-  const myActionText = isBatting ? `Looking <b>${bGuess}</b> [Card ${bVal}]` : `<b>${pPitch}</b> [Card ${pVal}]`;
-  const oppActionText = isBatting ? `<b>${pPitch}</b> [Card ${pVal}]` : `Looking <b>${bGuess}</b> [Card ${bVal}]`;
+  const myActionText = isBatting
+    ? `Looking <b>${bGuess}</b> [Card ${bVal}${bBonus > 0 ? ` +${bBonus} = <b>${bEff}</b>` : ''}]`
+    : `<b>${pPitch}</b> [Card ${pVal}${pBonus > 0 ? ` +${pBonus} = <b>${pEff}</b>` : ''}]`;
+  const oppActionText = isBatting
+    ? `<b>${pPitch}</b> [Card ${pVal}${pBonus > 0 ? ` +${pBonus} = <b>${pEff}</b>` : ''}]`
+    : `Looking <b>${bGuess}</b> [Card ${bVal}${bBonus > 0 ? ` +${bBonus} = <b>${bEff}</b>` : ''}]`;
 
   const myExecText = isBatting
-    ? (z2 ? (z2.batterExecuted ? `You: [${bVal}] 🟢 In Range` : `You: [${bVal}] 🔴 Out of Range`) : `You: [${bVal}]`)
-    : (z2 ? (z2.pitcherExecuted ? `You: [${pVal}] 🟢 Spot-on` : `You: [${pVal}] 🔴 Hanger`) : `You: [${pVal}]`);
+    ? (z2 ? (z2.batterExecuted ? `You: [${bVal}${bBonus > 0 ? `+${bBonus}` : ''}] 🟢 In Range` : `You: [${bVal}] 🔴 Out of Range`) : `You: [${bVal}]`)
+    : (z2 ? (z2.pitcherExecuted ? `You: [${pVal}${pBonus > 0 ? `+${pBonus}` : ''}] 🟢 Spot-on` : `You: [${pVal}] 🔴 Hanger`) : `You: [${pVal}]`);
 
   const oppExecText = isBatting
-    ? (z2 ? (z2.pitcherExecuted ? `Opp: [${pVal}] 🟢 Spot-on` : `Opp: [${pVal}] 🔴 Hanger`) : `Opp: [${pVal}]`)
-    : (z2 ? (z2.batterExecuted ? `Opp: [${bVal}] 🟢 In Range` : `Opp: [${bVal}] 🔴 Out of Range`) : `Opp: [${bVal}]`);
+    ? (z2 ? (z2.pitcherExecuted ? `Opp: [${pVal}${pBonus > 0 ? `+${pBonus}` : ''}] 🟢 Spot-on` : `Opp: [${pVal}] 🔴 Hanger`) : `Opp: [${pVal}]`)
+    : (z2 ? (z2.batterExecuted ? `Opp: [${bVal}${bBonus > 0 ? `+${bBonus}` : ''}] 🟢 In Range` : `Opp: [${bVal}] 🔴 Out of Range`) : `Opp: [${bVal}]`);
 
   const step2ExecHtml = `<span class="rb-step-val">${myExecText} vs ${oppExecText} &bull; Δ ${timingDelta}</span>`;
 
@@ -2999,9 +3258,9 @@ function renderOutcomeOverlay(res, isBatting = false) {
     <div class="result-modal-overlay" id="outcome-overlay">
       <div class="result-modal-card outcome">
         <div class="rm-header">
-          <span class="rm-tag">AT-BAT OUTCOME</span>
-          <span class="rm-suspense-label">⚡ PAYOFF CLASH</span>
-          <span class="rm-count-tag">${z1?.count ? `Count: ${z1.count}` : ''}</span>
+          <span class="rm-tag">${isBeat3 ? 'AT-BAT OUTCOME &bull; 3-2 SHOWDOWN (BEAT 3)' : 'AT-BAT OUTCOME'}</span>
+          <span class="rm-suspense-label">${isBeat3 ? '⚡ 3-2 CLIMAX' : '⚡ PAYOFF CLASH'}</span>
+          <span class="rm-count-tag">${isBeat3 ? 'Count: 3-2 Full' : (z1?.count ? `Count: ${z1.count}` : '')}</span>
         </div>
 
         <div class="rm-clash-recap">
@@ -3142,7 +3401,7 @@ function watchForBothCommitted() {
     if (committed?.host && committed?.guest && myRole === 'host') {
       gameRef('currentPA').once('value', paSnap => {
         const pa = paSnap.val();
-        if (!pa || pa.phase === 'resolved' || pa.phase === 'beat1_result' || window._resolvingBeat) return;
+        if (!pa || pa.phase === 'resolved' || pa.phase === 'beat1_result' || pa.phase === 'battle_back_result' || pa.phase === 'wild_pitch_result' || window._resolvingBeat) return;
         const currentBeat = pa.beat || 'beat1';
         window._resolvingBeat = true;
         setTimeout(() => {

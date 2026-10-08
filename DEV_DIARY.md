@@ -898,6 +898,83 @@ User feedback highlighted that this spatial overcrowding created visual friction
 - **Headless Game Simulation**: 10-game simulation executed 254 PAs across 10 completed games with an average of **6.20 runs/game**, 93 hits, 7 home wins, 3 away wins, and zero errors.
 - **Player Experience**: The baseball diamond is now clear, spacious, and natural. Player scouting information is instantly legible at a glance without cluttering the card drop trays, and the physical showdown between the mound and home plate feels authentic in every beat.
 
+---
+
+## Entry 17: Character Base Pitch Ratings & The 3-Beat At-Bat Rhythm
+*Date: October 7, 2026*
+
+### Context & The Problem
+Following playtesting of the baseball diamond interface, user feedback revealed two critical game design opportunities:
+1. **Arbitrary Pitch Selection & Lack of Character Agency**:
+   Pitch selection felt mathematically detached from player identity. Playing a low or high card didn't feel distinct based on *who* was on the mound or in the batter's box. A power pitcher's fastball felt identical to a finesse pitcher's fastball. Players needed tangible, numerical character stats tied directly to the cards so that pitching or hitting choices carried strategic weight and identity.
+2. **At-Bat Momentum & The "Battle Back" Mind Game**:
+   In baseball, an at-bat has a natural narrative arc:
+   - Establish count leverage (e.g. 0-2 Pitcher Count or 3-1 Batter Count).
+   - The advantaged player attacks, but the disadvantaged player can battle back (spoiling two-strike pitches, painting the black on 3-1).
+   - If the disadvantaged player survives, the count runs full (3-2) for a dramatic, climactic payoff showdown.
+
+### Solution Design
+
+#### 1. Character Base Pitch Ratings
+Every pitcher and batter now features an explicit `pitchRatings` numerical profile:
+- **Pitchers**:
+  - `fastball` (Arm Strength / Heat): e.g., Smoke Williams (+6), The Machine Castillo (+6).
+  - `breaking` (Spin / Bite): e.g., The Wizard Chen (+6), Slider Steve (+5).
+  - `offspeed` (Deception / Touch): e.g., Professor Davies (+6), Knuckles McGraw (+5).
+- **Batters**:
+  - `fastball` (Raw Power): e.g., The Bear Mackintosh (+5), Boom Boom Jones (+5).
+  - `breaking` (Vision / Recognition): e.g., Ichiro Tanaka (+5), Steady Eddie (+5).
+  - `offspeed` (Plate Discipline): e.g., Big Hurt Hernandez (+5), Cap'n Jack (+5).
+
+**Formula**:
+$$\text{Pitcher Effective Value} = \text{Card Value} + \text{Pitcher Rating}$$
+$$\text{Batter Effective Value} = \text{Card Value} + (\text{Batter Rating if pitch anticipated})$$
+
+#### 2. The 3-Beat At-Bat Rhythm
+1. **Beat 1: The Count Duel**:
+   Players contest leverage. High card wins:
+   - Pitcher wins $\rightarrow$ **0-2 Pitcher's Count** (Batter Power lockout).
+   - Batter wins $\rightarrow$ **3-1 Hitter's Count** (Pitcher Offspeed lockout).
+   - Tie $\rightarrow$ **3-2 Full Count** (No lockouts).
+2. **Beat 2: The Advantage Clash & Battle-Back**:
+   The advantaged player seeks to put away the plate appearance.
+   - On **0-2**: If the batter correctly anticipates the pitch and makes solid contact ($\Delta \le 2$), or is a Contact Hitter archetype, they foul the ball off to stay alive. The count runs full to 3-2 (`isBattleBack = true`)!
+   - On **3-1**: If the pitcher executes a strike with good timing ($\Delta \in [3, 4]$), they freeze the hitter or paint the black. The count runs full to 3-2 (`isBattleBack = true`)!
+   - When a battle-back occurs, a suspenseful `renderBattleBackModal` displays the duel breakdown, triggering a seamless transition to Beat 3.
+3. **Beat 3: 3-2 Full Count Showdown**:
+   Both players clash with a third card. All pitch choices are unlocked. The payoff resolves with full drama, where barreled balls produce extra-base hits or home runs, and mistimed whiffs end in swinging strikeouts.
+
+### Technical Implementation
+
+1. **Roster Data (`js/data.js`)**:
+   - Added `pitchRatings: { fastball, breaking, offspeed }` to all 8 pitchers (`PC01`–`PC08`) and all 12 batters (`BC01`–`BC12`).
+   - Implemented helper functions `getPitcherPitchRating(pitcherChar, pitchType)` and `getBatterPitchRating(batterChar, pitchType)`.
+
+2. **Resolution Mechanics (`js/resolution.js`)**:
+   - Overhauled `resolveBeat2`: Computes `pitcherEffectiveVal`, `batterEffectiveVal`, and identifies battle-back conditions on 0-2 and 3-1 counts.
+   - Implemented `resolveBeat3(opts)`: Complete showdown engine using effective card values, timing deltas, and archetype interactions.
+   - Updated `resolveSequentialPA`: Supports 3-beat sequences (`beat1`, `beat2`, `beat3`), storing full outcomes in `z1`, `z2`, and `z3`.
+   - Updated `executeBotPlayBeat`: Enhanced AI decision-making for Beat 2 and Beat 3.
+
+3. **User Interface & State Machine (`js/app.js` & `fullcount.css`)**:
+   - Extended state machine to manage `beat3` and `z3` placements and recycling across game state.
+   - Added `renderBattleBackModal` and `proceedToBeat3()` button handler.
+   - Added on-field scouting chips displaying base ratings (`FB +X Arm`, `BR +Y Spin`, `OFF +Z Touch` / `FB +X Pow`, `BR +Y Vis`, `OFF +Z Dis`).
+   - Added live rating badges (`.pt-rating-badge`) on diamond pitch trays.
+   - Updated execution pill with dynamic live calculation (`Card [7] + Base [+6] = [13] Effective Value`).
+   - Styled `.beat3-arena` and `.beat3-banner`.
+
+4. **Automated Verification (`tests/test_resolution.html` & `tests/test_play_ui.html`)**:
+   - Added comprehensive tests for base pitch ratings, Beat 2 battle-back conditions (0-2 and 3-1), Beat 3 resolution, Battle Back modal, and Beat 3 placing UI.
+
+---
+
+### Verification Results
+- **Automated Unit Tests**: **204 of 204 tests pass (100%)** with 0 failures across `test_resolution.html` and `test_play_ui.html`.
+- **Headless Game Simulation**: 10-game simulation executed 294 PAs across 10 completed games with an average of **6.60 runs/game**, 104 hits, 5 home wins, 5 away wins, and zero errors.
+- **Player Experience**: Every pitch decision now carries meaningful, character-driven strategy. The 3-beat momentum creates authentic baseball drama: battling back with 2 strikes and forcing a 3-2 full count showdown feels earned and exhilarating.
+
+
 
 
 
