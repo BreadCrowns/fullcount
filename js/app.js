@@ -3222,20 +3222,21 @@ function renderOutcomeOverlay(res, isBatting = false) {
   const myRoleTag = isBatting ? '🏏 You (Batter)' : '⚾ You (Pitcher)';
   const oppRoleTag = isBatting ? '⚾ Opponent (Pitcher)' : '🏏 Opponent (Batter)';
 
+  const pCardText = pVal === 1 ? 'WP [1]' : `[Card ${pVal}${pBonus > 0 ? ` +${pBonus} = <b>${pEff}</b>` : ` = <b>${pEff}</b>`}]`;
+  const bCardText = bVal === 1 ? 'K [1]' : `[Card ${bVal}${bBonus > 0 ? ` +${bBonus} = <b>${bEff}</b>` : ` = <b>${bEff}</b>`}]`;
+
   const myActionText = isBatting
-    ? `Looking <b>${bGuess}</b> [Card ${bVal}${bBonus > 0 ? ` +${bBonus} = <b>${bEff}</b>` : ''}]`
-    : `<b>${pPitch}</b> [Card ${pVal}${pBonus > 0 ? ` +${pBonus} = <b>${pEff}</b>` : ''}]`;
+    ? `Looking <b>${bGuess}</b> ${bCardText}`
+    : `<b>${pPitch}</b> ${pCardText}`;
   const oppActionText = isBatting
-    ? `<b>${pPitch}</b> [Card ${pVal}${pBonus > 0 ? ` +${pBonus} = <b>${pEff}</b>` : ''}]`
-    : `Looking <b>${bGuess}</b> [Card ${bVal}${bBonus > 0 ? ` +${bBonus} = <b>${bEff}</b>` : ''}]`;
+    ? `<b>${pPitch}</b> ${pCardText}`
+    : `Looking <b>${bGuess}</b> ${bCardText}`;
 
-  const myExecText = isBatting
-    ? (z2 ? (z2.batterExecuted ? `You: [${bVal}${bBonus > 0 ? `+${bBonus}` : ''}] 🟢 In Range` : `You: [${bVal}] 🔴 Out of Range`) : `You: [${bVal}]`)
-    : (z2 ? (z2.pitcherExecuted ? `You: [${pVal}${pBonus > 0 ? `+${pBonus}` : ''}] 🟢 Spot-on` : `You: [${pVal}] 🔴 Hanger`) : `You: [${pVal}]`);
+  const pExecText = pVal === 1 ? 'WP [1]' : `[${pVal}${pBonus > 0 ? `+${pBonus}=${pEff}` : `=${pEff}`}]`;
+  const bExecText = bVal === 1 ? 'K [1]' : `[${bVal}${bBonus > 0 ? `+${bBonus}=${bEff}` : `=${bEff}`}]`;
 
-  const oppExecText = isBatting
-    ? (z2 ? (z2.pitcherExecuted ? `Opp: [${pVal}${pBonus > 0 ? `+${pBonus}` : ''}] 🟢 Spot-on` : `Opp: [${pVal}] 🔴 Hanger`) : `Opp: [${pVal}]`)
-    : (z2 ? (z2.batterExecuted ? `Opp: [${bVal}${bBonus > 0 ? `+${bBonus}` : ''}] 🟢 In Range` : `Opp: [${bVal}] 🔴 Out of Range`) : `Opp: [${bVal}]`);
+  const myExecText = isBatting ? `You: ${bExecText}` : `You: ${pExecText}`;
+  const oppExecText = isBatting ? `Opp: ${pExecText}` : `Opp: ${bExecText}`;
 
   const step2ExecHtml = `<span class="rb-step-val">${myExecText} vs ${oppExecText} &bull; Δ ${timingDelta}</span>`;
 

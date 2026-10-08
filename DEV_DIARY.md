@@ -1016,11 +1016,37 @@ $$\text{Batter Effective Value} = \text{Card Value} + (\text{Batter Rating if pi
 - **Headless Game Simulation**: 10-game simulation executed 392 PAs across 10 completed games with zero errors, 80 hits, and 32 runs scored.
 - **Player Experience**: Pitch selection is no longer constrained by arbitrary brackets. Hand management now requires deliberate forethought: deciding whether to dump a volatile WP or K card in Beat 1 or hold it makes every hand feel tactical and authentic to baseball psychology.
 
+---
 
+## Entry 19: Beat 3 Fooled Contact Out Correction & Outcome Overlay Legacy Text Cleanup
+*Date: October 7, 2026*
 
+### Context & Bug Report
+During mobile playtesting on GitHub Pages (`breadcrowns.github.io`), a user reached Beat 3 (3-2 Full Count Showdown) as the Pitcher:
+- Pitcher threw: `BREAKING` with Card `5` (+3 rating bonus = 8 effective value).
+- Batter looked: `FASTBALL` with Card `7` (+0 rating bonus = 7 effective value).
+- Pitch Read: `❌ FOOLED` (Breaking pitch vs Looking Fastball).
+- Timing Delta: `Δ = |8 - 7| = 1` (`🏏 DELTA 1 • SOLID TIMING`).
+- At-Bat Result Displayed: `⚡ 3-2 FULL COUNT: SWINGING STRIKEOUT!`.
 
+### Diagnosis
+1. **Strikeout vs Weak Contact Out**:
+   - In baseball and under the established Result Matrix, when a batter is fooled on pitch type but their timing is solid ($\Delta \le 2$), their bat makes contact with the ball. Because they were geared for a different pitch (expecting heat, getting spin), they roll over or pop up weakly for an out in play—they do not swing through empty air.
+   - A swinging strikeout is reserved for mistimed whiffs ($\Delta \ge 3$) or playing the automatic `K` card.
+   - In `resolveBeat2`, $\Delta \le 2$ correctly resolved to `groundout` / `flyout`.
+   - In `resolveBeat3`, however, the fooled pitch branch checked `if (margin >= 0)` for an in-play out and fell through to `outcomeType = 'k'` for any negative margin. Because `margin = batterEff - pitcherEff = 7 - 8 = -1`, it erroneously triggered a swinging strikeout despite $\Delta = 1$ ("Solid Timing").
+2. **Legacy Range Text**:
+   - In `renderOutcomeOverlay` (`js/app.js`), the execution row still rendered legacy `🟢 Spot-on` and `🟢 In Range` labels from the deleted range system.
 
-
-
-
-
+### Solution
+1. **Engine Logic (`js/resolution.js`)**:
+   - In `resolveBeat3`, updated the fooled pitch branch condition to check `else if (timingDelta <= 2)`.
+   - Now, on $\Delta \le 2$, fooled hitters produce weak contact outs (`flyout` if Fastball, `groundout` if Breaking/Offspeed) with an informative rule reason: `"Full Count Showdown: Batter was fooled on pitch type, but solid timing (Delta X) produced weak contact for a routine out."`
+   - Only $\Delta \ge 3$ triggers a swinging strikeout (`k`).
+2. **Outcome Overlay Cleanup (`js/app.js`)**:
+   - Replaced legacy `Spot-on` / `In Range` execution strings with clean effective value math:
+     `You: [5+3=8] vs Opp: [7=7] • Δ 1`
+   - Added explicit support for special `WP [1]` and `K [1]` card badges in the recap rows.
+3. **Automated Verification**:
+   - Added test in `tests/test_resolution.html` asserting that fooled pitch with $\Delta = 1$ in Beat 3 resolves to `groundout`, not `k`.
+   - All 214 tests pass (100%).

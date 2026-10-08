@@ -1496,14 +1496,14 @@ function resolveBeat3(opts) {
       outcomeType = 'single';
       outcomeDisplay = '🏏 3-2 FULL COUNT: BLOOP SINGLE (AVOIDS K)!';
       ruleReason = `Full Count Showdown: Batter was fooled on pitch type, but pure bat speed punched a bloop Single!`;
-    } else if (margin >= 0) {
+    } else if (timingDelta <= 2) {
       outcomeType = (pitchType === 'fastball') ? 'flyout' : 'groundout';
-      outcomeDisplay = '⚾ 3-2 FULL COUNT: WEAK GROUNDOUT (FOOLED ON PITCH)';
-      ruleReason = `Full Count Showdown: Batter was fooled on pitch type; rolled over for a routine groundout.`;
+      outcomeDisplay = (pitchType === 'fastball') ? '🧤 3-2 FULL COUNT: POPUP TO INFIELD (FOOLED ON PITCH)' : '⚾ 3-2 FULL COUNT: WEAK GROUNDOUT (FOOLED ON PITCH)';
+      ruleReason = `Full Count Showdown: Batter was fooled on pitch type (${pitchType.toUpperCase()} vs Looking ${effectiveGuessPitch.toUpperCase()}), but solid timing (Delta ${timingDelta}) produced weak contact for a routine out.`;
     } else {
       outcomeType = 'k';
       outcomeDisplay = '⚡ 3-2 FULL COUNT: SWINGING STRIKEOUT!';
-      ruleReason = `Full Count Showdown: Pitcher fooled the batter with ${pitchType.toUpperCase()} (+${pitcherBonus}) for a swinging Strikeout!`;
+      ruleReason = `Full Count Showdown: Pitcher fooled the batter with ${pitchType.toUpperCase()} (+${pitcherBonus}) for a swinging Strikeout (Delta ${timingDelta})!`;
     }
   }
 
