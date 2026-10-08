@@ -2205,6 +2205,7 @@ function commitPlacement() {
   const pitchingRole = half === 'top' ? 'host' : 'guest';
   const battingRole  = half === 'top' ? 'guest' : 'host';
   const iAmPitching  = (myRole === pitchingRole);
+  const isBot        = Boolean(g.isSolo || g.guest?.isBot);
   const curPitch     = iAmPitching ? localPitchType : localGuessPitch;
 
   if (!curPitch) {
