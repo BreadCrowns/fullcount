@@ -2090,19 +2090,15 @@ function renderMiniPlacedCard(id, targetZone, canRemove, index, isPitching = nul
     ? getCardDisplay(card, isPitching)
     : card.value;
 
-  const isWP = (isPitching === true && card.value === 1);
-  const isK  = (isPitching === false && card.value === 1);
-  const specialClass = isWP ? 'wp-card' : (isK ? 'k-card' : '');
-
   return `
-    <div class="placed-number-card ${specialClass}" onclick="${canRemove ? 'removeBeatCard()' : ''}" title="${canRemove ? 'Click to remove' : ''}">
+    <div class="placed-number-card" onclick="${canRemove ? 'removeBeatCard()' : ''}" title="${canRemove ? 'Click to remove' : ''}">
       <span class="pnc-num">${display}</span>
       ${canRemove ? '<span class="remove-btn">✕</span>' : ''}
     </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HAND RENDERING (PURE NUMBER CARDS WITH WP / K BADGING)
+// HAND RENDERING (PURE NUMBER CARDS VALUES 1-6)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat = 'beat1') {
   if (!handIds || handIds.length === 0) {
@@ -2117,14 +2113,10 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
         const inPlacement = isInPlacement(id);
         const isActive = isCardActiveForRole(card, iAmBatting, iAmPitching) && !inPlacement && !myCommitted;
         const isSelected = (selectedCard === id) || (localBeatCard === id);
-        const isWP = iAmPitching && card.value === 1;
-        const isK  = iAmBatting  && card.value === 1;
-        const displayLabel = isWP ? 'WP' : (isK ? 'K' : card.value);
-        const specialClass = isWP ? 'wp-card' : (isK ? 'k-card' : '');
-        const specialBadge = isWP ? '<span class="card-special-badge">WILD PITCH</span>' : (isK ? '<span class="card-special-badge">STRIKEOUT</span>' : '');
+        const displayLabel = card.value;
 
         return `
-          <div class="number-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''} ${specialClass}"
+          <div class="number-card ${isActive ? 'active' : 'inactive'} ${isSelected ? 'selected' : ''}"
                draggable="${isActive ? 'true' : 'false'}"
                ondragstart="${isActive ? `handleCardDragStart(event, '${id}')` : ''}"
                ondragend="${isActive ? `handleCardDragEnd(event)` : ''}"
@@ -2133,9 +2125,8 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
                ontouchend="${isActive ? `handleTouchDragEnd(event)` : ''}"
                ontouchcancel="${isActive ? `handleTouchDragEnd(event)` : ''}"
                onclick="${isActive ? `selectCard('${id}')` : ''}"
-               title="${isActive ? `${isWP ? 'Wild Pitch (WP)' : (isK ? 'Strikeout (K)' : `Value: ${card.value}`)} (Drag to diamond tray or tap)` : 'Cannot play this card'}">
+               title="${isActive ? `Value: ${card.value} (Drag to diamond tray or tap)` : 'Cannot play this card'}">
             <span class="card-hero-num">${displayLabel}</span>
-            ${specialBadge}
           </div>`;
       }).join('')}
     </div>`;
@@ -2518,6 +2509,32 @@ function resolveBeatStep(beat) {
         }
         if ((charges[pitchingRole][pitchType] || 0) > 0) {
           charges[pitchingRole][pitchType]--;
+        }
+
+        // Ball in the dirt: Pitcher missed target; Batter card returned to hand unrevealed!
+        if (beat2Result.isBall) {
+          const batterHand = [...(gs.hands?.[battingRole] || [])];
+          if (batterCardId && !batterHand.includes(batterCardId)) {
+            batterHand.push(batterCardId);
+          }
+          if (myRole === battingRole) {
+            localHand = batterHand;
+          }
+
+          const updates = {
+            'currentPA/phase': 'battle_back_result',
+            'currentPA/beat': 'beat3',
+            'currentPA/committed/host': false,
+            'currentPA/committed/guest': false,
+            'currentPA/beatResults/beat2': beat2Result,
+            [`currentPA/placement/${pitchingRole}/z2`]: pitcherCardId ? [pitcherCardId] : [],
+            [`currentPA/placement/${battingRole}/z2`]:  [],
+            [`gameState/hands/${battingRole}`]:        batterHand,
+            'gameState/arsenalCharges': charges,
+            'gameState/pitcherRatings': currentRatings,
+          };
+          gameRef().update(updates);
+          return;
         }
 
         // Battle Back: disadvantaged player battles back to force 3-2 Full Count!
@@ -3017,9 +3034,14 @@ function renderPitcherPanel(pitcherChar, staminaState, pasFaced, isMe, reliefId,
       <div class="cp-name" style="color:${pitcherChar.color}">${pitcherChar.name}</div>
       <div class="cp-arch">${pitcherChar.archetype}</div>
       <div class="cp-zones-row">
-        <span>Z1 (Read): <b>${pitcherChar.zoneBonuses.z1>=0?'+':''}${pitcherChar.zoneBonuses.z1}</b></span>
-        <span>Z2 (Swing): <b>${pitcherChar.zoneBonuses.z2>=0?'+':''}${pitcherChar.zoneBonuses.z2}</b></span>
-        <span>Z3 (Result): <b>${pitcherChar.zoneBonuses.z3>=0?'+':''}${pitcherChar.zoneBonuses.z3}</b></span>
+        ${pitcherChar.baseTargets
+          ? `<span>FB Target: <b>${pitcherChar.baseTargets.fastball}</b></span>
+             <span>BR Target: <b>${pitcherChar.baseTargets.breaking}</b></span>
+             <span>OS Target: <b>${pitcherChar.baseTargets.offspeed}</b></span>`
+          : `<span>Z1: <b>${(pitcherChar.zoneBonuses?.z1??0)>=0?'+':''}${pitcherChar.zoneBonuses?.z1??0}</b></span>
+             <span>Z2: <b>${(pitcherChar.zoneBonuses?.z2??0)>=0?'+':''}${pitcherChar.zoneBonuses?.z2??0}</b></span>
+             <span>Z3: <b>${(pitcherChar.zoneBonuses?.z3??0)>=0?'+':''}${pitcherChar.zoneBonuses?.z3??0}</b></span>`
+        }
       </div>
       <div class="stamina-track">
         <div class="stamina-label" style="color:${stateColor}">⏱ Stamina: ${staminaState.toUpperCase()} (PA ${pasFaced})</div>
@@ -3043,9 +3065,14 @@ function renderBatterPanel(batterChar, isMe, score, gs, half) {
       <div class="cp-name" style="color:${batterChar.color}">${batterChar.name}</div>
       <div class="cp-arch">${batterChar.archetype}</div>
       <div class="cp-zones-row">
-        <span>Z1 (Read): <b>${batterChar.zoneBonuses.z1>=0?'+':''}${batterChar.zoneBonuses.z1}</b></span>
-        <span>Z2 (Swing): <b>${batterChar.zoneBonuses.z2>=0?'+':''}${batterChar.zoneBonuses.z2}</b></span>
-        <span>Z3 (Result): <b>${batterChar.zoneBonuses.z3>=0?'+':''}${batterChar.zoneBonuses.z3}</b></span>
+        ${batterChar.readFactors
+          ? `<span>FB Read: <b>+${batterChar.readFactors.fastball}</b></span>
+             <span>BR Read: <b>+${batterChar.readFactors.breaking}</b></span>
+             <span>OS Read: <b>+${batterChar.readFactors.offspeed}</b></span>`
+          : `<span>Z1: <b>${(batterChar.zoneBonuses?.z1??0)>=0?'+':''}${batterChar.zoneBonuses?.z1??0}</b></span>
+             <span>Z2: <b>${(batterChar.zoneBonuses?.z2??0)>=0?'+':''}${batterChar.zoneBonuses?.z2??0}</b></span>
+             <span>Z3: <b>${(batterChar.zoneBonuses?.z3??0)>=0?'+':''}${batterChar.zoneBonuses?.z3??0}</b></span>`
+        }
       </div>
       ${isTrailing ? `<div style="display:inline-block;background:rgba(255,71,87,0.2);color:#ff4757;font-size:0.65rem;font-weight:800;border-radius:3px;padding:1px 6px;margin-bottom:6px;">⚡ TRAILING</div>` : ''}
       ${gs.bases.second || gs.bases.third ? `<div style="display:inline-block;background:rgba(46,213,115,0.2);color:#2ed573;font-size:0.65rem;font-weight:800;border-radius:3px;padding:1px 6px;margin-bottom:6px;">🏃 RISP</div>` : ''}
@@ -3453,6 +3480,7 @@ window.proceedToBeat2 = proceedToBeat2;
 
 function renderBattleBackModal(b2, isPitcherMe) {
   if (!b2) return '';
+  const isBall = Boolean(b2.isBall);
   const pCard = b2.pitcherCardId ? getCard(b2.pitcherCardId) : null;
   const bCard = b2.batterCardId ? getCard(b2.batterCardId) : null;
   const pVal = pCard?.value ?? b2.pitcherCardVal ?? '—';
@@ -3467,25 +3495,31 @@ function renderBattleBackModal(b2, isPitcherMe) {
   const myRoleTag = isPitcherMe ? '⚾ You (Pitcher)' : '🏏 You (Batter)';
   const oppRoleTag = isPitcherMe ? '🏏 Opponent (Batter)' : '⚾ Opponent (Pitcher)';
 
-  const myVal = isPitcherMe ? pVal : bVal;
-  const myPitchLabel = isPitcherMe ? `Threw <b>${pPitch}</b>` : `Looking <b>${bGuess}</b>`;
+  const myVal = isPitcherMe ? pVal : (isBall ? bVal : bVal);
+  const myPitchLabel = isPitcherMe
+    ? (isBall ? `Threw <b>${pPitch}</b> (Missed Target ${b2.target})` : `Threw <b>${pPitch}</b>`)
+    : (isBall ? `Card Returned to Hand` : `Looking <b>${bGuess}</b>`);
   const myStatLabel = isPitcherMe ? `+${pBonus} Arm` : `+${bBonus} ${b2.pitchMatched ? 'Power' : 'Bonus'}`;
   const myEff = isPitcherMe ? pEff : bEff;
 
-  const oppVal = isPitcherMe ? bVal : pVal;
-  const oppPitchLabel = isPitcherMe ? `Looking <b>${bGuess}</b>` : `Threw <b>${pPitch}</b>`;
+  const oppVal = isPitcherMe ? (isBall ? '?' : bVal) : pVal;
+  const oppPitchLabel = isPitcherMe
+    ? (isBall ? `Card Returned to Hand Unrevealed` : `Looking <b>${bGuess}</b>`)
+    : (isBall ? `Threw <b>${pPitch}</b> (Missed Target ${b2.target})` : `Threw <b>${pPitch}</b>`);
   const oppStatLabel = isPitcherMe ? `+${bBonus} ${b2.pitchMatched ? 'Power' : 'Bonus'}` : `+${pBonus} Arm`;
-  const oppEff = isPitcherMe ? bEff : pEff;
+  const oppEff = isPitcherMe ? (isBall ? '?' : bEff) : pEff;
 
-  const reason = b2.ruleReason || b2.outcome?.ruleReason || 'Disadvantaged player fought back to stay alive! The count runs full to 3-2!';
+  const reason = b2.ruleReason || b2.outcome?.ruleReason || (isBall
+    ? `Pitcher played Card ${pVal}, missing Target ${b2.target} (Ball in the dirt!). Pitcher burns card; Batter card returned to hand. Advances to Payoff Pitch!`
+    : 'Disadvantaged player fought back to stay alive! The count runs full to 3-2!');
 
   return `
     <div class="result-modal-overlay" id="battle-back-modal">
       <div class="result-modal-card">
         <div class="rm-header">
-          <span class="rm-tag">BEAT 2 RESULT &bull; THE CLASH</span>
-          <span class="rm-suspense-label">⚡ BATTLED BACK!</span>
-          <span class="rm-winner-pill count-full">⚖️ COUNT TIED 3-2</span>
+          <span class="rm-tag">BEAT 2 RESULT &bull; ${isBall ? 'BALL IN THE DIRT' : 'THE CLASH'}</span>
+          <span class="rm-suspense-label">${isBall ? '⚡ BALL IN THE DIRT!' : '⚡ BATTLED BACK!'}</span>
+          <span class="rm-winner-pill count-full">${isBall ? '⚾ COUNT IN BATTER FAVOR' : '⚖️ COUNT TIED 3-2'}</span>
         </div>
 
         <div class="rm-cards-compare">
@@ -3495,7 +3529,7 @@ function renderBattleBackModal(b2, isPitcherMe) {
               <span class="card-hero-num">${myVal}</span>
             </div>
             <div class="rm-card-meta">${myPitchLabel}</div>
-            <div class="rm-eff-calc">Card ${myVal} [${myStatLabel}] = <b>${myEff}</b></div>
+            <div class="rm-eff-calc">${isBall && !isPitcherMe ? 'Card Kept in Hand' : `Card ${myVal} [${myStatLabel}] = <b>${myEff}</b>`}</div>
           </div>
           <div class="rm-vs anticipate-vs">VS</div>
           <div class="rm-player-box opp anticipate-flip-b">
@@ -3504,14 +3538,14 @@ function renderBattleBackModal(b2, isPitcherMe) {
               <span class="card-hero-num">${oppVal}</span>
             </div>
             <div class="rm-card-meta">${oppPitchLabel}</div>
-            <div class="rm-eff-calc">Card ${oppVal} [${oppStatLabel}] = <b>${oppEff}</b></div>
+            <div class="rm-eff-calc">${isBall && isPitcherMe ? 'Unrevealed' : `Card ${oppVal} [${oppStatLabel}] = <b>${oppEff}</b>`}</div>
           </div>
         </div>
 
         ${renderOutcomeNumberLine({
           pitchType: b2.pitchType || 'fastball',
           beat: 'beat2',
-          count: b2.count || '0-2',
+          count: b2.count || '3-2',
           batterBonus: bBonus,
           pitcherBonus: pBonus,
           launchAngle: (typeof b2.launchAngle === 'number') ? b2.launchAngle : ((typeof b2.total === 'number') ? b2.total : null),
@@ -3519,8 +3553,8 @@ function renderBattleBackModal(b2, isPitcherMe) {
         })}
 
         <div class="rm-count-banner count-full anticipate-banner">
-          <div class="rm-count-num">3-2</div>
-          <div class="rm-count-label">FULL COUNT SHOWDOWN FORCED!</div>
+          <div class="rm-count-num">${b2.count || '3-2'}</div>
+          <div class="rm-count-label">${isBall ? 'BALL IN DIRT &bull; PAYOFF PITCH FORCED!' : 'FULL COUNT SHOWDOWN FORCED!'}</div>
         </div>
 
         <div class="rm-explanation anticipate-explain">
@@ -3531,7 +3565,7 @@ function renderBattleBackModal(b2, isPitcherMe) {
         </div>
 
         <button class="btn-primary rm-btn btn-battle-back-continue anticipate-btn" onclick="proceedToBeat3()">
-          Proceed to 3-2 Full Count Showdown &rarr;
+          ${isBall ? 'Proceed to Payoff Pitch Showdown &rarr;' : 'Proceed to 3-2 Full Count Showdown &rarr;'}
         </button>
       </div>
     </div>`;

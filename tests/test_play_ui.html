@@ -266,23 +266,23 @@
       selectedCard = null;
       handleGameState(soloPlayState);
 
-      // 2b. Test Special Card Display (WP for Pitcher 1, K for Batter 1)
-      report(getCardDisplay(1, true) === 'WP', 'getCardDisplay returns WP for Pitcher card 1');
-      report(getCardDisplay(1, false) === 'K', 'getCardDisplay returns K for Batter card 1');
+      // 2b. Test Pure Number Card Display (Values 1-6)
+      report(getCardDisplay(1, true) === '1', 'getCardDisplay returns 1 for Pitcher card 1');
+      report(getCardDisplay(1, false) === '1', 'getCardDisplay returns 1 for Batter card 1');
       report(getCardDisplay(5, true) === '5', 'getCardDisplay returns card value string for non-1 cards');
 
-      // Test hand rendering with Card 1 (WP for pitcher, K for batter)
-      const pitcherHandWithWP = renderHand(['P19'], false, true, false, 'beat2');
-      report(pitcherHandWithWP.includes('wp-card') && pitcherHandWithWP.includes('WP') && pitcherHandWithWP.includes('WILD PITCH'), 'Pitcher Card 1 renders as WP with WILD PITCH badge');
+      // Test hand rendering with Card 1 (pure number 1 without special badges)
+      const pitcherHandWith1 = renderHand(['P19'], false, true, false, 'beat2');
+      report(pitcherHandWith1.includes('card-hero-num') && pitcherHandWith1.includes('1'), 'Pitcher Card 1 renders as pure number 1');
 
-      const batterHandWithK = renderHand(['B13'], true, false, false, 'beat2');
-      report(batterHandWithK.includes('k-card') && batterHandWithK.includes('K') && batterHandWithK.includes('STRIKEOUT'), 'Batter Card 1 renders as K with STRIKEOUT badge');
+      const batterHandWith1 = renderHand(['B13'], true, false, false, 'beat2');
+      report(batterHandWith1.includes('card-hero-num') && batterHandWith1.includes('1'), 'Batter Card 1 renders as pure number 1');
 
-      // Test mini placed card with WP and K
-      const miniWP = renderMiniPlacedCard('P19', 'mound', true, 0, true);
-      report(miniWP.includes('wp-card') && miniWP.includes('WP'), 'renderMiniPlacedCard renders WP card for pitcher');
-      const miniK = renderMiniPlacedCard('B13', 'plate', true, 0, false);
-      report(miniK.includes('k-card') && miniK.includes('K'), 'renderMiniPlacedCard renders K card for batter');
+      // Test mini placed card
+      const miniP1 = renderMiniPlacedCard('P19', 'mound', true, 0, true);
+      report(miniP1.includes('placed-number-card') && miniP1.includes('1'), 'renderMiniPlacedCard renders card 1 for pitcher');
+      const miniB1 = renderMiniPlacedCard('B13', 'plate', true, 0, false);
+      report(miniB1.includes('placed-number-card') && miniB1.includes('1'), 'renderMiniPlacedCard renders card 1 for batter');
 
       // 3. Test Beat 1 Result Modal phase
       soloPlayState.currentPA.phase = 'beat1_result';

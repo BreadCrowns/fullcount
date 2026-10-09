@@ -102,6 +102,7 @@ const SWING_TYPES = {
 
 const PITCHER_CHARACTERS = {
   'PC01':{ id:'PC01', name:'"Big Jake" Harmon'        , archetype:'Power Pitcher'      , color:'#c44b4b',
+    baseTargets:{ fastball:2, breaking:4, offspeed:5 },
     pitchRatings:{ fastball:5, breaking:3, offspeed:1 },
     executionDifficulties:{ fastball:3, breaking:5, offspeed:8 },
     zoneBonuses:{ z1:-1, z2:5, z3:-2 },
@@ -109,8 +110,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:10, high:16, bullseye:13, wildBust:20 },
     pitchAffinity:[ {pitchCall:'fastball', zone:'z2', bonus:3}, {pitchCall:'slider', zone:'z2', bonus:2} ],
     stamina:{ freshMax:5, tiringMax:8, tiringMod:{z1:0,z2:-3,z3:0}, gassedMod:{z1:-2,z2:-5,z3:0} },
-    specialText:'Power Ace. Fastball Heat +5, Breaking +3, Offspeed +1.' },
+    specialText:'Power Ace. Fastball Target 2, Breaking 4, Offspeed 5.' },
   'PC02':{ id:'PC02', name:'"El Arte" Medina'          , archetype:'Control Artist'     , color:'#4b8bc4',
+    baseTargets:{ fastball:4, breaking:3, offspeed:2 },
     pitchRatings:{ fastball:2, breaking:4, offspeed:5 },
     executionDifficulties:{ offspeed:3, breaking:4, fastball:6 },
     zoneBonuses:{ z1:4, z2:2, z3:2 },
@@ -118,8 +120,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:9, high:15, bullseye:12, wildBust:19 },
     pitchAffinity:[ {pitchCall:'changeup', zone:'z1', bonus:4}, {pitchCall:'changeup_slow', zone:'z1', bonus:4}, {pitchCall:'curveball', zone:'z1', bonus:2} ],
     stamina:{ freshMax:7, tiringMax:10, tiringMod:{z1:0,z2:-2,z3:0}, gassedMod:{z1:-1,z2:-3,z3:0} },
-    specialText:'Pinpoint Master. Offspeed Changeup +5, Breaking +4, Fastball +2.' },
+    specialText:'Pinpoint Master. Offspeed Target 2, Breaking 3, Fastball 4.' },
   'PC03':{ id:'PC03', name:'"The Groundskeeper" Pérez', archetype:'Ground Ball Machine', color:'#4baa5a',
+    baseTargets:{ fastball:3, breaking:3, offspeed:4 },
     pitchRatings:{ fastball:4, breaking:4, offspeed:2 },
     executionDifficulties:{ fastball:3, breaking:5, offspeed:6 },
     zoneBonuses:{ z1:2, z2:0, z3:6 },
@@ -127,8 +130,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:8, high:14, bullseye:11, wildBust:18 },
     pitchAffinity:[ {pitchCall:'twoseamer', zone:'z3', bonus:5}, {pitchCall:'splitter', zone:'z3', bonus:3} ],
     stamina:{ freshMax:7, tiringMax:11, tiringMod:{z1:0,z2:0,z3:-3}, gassedMod:{z1:0,z2:-2,z3:-5} },
-    specialText:'Heavy Sinkerballer. Fastball Sinker +4, Breaking +4, Offspeed +2.' },
+    specialText:'Heavy Sinkerballer. Fastball Target 3, Breaking 3, Offspeed 4.' },
   'PC04':{ id:'PC04', name:'"Smoke" Williams'          , archetype:'Closer'             , color:'#e0a020',
+    baseTargets:{ fastball:2, breaking:4, offspeed:5 },
     pitchRatings:{ fastball:6, breaking:3, offspeed:0 },
     executionDifficulties:{ fastball:2, breaking:6, offspeed:9 },
     zoneBonuses:{ z1:0, z2:7, z3:2 },
@@ -136,8 +140,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:11, high:17, bullseye:14, wildBust:21 },
     pitchAffinity:[ {pitchCall:'slider', zone:'z2', bonus:5}, {pitchCall:'fastball', zone:'z2', bonus:3} ],
     stamina:{ freshMax:3, tiringMax:5, tiringMod:{z1:0,z2:-4,z3:0}, gassedMod:{z1:0,z2:-8,z3:0} },
-    specialText:'Flamethrower Closer. Fastball 99mph Heat +6, Breaking +3, Offspeed +0.' },
+    specialText:'Flamethrower Closer. Fastball Target 2, Breaking 4, Offspeed 5.' },
   'PC05':{ id:'PC05', name:'"The Professor" Volkov'    , archetype:'Junkballer'         , color:'#8855cc',
+    baseTargets:{ fastball:5, breaking:3, offspeed:2 },
     pitchRatings:{ fastball:1, breaking:4, offspeed:6 },
     executionDifficulties:{ offspeed:2, breaking:4, fastball:7 },
     zoneBonuses:{ z1:6, z2:-2, z3:3 },
@@ -145,8 +150,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:7, high:13, bullseye:10, wildBust:17 },
     pitchAffinity:[ {pitchCall:'knuckleball', zone:'z1', bonus:3}, {pitchCall:'eephus', zone:'z1', bonus:5} ],
     stamina:{ freshMax:6, tiringMax:9, tiringMod:{z1:-2,z2:0,z3:0}, gassedMod:{z1:-4,z2:0,z3:-2} },
-    specialText:'Soft-tossing Wizard. Offspeed Deception +6, Breaking +4, Fastball +1.' },
+    specialText:'Soft-tossing Wizard. Offspeed Target 2, Breaking 3, Fastball 5.' },
   'PC06':{ id:'PC06', name:'"The Machine" Castillo'    , archetype:'Ace'                , color:'#e8b84b',
+    baseTargets:{ fastball:3, breaking:3, offspeed:3 },
     pitchRatings:{ fastball:4, breaking:4, offspeed:4 },
     executionDifficulties:{ fastball:3, breaking:4, offspeed:5 },
     zoneBonuses:{ z1:2, z2:3, z3:2 },
@@ -154,8 +160,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:9, high:16, bullseye:12, wildBust:20 },
     pitchAffinity:[ {pitchCall:'fastball', zone:'z1', bonus:1}, {pitchCall:'slider', zone:'z1', bonus:1}, {pitchCall:'curveball', zone:'z1', bonus:1}, {pitchCall:'changeup', zone:'z1', bonus:1} ],
     stamina:{ freshMax:8, tiringMax:11, tiringMod:{z1:0,z2:-2,z3:0}, gassedMod:{z1:-1,z2:-3,z3:0} },
-    specialText:'Complete Ace. Fastball +4, Breaking +4, Offspeed +4 balanced repertoire.' },
+    specialText:'Complete Ace. Balanced Target 3 across Fastball, Breaking, Offspeed.' },
   'PC07':{ id:'PC07', name:'"Setup Man" Kowalski'      , archetype:'Reliever'           , color:'#4b99aa',
+    baseTargets:{ fastball:3, breaking:3, offspeed:4 },
     pitchRatings:{ fastball:4, breaking:4, offspeed:2 },
     executionDifficulties:{ fastball:4, breaking:4, offspeed:6 },
     zoneBonuses:{ z1:2, z2:4, z3:3 },
@@ -163,8 +170,9 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:10, high:15, bullseye:13, wildBust:19 },
     pitchAffinity:[ {pitchCall:'cutter', zone:'z2', bonus:3}, {pitchCall:'twoseamer', zone:'z3', bonus:2} ],
     stamina:{ freshMax:4, tiringMax:6, tiringMod:{z1:0,z2:-2,z3:0}, gassedMod:{z1:0,z2:-4,z3:-2} },
-    specialText:'Setup Specialist. Fastball Cutter +4, Breaking +4, Offspeed +2.' },
+    specialText:'Setup Specialist. Fastball Target 3, Breaking 3, Offspeed 4.' },
   'PC08':{ id:'PC08', name:'"The Wizard" Chen'         , archetype:'Deceptive Starter'  , color:'#cc5599',
+    baseTargets:{ fastball:4, breaking:2, offspeed:3 },
     pitchRatings:{ fastball:2, breaking:5, offspeed:4 },
     executionDifficulties:{ breaking:3, offspeed:4, fastball:6 },
     zoneBonuses:{ z1:3, z2:2, z3:1 },
@@ -172,7 +180,7 @@ const PITCHER_CHARACTERS = {
     strikeZone:{ low:8, high:15, bullseye:11, wildBust:19 },
     pitchAffinity:[ {pitchCall:'slurve', zone:'z1', bonus:5}, {pitchCall:'splitter', zone:'z1', bonus:3} ],
     stamina:{ freshMax:6, tiringMax:9, tiringMod:{z1:-2,z2:0,z3:0}, gassedMod:{z1:-4,z2:-2,z3:0} },
-    specialText:'Spin Deception. Breaking Spin +5, Offspeed +4, Fastball +2.' },
+    specialText:'Spin Deception. Breaking Target 2, Offspeed 3, Fastball 4.' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -181,193 +189,53 @@ const PITCHER_CHARACTERS = {
 // ─────────────────────────────────────────────────────────────────────────────
 const BATTER_CHARACTERS = {
   'BC01':{ id:'BC01', name:'"The Bear" Mackintosh'      , archetype:'Slugger'            , color:'#c44b4b',
+    readFactors:{ fastball:2, breaking:1, offspeed:0 },
     pitchRatings:{ fastball:5, breaking:2, offspeed:1 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:3, balanced:5, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:9, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:10, max:10, outcome:'flyout', label:'Deep Flyout', color:'#718096' },
-      { min:11, max:12, outcome:'homerun', label:'HOME RUN 🔥', color:'#ecc94b' },
-      { min:13, max:13, outcome:'double', label:'Monster Double ⚡', color:'#38b2ac' },
-      { min:14, max:14, outcome:'homerun', label:'UPPER DECK HR 🔥', color:'#ecc94b' },
-      { min:15, max:99, outcome:'flyout', label:'Deep Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:-2, z2:2, z3:6 },
-    readAffinity:{ trigger:'any_counter', effect:'z3_bonus:3' },
-    clutch:{ condition:'risp', bonuses:{z3:5} },
-    specialText:'Slugger. vs Fastball +5 Power, vs Breaking +2, vs Offspeed +1.' },
+    specialText:'Slugger. Fastball Read +2, Breaking +1, Offspeed 0.' },
   'BC02':{ id:'BC02', name:'"Slick" Torres'             , archetype:'Contact Hitter'     , color:'#4b8bc4',
+    readFactors:{ fastball:1, breaking:1, offspeed:2 },
     pitchRatings:{ fastball:2, breaking:3, offspeed:5 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:2, balanced:5, power:9 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:11, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:12, max:13, outcome:'flyout', label:'Lineout / Flyout', color:'#718096' },
-      { min:14, max:14, outcome:'double', label:'Line Drive ⚡', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:2, z2:5, z3:-1 },
-    readAffinity:{ trigger:'B1', effect:'z2_bonus:5' },
-    clutch:{ condition:'two_strikes', bonuses:{z2:3} },
-    specialText:'Contact Master. vs Offspeed +5, vs Breaking +3, vs Fastball +2.' },
+    specialText:'Contact Master. Offspeed Read +2, Breaking +1, Fastball +1.' },
   'BC03':{ id:'BC03', name:'"The Professor" Nakamura'   , archetype:'Disciplined Hitter' , color:'#8855cc',
+    readFactors:{ fastball:1, breaking:2, offspeed:1 },
     pitchRatings:{ fastball:2, breaking:5, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:3, balanced:4, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:11, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'double', label:'Gap Double ⚡', color:'#38b2ac' },
-      { min:14, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:6, z2:1, z3:-2 },
-    readAffinity:{ trigger:'B4', effect:'walk_at_7' },
-    clutch:{ condition:'full_count', bonuses:{z1:4} },
-    specialText:'Disciplined Eye. vs Breaking +5 Vision, vs Offspeed +3, vs Fastball +2.' },
+    specialText:'Disciplined Eye. Breaking Read +2, Offspeed +1, Fastball +1.' },
   'BC04':{ id:'BC04', name:'"Boom Boom" Barrett'        , archetype:'Free Swinger'       , color:'#e0a020',
+    readFactors:{ fastball:2, breaking:0, offspeed:0 },
     pitchRatings:{ fastball:5, breaking:1, offspeed:1 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:4, balanced:5, power:7 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'k', label:'Strikeout Swinging ⚡', color:'#e53e3e' },
-      { min:11, max:11, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:12, max:13, outcome:'homerun', label:'MONSTER BOMB 🔥', color:'#ecc94b' },
-      { min:14, max:14, outcome:'double', label:'Double', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:-4, z2:4, z3:5 },
-    readAffinity:{ trigger:'B6', effect:'z3_bonus:8' },
-    clutch:{ condition:'pitcher_won_z1_last_pa', bonuses:{z1:-2} },
-    specialText:'Free Swinger. vs Fastball +5 Power, vs Breaking +1, vs Offspeed +1.' },
+    specialText:'Free Swinger. Fastball Read +2, Breaking 0, Offspeed 0.' },
   'BC05':{ id:'BC05', name:'"El Rayo" Fuentes'          , archetype:'Speed Specialist'   , color:'#4baa5a',
+    readFactors:{ fastball:1, breaking:0, offspeed:2 },
     pitchRatings:{ fastball:3, breaking:2, offspeed:4 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:2, balanced:5, power:9 },
-    battedBallSpectrum: [
-      { min:0, max:7, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:8, max:10, outcome:'single', label:'Infield Single ⚡', color:'#48bb78' },
-      { min:11, max:13, outcome:'flyout', label:'Popout / Flyout', color:'#718096' },
-      { min:14, max:14, outcome:'double', label:'Speed Double', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:2, z2:2, z3:4 },
-    readAffinity:{ trigger:'any_counter', effect:'auto_steal' },
-    clutch:{ condition:'runner_on_second', bonuses:{z3:5} },
-    specialText:'Speedster. vs Offspeed +4 Touch, vs Fastball +3, vs Breaking +2.' },
+    specialText:'Speedster. Offspeed Read +2, Fastball +1, Breaking 0.' },
   'BC06':{ id:'BC06', name:'"Ice" Peterson'             , archetype:'Clutch Hitter'      , color:'#4b99aa',
+    readFactors:{ fastball:1, breaking:2, offspeed:1 },
     pitchRatings:{ fastball:3, breaking:4, offspeed:3 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:3, balanced:5, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'single', label:'Clutch Single', color:'#3182ce' },
-      { min:11, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'homerun', label:'HOME RUN 🔥', color:'#ecc94b' },
-      { min:14, max:14, outcome:'double', label:'Double ⚡', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:1, z2:2, z3:3 },
-    readAffinity:{ trigger:'any_counter', effect:'all_zones_bonus:2' },
-    clutch:{ condition:'final_inning_close', effect:'double_bonuses' },
-    specialText:'Clutch Performer. vs Breaking +4, vs Fastball +3, vs Offspeed +3.' },
+    specialText:'Clutch Performer. Breaking Read +2, Fastball +1, Offspeed +1.' },
   'BC07':{ id:'BC07', name:'"Scrappy" Olsen'            , archetype:'Utility Hitter'     , color:'#888888',
+    readFactors:{ fastball:1, breaking:1, offspeed:1 },
     pitchRatings:{ fastball:3, breaking:3, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:3, balanced:5, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:9, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:10, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'double', label:'Hustle Double', color:'#38b2ac' },
-      { min:14, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:2, z2:3, z3:2 },
-    readAffinity:null,
-    clutch:{ condition:'two_outs', bonuses:{chosen:3} },
-    specialText:'Reliable Utility. Balanced vs Fastball +3, vs Breaking +3, vs Offspeed +3.' },
+    specialText:'Reliable Utility. Balanced Read +1 across all pitches.' },
   'BC08':{ id:'BC08', name:'"Lightning" Jackson'        , archetype:'Power Hitter'       , color:'#e8b84b',
+    readFactors:{ fastball:2, breaking:1, offspeed:0 },
     pitchRatings:{ fastball:5, breaking:2, offspeed:2 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:3, balanced:5, power:7 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:9, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:10, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'homerun', label:'LIGHTNING BLAST 🔥', color:'#ecc94b' },
-      { min:14, max:14, outcome:'double', label:'Double', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:-1, z2:2, z3:7 },
-    readAffinity:{ trigger:'B2', effect:'z3_bonus:9' },
-    clutch:{ condition:'runner_on_base', bonuses:{z3:5} },
-    specialText:'Pure Power. vs Fastball +5 Heat Hunter, vs Breaking +2, vs Offspeed +2.' },
+    specialText:'Pure Power. Fastball Read +2, Breaking +1, Offspeed 0.' },
   'BC09':{ id:'BC09', name:'"The Captain" Reyes'        , archetype:'Complete Hitter'    , color:'#cc5599',
+    readFactors:{ fastball:1, breaking:1, offspeed:1 },
     pitchRatings:{ fastball:4, breaking:4, offspeed:3 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:3, balanced:4, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:11, max:12, outcome:'flyout', label:'Lineout / Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'double', label:'Gap Double ⚡', color:'#38b2ac' },
-      { min:14, max:14, outcome:'homerun', label:'Home Run 🔥', color:'#ecc94b' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:2, z2:4, z3:3 },
-    readAffinity:null,
-    clutch:{ condition:'trailing', bonuses:{z1:3,z2:3,z3:3} },
-    specialText:'Complete Leader. vs Fastball +4, vs Breaking +4, vs Offspeed +3.' },
+    specialText:'Complete Leader. Balanced Read +1 across all pitches.' },
   'BC10':{ id:'BC10', name:'"Ghost" Yamamoto'           , archetype:'Switch Hitter'      , color:'#5599dd',
+    readFactors:{ fastball:1, breaking:1, offspeed:2 },
     pitchRatings:{ fastball:3, breaking:3, offspeed:4 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:3, balanced:5, power:8 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'single', label:'Bunt / Single ⚡', color:'#48bb78' },
-      { min:11, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'single', label:'Clean Single', color:'#3182ce' },
-      { min:14, max:14, outcome:'double', label:'Double', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:3, z2:2, z3:2 },
-    readAffinity:null,
-    clutch:null,
-    specialText:'Switch Hitter. vs Offspeed +4, vs Fastball +3, vs Breaking +3.' },
+    specialText:'Switch Hitter. Offspeed Read +2, Fastball +1, Breaking +1.' },
   'BC11':{ id:'BC11', name:'"The Wall" Dubois'          , archetype:'Defensive Specialist', color:'#44aa88',
+    readFactors:{ fastball:2, breaking:0, offspeed:1 },
     pitchRatings:{ fastball:4, breaking:2, offspeed:3 },
-    scoutingReport:{ hotZone:'low', coldZone:'high' },
-    swingDifficulties:{ contact:2, balanced:5, power:9 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'single', label:'Pure Single', color:'#3182ce' },
-      { min:11, max:12, outcome:'flyout', label:'Flyout', color:'#718096' },
-      { min:13, max:13, outcome:'double', label:'Line Drive ⚡', color:'#38b2ac' },
-      { min:14, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:5, z2:0, z3:-3 },
-    readAffinity:{ trigger:'B5', effect:'walk_bonus_pct:25' },
-    clutch:{ condition:'ahead_in_count', bonuses:{z1:5} },
-    specialText:'Lead-off Table Setter. vs Fastball +4, vs Offspeed +3, vs Breaking +2.' },
+    specialText:'Lead-off Table Setter. Fastball Read +2, Offspeed +1, Breaking 0.' },
   'BC12':{ id:'BC12', name:'"The Bricks" Murphy'        , archetype:'Designated Hitter'  , color:'#aa4444',
+    readFactors:{ fastball:2, breaking:0, offspeed:1 },
     pitchRatings:{ fastball:5, breaking:1, offspeed:2 },
-    scoutingReport:{ hotZone:'high', coldZone:'low' },
-    swingDifficulties:{ contact:4, balanced:5, power:7 },
-    battedBallSpectrum: [
-      { min:0, max:8, outcome:'groundout', label:'Groundout', color:'#718096' },
-      { min:9, max:10, outcome:'k', label:'Strikeout Swinging ⚡', color:'#e53e3e' },
-      { min:11, max:11, outcome:'single', label:'Single', color:'#3182ce' },
-      { min:12, max:13, outcome:'homerun', label:'UPPER DECK HR 🔥', color:'#ecc94b' },
-      { min:14, max:14, outcome:'double', label:'Wall-Ball Double', color:'#38b2ac' },
-      { min:15, max:99, outcome:'flyout', label:'Flyout', color:'#718096' }
-    ],
-    zoneBonuses:{ z1:-4, z2:0, z3:9 },
-    readAffinity:{ trigger:'B1_only', effect:'only_b1_counters' },
-    clutch:{ condition:'risp', bonuses:{z3:7} },
-    specialText:'Pure Cleanup DH. vs Fastball +5 Power, vs Offspeed +2, vs Breaking +1.' },
+    specialText:'Pure Cleanup DH. Fastball Read +2, Offspeed +1, Breaking 0.' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -460,18 +328,27 @@ function getBatterPitchRating(batterChar, pitchType) {
   return batterChar.pitchRatings?.[pitchType] ?? 0;
 }
 
+function getPitcherBaseTarget(pitcherChar, pitchType) {
+  if (!pitcherChar || !pitchType) return 3;
+  return pitcherChar.baseTargets?.[pitchType] ?? 3;
+}
+
+function getBatterReadFactor(batterChar, pitchType) {
+  if (!batterChar || !pitchType) return 1;
+  return batterChar.readFactors?.[pitchType] ?? 1;
+}
+
 function getCardDisplay(cardOrVal, isPitching = false) {
   if (cardOrVal === null || cardOrVal === undefined) return '—';
   const val = (typeof cardOrVal === 'object') ? cardOrVal?.value : Number(cardOrVal);
-  if (val === 1) {
-    return isPitching ? 'WP' : 'K';
-  }
   return isNaN(val) ? '—' : String(val);
 }
 
 if (typeof window !== 'undefined') {
   window.getPitcherPitchRating = getPitcherPitchRating;
   window.getBatterPitchRating  = getBatterPitchRating;
+  window.getPitcherBaseTarget  = getPitcherBaseTarget;
+  window.getBatterReadFactor   = getBatterReadFactor;
   window.getCardDisplay        = getCardDisplay;
 }
 
@@ -489,6 +366,8 @@ if (typeof module !== 'undefined' && module.exports) {
     getDeckPreset,
     getPitcherPitchRating,
     getBatterPitchRating,
+    getPitcherBaseTarget,
+    getBatterReadFactor,
     getCardDisplay,
   };
 }

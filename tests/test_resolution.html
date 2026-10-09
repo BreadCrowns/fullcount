@@ -165,366 +165,189 @@
           assert(totalPitches === 9, `Pitcher ${p.name} has exactly 9 pitch charges (${totalPitches})`);
         });
 
-        // 12. Sequential Beat 1 Tests (Setup Pitch Sweet Spot Resolution)
-        // A. Pitcher plays Card 1 (WP in dirt) -> 3-1 Count + Runners advance
-        const b1PitcherWP = resolveBeat1({
-          pitcherCardId: 'P19', // Val 1 (WP)
-          batterCardId: 'B4',
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1PitcherWP.winner === 'batter', `Pitch 1 WP awards 3-1 count`);
-        assert(b1PitcherWP.count === '3-1', `Pitch 1 WP establishes 3-1 count`);
-        assert(b1PitcherWP.isWildPitch === true, `Pitch 1 WP is flagged as wild pitch`);
+        // 12. Character Base Targets & Read Factors Tests
+        assert(typeof getPitcherBaseTarget === 'function', 'getPitcherBaseTarget helper is defined');
+        assert(typeof getBatterReadFactor === 'function', 'getBatterReadFactor helper is defined');
+        const pJake = PITCHER_CHARACTERS['PC01']; // Big Jake: FB 2, BR 4, OS 5
+        const bBear = BATTER_CHARACTERS['BC01'];  // The Bear: FB +2, BR +1, OS 0
+        assert(getPitcherBaseTarget(pJake, 'fastball') === 2, 'Big Jake has Fastball Base Target of 2');
+        assert(getPitcherBaseTarget(pJake, 'breaking') === 4, 'Big Jake has Breaking Base Target of 4');
+        assert(getPitcherBaseTarget(pJake, 'offspeed') === 5, 'Big Jake has Offspeed Base Target of 5');
+        assert(getBatterReadFactor(bBear, 'fastball') === 2, 'The Bear has Fastball Read Factor of +2');
+        assert(getBatterReadFactor(bBear, 'breaking') === 1, 'The Bear has Breaking Read Factor of +1');
+        assert(getBatterReadFactor(bBear, 'offspeed') === 0, 'The Bear has Offspeed Read Factor of 0');
 
-        // B. Batter plays Card 1 (K whiff) -> 0-2 Pitcher Count
-        const b1PitcherWins = resolveBeat1({
-          pitcherCardId: 'P1',
+        // 13. Sequential Beat 1 Tests (The Read: Pitch Choice & Anticipation)
+        // A. Anticipated Pitch: Batter correctly anticipates Fastball -> Target elevated to 4 (Base 2 + Read 2)
+        const b1Anticipated = resolveBeat1({
           pitchType: 'fastball',
-          batterCardId: 'B13', // Val 1 (K!)
           guessPitch: 'fastball',
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b1PitcherWins.winner === 'pitcher', `Beat 1 batter K awards pitcher advantage`);
-        assert(b1PitcherWins.count === '0-2', `Beat 1 batter K establishes 0-2 Pitcher's Count`);
-        assert(b1PitcherWins.lockedOption === null, `No artificial option lockouts on pitcher win`);
-        assert(b1PitcherWins.isDominant === true, `Batter K establishes dominant count advantage`);
-        assert(b1PitcherWins.revealCardFirst === 'batter', `Batter must play execution card face-up first on dominant pitcher win`);
+        assert(b1Anticipated.winner === 'batter', 'Correct anticipation awards batter advantage');
+        assert(b1Anticipated.pitchMatched === true, 'pitchMatched is true on correct anticipation');
+        assert(b1Anticipated.effectiveTarget === 4, `Target elevated to 4 (Base 2 + Read 2) (got: ${b1Anticipated.effectiveTarget})`);
+        assert(b1Anticipated.count === '3-1', "Correct anticipation establishes 3-1 Hitter's Count");
 
-        // C. Sweet Spot Barrel: Batter anticipates Fastball and squares up Center 12 -> 3-1 Count
-        const b1BatterWins = resolveBeat1({
+        // B. Fooled Batter: Batter anticipates Offspeed, pitcher throws Fastball -> Target remains at Base 2
+        const b1Fooled = resolveBeat1({
           pitchType: 'fastball',
-          pitcherCardId: 'P24', // Val 3 + PC01 FB 5 = 8
-          guessPitch: 'fastball',
-          batterCardId: 'B8',   // Val 4 -> Total 12 (Squared up Center 12!)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1BatterWins.winner === 'batter', `Beat 1 sweet spot barrel awards batter advantage`);
-        assert(b1BatterWins.count === '3-1', `Beat 1 sweet spot establishes 3-1 Hitter's Count`);
-        assert(b1BatterWins.lockedOption === null, `No artificial option lockouts on batter win`);
-        assert(b1BatterWins.isDominant === true, `Squared up sweet spot establishes dominant count advantage`);
-        assert(b1BatterWins.revealCardFirst === 'pitcher', `Pitcher must throw execution card face-up first on dominant batter win`);
-
-        // D. Outside Sweet Spot (High Heat 17 > 15): 0-2 Count
-        const b1HighHeat = resolveBeat1({
-          pitchType: 'fastball',
-          pitcherCardId: 'P1',  // Val 6 + FB 5 = 11
-          guessPitch: 'fastball',
-          batterCardId: 'B6',   // Val 6 -> Total 17 (above barrel max 15)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1HighHeat.winner === 'pitcher', `High heat outside sweet spot awards pitcher win`);
-        assert(b1HighHeat.count === '0-2', `High heat establishes 0-2 Pitcher's Count`);
-        assert(b1HighHeat.isDominant === true, `High heat establishes dominant count advantage`);
-        assert(b1HighHeat.revealCardFirst === 'batter', `Batter must play face-up first on dominant high heat`);
-
-        // E. Line Drive Band ([6-7] on Breaking Center 9): 3-2 Full Count
-        const b1Tie = resolveBeat1({
-          pitchType: 'breaking',
-          pitcherCardId: 'P25', // Val 2 + PC01 Breaking 3 = 5
-          guessPitch: 'breaking',
-          batterCardId: 'B1',   // Val 2 -> Total 7 (Line Drive Band [6-7])
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b1Tie.winner === 'tie', `Line drive contact results in tie`);
-        assert(b1Tie.count === '3-2', `Beat 1 line drive establishes 3-2 Full Count`);
-        assert(b1Tie.lockedOption === null, `3-2 Full count has no option lockouts`);
-        assert(b1Tie.isDominant === false, `Line drive has no dominant advantage`);
-        assert(b1Tie.revealCardFirst === null, `Line drive does not force card reveal`);
-
-        // 13. Sequential Beat 2 Tests (Bell Curve Launch Angle Spectrum)
-        // Scenario A: PITCH ANTICIPATED - SWEET SPOT BARREL (Center 9, Band [8-10]) -> HOME RUN
-        const b2HR = resolveBeat2({
-          count: '3-2',
-          pitchType: 'breaking',
-          pitcherCardId: 'P24', // val 3 + PC01 Breaking 3 = 6
-          guessPitch: 'breaking',
-          batterCardId: 'B8',   // val 4 -> Total 10 (Sweet Spot Barrel!)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b2HR.pitcherExecuted === true, `Pitcher executes delivery`);
-        assert(b2HR.batterExecuted === true, `Batter executes swing in anticipated pitch`);
-        assert(b2HR.launchAngle === 10, `Launch Angle Total is 10 (Sweet Spot Barrel)`);
-        assert(b2HR.matchTier === 'matched', `Batter anticipated pitch (match)`);
-        assert(b2HR.outcomeType === 'homerun', `Pitch match + Sweet Spot 10 produces Home Run`);
-
-        // Pitch Match with High Heat (15+): Neutral count produces routine flyout
-        const b2FullContactMistimed = resolveBeat2({
-          count: '3-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P1',  // val 6 + PC01 FB 5 = 11
-          guessPitch: 'fastball',
-          batterCardId: 'B6',   // val 6 -> Total 17 (High Heat Band 15+)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC02'],
-        });
-        assert(b2FullContactMistimed.matchTier === 'matched', `Pitch match on swing`);
-        assert(b2FullContactMistimed.launchAngle >= 15, `Launch Angle is 15+ (high heat)`);
-        assert(b2FullContactMistimed.outcomeType === 'flyout' || b2FullContactMistimed.outcomeType === 'groundout', `Pitch match high heat contact produces routine out`);
-
-        // Scenario B: PITCH ANTICIPATED - LINE DRIVE BAND ([6-7]) -> SINGLE
-        const b2SolidHit = resolveBeat2({
-          count: '3-2',
-          pitchType: 'breaking',
-          pitcherCardId: 'P25', // val 2 + PC01 Breaking 3 = 5
-          guessPitch: 'breaking',
-          batterCardId: 'B1',   // val 2 -> Total 7 (Line Drive Band)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b2SolidHit.matchTier === 'matched', `Batter read the breaking pitch`);
-        assert(b2SolidHit.launchAngle === 7, `Launch Angle Total is 7 (line drive band)`);
-        assert(b2SolidHit.outcomeType === 'single', `Line drive band on anticipated pitch produces single`);
-
-        // Pitch Anticipated on 0-2 Count with High Heat (15+) -> Strikeout
-        const b2Strikeout = resolveBeat2({
-          count: '0-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P1',  // val 6 + FB 5 = 11
-          guessPitch: 'fastball',
-          batterCardId: 'B6',   // val 6 -> Total 17 (High Heat Band 15+)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b2Strikeout.launchAngle >= 15, `Launch Angle is 15+ (high heat)`);
-        assert(b2Strikeout.outcomeType === 'k', `0-2 count high heat results in Strikeout`);
-
-        // Scenario C: FOOLED / WHIFF (Batter guessed wrong pitch)
-        // Fooled with low contact (Total <= 14) -> Weak groundout
-        const b2ContactProtect = resolveBeat2({
-          count: '3-2',
-          pitchType: 'breaking', // PC01 Breaking bonus = 3
-          pitcherCardId: 'P25',  // val 2 -> eff = 5
-          guessPitch: 'fastball', // Pitch wrong (+0)
-          batterCardId: 'B10',   // val 3 -> Total 8 <= 14
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC02'],
-        });
-        assert(b2ContactProtect.matchTier === 'whiff', `Batter guessed wrong pitch`);
-        assert(b2ContactProtect.launchAngle <= 14, `Launch Angle is <= 14`);
-        assert(b2ContactProtect.outcomeType === 'groundout' || b2ContactProtect.outcomeType === 'flyout', `Fooled batter with moderate total produces weak out`);
-
-        // Whiff with low total (<= 14) -> Popout/Groundout
-        const b2WhiffGoodSwing = resolveBeat2({
-          count: '3-2',
-          pitchType: 'breaking', // PC01 Breaking bonus = 3
-          pitcherCardId: 'P25', // Val 2 -> eff = 5
-          guessPitch: 'fastball', // WRONG (+0)
-          batterCardId: 'B17',  // Val 4 -> Total 9 <= 14
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b2WhiffGoodSwing.matchTier === 'whiff', `Batter guessed wrong pitch`);
-        assert(b2WhiffGoodSwing.launchAngle <= 14, `Launch Angle is <= 14`);
-        assert(b2WhiffGoodSwing.outcomeType === 'flyout' || b2WhiffGoodSwing.outcomeType === 'groundout', `Fooled batter produces popout/groundout`);
-
-        // Whiff with High Heat (Total 15+) -> Swinging Strikeout!
-        const b2WhiffCleanPitch = resolveBeat2({
-          count: '3-2',
-          pitchType: 'fastball', // PC01 Fastball bonus = 5
-          pitcherCardId: 'P1',  // Val 6 -> eff = 11
-          guessPitch: 'offspeed', // WRONG (+0)
-          batterCardId: 'B6',   // Val 6 -> Total 17 >= 15
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b2WhiffCleanPitch.matchTier === 'whiff', `Batter fooled on pitch`);
-        assert(b2WhiffCleanPitch.launchAngle >= 15, `Launch Angle is >= 15`);
-        assert(b2WhiffCleanPitch.outcomeType === 'k', `Fooled on pitch with high heat produces Strikeout`);
-
-        // ── SPECIAL CARDS TESTS: WP (Wild Pitch) & K (Automatic Strikeout) ──
-        // Pitcher plays WP (Card 1) on 0-2 count
-        const b2WildPitch02 = resolveBeat2({
-          count: '0-2',
-          pitchType: 'fastball',
-          pitcherCardId: 'P19', // Val 1 (WP!)
           guessPitch: 'offspeed',
-          batterCardId: 'B4',   // Val 3
-          bases: { first: true, second: false, third: true },
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2WildPitch02.isPitcherWP === true, `Pitcher Card 1 is identified as WP (Wild Pitch)`);
-        assert(b2WildPitch02.outcomeType === 'wild_pitch', `WP on 0-2 count resolves to wild_pitch`);
-        assert(b2WildPitch02.isWildPitchReset === true, `isWildPitchReset is flagged true on 0-2 wild pitch`);
-        assert(b2WildPitch02.outsAdded === 0, `Wild pitch adds zero outs`);
-        assert(b2WildPitch02.runsScored === 1, `Runner on 3rd scores on wild pitch`);
-        assert(b2WildPitch02.ruleReason.includes('Wild pitch') || b2WildPitch02.ruleReason.includes('wild pitch'), `Rule reason describes wild pitch in dirt`);
+        assert(b1Fooled.winner === 'pitcher', 'Fooled batter awards pitcher advantage');
+        assert(b1Fooled.pitchMatched === false, 'pitchMatched is false when fooled');
+        assert(b1Fooled.effectiveTarget === 2, `Target remains at baseline 2 (got: ${b1Fooled.effectiveTarget})`);
+        assert(b1Fooled.count === '0-2', "Fooled batter establishes 0-2 Pitcher's Count");
 
-        // Batter plays K (Card 1) -> Automatic Strikeout on 3-2!
-        const b2BatterK = resolveBeat2({
-          count: '3-2',
+        // 14. Sequential Beat 2 Tests (Execution Clash: Pitcher Target & Batter Window)
+        // Check 1: Pitcher Execution Fail (Pitcher < Target) -> Ball in the Dirt
+        // Pitcher plays Card 1 vs Target 3:
+        const b2BallInDirt = resolveBeat2({
+          target: 3,
           pitchType: 'fastball',
-          pitcherCardId: 'P2',  // Val 9
-          guessPitch: 'fastball',
-          batterCardId: 'B13',  // Val 1 (K!)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P19', // Val 1 < Target 3
+          batterCardId: 'B8',   // Val 4
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2BatterK.isBatterK === true, `Batter Card 1 is identified as K (Strikeout)`);
-        assert(b2BatterK.outcomeType === 'k', `Batter K card produces automatic Strikeout on 3-2 count`);
+        assert(b2BallInDirt.pitcherExecuted === false, 'Pitcher failed execution (Card 1 < Target 3)');
+        assert(b2BallInDirt.isBall === true, 'Unexecuted pitch is marked as Ball in the Dirt');
+        assert(b2BallInDirt.returnBatterCard === true, 'Batter card is returned unrevealed to hand');
+        assert(b2BallInDirt.advancesTo === 'beat3', 'Ball in dirt advances to Beat 3 Payoff Pitch');
+        assert(b2BallInDirt.winner === 'batter', 'Ball in dirt awards batter advantage');
 
-        // Both players play Card 1 -> Strikeout on Wild Pitch!
-        const b2Both1 = resolveBeat2({
-          count: '0-2',
+        // Check 2: Strikeout / Whiff (Batter > Pitcher)
+        // Pitcher plays Card 4 (Target 3), Batter plays Card 5 (overswung)
+        const b2Strikeout = resolveBeat2({
+          target: 3,
           pitchType: 'fastball',
-          pitcherCardId: 'P19', // Val 1 (WP)
-          guessPitch: 'fastball',
-          batterCardId: 'B13',  // Val 1 (K)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P5', // Val 4 >= Target 3
+          batterCardId: 'B2',  // Val 5 > Pitcher 4
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2Both1.outcomeType === 'k', `Both Card 1s records Strikeout`);
-        assert(b2Both1.isWildPitchReset === true, `Both Card 1s advances runners on the wild pitch`);
+        assert(b2Strikeout.pitcherExecuted === true, 'Pitcher executed delivery (Card 4 >= Target 3)');
+        assert(b2Strikeout.outcomeType === 'k', 'Batter > Pitcher produces Strikeout (Whiff)');
+        assert(b2Strikeout.outsAdded === 1, 'Strikeout adds 1 out');
+        assert(b2Strikeout.winner === 'pitcher', 'Strikeout awards pitcher win');
 
-        // 3-1 Count Executed Pitch Whiff Test (Pillar A: Pitcher battles back to 3-2, never immediate Strikeout)
-        // Pitcher challenges with Fastball using Card P1 (val 6 + FB 5 = 11).
-        // Batter anticipates Fastball with Card B6 (val 6). Launch Angle = 17 (above barrel max 15).
-        const b2Executed31AnticipatedWhiff = resolveBeat2({
-          count: '3-1',
+        // Check 3: Weak Groundout (Batter < Target)
+        // Pitcher plays Card 5 (Target 4), Batter plays Card 2 (< Target)
+        const b2WeakGroundout = resolveBeat2({
+          target: 4,
           pitchType: 'fastball',
-          pitcherCardId: 'P1',  // Val 6 (FB 5 = 11)
-          guessPitch: 'fastball', // Anticipated
-          batterCardId: 'B6',   // Val 6 -> Launch Angle 17 (above barrel max 15)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P2', // Val 5 >= Target 4
+          batterCardId: 'B1', // Val 2 < Target 4
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2Executed31AnticipatedWhiff.pitcherExecuted === true, `Pitcher executed Fastball with Card 6`);
-        assert(b2Executed31AnticipatedWhiff.launchAngle >= 16, `Launch Angle is high heat above barrel (${b2Executed31AnticipatedWhiff.launchAngle})`);
-        assert(b2Executed31AnticipatedWhiff.outcomeType === 'battle_back', `Executed strike with Delta 6 whiff on 3-1 count battles back to 3-2 Full Count`);
-        assert(b2Executed31AnticipatedWhiff.isBattleBack === true, `isBattleBack is true on 3-1 executed strike`);
-        assert(b2Executed31AnticipatedWhiff.outcomeType !== 'walk', `Executed strike cannot be a Walk`);
+        assert(b2WeakGroundout.pitcherExecuted === true, 'Pitcher executed delivery');
+        assert(b2WeakGroundout.outcomeType === 'groundout', 'Batter < Target produces Weak Groundout');
+        assert(b2WeakGroundout.outsAdded === 1, 'Groundout adds 1 out');
+        assert(b2WeakGroundout.winner === 'pitcher', 'Weak groundout awards pitcher win');
 
-        // 3-1 Count Executed Pitch Fooled Whiff Test:
-        // Pitcher executes Fastball with Card P1 (val 6).
-        // Batter fooled looking Offspeed with Card B4 (val 3).
-        const b2Executed31FooledWhiff = resolveBeat2({
-          count: '3-1',
+        // Check 4: Base Hit in the Window (Target <= Batter < Pitcher)
+        // Subcase A: Clean Single (Batter Card <= 4)
+        const b2CleanSingle = resolveBeat2({
+          target: 3,
           pitchType: 'fastball',
-          pitcherCardId: 'P1',  // Val 6
-          guessPitch: 'offspeed', // Fooled
-          batterCardId: 'B4',   // Val 3
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P1', // Val 6
+          batterCardId: 'B8',  // Val 4 in Window [3..6)
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2Executed31FooledWhiff.outcomeType === 'battle_back', `Executed strike with Delta 6 fooled whiff on 3-1 count battles back to 3-2 Full Count`);
-        assert(b2Executed31FooledWhiff.isBattleBack === true, `isBattleBack is true on 3-1 fooled whiff`);
-        assert(b2Executed31FooledWhiff.outcomeType !== 'walk', `Fooled whiff on executed strike cannot be a Walk`);
+        assert(b2CleanSingle.outcomeType === 'single', 'Card 4 in Window produces Clean Single');
+        assert(b2CleanSingle.winner === 'batter', 'Clean single awards batter win');
+        assert(b2CleanSingle.outsAdded === 0, 'Single adds 0 outs');
 
-        // 3-1 Count Unexecuted Pitch Test:
-        // Pitcher fails execution throwing Fastball with Card P30 (val 1, out of range 6-10).
-        // Batter is fooled on pitch type. Unexecuted ball on 3-1 is Ball Four -> Walk!
-        const b2Unexecuted31Walk = resolveBeat2({
-          count: '3-1',
+        // Subcase B: Gapping Double (Batter Card >= 5)
+        const b2GapDouble = resolveBeat2({
+          target: 3,
           pitchType: 'fastball',
-          pitcherCardId: 'P30', // Val 1 (out of range 6-10)
-          guessPitch: 'breaking', // Fooled
-          batterCardId: 'B4',
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P1', // Val 6
+          batterCardId: 'B2',  // Val 5 in Window [3..6)
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(!b2Unexecuted31Walk.pitcherExecuted, `Pitcher failed execution with Card 1 on Fastball`);
-        assert(b2Unexecuted31Walk.outcomeType === 'walk', `Unexecuted pitch on 3-1 count properly resolves to Walk (Ball Four)`);
+        assert(b2GapDouble.outcomeType === 'double', 'Card 5 in Window produces Gapping Double');
+        assert(b2GapDouble.winner === 'batter', 'Double awards batter win');
 
+        // Check 5: Exact Match Collision (Batter == Pitcher)
+        // Subcase A: Exact Match with Batter Advantage -> Barreled Home Run!
+        const b2BarreledHR = resolveBeat2({
+          target: 3,
+          advantageSide: 'batter',
+          pitchType: 'fastball',
+          pitcherCardId: 'P5', // Val 4
+          batterCardId: 'B8',  // Val 4 == Pitcher 4
+          pitcherChar: pJake,
+          batterChar: bBear,
+        });
+        assert(b2BarreledHR.outcomeType === 'homerun', 'Exact match with read advantage produces Home Run');
+        assert(b2BarreledHR.winner === 'batter', 'Home run awards batter win');
 
+        // Subcase B: Exact Match with Pitcher Advantage -> Foul Ball / Battle to Beat 3!
+        const b2FoulBattle = resolveBeat2({
+          target: 3,
+          advantageSide: 'pitcher',
+          pitchType: 'fastball',
+          pitcherCardId: 'P5', // Val 4
+          batterCardId: 'B8',  // Val 4 == Pitcher 4
+          pitcherChar: pJake,
+          batterChar: bBear,
+        });
+        assert(b2FoulBattle.outcomeType === 'battle_back', 'Exact match with pitcher advantage produces battle_back');
+        assert(b2FoulBattle.isBattleBack === true, 'isBattleBack flagged true on exact match foul');
+        assert(b2FoulBattle.isFoulBall === true, 'isFoulBall flagged true on exact match foul');
+        assert(b2FoulBattle.advancesTo === 'beat3', 'Foul ball advances to Beat 3');
+        assert(b2FoulBattle.winner === 'tie', 'Foul ball is a tie');
 
-        // 14. Character Base Pitch Ratings Tests
-        assert(typeof getPitcherPitchRating === 'function', 'getPitcherPitchRating helper is defined');
-        assert(typeof getBatterPitchRating === 'function', 'getBatterPitchRating helper is defined');
-        const pSmoke = PITCHER_CHARACTERS['PC04']; // Smoke Williams
-        const bBear = BATTER_CHARACTERS['BC01'];   // The Bear Mackintosh
-        assert(getPitcherPitchRating(pSmoke, 'fastball') === 6, 'Smoke Williams has +6 Fastball rating');
-        assert(getPitcherPitchRating(pSmoke, 'breaking') === 3, 'Smoke Williams has +3 Breaking rating');
-        assert(getBatterPitchRating(bBear, 'fastball') === 5, 'The Bear Mackintosh has +5 Fastball rating');
-        assert(getBatterPitchRating(bBear, 'breaking') === 2, 'The Bear Mackintosh has +2 Breaking rating');
-
-        // 15. Beat 2 Battle-Back Condition Tests
-        // 0-2 Count: Batter makes line drive contact ([6–7]) on read pitch -> Battles back to 3-2!
-        const b2BattleBack02 = resolveBeat2({
-          count: '0-2',
+        // 15. Beat 3 & Beat 4 Payoff Pitch Tests
+        // A. Beat 3 Payoff Read
+        const b3PayoffRead = resolveBeat3({
           pitchType: 'breaking',
-          pitcherCardId: 'P25', // Val 2 + PC01 Breaking 3 = 5
           guessPitch: 'breaking',
-          batterCardId: 'B1',   // Val 2 -> Total 7 (Line Drive Band [6–7])
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2BattleBack02.isBattleBack === true, '0-2 Count with line drive contact triggers battle back');
-        assert(b2BattleBack02.outcomeType === 'battle_back', '0-2 Battle back outcomeType is battle_back');
-        assert(b2BattleBack02.launchAngle === 7, `Launch Angle is 7 (${b2BattleBack02.launchAngle} == 7)`);
+        assert(b3PayoffRead.winner === 'batter', 'Beat 3 read awards batter advantage on match');
+        assert(b3PayoffRead.effectiveTarget === 5, 'Beat 3 target calculated correctly (Base 4 + Read 1 = 5)');
 
-        // 3-1 Count: Pitcher throws clutch strike with high heat (16+) -> Battles back to 3-2!
-        const b2BattleBack31 = resolveBeat2({
-          count: '3-1',
+        // B. Beat 4 Payoff Execution Clash: Pitcher Misses Target -> Ball Four Walk!
+        const b4PayoffWalk = resolveBeat4({
+          target: 4,
           pitchType: 'fastball',
-          pitcherCardId: 'P1',  // Val 6 + PC01 FB 5 = 11
-          guessPitch: 'fastball',
-          batterCardId: 'B6',   // Val 6 -> Total 17 (High Heat above barrel max 15)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P7', // Val 3 < Target 4
+          batterCardId: 'B8',  // Val 4
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b2BattleBack31.isBattleBack === true, '3-1 Count with clutch strike triggers battle back');
-        assert(b2BattleBack31.outcomeType === 'battle_back', '3-1 Battle back outcomeType is battle_back');
+        assert(b4PayoffWalk.outcomeType === 'walk', 'Payoff pitch missed target resolves to Ball Four Walk');
+        assert(b4PayoffWalk.winner === 'batter', 'Ball Four Walk awards batter win');
 
-        // 16. Beat 3 Full Count Showdown (resolveBeat3) Tests
-        // Sweet Spot Band (11–14) -> Home Run!
-        const b3ShowdownHR = resolveBeat3({
-          pitchType: 'breaking',
-          pitcherCardId: 'P25', // Val 2 + PC01 Breaking 3 = 5
-          guessPitch: 'breaking',
-          batterCardId: 'B26',  // Val 6 + BC01 Breaking 2 = 8 -> Total 13 (Sweet Spot Band 11–14)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b3ShowdownHR.outcomeType === 'homerun', `3-2 Full Count showdown in sweet spot produces Home Run (${b3ShowdownHR.outcomeType})`);
-        assert(b3ShowdownHR.count === '3-2', 'Beat 3 count is 3-2');
-
-        // Wild Pitch (Card 1) on 3-2 count -> Ball Four Walk!
-        const b3ShowdownWalk = resolveBeat3({
+        // C. Beat 4 Payoff Execution Clash: Exact Match with Pitcher Advantage falls in for Single
+        const b4PayoffClutchSingle = resolveBeat4({
+          target: 3,
+          advantageSide: 'pitcher',
           pitchType: 'fastball',
-          pitcherCardId: 'P19', // Val 1 (WP in dirt!)
-          guessPitch: 'fastball',
-          batterCardId: 'B2',
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
+          pitcherCardId: 'P5', // Val 4
+          batterCardId: 'B8',  // Val 4 == Pitcher 4
+          pitcherChar: pJake,
+          batterChar: bBear,
         });
-        assert(b3ShowdownWalk.outcomeType === 'walk', `3-2 Full Count showdown wild pitch produces Walk`);
-
-        // Fooled with High Heat (Total >= 15) -> Punchout Strikeout!
-        const b3ShowdownStrikeout = resolveBeat3({
-          pitchType: 'breaking',
-          pitcherCardId: 'P2',  // Val 9 + PC01 Breaking 3 = 12
-          guessPitch: 'fastball', // Fooled on pitch type (+0)
-          batterCardId: 'B18',  // Val 9 -> Total 21 (High Heat >= 15)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b3ShowdownStrikeout.outcomeType === 'k', `3-2 Full Count showdown fooled high heat produces Strikeout`);
-
-        // Fooled on pitch type with low total (<= 14) -> Weak groundout
-        const b3ShowdownFooledSolidTiming = resolveBeat3({
-          pitchType: 'breaking',
-          pitcherCardId: 'P24', // Val 3 + PC01 Breaking 3 = 6
-          guessPitch: 'fastball', // Fooled on pitch type (+0)
-          batterCardId: 'B10',  // Val 4 -> Total 10 (<= 14)
-          pitcherChar: PITCHER_CHARACTERS['PC01'],
-          batterChar: BATTER_CHARACTERS['BC01'],
-        });
-        assert(b3ShowdownFooledSolidTiming.outcomeType === 'groundout', `Beat 3 fooled on pitch with low total produces weak groundout, NOT Strikeout (${b3ShowdownFooledSolidTiming.outcomeType})`);
-        assert(b3ShowdownFooledSolidTiming.launchAngle <= 14, `Beat 3 launch angle is <= 14 (${b3ShowdownFooledSolidTiming.launchAngle})`);
+        assert(b4PayoffClutchSingle.outcomeType === 'single', 'Payoff pitch exact match with pitcher advantage falls in for Single');
+        assert(b4PayoffClutchSingle.winner === 'batter', 'Clutch single awards batter win');
 
         // 17. Sequential 3-Beat PA Resolution
         const seq3BeatResult = resolveSequentialPA({
-          beat1: b1PitcherWins,
-          beat2: b2BattleBack02,
-          beat3: b3ShowdownHR,
+          beat1: b1Fooled,
+          beat2: b2FoulBattle,
+          beat3: b2BarreledHR,
           bases: { first:false, second:false, third:false },
-          pitcherChar: pSmoke,
+          pitcherChar: pJake,
           batterChar: bBear,
           score: { batting:0, pitching:0 },
           outs: 0,
@@ -667,7 +490,7 @@
           });
 
           let b3 = null;
-          if (b2.isBattleBack) {
+          if (b2.isBattleBack || b2.isBall) {
             simState.currentPA = { beatResults: { beat1: b1, beat2: b2 } };
             const pitcherPlay3 = executeBotPlayBeat(simState, pitchingRole, 'beat3');
             simState.hands[pitchingRole] = pitcherPlay3.botHand;
