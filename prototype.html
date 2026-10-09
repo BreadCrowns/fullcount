@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Count - Modern Mobile Card Game UI</title>
+  <style>
+    /* ==========================================================================
+       FULL COUNT — HIGH-FIDELITY MOBILE CARD GAME UI (ZERO EXTERNAL DEPENDENCY)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-canvas: #090a16;
+      --bg-phone: #0e0f24;
+      --bg-header: #181938;
+      --bg-dock: #181938;
+      --felt-center: #1a6f3f;
+      --felt-mid: #145934;
+      --felt-dark: #0d3d22;
+      --royal-blue: #2563eb;
+      --royal-blue-hover: #1d4ed8;
+      --royal-blue-glow: rgba(37, 99, 235, 0.5);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.4);
+      --card-white: #ffffff;
+      --card-border: #e2e8f0;
+      --text-dark: #0f172a;
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, monospace;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: #f8fafc;
+      font-family: var(--font-stack);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    /* ── CONTROLS TOOLBAR ── */
+    .top-toolbar {
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0 4px;
+    }
+
+    .pill-tabs {
+      display: flex;
+      background: #181938;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .pill-tab {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .pill-tab.active {
+      background: var(--royal-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 8px var(--royal-blue-glow);
+    }
+
+    .btn-intel {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-intel:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    /* ── MOBILE PHONE SHELL ── */
+    .phone-container {
+      width: 100%;
+      max-width: 414px;
+      height: 840px;
+      background: var(--bg-phone);
+      border: 4px solid #334155;
+      border-radius: 46px;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Phone Speaker / Dynamic Island */
+    .phone-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 20px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .island-lens {
+      width: 9px;
+      height: 9px;
+      background: #111827;
+      border: 1.5px solid #1f2937;
+      border-radius: 50%;
+      margin-left: 45px;
+    }
+
+    /* =========================================================================
+       1. TOP 30%: STATUS & OPPONENT ZONE
+       ========================================================================= */
+    .game-header {
+      background: var(--bg-header);
+      padding: 34px 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .brand-tag {
+      font-size: 0.6rem;
+      font-weight: 900;
+      color: var(--gold);
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Gold Score Pill */
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .score-led {
+      width: 7px;
+      height: 7px;
+      background: #fbbf24;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #fbbf24;
+    }
+    .score-text {
+      font-size: 0.8rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .score-sep { color: #64748b; font-weight: 700; }
+    .score-inn {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #fde047;
+      letter-spacing: 0.5px;
+    }
+    .outs-group {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 2px;
+    }
+    .out-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #334155;
+    }
+    .out-dot.filled {
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+    }
+
+    /* Opponent Bar */
+    .opponent-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 6px 10px;
+    }
+    .opp-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .opp-avatar {
+      width: 32px;
+      height: 32px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1.5px solid rgba(245, 158, 11, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .opp-details {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .opp-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .opp-name {
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+    .opp-badge {
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: #fb923c;
+      background: rgba(249, 115, 22, 0.18);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .opp-sub {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .opp-stats-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .opp-hand-counter {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .opp-status-pill {
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .opp-status-pill.ready {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    /* =========================================================================
+       2. MIDDLE 40%: ARENA / STADIUM FELT CARD MAT
+       ========================================================================= */
+    .felt-arena {
+      flex: 1;
+      margin: 8px;
+      padding: 12px;
+      background: radial-gradient(ellipse at 50% 40%, var(--felt-center) 0%, var(--felt-mid) 60%, var(--felt-dark) 100%);
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle Diamond Texture Overlay */
+    .felt-arena::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 16px 16px;
+      pointer-events: none;
+    }
+
+    .arena-banner {
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+    }
+    .arena-banner-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #e2e8f0;
+      backdrop-filter: blur(4px);
+    }
+    .arena-banner-pill b { color: #facc15; }
+
+    /* ── PITCH CARDS ROW (BEAT 1) ── */
+    .pitch-cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      z-index: 10;
+      margin: auto 0;
+    }
+
+    .pitch-card {
+      background: var(--card-white);
+      color: var(--text-dark);
+      border-radius: 12px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 106px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      border: 2.5px solid transparent;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .pitch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
+    }
+
+    .pitch-card.active {
+      border-color: var(--royal-blue);
+      box-shadow: 0 0 0 3px var(--royal-blue), 0 12px 25px var(--royal-blue-glow);
+      transform: translateY(-6px);
+    }
+
+    .pc-top {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pc-icon { font-size: 1.25rem; }
+    .pc-name {
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      text-transform: uppercase;
+    }
+
+    .pc-body {
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 3px 5px;
+      width: 100%;
+      text-align: center;
+    }
+    .pc-target {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #1e3a8a;
+    }
+    .pc-tunnel {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #64748b;
+    }
+
+    .pc-badge {
+      font-size: 0.58rem;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #475569;
+      letter-spacing: 0.4px;
+    }
+    .pitch-card.active .pc-badge {
+      background: var(--royal-blue);
+      color: #ffffff;
+    }
+
+    /* ── CENTER FACE-DOWN CARD (BEAT 1) ── */
+    .face-down-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      margin: auto 0;
+    }
+    .face-down-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #a7f3d0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-back {
+      width: 72px;
+      height: 102px;
+      border-radius: 12px;
+      border: 3.5px solid #ffffff;
+      background-color: #1d4ed8;
+      background-image: 
+        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px),
+        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px);
+      background-blend-mode: multiply;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-back::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 6px;
+    }
+    .card-back-stamp {
+      font-size: 0.62rem;
+      font-weight: 900;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      backdrop-filter: blur(4px);
+      z-index: 2;
+    }
+
+    /* ── BEAT 2 CLASH ARENA ── */
+    .b2-showcase-card {
+      background: #ffffff;
+      color: var(--text-dark);
+      border-radius: 14px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 10;
+    }
+    .b2-pitch-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .b2-pitch-icon { font-size: 1.5rem; }
+    .b2-pitch-title {
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+    }
+    .b2-pitch-sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .b2-target-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+    .b2-target-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #64748b;
+    }
+    .b2-target-num {
+      font-size: 1.1rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      background: var(--gold);
+      color: #000;
+      padding: 1px 8px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Clash Head-to-Head Arena */
+    .clash-duel-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 100%;
+      z-index: 10;
+      margin: auto 0;
+    }
+
+    .clash-slot-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .slot-title {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #a7f3d0;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .drop-slot {
+      width: 74px;
+      height: 104px;
+      border-radius: 12px;
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+    .drop-slot.filled {
+      border: 2px solid #ffffff;
+      background: #ffffff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    .drop-slot-hint {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.85);
+      text-align: center;
+      padding: 4px;
+    }
+
+    .clash-vs-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .vs-tag {
+      font-size: 0.82rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #fbbf24;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+    .vs-sub {
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: #a7f3d0;
+      letter-spacing: 0.5px;
+    }
+
+    /* Clash Math Strip */
+    .clash-math-strip {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      z-index: 10;
+    }
+    .math-highlight {
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #fbbf24;
+    }
+
+    /* =========================================================================
+       3. BOTTOM 30%: PRIMARY TOUCH / THUMB ZONE
+       ========================================================================= */
+    .game-dock {
+      background: var(--bg-dock);
+      padding: 10px 14px 22px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    /* Player Profile Line */
+    .player-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+    .my-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .my-avatar {
+      width: 28px;
+      height: 28px;
+      background: rgba(37, 99, 235, 0.25);
+      border: 1.5px solid rgba(37, 99, 235, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+    .my-name {
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+    .my-sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+    .role-badge {
+      font-size: 0.65rem;
+      font-weight: 900;
+      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Status Context Pill (Mirrors Pill above action button) */
+    .status-context-pill {
+      background: #0e0f24;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      padding: 5px 16px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #cbd5e1;
+      text-align: center;
+      margin: 0 auto;
+      max-width: 92%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.3px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Chunky Action Button (Mirrors BET Button) */
+    .btn-action-lock {
+      width: 100%;
+      height: 48px;
+      background: var(--royal-blue);
+      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--royal-blue-glow);
+      transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .btn-action-lock:hover:not(:disabled) {
+      background: #1d4ed8;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+      transform: translateY(-1px);
+    }
+    .btn-action-lock:active:not(:disabled) {
+      transform: translateY(2px) scale(0.99);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-action-lock:disabled {
+      background: #1e293b;
+      color: #64748b;
+      box-shadow: none;
+      cursor: not-allowed;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0.7;
+    }
+
+    .locked-badge-active {
+      width: 100%;
+      height: 48px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #34d399;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+    }
+
+    /* Hand Cards Row: Crisp White Number Cards (1–6) */
+    .hand-cards-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .number-card {
+      width: 58px;
+      height: 82px;
+      background: var(--card-white);
+      color: var(--text-dark);
+      border-radius: 10px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 4px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.15s;
+    }
+
+    .card-corner-val {
+      font-size: 0.72rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #64748b;
+      line-height: 1;
+    }
+    .card-corner-val.top { align-self: flex-start; }
+    .card-corner-val.bottom { align-self: flex-end; transform: rotate(180deg); }
+
+    .card-center-num {
+      font-size: 1.9rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .number-card.active:hover {
+      transform: translateY(-8px) scale(1.08);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
+      border-color: rgba(37, 99, 235, 0.5);
+      z-index: 10;
+    }
+
+    .number-card.selected {
+      border-color: var(--royal-blue);
+      border-width: 2.5px;
+      box-shadow: 0 0 16px var(--royal-blue-glow), 0 12px 25px rgba(0, 0, 0, 0.6);
+      transform: translateY(-16px) scale(1.12);
+      z-index: 20;
+    }
+
+    .number-card.view-only {
+      opacity: 0.72;
+      cursor: default;
+    }
+    .number-card.view-only:hover {
+      transform: none;
+    }
+
+    /* Placed Card Inside Drop Slot */
+    .placed-card-view {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px;
+      position: relative;
+    }
+    .pcv-num {
+      font-size: 2.2rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #1e3a8a;
+      line-height: 1;
+      margin: auto 0;
+    }
+    .pcv-remove {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #ef4444;
+      cursor: pointer;
+    }
+
+    /* ── SCOUTING DOSSIER MODAL ── */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.hidden { display: none; }
+
+    .modal-card {
+      width: 100%;
+      background: #181938;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+    .modal-title {
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .scout-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sb-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sb-name { font-size: 0.8rem; font-weight: 900; color: #fff; }
+    .sb-archetype { font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; }
+    .sb-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .sb-cell {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 2px;
+      border-radius: 6px;
+    }
+    .sb-cell-label { font-size: 0.62rem; color: #94a3b8; font-weight: 700; display: block; }
+    .sb-cell-val { font-size: 0.72rem; color: #f8fafc; font-weight: 900; }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Toolbar -->
+  <div class="top-toolbar">
+    <div class="pill-tabs">
+      <button class="pill-tab active" id="tab-b1" onclick="switchBeat('beat1')">Beat 1: The Read</button>
+      <button class="pill-tab" id="tab-b2" onclick="switchBeat('beat2')">Beat 2: The Clash</button>
+    </div>
+    <button class="btn-intel" onclick="toggleModal(true)">
+      <span>ℹ️</span> Scout Intel
+    </button>
+  </div>
+
+  <!-- Mobile Phone Viewport -->
+  <div class="phone-container">
+    
+    <!-- Phone Camera Island -->
+    <div class="phone-island"><div class="island-lens"></div></div>
+
+    <!-- 1. TOP 30%: STATUS & OPPONENT ZONE -->
+    <header class="game-header">
+      
+      <!-- Brand & Gold Score Pill -->
+      <div class="brand-row">
+        <div class="brand-logo">
+          <span class="brand-title">FULL COUNT</span>
+          <span class="brand-tag">DUEL</span>
+        </div>
+
+        <div class="score-badge">
+          <span class="score-led"></span>
+          <div class="score-text">
+            <span>VIS</span> 2 <span class="score-sep">-</span> 1 <span>HOME</span>
+          </div>
+          <span class="score-sep">•</span>
+          <span class="score-inn">▲ INN 1</span>
+          <div class="outs-group">
+            <span class="out-dot filled"></span>
+            <span class="out-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opponent Bar -->
+      <div class="opponent-bar">
+        <div class="opp-profile">
+          <div class="opp-avatar">🏏</div>
+          <div class="opp-details">
+            <div class="opp-name-row">
+              <span class="opp-name">Marcus Cole</span>
+              <span class="opp-badge">Slugger</span>
+            </div>
+            <span class="opp-sub">BATTER • Count: 0-0</span>
+          </div>
+        </div>
+
+        <div class="opp-stats-right">
+          <div class="opp-hand-counter">
+            <span>🎴</span>
+            <span>5</span>
+          </div>
+          <div class="opp-status-pill" id="opp-status-pill">
+            CHOOSING…
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. MIDDLE 40%: STADIUM FELT MAT -->
+    <main class="felt-arena">
+      
+      <!-- Banner Indicator -->
+      <div class="arena-banner">
+        <div class="arena-banner-pill" id="arena-banner-text">
+          <span>⚡</span>
+          <span>BEAT 1: <b>THE READ</b> — Call Pitch Delivery</span>
+        </div>
+      </div>
+
+      <!-- ── BEAT 1 CONTENT: 3 PITCH CARDS + OPPONENT FACE-DOWN CARD ── -->
+      <div id="view-beat1" style="display: flex; flex-direction: column; justify-content: space-between; flex: 1; width: 100%;">
+        
+        <!-- 3 Pitch Cards Laid Side-by-Side Across Felt -->
+        <div class="pitch-cards-row">
+          
+          <!-- Fastball -->
+          <div class="pitch-card" id="pc-fastball" onclick="selectPitch('fastball')">
+            <div class="pc-top">
+              <span class="pc-icon">🔥</span>
+              <span class="pc-name">Fastball</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-target">Base Tgt 5</div>
+              <div class="pc-tunnel">Tunnel -3 (Tgt 2)</div>
+            </div>
+            <span class="pc-badge">CALL PITCH</span>
+          </div>
+
+          <!-- Breaking -->
+          <div class="pitch-card" id="pc-breaking" onclick="selectPitch('breaking')">
+            <div class="pc-top">
+              <span class="pc-icon">🌀</span>
+              <span class="pc-name">Breaking</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-target">Base Tgt 5</div>
+              <div class="pc-tunnel">Tunnel -2 (Tgt 3)</div>
+            </div>
+            <span class="pc-badge">CALL PITCH</span>
+          </div>
+
+          <!-- Offspeed -->
+          <div class="pitch-card" id="pc-offspeed" onclick="selectPitch('offspeed')">
+            <div class="pc-top">
+              <span class="pc-icon">⏱️</span>
+              <span class="pc-name">Offspeed</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-target">Base Tgt 5</div>
+              <div class="pc-tunnel">Tunnel -1 (Tgt 4)</div>
+            </div>
+            <span class="pc-badge">CALL PITCH</span>
+          </div>
+        </div>
+
+        <!-- Center: Opponent Face-Down Anticipation Card -->
+        <div class="face-down-container">
+          <span class="face-down-label">Opponent Anticipation Call</span>
+          <div class="card-back">
+            <span class="card-back-stamp" id="card-back-stamp">HIDDEN</span>
+          </div>
+        </div>
+
+        <div style="text-align: center; font-size: 0.65rem; color: #a7f3d0; font-style: italic; opacity: 0.85;">
+          Delivery choice establishes the target difficulty for Beat 2 execution.
+        </div>
+      </div>
+
+      <!-- ── BEAT 2 CONTENT: TARGET SHOWCASE + HEAD-TO-HEAD CLASH ── -->
+      <div id="view-beat2" style="display: none; flex-direction: column; justify-content: space-between; flex: 1; width: 100%;">
+        
+        <!-- Pitch & Target Showcase Plaque -->
+        <div class="b2-showcase-card">
+          <div class="b2-pitch-left">
+            <span class="b2-pitch-icon" id="b2-pitch-icon">🔥</span>
+            <div>
+              <div class="b2-pitch-title" id="b2-pitch-title">FASTBALL DELIVERY</div>
+              <div class="b2-pitch-sub">Big Jake Harmon • Tunneling Applied</div>
+            </div>
+          </div>
+          <div class="b2-target-pill">
+            <span class="b2-target-label">TARGET</span>
+            <span class="b2-target-num" id="b2-target-num">4</span>
+          </div>
+        </div>
+
+        <!-- Center Clash Head-to-Head -->
+        <div class="clash-duel-row">
+          
+          <!-- Opponent Side (Face Down) -->
+          <div class="clash-slot-wrapper">
+            <span class="slot-title">Batter Swing</span>
+            <div class="card-back">
+              <span class="card-back-stamp">FACE DOWN</span>
+            </div>
+          </div>
+
+          <!-- VS Badge -->
+          <div class="clash-vs-badge">
+            <span class="vs-tag">VS</span>
+            <span class="vs-sub">CLASH</span>
+          </div>
+
+          <!-- Player Delivery Card Slot -->
+          <div class="clash-slot-wrapper">
+            <span class="slot-title">Your Delivery</span>
+            <div class="drop-slot" id="drop-slot" onclick="removePlacedCard()">
+              <div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clash Threshold Math Strip -->
+        <div class="clash-math-strip">
+          <span id="clash-math-desc">Select 1 card from hand to execute pitch.</span>
+          <span class="math-highlight" id="clash-math-val">CARD [?] vs TGT [4]</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 3. BOTTOM 30%: PRIMARY TOUCH / THUMB ZONE -->
+    <footer class="game-dock">
+      
+      <!-- Player Profile Line -->
+      <div class="player-line">
+        <div class="my-info">
+          <div class="my-avatar">⚾</div>
+          <div>
+            <div class="my-name">Big Jake Harmon</div>
+            <div class="my-sub">PITCHER • Hand: 5/5</div>
+          </div>
+        </div>
+        <span class="role-badge">PITCHING</span>
+      </div>
+
+      <!-- Centered Status Context Pill -->
+      <div class="status-context-pill" id="status-pill">
+        SELECT FASTBALL, BREAKING, OR OFFSPEED
+      </div>
+
+      <!-- Chunky Action Button (Mirrors BET Button) -->
+      <div id="action-btn-area">
+        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
+          <span>🔒</span>
+          <span id="action-btn-label">CHOOSE PITCH</span>
+        </button>
+      </div>
+
+      <!-- Player Hand: 5 Pure Number Cards -->
+      <div>
+        <div style="font-size: 0.65rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; display: flex; justify-content: space-between; padding: 0 4px;">
+          <span id="hand-heading">CARDS RESERVED FOR BEAT 2</span>
+          <span style="color: #64748b;">VALUES 1–6</span>
+        </div>
+
+        <div class="hand-cards-container">
+          
+          <!-- Card 1 -->
+          <div class="number-card view-only" id="card-1" onclick="tapHandCard(1, 'card-1')">
+            <span class="card-corner-val top">1</span>
+            <span class="card-center-num">1</span>
+            <span class="card-corner-val bottom">1</span>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="number-card view-only" id="card-2" onclick="tapHandCard(2, 'card-2')">
+            <span class="card-corner-val top">2</span>
+            <span class="card-center-num">2</span>
+            <span class="card-corner-val bottom">2</span>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="number-card view-only" id="card-4" onclick="tapHandCard(4, 'card-4')">
+            <span class="card-corner-val top">4</span>
+            <span class="card-center-num">4</span>
+            <span class="card-corner-val bottom">4</span>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="number-card view-only" id="card-5" onclick="tapHandCard(5, 'card-5')">
+            <span class="card-corner-val top">5</span>
+            <span class="card-center-num">5</span>
+            <span class="card-corner-val bottom">5</span>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="number-card view-only" id="card-6" onclick="tapHandCard(6, 'card-6')">
+            <span class="card-corner-val top">6</span>
+            <span class="card-center-num">6</span>
+            <span class="card-corner-val bottom">6</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ── SCOUTING DOSSIER MODAL ── -->
+    <div class="modal-overlay hidden" id="modal-scout">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📊</span>
+            <span>MATCHUP SCOUTING DOSSIER</span>
+          </div>
+          <button class="btn-close-modal" onclick="toggleModal(false)">✕</button>
+        </div>
+
+        <!-- Pitcher Dossier -->
+        <div class="scout-box" style="border-color: rgba(59, 130, 246, 0.4);">
+          <div class="sb-title-row">
+            <span class="sb-name">⚾ Big Jake Harmon (Pitcher)</span>
+            <span class="sb-archetype" style="background: rgba(59,130,246,0.2); color: #93c5fd;">Power Arm</span>
+          </div>
+          <div class="sb-grid">
+            <div class="sb-cell">
+              <span class="sb-cell-label">Fastball</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -3</span>
+            </div>
+            <div class="sb-cell">
+              <span class="sb-cell-label">Breaking</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -2</span>
+            </div>
+            <div class="sb-cell">
+              <span class="sb-cell-label">Offspeed</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Batter Dossier -->
+        <div class="scout-box" style="border-color: rgba(245, 158, 11, 0.4);">
+          <div class="sb-title-row">
+            <span class="sb-name">🏏 Marcus Cole (Batter)</span>
+            <span class="sb-archetype" style="background: rgba(245,158,11,0.2); color: #fde047;">Power Slugger</span>
+          </div>
+          <div class="sb-grid">
+            <div class="sb-cell">
+              <span class="sb-cell-label">Read Fastball</span>
+              <span class="sb-cell-val">Read +2 (Tgt 7)</span>
+            </div>
+            <div class="sb-cell">
+              <span class="sb-cell-label">Read Breaking</span>
+              <span class="sb-cell-val">Read +1 (Tgt 6)</span>
+            </div>
+            <div class="sb-cell">
+              <span class="sb-cell-label">Read Offspeed</span>
+              <span class="sb-cell-val">Read +3 (Tgt 8)</span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="toggleModal(false)" style="width: 100%; height: 38px; background: var(--royal-blue); border: none; border-radius: 10px; color: #fff; font-weight: 800; font-size: 0.8rem; cursor: pointer;">
+          RETURN TO DUEL
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript State & Tactile Audio Engine -->
+  <script>
+    // Web Audio Synthesizer for tactile card click feedback
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTactileSound(type) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'thump') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'lock') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.18);
+        osc.start(now);
+        osc.stop(now + 0.18);
+      }
+    }
+
+    let activeBeat = 'beat1';
+    let selectedPitch = null;
+    let selectedHandCard = null;
+    let effectiveTarget = 4;
+
+    function switchBeat(beat) {
+      activeBeat = beat;
+      playTactileSound('click');
+
+      const tab1 = document.getElementById('tab-b1');
+      const tab2 = document.getElementById('tab-b2');
+      const view1 = document.getElementById('view-beat1');
+      const view2 = document.getElementById('view-beat2');
+      const bannerText = document.getElementById('arena-banner-text');
+      const handHeading = document.getElementById('hand-heading');
+      const handCards = document.querySelectorAll('.number-card');
+
+      if (beat === 'beat1') {
+        tab1.classList.add('active');
+        tab2.classList.remove('active');
+        view1.style.display = 'flex';
+        view2.style.display = 'none';
+        bannerText.innerHTML = '<span>⚡</span> <span>BEAT 1: <b>THE READ</b> — Call Pitch Delivery</span>';
+        handHeading.textContent = 'CARDS RESERVED FOR BEAT 2';
+
+        handCards.forEach(c => {
+          c.classList.add('view-only');
+          c.classList.remove('active', 'selected');
+        });
+
+        updateBeat1ActionState();
+      } else {
+        tab2.classList.add('active');
+        tab1.classList.remove('active');
+        view2.style.display = 'flex';
+        view1.style.display = 'none';
+        bannerText.innerHTML = '<span>⚡</span> <span>BEAT 2: <b>THE CLASH</b> — Execute Pitch Delivery</span>';
+        handHeading.textContent = 'TAP 1 CARD TO THROW PITCH';
+
+        handCards.forEach(c => {
+          c.classList.remove('view-only');
+          c.classList.add('active');
+        });
+
+        updateBeat2ActionState();
+      }
+    }
+
+    function selectPitch(pitchKey) {
+      if (activeBeat !== 'beat1') return;
+      playTactileSound('click');
+      selectedPitch = pitchKey;
+
+      ['fastball', 'breaking', 'offspeed'].forEach(p => {
+        const el = document.getElementById(`pc-${p}`);
+        const badge = el.querySelector('.pc-badge');
+        if (p === pitchKey) {
+          el.classList.add('active');
+          badge.textContent = '✓ SELECTED';
+        } else {
+          el.classList.remove('active');
+          badge.textContent = 'CALL PITCH';
+        }
+      });
+
+      updateBeat1ActionState();
+    }
+
+    function updateBeat1ActionState() {
+      const btn = document.getElementById('action-btn');
+      const label = document.getElementById('action-btn-label');
+      const pill = document.getElementById('status-pill');
+
+      if (!selectedPitch) {
+        btn.disabled = true;
+        label.textContent = 'CHOOSE PITCH';
+        pill.textContent = 'SELECT FASTBALL, BREAKING, OR OFFSPEED';
+      } else {
+        btn.disabled = false;
+        label.textContent = `LOCK IN ${selectedPitch.toUpperCase()} DELIVERY`;
+        pill.textContent = `${selectedPitch.toUpperCase()} • TUNNEL TARGET READY`;
+      }
+    }
+
+    function tapHandCard(val, elId) {
+      if (activeBeat !== 'beat2') return;
+
+      if (selectedHandCard === val) {
+        removePlacedCard();
+        return;
+      }
+
+      playTactileSound('thump');
+      selectedHandCard = val;
+
+      document.querySelectorAll('.number-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById(elId).classList.add('selected');
+
+      const slot = document.getElementById('drop-slot');
+      slot.classList.add('filled');
+      slot.innerHTML = `
+        <div class="placed-card-view">
+          <span style="font-size:0.65rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
+          <span class="pcv-num">${val}</span>
+          <span class="pcv-remove">✕ Remove</span>
+        </div>
+      `;
+
+      updateBeat2ActionState();
+    }
+
+    function removePlacedCard() {
+      playTactileSound('click');
+      selectedHandCard = null;
+      document.querySelectorAll('.number-card').forEach(c => c.classList.remove('selected'));
+      
+      const slot = document.getElementById('drop-slot');
+      slot.classList.remove('filled');
+      slot.innerHTML = `<div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>`;
+
+      updateBeat2ActionState();
+    }
+
+    function updateBeat2ActionState() {
+      const btn = document.getElementById('action-btn');
+      const label = document.getElementById('action-btn-label');
+      const pill = document.getElementById('status-pill');
+      const mathDesc = document.getElementById('clash-math-desc');
+      const mathVal = document.getElementById('clash-math-val');
+
+      if (selectedHandCard === null) {
+        btn.disabled = true;
+        label.textContent = 'CHOOSE EXECUTION CARD';
+        pill.textContent = 'PICK 1 CARD FROM HAND TO THROW';
+        mathDesc.textContent = 'Select 1 card from hand to execute pitch.';
+        mathVal.textContent = `CARD [?] vs TGT [${effectiveTarget}]`;
+      } else {
+        btn.disabled = false;
+        label.textContent = 'LOCK IN PITCH EXECUTION';
+        
+        const isStrike = selectedHandCard >= effectiveTarget;
+        if (isStrike) {
+          pill.textContent = `CARD [${selectedHandCard}] ≥ TARGET [${effectiveTarget}] • STRIKE IN ZONE 🟢`;
+          mathDesc.textContent = 'Execution succeeds: Strike thrown in the zone!';
+          mathVal.textContent = `[${selectedHandCard}] ≥ [${effectiveTarget}] STRIKE`;
+        } else {
+          pill.textContent = `CARD [${selectedHandCard}] < TARGET [${effectiveTarget}] • BALL IN DIRT 🔴`;
+          mathDesc.textContent = 'Missed target: Ball outside zone.';
+          mathVal.textContent = `[${selectedHandCard}] < [${effectiveTarget}] BALL`;
+        }
+      }
+    }
+
+    function commitAction() {
+      playTactileSound('lock');
+      const area = document.getElementById('action-btn-area');
+      area.innerHTML = `
+        <div class="locked-badge-active">
+          <span>✅</span>
+          <span>LOCKED IN ✓ WAITING…</span>
+        </div>
+      `;
+
+      const oppPill = document.getElementById('opp-status-pill');
+      oppPill.className = 'opp-status-pill ready';
+      oppPill.textContent = 'READY ✓';
+
+      if (activeBeat === 'beat1') {
+        setTimeout(() => {
+          switchBeat('beat2');
+          area.innerHTML = `
+            <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
+              <span>🔒</span>
+              <span id="action-btn-label">CHOOSE EXECUTION CARD</span>
+            </button>
+          `;
+        }, 800);
+      }
+    }
+
+    function toggleModal(open) {
+      playTactileSound('click');
+      const modal = document.getElementById('modal-scout');
+      if (open) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

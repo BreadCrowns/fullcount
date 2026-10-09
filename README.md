@@ -1,6 +1,7 @@
 # Full Count — Prototype Setup Guide
 
-> **v1 Prototype** · 2-player online · 3-inning game
+> **v1 Prototype** · 2-player online · 3-inning game  
+> 📱 **Live Mobile Card Game UI Prototype**: [https://breadcrowns.github.io/fullcount/prototype.html](https://breadcrowns.github.io/fullcount/prototype.html)
 
 ---
 
