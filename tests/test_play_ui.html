@@ -165,14 +165,14 @@
       const offspeedTray = document.querySelector('.pitch-tray[data-pitch="offspeed"]');
       report(offspeedTray?.classList.contains('active') && !document.querySelector('.pitch-tray[data-pitch="breaking"]')?.classList.contains('active'), 'Clicking Offspeed tray switches active pitch to Offspeed');
 
-      // Test lock-in button remains disabled if card not selected
+      // Test lock-in button is enabled when pitch is selected (card not required in Beat 1)
       const lockBtnWithPitchOnly = document.getElementById('lock-btn');
-      report(lockBtnWithPitchOnly?.disabled === true, 'Lock-in button remains disabled when only pitch is selected (card missing)');
+      report(lockBtnWithPitchOnly?.disabled === false, 'Lock-in button is enabled when pitch is selected without a card');
 
-      // Test selecting a card enables lock-in button
+      // Test selecting a card also keeps lock-in button enabled
       selectCard('P1');
       const lockBtnReady = document.getElementById('lock-btn');
-      report(lockBtnReady?.disabled === false, 'Lock-in button is enabled when both pitch and card are selected');
+      report(lockBtnReady?.disabled === false, 'Lock-in button remains enabled when card is chosen');
       selectCard('P1'); // deselect
 
       // Test pointer-events on Beat 1 pitch trays (must not be 'none')
@@ -517,26 +517,24 @@
       // 9. Test Outcome Number Line Component
       report(typeof window.renderOutcomeNumberLine === 'function', 'renderOutcomeNumberLine helper is defined');
       
-      const fbNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat1', launchAngle: 12, batterBonus: 3, pitchMatched: true });
+      const fbNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat1' });
       report(fbNl.includes('outcome-number-line-container'), 'Number line renders container element');
-      report(fbNl.includes('FASTBALL (Center 12)'), 'Fastball number line displays Fastball and Center 12');
-      report(fbNl.includes('center-spot') && fbNl.includes('sweet-spot'), 'Center 12 is styled as center-spot and sweet-spot');
-      report(fbNl.includes('nl-needle-pin') && fbNl.includes('TOTAL 12'), 'Needle pin displays TOTAL 12 on needle target');
+      report(fbNl.includes('FASTBALL') && fbNl.includes('Base Target'), 'Fastball Beat 1 displays Fastball and Base Target');
+      report(fbNl.includes('3-1 HITTER COUNT') && fbNl.includes('0-2 PITCHER COUNT'), 'Beat 1 displays 3-1 Hitter Count and 0-2 Pitcher Count previews');
+      report(fbNl.includes('b1-preview-track'), 'Beat 1 renders b1-preview-track');
 
-      const bbNl = window.renderOutcomeNumberLine({ pitchType: 'breaking', beat: 'beat2', launchAngle: 7, batterBonus: 2, pitchMatched: true });
-      report(bbNl.includes('BREAKING (Center 9)'), 'Breaking number line displays Breaking and Center 9');
-      report(bbNl.includes('line-drive'), 'Breaking number line includes line-drive band');
+      const bbNl = window.renderOutcomeNumberLine({ pitchType: 'breaking', beat: 'beat2', target: 4, pitcherCardVal: 4, launchAngle: 4 });
+      report(bbNl.includes('BREAKING') && bbNl.includes('Target <b>4</b>'), 'Breaking Beat 2 displays Breaking and Target 4');
+      report(bbNl.includes('center-spot') && bbNl.includes('sweet-spot'), 'Collision is styled as center-spot and sweet-spot');
+      report(bbNl.includes('nl-needle-pin') && bbNl.includes('CARD 4'), 'Needle pin displays CARD 4 on needle target');
+      report(bbNl.includes('line-drive'), 'Target window includes line-drive hit band');
 
-      const offNl = window.renderOutcomeNumberLine({ pitchType: 'offspeed', beat: 'beat3', launchAngle: 6, batterBonus: 1, pitchMatched: true, projected: true });
-      report(offNl.includes('OFFSPEED (Center 6)'), 'Offspeed number line displays Offspeed and Center 6');
-      report(offNl.includes('EST 6'), 'Projected needle displays EST 6 prefix');
-
-      const fooledNl = window.renderOutcomeNumberLine({ pitchType: 'fastball', beat: 'beat2', launchAngle: 16, batterBonus: 2, pitchMatched: false });
-      report(fooledNl.includes('Fooled on Pitch Type'), 'Fooled number line explains fooled pitch type');
-      report(!fooledNl.includes('nl-cell sweet-spot'), 'Fooled number line negates sweet-spot barrel band');
+      const offNl = window.renderOutcomeNumberLine({ pitchType: 'offspeed', beat: 'beat3', target: 3, pitcherCardVal: 4, launchAngle: 5, projected: true });
+      report(offNl.includes('OFFSPEED') && offNl.includes('Target <b>3</b>'), 'Offspeed Beat 3 displays Offspeed and Target 3');
+      report(offNl.includes('EST 5'), 'Projected needle displays EST 5 prefix');
 
       const unselectedNl = window.renderOutcomeNumberLine({ pitchType: null });
-      report(unselectedNl.includes('SELECT PITCH TO PREVIEW BANDS'), 'Unselected number line displays SELECT PITCH TO PREVIEW BANDS badge');
+      report(unselectedNl.includes('SELECT PITCH TO PREVIEW'), 'Unselected displays SELECT PITCH TO PREVIEW badge');
       report(unselectedNl.includes('unselected'), 'Unselected number line cells contain unselected class');
 
       // Verify number line in active modals and field
