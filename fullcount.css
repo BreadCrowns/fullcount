@@ -5864,3 +5864,118 @@ body.is-dragging-card {
   cursor: pointer;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   BEAT 2: PITCH & TARGET SHOWCASE + CARD EXECUTION SLOT
+   ───────────────────────────────────────────────────────────────────────────── */
+.b2-target-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 280px;
+  padding: 6px 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.b2-target-showcase.mine-territory {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+.b2-target-showcase.opp-territory {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+}
+
+.b2-pitch-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.b2-pitch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+.b2-anticipation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #60a5fa;
+  letter-spacing: 0.03em;
+}
+
+.b2-target-pill {
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.35));
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  color: #fef08a;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.b2-card-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  width: 100%;
+  border: 1.5px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.b2-card-slot.has-card {
+  border-style: solid;
+  border-color: #2ed573;
+  background: rgba(46, 213, 115, 0.1);
+}
+
+.b2-card-slot.drag-over {
+  border-color: #2ed573 !important;
+  background: rgba(46, 213, 115, 0.25) !important;
+  transform: scale(1.02);
+}
+
+.b2-card-slot .tray-empty-hint {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.02em;
+}
+
+/* Beat 1 View-Only Cards in Hand */
+.number-card.b1-view-only {
+  cursor: default;
+  opacity: 0.92;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  position: relative;
+}
+
+.number-card.b1-view-only:hover {
+  transform: none;
+  border-color: var(--border-light);
+  box-shadow: none;
+}
+
+

@@ -169,11 +169,9 @@
       const lockBtnWithPitchOnly = document.getElementById('lock-btn');
       report(lockBtnWithPitchOnly?.disabled === false, 'Lock-in button is enabled when pitch is selected without a card');
 
-      // Test selecting a card also keeps lock-in button enabled
+      // Test tapping a card in Beat 1 does not play it (cards are unplayable in Beat 1)
       selectCard('P1');
-      const lockBtnReady = document.getElementById('lock-btn');
-      report(lockBtnReady?.disabled === false, 'Lock-in button remains enabled when card is chosen');
-      selectCard('P1'); // deselect
+      report(localBeatCard === null, 'Tapping card in Beat 1 does not play card (cards reserved for Beat 2)');
 
       // Test pointer-events on Beat 1 pitch trays (must not be 'none')
       const moundTrays = document.querySelectorAll('.diamond-mound .pitch-tray');
@@ -184,29 +182,17 @@
       });
       report(allPeAuto, 'All Beat 1 mound pitch trays have pointer-events auto (interactive for clicks and drops)');
 
-      // Test dragging and dropping a card directly onto Fastball tray
-      const startEvt = new Event('dragstart', { bubbles: true });
-      handleCardDragStart(startEvt, 'P11');
-      const dropEvt = new Event('drop', { bubbles: true });
-      handleTrayDrop(dropEvt, 'fastball', 'mound');
-      handleCardDragEnd(new Event('dragend', { bubbles: true }));
-
-      report(localPitchType === 'fastball', `Dropping card on Fastball selects Fastball pitch (is: ${localPitchType})`);
-      report(localBeatCard === 'P11', `Dropping card on Fastball places card P11 (is: ${localBeatCard})`);
-      const fbPlacedCard = document.querySelector('.pitch-tray[data-pitch="fastball"] .placed-number-card');
-      report(fbPlacedCard !== null, 'Card P11 stays placed inside Fastball tray after drop');
+      // Test selecting Fastball pitch
+      handleTrayClick('fastball', 'mound');
+      report(localPitchType === 'fastball', `Selecting Fastball selects Fastball pitch (is: ${localPitchType})`);
+      report(localBeatCard === null, `Cards cannot be placed in Beat 1 (localBeatCard is null)`);
       const fbActiveTray = document.querySelector('.pitch-tray.active');
-      report(fbActiveTray?.getAttribute('data-pitch') === 'fastball', 'Fastball tray is highlighted active after drop');
+      report(fbActiveTray?.getAttribute('data-pitch') === 'fastball', 'Fastball tray is highlighted active after selection');
 
-      // Test dragging another card onto Breaking tray switches pitch and placed card
-      handleCardDragStart(startEvt, 'P21');
-      handleTrayDrop(dropEvt, 'breaking', 'mound');
-      handleCardDragEnd(new Event('dragend', { bubbles: true }));
-
-      report(localPitchType === 'breaking', `Dropping card on Breaking switches pitch to Breaking (is: ${localPitchType})`);
-      report(localBeatCard === 'P21', `Dropping card on Breaking updates placed card to P21 (is: ${localBeatCard})`);
-      const brPlacedCard = document.querySelector('.pitch-tray[data-pitch="breaking"] .placed-number-card');
-      report(brPlacedCard !== null, 'Card P21 stays placed inside Breaking tray after drop');
+      // Test switching pitch to Breaking
+      handleTrayClick('breaking', 'mound');
+      report(localPitchType === 'breaking', `Clicking Breaking switches pitch to Breaking (is: ${localPitchType})`);
+      report(localBeatCard === null, 'localBeatCard remains null in Beat 1');
 
       // Test commitPlacement() in Solo match
       let commitUpdates = null;
@@ -369,16 +355,24 @@
       soloPlayState.currentPA.beatResults.beat1 = {
         winner: 'batter',
         count: '3-1',
-        lockedOption: 'offspeed',
+        pitchType: 'fastball',
+        guessPitch: 'fastball',
+        pitchMatched: true,
+        target: 5,
+        effectiveTarget: 5,
+        baseTarget: 4,
+        readFactor: 1,
         isDominant: true,
         revealCardFirst: 'pitcher',
-        margin: 6
+        margin: 1
       };
       handleGameState(soloPlayState);
       const b2Html = document.getElementById('app').innerHTML;
       report(b2Html.length > 100, `Beat 2 placing rendered successfully (${b2Html.length} chars)`);
-      const lockedTiles = document.querySelectorAll('.choice-tile.locked');
-      report(lockedTiles.length === 0, 'All 3 pitch trays remain unlocked without artificial lockout on 3-1 count');
+      report(document.querySelector('.b2-target-showcase') !== null, 'Beat 2 renders Pitch & Target showcase instead of pitch selection trays');
+      report(b2Html.includes('TARGET 5') || b2Html.includes('TARGET <b>5</b>'), 'Beat 2 displays established target number 5');
+      report(b2Html.includes('FASTBALL'), 'Beat 2 displays established pitch being thrown');
+      report(document.querySelector('.b2-card-slot') !== null, 'Beat 2 renders dedicated execution card slot');
       report(document.querySelector('.beat2-advantage-banner') !== null, 'Beat 2 advantage banner renders in Beat 2 arena');
       report(document.querySelector('.beat2-advantage-banner.count-hitter') !== null, 'Beat 2 advantage banner reflects 3-1 count leverage');
       report(document.querySelector('.opponent-bar .opp-scout-chips') === null, 'Opponent scouting chips removed from top opponent bar');
@@ -386,17 +380,12 @@
       report(document.querySelector('.diamond-pitcher-stats .field-scout-chips') !== null, 'Pitcher scouting stats display in top pitcher stats box (purple)');
       report(document.querySelector('.diamond-batter-stats .field-scout-chips') !== null, 'Batter scouting stats display in bottom batter stats box (red)');
 
-      // 4b. Test Baseball Diamond & Drag Trays
+      // 4b. Test Baseball Diamond & Active Hand Cards in Beat 2
       report(document.querySelector('.diamond-field') !== null, 'Play area renders Baseball Diamond field');
-      report(document.querySelector('.diamond-mound') !== null, 'Pitcher card tray is positioned on pitcher mound (green)');
-      report(document.querySelector('.diamond-plate-area') !== null, 'Batter card tray is positioned at home plate (orange)');
-      const trays = document.querySelectorAll('.pitch-tray');
-      report(trays.length === 3, `Beat 2 renders exactly 3 pitch selection trays (found ${trays.length})`);
+      report(document.querySelector('.diamond-mound') !== null, 'Pitcher card showcase is positioned on pitcher mound (green)');
+      report(document.querySelector('.diamond-plate-area') !== null, 'Batter card showcase is positioned at home plate (orange)');
       const draggableCards = document.querySelectorAll('.number-card[draggable="true"]');
-      report(draggableCards.length > 0, `Active hand cards are draggable for drag-and-drop (found ${draggableCards.length})`);
-      report(document.querySelector('.pitch-tray[data-pitch]') !== null, 'Pitch trays contain data-pitch attributes for drop targeting');
-      report(document.querySelector('.pt-range') === null, 'Pitch number ranges removed from diamond trays');
-      report(document.querySelector('.pt-fav-tag') === null, 'Favorite pitch tags removed from diamond trays');
+      report(draggableCards.length > 0, `Active hand cards are playable for Beat 2 clash (found ${draggableCards.length})`);
 
       // 4c. Test Tooltip Popup System
       showTooltipPopup('Fastball Intel', 'High heat window is 6-10.');
