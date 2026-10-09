@@ -982,7 +982,7 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
         ${renderZoneBoard(pa, iAmBatting, myCommitted, pa.phase, null, pitcherChar, batterChar, gs)}
       </main>
 
-      <!-- BOTTOM PLAYER DOCK: USER CONTROLS ONLY (CLEAN & MINIMAL) -->
+      <!-- BOTTOM PLAYER DOCK: USER CONTROLS ONLY (MATCHING REFERENCE UI) -->
       <footer class="player-dock">
         <div class="player-bar">
           <div class="player-profile">
@@ -993,32 +993,34 @@ function renderPlacing(g, gs, pa, iAmBatting, iAmPitching, pitcherChar, batterCh
             </div>
           </div>
           <div class="dock-controls-row">
-            <span class="placed-indicator">${currentBeat === 'beat1' ? 'Beat <b>1</b>: The Read &bull; <b>Choose Pitch</b>' : (currentBeat === 'beat2' ? `Beat <b>2</b>: The Clash &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1` : (currentBeat === 'beat3' ? `Beat <b>3</b>: Full Count &bull; <b>Choose Pitch</b>` : `Beat <b>4</b> &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1`))}</span>
+            <span class="placed-indicator">${currentBeat === 'beat1' ? 'Beat <b>1</b>: The Read' : (currentBeat === 'beat2' ? `Beat <b>2</b>: The Clash` : (currentBeat === 'beat3' ? `Beat <b>3</b>: Full Count` : `Beat <b>4</b> &bull; Card: <b>${localBeatCard ? '1' : '0'}</b>/1`))}</span>
             ${canSub ? `<button class="btn-relief" onclick="substitutePitcher('${reliefId}')">Relief</button>` : ''}
           </div>
         </div>
 
-        <!-- 3 PITCH SELECTION BUTTONS (RIGHT ABOVE USER'S CARDS IN BEAT 1 & BEAT 3) -->
-        ${(currentBeat === 'beat1' || currentBeat === 'beat3') ? renderPitchSelectionButtons(pitcherChar, batterChar, iAmPitching, localPitchType, localGuessPitch, currentBeat) : ''}
+        <!-- 1. Centered Status Pill -->
+        <div class="selection-status-pill">${lockBtnSub || lockBtnLabel}</div>
 
-        <!-- HAND + TURN ACTION BUTTON -->
+        <!-- 2. Action Button: Chunky Royal Blue (Mirrors BET button) -->
+        <div class="lock-in-action-area">
+          ${!myCommitted ? `
+            <button class="btn-snap-lock ${lockBtnDisabled ? 'disabled' : ''}" id="lock-btn" onclick="commitPlacement()" ${lockBtnDisabled ? 'disabled' : ''}>
+              <span class="btn-icon">🔒</span>
+              <span class="btn-label">${lockBtnLabel}</span>
+              <span class="btn-sub" style="display:none;">${lockBtnSub}</span>
+            </button>
+          ` : `
+            <div class="locked-indicator-badge">
+              <span class="lock-icon">✅</span>
+              <span class="lock-text">LOCKED IN</span>
+              <span class="btn-sub" style="font-size:0.55rem;color:var(--text-muted);display:none;">Waiting...</span>
+            </div>
+          `}
+        </div>
+
+        <!-- 3. Player's 5 Cards in Hand (Pure Number Cards) -->
         <div class="hand-row">
           ${renderHand(localHand, iAmBatting, iAmPitching, myCommitted, currentBeat)}
-          <div class="lock-in-action-area">
-            ${!myCommitted ? `
-              <button class="btn-snap-lock ${lockBtnDisabled ? 'disabled' : ''}" id="lock-btn" onclick="commitPlacement()" ${lockBtnDisabled ? 'disabled' : ''}>
-                <span class="btn-icon">🔒</span>
-                <span class="btn-label">${lockBtnLabel}</span>
-                <span class="btn-sub">${lockBtnSub}</span>
-              </button>
-            ` : `
-              <div class="locked-indicator-badge">
-                <span class="lock-icon">✅</span>
-                <span class="lock-text">LOCKED IN</span>
-                <span class="btn-sub" style="font-size:0.55rem;color:var(--text-muted);display:block;">Waiting...</span>
-              </div>
-            `}
-          </div>
         </div>
       </footer>
 
@@ -1479,9 +1481,12 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
       ? `<div class="beat3-banner count-full"><span class="b1-title">⚡ BEAT 3: 3-2 FULL COUNT SHOWDOWN</span></div>`
       : `<div class="beat1-banner"><span class="b1-title">BEAT 1: THE READ</span></div>`;
 
+    const pitchDockHtml = renderPitchSelectionButtons(pitcherChar, batterChar, !iAmBatting, localPitchType, localGuessPitch, currentBeat);
+
     mainContentHtml = `
       <div class="${isBeat3 ? 'beat3-arena' : 'beat1-arena'} diamond-arena">
         ${arenaBannerHtml}
+        ${pitchDockHtml}
 
         <div class="diamond-field">
           <div class="infield-dirt"></div>
@@ -1780,6 +1785,7 @@ function renderHand(handIds, iAmBatting, iAmPitching, myCommitted, currentBeat =
 
         return `
           <div class="number-card ${isBeat1 ? 'b1-view-only' : (isActive ? 'active' : 'inactive')} ${isSelected ? 'selected' : ''}"
+               data-val="${displayLabel}"
                draggable="${isActive ? 'true' : 'false'}"
                ondragstart="${isActive ? `handleCardDragStart(event, '${id}')` : ''}"
                ondragend="${isActive ? `handleCardDragEnd(event)` : ''}"
@@ -2622,33 +2628,39 @@ function substitutePitcher(reliefId) {
 // UI PANEL HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 function renderScoreHeader(gs, half, rosters) {
-  const inningLabel = half === 'top' ? `▲ INNING ${gs.inning}` : `▼ INNING ${gs.inning}`;
-  const awayName = rosters.guest?.name || 'VISITOR';
+  const inningLabel = half === 'top' ? `▲ INN ${gs.inning}` : `▼ INN ${gs.inning}`;
+  const awayName = rosters.guest?.name || 'VIS';
   const homeName = rosters.host?.name || 'HOME';
   return `
     <div class="score-header">
-      <div class="score-team away">
-        <span class="team-label">${awayName}</span>
-        <span class="score-value">${gs.score.top}</span>
+      <div class="header-brand">
+        <span class="header-logo-text">FULL COUNT</span>
       </div>
-      <div class="hud-center">
+      <div class="score-pill-badge">
+        <span class="score-pill-dot">🟡</span>
+        <div class="score-team away">
+          <span class="team-label">${awayName}</span>
+          <span class="score-value">${gs.score.top}</span>
+        </div>
+        <span class="score-pill-sep">-</span>
+        <div class="score-team home">
+          <span class="score-value">${gs.score.bottom}</span>
+          <span class="team-label">${homeName}</span>
+        </div>
+        <span class="score-pill-sep">&bull;</span>
         <div class="inning-badge">${inningLabel}</div>
         <div class="hud-count-row">
-          <div class="diamond">
-            <div class="base second ${gs.bases.second ? 'occupied' : ''}">◆</div>
+          <div class="diamond" style="display:none;">
+            <div class="base second ${gs.bases?.second ? 'occupied' : ''}">◆</div>
             <div class="base-row">
-              <div class="base third ${gs.bases.third ? 'occupied' : ''}">◆</div>
-              <div class="base first ${gs.bases.first ? 'occupied' : ''}">◆</div>
+              <div class="base third ${gs.bases?.third ? 'occupied' : ''}">◆</div>
+              <div class="base first ${gs.bases?.first ? 'occupied' : ''}">◆</div>
             </div>
           </div>
           <div class="outs-row">
             ${[0,1,2].map(i => `<span class="out-dot ${i < gs.outs ? 'out-filled' : ''}">●</span>`).join('')}
           </div>
         </div>
-      </div>
-      <div class="score-team home">
-        <span class="score-value">${gs.score.bottom}</span>
-        <span class="team-label">${homeName}</span>
       </div>
     </div>`;
 }

@@ -6,10 +6,14 @@
 
 :root {
   /* Surface & Background */
-  --bg-deep: #070b14;
-  --bg-field: #0d1527;
-  --bg-surface: #131d33;
-  --bg-card: rgba(23, 37, 65, 0.85);
+  --bg-deep: #0e0f24;
+  --bg-header: #181938;
+  --bg-dock: #181938;
+  --bg-felt: #145934;
+  --bg-felt-glow: #166534;
+  --bg-field: #145934;
+  --bg-surface: #181938;
+  --bg-card: #ffffff;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-bright: rgba(255, 255, 255, 0.2);
 
@@ -17,6 +21,8 @@
   --gold: #f59e0b;
   --gold-glow: rgba(245, 158, 11, 0.35);
   --gold-bright: #fbbf24;
+  --royal-blue: #2563eb;
+  --royal-blue-glow: rgba(37, 99, 235, 0.45);
   --pitcher-blue: #3b82f6;
   --pitcher-blue-glow: rgba(59, 130, 246, 0.35);
   --batter-orange: #f97316;
@@ -31,9 +37,9 @@
   /* Dimensions & Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
   --radius-full: 9999px;
-  --max-w: 640px;
+  --max-w: 520px;
 }
 
 *, *::before, *::after {
@@ -44,7 +50,7 @@
 }
 
 body {
-  background-color: var(--bg-deep);
+  background-color: #080914;
   color: #f1f5f9;
   font-family: var(--font-main);
   min-height: 100vh;
@@ -63,7 +69,7 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: radial-gradient(circle at 50% 20%, #15233d 0%, var(--bg-deep) 85%);
+  background-color: var(--bg-deep);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -183,11 +189,12 @@ input[type="text"]:focus {
   max-height: 100vh;
   overflow: hidden;
   position: relative;
+  background-color: var(--bg-deep);
 }
 
 .game-hud {
   flex-shrink: 0;
-  background: rgba(10, 15, 26, 0.95);
+  background: var(--bg-header);
   border-bottom: 1px solid var(--border-subtle);
   padding: 8px 12px;
   display: flex;
@@ -196,27 +203,53 @@ input[type="text"]:focus {
   z-index: 20;
 }
 
-/* Score Header */
+/* Score Header: Full Count Brand on Left, Gold Badge on Right */
 .score-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius-md);
-  padding: 4px 10px;
-  border: 1px solid var(--border-subtle);
+  background: transparent;
+  padding: 2px 2px;
+  border: none;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-title, .header-logo-text {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* Gold Pill Score Badge (e.g. 🟡 2 - 1 · INN 1) */
+.score-pill-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.score-pill-dot {
+  font-size: 0.65rem;
 }
 
 .score-team {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 90px;
+  gap: 4px;
 }
-.score-team.home { justify-content: flex-end; }
 
 .team-label {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.5px;
@@ -224,9 +257,15 @@ input[type="text"]:focus {
 
 .score-value {
   font-family: var(--font-mono);
-  font-size: 1.25rem;
+  font-size: 0.95rem;
   font-weight: 900;
   color: #fff;
+}
+
+.score-pill-sep {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .hud-center {
@@ -246,28 +285,28 @@ input[type="text"]:focus {
 .hud-count-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 /* Minimal Bases Diamond */
 .hud-count-row .diamond {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   position: relative;
 }
 
 .hud-count-row .diamond .base {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: #334155;
   border-radius: 1px;
   position: absolute;
   transform: rotate(45deg);
 }
 
-.hud-count-row .diamond .base.second { top: 1px; left: 8px; }
-.hud-count-row .diamond .base.third  { top: 8px; left: 1px; }
-.hud-count-row .diamond .base.first  { top: 8px; right: 1px; }
+.hud-count-row .diamond .base.second { top: 1px; left: 6px; }
+.hud-count-row .diamond .base.third  { top: 6px; left: 1px; }
+.hud-count-row .diamond .base.first  { top: 6px; right: 1px; }
 
 .hud-count-row .diamond .base.occupied {
   background: var(--gold);
@@ -282,8 +321,8 @@ input[type="text"]:focus {
 }
 
 .out-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #334155;
 }
@@ -298,7 +337,10 @@ input[type="text"]:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 4px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .opponent-profile {
@@ -360,17 +402,23 @@ input[type="text"]:focus {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   3. CENTER DUEL ARENA (DIAMOND BATTLEFIELD)
+   3. CENTER DUEL ARENA (STADIUM FELT PLAYING TABLE)
    ───────────────────────────────────────────────────────────────────────────── */
 .battlefield {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: 6px 12px;
+  padding: 8px 10px;
   position: relative;
   overflow-y: auto;
+  background: var(--bg-felt);
+  background: radial-gradient(ellipse at 50% 40%, var(--bg-felt-glow) 0%, var(--bg-felt) 65%, #0f3d22 100%);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.55);
+  border-radius: var(--radius-lg);
+  margin: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .diamond-arena {
@@ -378,9 +426,9 @@ input[type="text"]:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
-  justify-content: space-around;
+  justify-content: flex-start;
 }
 
 /* Banners */
@@ -390,33 +438,33 @@ input[type="text"]:focus {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(15, 23, 42, 0.7);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .b1-title, .b2-adv-badge {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0.8px;
   color: #fff;
 }
 
 .b1-subtitle, .b2-adv-desc {
-  font-size: 0.66rem;
-  color: #94a3b8;
+  font-size: 0.65rem;
+  color: #cbd5e1;
   margin-top: 1px;
 }
 
 .beat2-advantage-banner.count-hitter {
   border-color: rgba(249, 115, 22, 0.5);
-  background: linear-gradient(180deg, rgba(249, 115, 22, 0.2) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(180deg, rgba(249, 115, 22, 0.25) 0%, rgba(15, 23, 42, 0.7) 100%);
 }
 .beat2-advantage-banner.count-pitcher {
   border-color: rgba(59, 130, 246, 0.5);
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.2) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.25) 0%, rgba(15, 23, 42, 0.7) 100%);
 }
 
 .b2-dominant-callout {
@@ -426,10 +474,10 @@ input[type="text"]:focus {
   margin-top: 3px;
 }
 
-/* Diamond Field Container */
+/* Diamond Field Container on Felt Table */
 .diamond-field {
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -455,10 +503,11 @@ input[type="text"]:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 10px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--border-subtle);
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
 }
 
 .fpc-main {
@@ -486,27 +535,27 @@ input[type="text"]:focus {
 }
 
 .scout-chip {
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  padding: 2px 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  padding: 2px 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   color: #cbd5e1;
 }
 .scout-chip.archetype-chip {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: #f1f5f9;
 }
 .scout-chip.stat-chip.tunnel-chip {
-  background: rgba(56, 189, 248, 0.12);
-  border-color: rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
 }
 .scout-chip.stat-chip.read-chip {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fde047;
 }
 .scout-chip b { color: var(--gold-bright); }
 
@@ -521,38 +570,49 @@ input[type="text"]:focus {
 
 .mound-rubber, .home-plate-pentagon { display: none; }
 
-/* ── PITCH TRAYS (BEAT 1 & BEAT 3: THE READ) ── */
-.pitch-trays-container, .batter-trays-container {
+/* ── PITCH TRAYS (CLEAN WHITE CARDS LAID SIDE-BY-SIDE ACROSS TOP OF FELT) ── */
+.pitch-selection-dock {
   width: 100%;
+  max-width: 440px;
+  padding: 2px 0 4px;
+}
+
+.pitch-selection-dock .pitch-trays-container, .pitch-trays-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  width: 100%;
 }
 
 .pitch-tray.choice-tile {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: #ffffff;
+  color: #0f172a;
+  border: 2px solid transparent;
+  border-radius: 10px;
   padding: 8px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 4px;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
-  min-height: 76px;
+  transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+  min-height: 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  position: relative;
+  user-select: none;
 }
 
 .pitch-tray.choice-tile:hover {
-  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .pitch-tray.choice-tile.active {
-  border-color: var(--gold);
-  background: rgba(245, 158, 11, 0.15);
-  box-shadow: 0 0 16px var(--gold-glow);
-  transform: translateY(-2px);
+  border-color: var(--royal-blue);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px var(--royal-blue), 0 8px 20px var(--royal-blue-glow);
+  transform: translateY(-3px);
 }
 
 .pt-header {
@@ -561,11 +621,12 @@ input[type="text"]:focus {
   gap: 4px;
 }
 
-.pt-icon { font-size: 1.2rem; }
+.pt-icon { font-size: 1.25rem; }
 .pt-name {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 0.3px;
 }
 
 .pt-rating-badge {
@@ -575,10 +636,10 @@ input[type="text"]:focus {
   gap: 2px;
   font-size: 0.62rem;
   font-weight: 700;
-  color: var(--text-bright);
-  background: rgba(0, 0, 0, 0.45);
-  padding: 3px 6px;
+  color: #334155;
+  background: #f1f5f9;
   border-radius: var(--radius-sm);
+  padding: 3px 4px;
   text-align: center;
   width: 100%;
 }
@@ -586,62 +647,67 @@ input[type="text"]:focus {
 .pt-badge-main {
   font-size: 0.66rem;
   font-weight: 800;
-  color: var(--gold-bright);
+  color: #1e3a8a;
 }
 
 .pt-badge-opp-risk {
   font-size: 0.58rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .tray-selected-pill {
   font-size: 0.6rem;
   font-weight: 900;
-  color: #000;
-  background: var(--gold-bright);
-  padding: 2px 6px;
+  color: #ffffff;
+  background: var(--royal-blue);
+  padding: 2px 8px;
   border-radius: var(--radius-full);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
-/* ── PITCH SELECTION DOCK (RIGHT ABOVE CARDS IN BEAT 1 & 3) ── */
-.pitch-selection-dock {
-  width: 100%;
-  padding: 4px 0 2px;
-}
-
-.pitch-selection-dock .pitch-trays-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-.pitch-selection-dock .pitch-tray.choice-tile {
-  min-height: 62px;
-  padding: 6px 4px;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+/* ── FACE-DOWN OPPONENT CARD (CLASSIC BLUE CROSSHATCH PATTERN ON FELT) ── */
+.hidden-opponent-card {
+  width: 68px;
+  height: 96px;
+  border-radius: 10px;
+  border: 3.5px solid #ffffff;
+  background-color: #1d4ed8;
+  background-image: 
+    repeating-linear-gradient(45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px),
+    repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px);
+  background-blend-mode: multiply;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.pitch-selection-dock .pitch-tray.choice-tile:hover {
-  border-color: rgba(255, 255, 255, 0.35);
+.hidden-opponent-card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  pointer-events: none;
 }
 
-.pitch-selection-dock .pitch-tray.choice-tile.active {
-  border-color: var(--gold);
-  background: rgba(245, 158, 11, 0.22);
-  box-shadow: 0 0 16px var(--gold-glow);
-  transform: translateY(-2px);
+.hidden-opponent-card .mystery-mark {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.hidden-opponent-card:not(.waiting) .mystery-mark {
+  background: #16a34a;
 }
 
 /* ── FIELD DUEL STATUS ON MOUND & PLATE (BEAT 1 & 3) ── */
@@ -655,31 +721,33 @@ input[type="text"]:focus {
 .duel-pick-tag {
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--gold-bright);
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fff;
+  background: rgba(37, 99, 235, 0.4);
+  border: 1px solid rgba(37, 99, 235, 0.6);
   padding: 3px 10px;
   border-radius: var(--radius-full);
 }
 
 .duel-hint-tag {
   font-size: 0.68rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
 }
 
 /* ── EXECUTION CLASH SHOWCASE (BEAT 2 & BEAT 4) ── */
 .b2-target-showcase {
   width: 100%;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  max-width: 440px;
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  border-radius: 12px;
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .b2-pitch-info-row {
@@ -690,9 +758,9 @@ input[type="text"]:focus {
 }
 
 .b2-pitch-badge, .b2-anticipation-badge {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #0f172a;
 }
 
 .b2-target-pill {
@@ -706,28 +774,30 @@ input[type="text"]:focus {
 }
 
 .b2-card-slot {
-  width: 72px;
+  width: 68px;
   height: 96px;
-  border: 2px dashed rgba(255, 255, 255, 0.25);
-  border-radius: var(--radius-md);
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .b2-card-slot.has-card {
   border-style: solid;
-  border-color: var(--gold);
-  background: rgba(245, 158, 11, 0.1);
+  border-color: #ffffff;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
 .tray-empty-hint {
   font-size: 0.65rem;
-  font-weight: 700;
-  color: #94a3b8;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
   padding: 4px;
 }
@@ -761,9 +831,12 @@ input[type="text"]:focus {
 /* ─────────────────────────────────────────────────────────────────────────────
    4. PURE NUMBER CARDS & BOTTOM DOCK
    ───────────────────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   4. PURE NUMBER CARDS & BOTTOM CONTROL DOCK (MATCHING MOBILE CARD GAME)
+   ───────────────────────────────────────────────────────────────────────────── */
 .player-dock {
   flex-shrink: 0;
-  background: rgba(10, 15, 26, 0.98);
+  background: var(--bg-dock);
   border-top: 1px solid var(--border-subtle);
   padding: 8px 12px 14px;
   display: flex;
@@ -815,65 +888,195 @@ input[type="text"]:focus {
   font-weight: 700;
 }
 
-/* Hand Row */
-.hand-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* 1. Selection / Status Pill (Mirrors Pill Above Action Button) */
+.selection-status-pill {
+  background: #0e0f24;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 auto;
+  max-width: 92%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
 }
 
-.hand-cards-container {
-  flex: 1;
+/* 2. Action Button: Full-width Chunky Royal Blue (Mirrors BET Button) */
+.lock-in-action-area {
+  width: 100%;
+}
+
+.btn-snap-lock {
+  width: 100%;
+  height: 48px;
+  background: var(--royal-blue);
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--royal-blue-glow);
+  transition: transform 0.15s, background-color 0.2s, box-shadow 0.2s;
+  padding: 0 16px;
 }
 
-/* The Pure Number Card */
+.btn-snap-lock:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6);
+}
+
+.btn-snap-lock:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-snap-lock.disabled, .btn-snap-lock:disabled {
+  background: #1e293b;
+  color: #64748b;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-snap-lock .btn-icon {
+  font-size: 0.95rem;
+}
+
+.btn-snap-lock .btn-label {
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.btn-snap-lock .btn-sub {
+  font-size: 0.62rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.locked-indicator-badge {
+  width: 100%;
+  height: 48px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #34d399;
+}
+
+.locked-indicator-badge .lock-icon {
+  font-size: 1rem;
+}
+
+.locked-indicator-badge .lock-text {
+  font-size: 0.88rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+}
+
+/* 3. Hand Row: Crisp White Number Cards (Mirrors Bottom Token Row) */
+.hand-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hand-cards-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Crisp White Number Card */
 .number-card {
-  width: 50px;
-  height: 72px;
-  background: linear-gradient(145deg, #1e293b, #0f172a);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-md);
+  width: 56px;
+  height: 78px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  position: relative;
+  user-select: none;
+}
+
+.number-card::before {
+  content: attr(data-val);
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #64748b;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.number-card::after {
+  content: attr(data-val);
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #64748b;
+  font-family: var(--font-mono);
+  line-height: 1;
+  transform: rotate(180deg);
 }
 
 .number-card .card-hero-num {
   font-family: var(--font-mono);
-  font-size: 1.7rem;
+  font-size: 1.85rem;
   font-weight: 900;
-  color: #fff;
+  color: #0f172a;
   line-height: 1;
 }
 
 .number-card.active:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  border-color: rgba(37, 99, 235, 0.5);
 }
 
 .number-card.selected {
-  border-color: var(--gold);
-  background: linear-gradient(145deg, #2d3748, #1a202c);
-  box-shadow: 0 0 14px var(--gold-glow);
-  transform: translateY(-6px);
+  border-color: var(--royal-blue);
+  border-width: 2.5px;
+  box-shadow: 0 0 16px var(--royal-blue-glow), 0 8px 20px rgba(0, 0, 0, 0.4);
+  transform: translateY(-8px);
 }
 
 .number-card.b1-view-only, .b1-hand-view-only .number-card {
-  opacity: 0.6;
+  opacity: 0.75;
   cursor: default;
 }
 .number-card.b1-view-only:hover {
   transform: none;
 }
 
-/* Placed Mini Card */
+/* Placed Mini Card (inside .b2-card-slot on table) */
 .placed-number-card {
   width: 100%;
   height: 100%;
@@ -881,13 +1084,15 @@ input[type="text"]:focus {
   align-items: center;
   justify-content: center;
   position: relative;
+  background: #ffffff;
+  border-radius: 8px;
 }
 
 .placed-number-card .pnc-num {
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 900;
-  color: var(--gold-bright);
+  color: #0f172a;
 }
 
 .placed-number-card .remove-btn {
@@ -897,79 +1102,6 @@ input[type="text"]:focus {
   font-size: 0.7rem;
   color: #ef4444;
   font-weight: 900;
-}
-
-/* Lock In Action Button */
-.lock-in-action-area {
-  flex-shrink: 0;
-}
-
-.btn-snap-lock {
-  min-width: 110px;
-  height: 72px;
-  background: linear-gradient(135deg, var(--gold), #d97706);
-  border: none;
-  border-radius: var(--radius-md);
-  color: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px var(--gold-glow);
-  transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
-  padding: 6px 10px;
-}
-
-.btn-snap-lock:active { transform: scale(0.97); }
-
-.btn-snap-lock.disabled, .btn-snap-lock:disabled {
-  background: #1e293b;
-  color: #64748b;
-  box-shadow: none;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.btn-snap-lock .btn-label {
-  font-size: 0.74rem;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  text-align: center;
-  line-height: 1.1;
-}
-
-.btn-snap-lock .btn-sub {
-  font-size: 0.55rem;
-  font-weight: 700;
-  opacity: 0.8;
-  text-align: center;
-  line-height: 1.1;
-  max-width: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.locked-indicator-badge {
-  min-width: 110px;
-  height: 72px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1.5px solid rgba(16, 185, 129, 0.4);
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: #34d399;
-}
-
-.locked-indicator-badge .lock-text {
-  font-size: 0.74rem;
-  font-weight: 900;
-  letter-spacing: 0.5px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
