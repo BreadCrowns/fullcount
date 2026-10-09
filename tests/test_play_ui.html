@@ -502,6 +502,8 @@
       report(ratingBadges[0].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Fastball base target 5');
       report(ratingBadges[1].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Breaking base target 5');
       report(ratingBadges[2].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Offspeed base target 5');
+      report(ratingBadges[0].textContent.includes('Tunnel -3'), 'Pitch buttons display pitcher tunneling adjustment (Tunnel -3)');
+      report(ratingBadges[0].textContent.includes('Opp Read'), 'Pitch buttons display opponent hitter read adjustment');
       const b3LockBtn = document.getElementById('lock-btn');
       report(b3LockBtn !== null, 'Lock-in button exists in Beat 3');
       report(b3LockBtn?.textContent.includes('SHOWDOWN'), 'Lock-in button reflects SHOWDOWN context');
@@ -529,10 +531,24 @@
       report(unselectedNl.includes('SELECT PITCH TO PREVIEW'), 'Unselected displays SELECT PITCH TO PREVIEW badge');
       report(unselectedNl.includes('unselected'), 'Unselected number line cells contain unselected class');
 
-      // Verify number line in Beat 2 execution clash
+      // Verify number line in Beat 2 execution clash adjusts to new target
       soloPlayState.currentPA.beat = 'beat2';
+      soloPlayState.currentPA.beatResults.beat1 = {
+        winner: 'batter',
+        advantageSide: 'batter',
+        count: '3-1',
+        pitchType: 'fastball',
+        guessPitch: 'fastball',
+        pitchMatched: true,
+        target: 9,
+        effectiveTarget: 9,
+        readFactor: 4
+      };
       handleGameState(soloPlayState);
-      report(document.querySelector('.diamond-number-line') !== null, 'Diamond battlefield renders live color-coded number line');
+      const b2Nl = document.querySelector('.diamond-number-line');
+      report(b2Nl !== null, 'Diamond battlefield renders live color-coded number line');
+      report(b2Nl?.textContent.includes('Target 9'), 'Beat 2 number line adjusts to new elevated target 9');
+      report(b2Nl?.textContent.includes('BATTER ADVANTAGE'), 'Beat 2 number line highlights Batter Advantage');
 
       // 10. Test Pitch Result Screen: No cards displayed, only the two pitches, advantage, and new target
       soloPlayState.currentPA.phase = 'beat1_result';

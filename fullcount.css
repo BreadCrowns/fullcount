@@ -481,6 +481,7 @@ input[type="text"]:focus {
 .field-scout-chips {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -492,6 +493,20 @@ input[type="text"]:focus {
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
   color: #cbd5e1;
+}
+.scout-chip.archetype-chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+.scout-chip.stat-chip.tunnel-chip {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}
+.scout-chip.stat-chip.read-chip {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
 }
 .scout-chip b { color: var(--gold-bright); }
 
@@ -526,7 +541,7 @@ input[type="text"]:focus {
   gap: 4px;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
-  min-height: 72px;
+  min-height: 76px;
 }
 
 .pitch-tray.choice-tile:hover {
@@ -554,12 +569,30 @@ input[type="text"]:focus {
 }
 
 .pt-rating-badge {
-  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  width: 100%;
+}
+
+.pt-badge-main {
+  font-size: 0.66rem;
   font-weight: 800;
   color: var(--gold-bright);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
+}
+
+.pt-badge-opp-risk {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #94a3b8;
 }
 
 .tray-selected-pill {
@@ -1247,9 +1280,51 @@ input[type="text"]:focus {
   color: var(--gold-bright);
 }
 
+.nl-cell.target-pin {
+  background: rgba(245, 158, 11, 0.4);
+  border: 1.5px solid var(--gold-bright);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.nl-cell.under-target {
+  background: rgba(239, 68, 68, 0.08);
+  color: #64748b;
+}
+
+.nl-cell.above-target {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
 .nl-cell.line-drive {
   background: rgba(16, 185, 129, 0.2);
   color: #34d399;
+}
+
+.nl-adv-pill {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.nl-adv-pill.hitter {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--gold-bright);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.nl-adv-pill.pitcher {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.nl-adv-pill.neutral {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .nl-header-title {

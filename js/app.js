@@ -1162,6 +1162,11 @@ function renderBeat2AdvantageBanner(b1Data, iAmBatting, iAmPitching) {
 function renderFieldPitcherInfo(pitcherChar, charges, isFatigued, isUserPitching, count, pitcherRatings) {
   const name = pitcherChar?.name || 'Pitcher';
   const label = isUserPitching ? 'YOU' : 'OPP';
+  const archetype = pitcherChar?.archetype || 'Pitcher';
+  const tunFB = (typeof getPitcherTunneling === 'function') ? getPitcherTunneling(pitcherChar, 'fastball') : (pitcherChar?.tunneling?.fastball ?? 2);
+  const tunBR = (typeof getPitcherTunneling === 'function') ? getPitcherTunneling(pitcherChar, 'breaking') : (pitcherChar?.tunneling?.breaking ?? 2);
+  const tunOS = (typeof getPitcherTunneling === 'function') ? getPitcherTunneling(pitcherChar, 'offspeed') : (pitcherChar?.tunneling?.offspeed ?? 2);
+
   return `
     <div class="field-player-card pitcher-info-card">
       <div class="fpc-main">
@@ -1172,7 +1177,10 @@ function renderFieldPitcherInfo(pitcherChar, charges, isFatigued, isUserPitching
           ${isFatigued ? '<span class="fpc-fatigue-badge" title="Pitcher Fatigued: Reduced execution effectiveness">⚠️ FATIGUED</span>' : ''}
         </div>
         <div class="field-scout-chips">
-          <span class="scout-chip">${pitcherChar?.archetype || 'Pitcher'}</span>
+          <span class="scout-chip archetype-chip">${archetype}</span>
+          <span class="scout-chip stat-chip tunnel-chip" title="Fastball Tunneling: -${tunFB} drags Target down to ${Math.max(2, 5 - tunFB)}">🔥 FB -${tunFB} (Tgt ${Math.max(2, 5 - tunFB)})</span>
+          <span class="scout-chip stat-chip tunnel-chip" title="Breaking Tunneling: -${tunBR} drags Target down to ${Math.max(2, 5 - tunBR)}">🌀 BR -${tunBR} (Tgt ${Math.max(2, 5 - tunBR)})</span>
+          <span class="scout-chip stat-chip tunnel-chip" title="Offspeed Tunneling: -${tunOS} drags Target down to ${Math.max(2, 5 - tunOS)}">⏱️ OS -${tunOS} (Tgt ${Math.max(2, 5 - tunOS)})</span>
         </div>
       </div>
     </div>`;
@@ -1181,6 +1189,15 @@ function renderFieldPitcherInfo(pitcherChar, charges, isFatigued, isUserPitching
 function renderFieldBatterInfo(batterChar, isUserBatting, count) {
   const name = batterChar?.name || 'Batter';
   const label = isUserBatting ? 'YOU' : 'OPP';
+  const archetype = batterChar?.archetype || 'Batter';
+  const readFB = (typeof getBatterReadFactor === 'function') ? getBatterReadFactor(batterChar, 'fastball') : (batterChar?.readFactors?.fastball ?? 2);
+  const readBR = (typeof getBatterReadFactor === 'function') ? getBatterReadFactor(batterChar, 'breaking') : (batterChar?.readFactors?.breaking ?? 2);
+  const readOS = (typeof getBatterReadFactor === 'function') ? getBatterReadFactor(batterChar, 'offspeed') : (batterChar?.readFactors?.offspeed ?? 2);
+
+  const fbTgt = Math.min(10, 5 + readFB);
+  const brTgt = Math.min(10, 5 + readBR);
+  const osTgt = Math.min(10, 5 + readOS);
+
   return `
     <div class="field-player-card batter-info-card">
       <div class="fpc-main">
@@ -1190,7 +1207,10 @@ function renderFieldBatterInfo(batterChar, isUserBatting, count) {
           <span class="fpc-name">${name}</span>
         </div>
         <div class="field-scout-chips">
-          <span class="scout-chip">${batterChar?.archetype || 'Batter'}</span>
+          <span class="scout-chip archetype-chip">${archetype}</span>
+          <span class="scout-chip stat-chip read-chip" title="Fastball Read: +${readFB} elevates Target to ${fbTgt}${fbTgt >= 9 ? ' (Home Run)' : ''}">🔥 FB +${readFB} (Tgt ${fbTgt}${fbTgt >= 9 ? ' HR' : ''})</span>
+          <span class="scout-chip stat-chip read-chip" title="Breaking Read: +${readBR} elevates Target to ${brTgt}${brTgt >= 7 ? ' (Double)' : ''}">🌀 BR +${readBR} (Tgt ${brTgt}${brTgt >= 7 ? ' 2B' : ''})</span>
+          <span class="scout-chip stat-chip read-chip" title="Offspeed Read: +${readOS} elevates Target to ${osTgt}">⏱️ OS +${readOS} (Tgt ${osTgt})</span>
         </div>
       </div>
     </div>`;
@@ -1198,8 +1218,8 @@ function renderFieldBatterInfo(batterChar, isUserBatting, count) {
 
 // ── PITCH SELECTION DOCK (PLACED RIGHT ABOVE USER'S CARDS IN BEAT 1 & 3) ──
 function renderPitchSelectionButtons(pitcherChar, batterChar, isPitching, localPitch, localGuess, currentBeat) {
-  const pTargets = pitcherChar?.baseTargets || { fastball: 4, breaking: 4, offspeed: 3 };
-  const bReads = batterChar?.readFactors || { fastball: 1, breaking: 2, offspeed: 1 };
+  const pTunneling = pitcherChar?.tunneling || { fastball: 2, breaking: 2, offspeed: 2 };
+  const bReads = batterChar?.readFactors || { fastball: 2, breaking: 2, offspeed: 2 };
 
   const pitches = [
     { key: 'fastball', name: 'Fastball', icon: '🔥' },
@@ -1209,16 +1229,21 @@ function renderPitchSelectionButtons(pitcherChar, batterChar, isPitching, localP
 
   const buttonsHtml = pitches.map(p => {
     const isSelected = isPitching ? (localPitch === p.key) : (localGuess === p.key);
-    const tgt = (typeof getPitcherBaseTarget === 'function')
-      ? getPitcherBaseTarget(pitcherChar, p.key)
-      : (pTargets[p.key] ?? (p.key === 'offspeed' ? 3 : 4));
+    const baseTgt = 5;
+    const tun = (typeof getPitcherTunneling === 'function')
+      ? getPitcherTunneling(pitcherChar, p.key)
+      : (pTunneling[p.key] ?? 2);
     const read = (typeof getBatterReadFactor === 'function')
       ? getBatterReadFactor(batterChar, p.key)
-      : (bReads[p.key] ?? 1);
+      : (bReads[p.key] ?? 2);
+
+    const tunTgt = Math.max(2, baseTgt - tun);
+    const readTgt = Math.min(10, baseTgt + read);
+    const readThreat = readTgt >= 9 ? 'HR 💥' : (readTgt >= 7 ? '2B ⚡' : '1B 🏏');
 
     const badgeText = isPitching
-      ? `Target ${tgt}`
-      : `Target ${tgt} <small>(+${read} Read)</small>`;
+      ? `<span class="pt-badge-main">Target ${baseTgt} &bull; <b>Tunnel -${tun} (Tgt ${tunTgt})</b></span><span class="pt-badge-opp-risk">⚠️ Opp Read +${read} (Tgt ${readTgt} ${readThreat})</span>`
+      : `<span class="pt-badge-main">Target ${baseTgt} &bull; <b>Read +${read} (Tgt ${readTgt} ${readThreat})</b></span><span class="pt-badge-opp-risk">Opp Tunnel -${tun} (Tgt ${tunTgt})</span>`;
 
     const selectedPill = isSelected
       ? `<div class="tray-selected-pill">${isPitching ? '✓ SELECTED' : '✓ ANTICIPATED'}</div>`
@@ -1233,8 +1258,8 @@ function renderPitchSelectionButtons(pitcherChar, batterChar, isPitching, localP
            ondragleave="handleTrayDragLeave(event)"
            ondrop="handleTrayDrop(event, '${p.key}', '${isPitching ? 'mound' : 'plate'}')"
            onclick="handleTrayClick('${p.key}', '${isPitching ? 'mound' : 'plate'}')"
-           data-tooltip-title="${p.name} (Target ${tgt})"
-           data-tooltip-body="${isPitching ? `Base Target: ${tgt}. Required minimum card to execute pitch.` : `Anticipate ${p.name}. Base Target: ${tgt}, Read Factor: +${read}.`}">
+           data-tooltip-title="${p.name} (Base Target 5)"
+           data-tooltip-body="${isPitching ? `Base Target 5. Your Tunneling: -${tun} (drags target down to ${tunTgt}). Opponent Read: +${read} (elevates target to ${readTgt}, unlocking ${readThreat}).` : `Base Target 5. Your Read Factor: +${read} (elevates target to ${readTgt}, unlocking ${readThreat}). Opponent Tunneling: -${tun} (drags target down to ${tunTgt}).`}">
         <div class="pt-header">
           <span class="pt-icon">${p.icon}</span>
           <span class="pt-name">${p.name}</span>
@@ -1473,16 +1498,26 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
             ${bases.first ? '<span class="runner-dot">🏃</span>' : ''}
           </div>
 
-          <!-- Mound (Pitcher) -->
+          <!-- 1. Purple Box: Pitcher Stats (Top) -->
+          <div class="diamond-pitcher-stats ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${renderFieldPitcherInfo(pitcherChar, charges, staminaState?.isFatigued, !iAmBatting, count, gs?.pitcherRatings?.[pitchingRole])}
+          </div>
+
+          <!-- 2. Green Box: Pitcher Mound (Center) -->
           <div class="diamond-mound ${!iAmBatting ? 'mine-territory' : 'opp-territory'}">
             <div class="mound-rubber"></div>
             ${moundSlotEl}
           </div>
 
-          <!-- Plate (Batter) -->
+          <!-- 3. Orange Box: Batter Plate (Bottom) -->
           <div class="diamond-plate-area ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
             <div class="home-plate-pentagon"></div>
             ${plateSlotEl}
+          </div>
+
+          <!-- 4. Red Box: Batter Stats (Bottom) -->
+          <div class="diamond-batter-stats ${iAmBatting ? 'mine-territory' : 'opp-territory'}">
+            ${renderFieldBatterInfo(batterChar, iAmBatting, count)}
           </div>
         </div>
       </div>
@@ -1505,7 +1540,11 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
 
     const clashData = isBeat4 ? (pa?.beatResults?.beat3 || {}) : (b1Data || {});
     const establishedPitch = clashData?.pitchType || 'fastball';
-    const establishedTarget = clashData?.target ?? clashData?.effectiveTarget ?? (establishedPitch === 'offspeed' ? 3 : 4);
+    const establishedTarget = clashData?.target ?? clashData?.effectiveTarget ?? (
+      clashData?.advantageSide === 'batter'
+        ? Math.min(10, 5 + (batterChar?.readFactors?.[establishedPitch] ?? 2))
+        : Math.max(2, 5 - (pitcherChar?.tunneling?.[establishedPitch] ?? 2))
+    );
     const pitchIcon = getPitchIcon(establishedPitch);
     const pPitchName = establishedPitch.toUpperCase();
 
@@ -1667,11 +1706,17 @@ function renderZoneBoard(pa, iAmBatting, myCommitted, phase, res, pitcherChar, b
           pitchType: curPitch,
           beat: isBeat3 ? 'beat3' : (isBeat4 ? 'beat4' : 'beat2'),
           count: count,
-          batterBonus: batterRatings[curPitch] ?? 0,
-          pitcherBonus: pitcherRatings[curPitch] ?? 0,
-          launchAngle: (cardVal !== null ? (!iAmBatting ? (cardVal + (pitcherRatings[curPitch] ?? 0) + (isOppDisadvantaged && oppCommitted && pa?.beatPlacements?.beat2?.[oppKey]?.cardId ? (getCard(pa?.beatPlacements?.beat2?.[oppKey]?.cardId)?.value || 3) : 3)) : (cardVal + (pitcherRatings[curPitch] ?? 0) + 3)) : null),
-          projected: true,
-          pitchMatched: true,
+          target: establishedTarget,
+          effectiveTarget: establishedTarget,
+          advantageSide: clashData?.advantageSide || (clashData?.winner === 'batter' ? 'batter' : 'pitcher'),
+          tunneling: clashData?.tunneling ?? (pitcherChar?.tunneling?.[curPitch] ?? 2),
+          readFactor: clashData?.readFactor ?? (batterChar?.readFactors?.[curPitch] ?? 2),
+          cardVal: cardVal,
+          pitcherCardVal: (!iAmBatting ? cardVal : (isDominant && isOppDisadvantaged && oppCommitted ? (getCard(pa?.beatPlacements?.beat2?.[oppKey]?.cardId || pa?.firstRevealedCard)?.value || null) : null)),
+          batterCardVal: (iAmBatting ? cardVal : (isDominant && isOppDisadvantaged && oppCommitted ? (getCard(pa?.beatPlacements?.beat2?.[oppKey]?.cardId || pa?.firstRevealedCard)?.value || null) : null)),
+          launchAngle: cardVal,
+          projected: false,
+          pitchMatched: clashData?.pitchMatched ?? false,
           extraClass: 'diamond-number-line'
         })}
       </div>
@@ -2799,8 +2844,11 @@ function renderOutcomeNumberLine(opts = {}) {
 
   // ── BEAT 2: THE 10-CARD TARGET WINDOW ──
   const target = opts.target || opts.effectiveTarget || 5;
-  const pitcherCardVal = opts.pitcherCardVal || (opts.projectedPitcherCardVal || 6);
-  const selectedCardVal = opts.launchAngle || opts.batterCardVal || opts.cardVal || null;
+  const advSide = opts.advantageSide || (target > 5 ? 'batter' : (target < 5 ? 'pitcher' : 'neutral'));
+  const readFactor = opts.readFactor || 2;
+  const tunneling = opts.tunneling || 2;
+  const pitcherCardVal = (opts.pitcherCardVal !== undefined) ? opts.pitcherCardVal : (opts.projectedPitcherCardVal || null);
+  const selectedCardVal = opts.launchAngle ?? opts.batterCardVal ?? opts.cardVal ?? null;
 
   let cellsHtml = '';
   for (let n = 1; n <= 10; n++) {
@@ -2817,12 +2865,16 @@ function renderOutcomeNumberLine(opts = {}) {
       outcomeClass = 'high-heat outside';
       outcomeLabel = 'K';
     } else if (n < target) {
-      outcomeClass = 'low-contact outside';
+      outcomeClass = 'outside under-target low-contact';
       outcomeLabel = 'OUT';
+    } else if (n === target && pitcherCardVal === null) {
+      outcomeClass = 'target-pin sweet-spot';
+      outcomeLabel = (target >= 9) ? '💥 HR' : (target >= 7 ? '⚡ 2B' : (target >= 5 ? '🎯 TGT' : 'OUT'));
     } else {
-      // Inside target window: [target <= n < pitcherCardVal]
-      outcomeClass = 'line-drive';
-      if (target >= 7) outcomeLabel = (n >= 8) ? '2B' : '1B';
+      // Inside target window: [target <= n]
+      outcomeClass = 'line-drive above-target';
+      if (target >= 9) outcomeLabel = (n >= 9) ? '💥 HR' : '2B';
+      else if (target >= 7) outcomeLabel = (n >= 8) ? '⚡ 2B' : '1B';
       else if (target >= 5) outcomeLabel = '1B';
       else outcomeLabel = 'OUT';
     }
@@ -2843,26 +2895,37 @@ function renderOutcomeNumberLine(opts = {}) {
     `;
   }
 
+  const advPill = (advSide === 'batter' || target > 5)
+    ? `<span class="nl-adv-pill hitter">🏏 BATTER ADVANTAGE (+${readFactor} Read &bull; ${target >= 9 ? '💥 HR Tier' : (target >= 7 ? '⚡ 2B Tier' : '1B Tier')})</span>`
+    : ((advSide === 'pitcher' || target < 5)
+      ? `<span class="nl-adv-pill pitcher">⚾ PITCHER ADVANTAGE (-${tunneling} Tunneling &bull; Target ${target})</span>`
+      : `<span class="nl-adv-pill neutral">⚖️ EVEN COUNT</span>`);
+
   const legendHtml = `
     <div class="nl-legend">
       <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &lt;${target} Groundout</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Target ${target}</span>
       <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> Window: Hit</span>
-      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Barrel</span>
       <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &gt;Pitcher: K</span>
     </div>
   `;
+
+  const footerNote = (advSide === 'batter' || target > 5)
+    ? `<b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; Target elevated to <b>${target}</b> (+${readFactor} Read) &bull; Barreled = <b>${target >= 9 ? '💥 Home Run' : (target >= 7 ? '⚡ Double' : 'Clean Single')}</b>`
+    : `<b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; Target tunneled to <b>${target}</b> (-${tunneling} Tunneling &bull; Pitcher Control) &bull; &gt;Pitcher = <b>Strikeout</b>`;
 
   return `
     <div class="outcome-number-line-container ${extraClass}">
       <div class="nl-header-row">
         <span class="nl-pitch-badge">${pitchIcon} ${pitchName} &bull; Target <b>${target}</b></span>
+        ${advPill}
         ${legendHtml}
       </div>
       <div class="nl-track">
         ${cellsHtml}
       </div>
       <div class="nl-footer-note">
-        <b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; [${target}..${pitcherCardVal}) &rarr; <b>Hit</b> &bull; Equal &rarr; <b>Barrel (${target >= 9 ? 'HR' : (target >= 7 ? '2B' : '1B')})</b> &bull; &gt;${pitcherCardVal} &rarr; <b>Strikeout</b>
+        ${footerNote}
       </div>
     </div>
   `;
@@ -2912,14 +2975,14 @@ function renderBeat1ResultModal(b1, isPitcherMe, isBeat3 = false) {
     <div class="rm-pitch-showcase-tile pitcher-pitch">
       <span class="rm-pitch-tile-icon">${pIcon}</span>
       <span class="rm-pitch-tile-name">${pPitch}</span>
-      <span class="rm-pitch-tile-stat">Target ${b1.baseTarget || 4}</span>
+      <span class="rm-pitch-tile-stat">Tunnel -${b1.tunneling ?? 2} &bull; Tgt ${b1.effectiveTarget ?? 3}</span>
     </div>`;
 
   const batterTileHtml = `
     <div class="rm-pitch-showcase-tile batter-pitch">
       <span class="rm-pitch-tile-icon">${bIcon}</span>
       <span class="rm-pitch-tile-name">${bGuess}</span>
-      <span class="rm-pitch-tile-stat">+${b1.readFactor || 1} Read</span>
+      <span class="rm-pitch-tile-stat">+${b1.readFactor ?? 2} Read &bull; Tgt ${b1.effectiveTarget ?? 7}</span>
     </div>`;
 
   return `
@@ -2952,8 +3015,8 @@ function renderBeat1ResultModal(b1, isPitcherMe, isBeat3 = false) {
 
         <div class="rm-target-highlight">
           <span class="rm-th-label">ESTABLISHED TARGET NUMBER</span>
-          <span class="rm-th-number">${b1.effectiveTarget || b1.target || 4}</span>
-          <span class="rm-th-sub">${winner === 'batter' ? `Base Target ${b1.baseTarget || 4} + Read Factor ${b1.readFactor || 1}` : `Base Target ${b1.baseTarget || 4} (Batter Fooled)`}</span>
+          <span class="rm-th-number">${b1.effectiveTarget || b1.target || 5}</span>
+          <span class="rm-th-sub">${winner === 'batter' ? `Base Target 5 + Read Factor ${b1.readFactor ?? 2}` : `Base Target 5 - Tunneling ${b1.tunneling ?? 2} (Pitcher Control)`}</span>
         </div>
 
         <div class="rm-explanation anticipate-explain">
@@ -3154,8 +3217,13 @@ function renderBattleBackModal(b2, isPitcherMe) {
           pitchType: b2.pitchType || 'fastball',
           beat: 'beat2',
           count: b2.count || '3-2',
-          batterBonus: bBonus,
-          pitcherBonus: pBonus,
+          target: b2.target || b2.effectiveTarget || 5,
+          effectiveTarget: b2.target || b2.effectiveTarget || 5,
+          advantageSide: b2.advantageSide || 'pitcher',
+          tunneling: b2.tunneling,
+          readFactor: b2.readFactor,
+          pitcherCardVal: (typeof pVal === 'number' ? pVal : null),
+          batterCardVal: (typeof bVal === 'number' ? bVal : null),
           launchAngle: (typeof b2.launchAngle === 'number') ? b2.launchAngle : ((typeof b2.total === 'number') ? b2.total : null),
           pitchMatched: (b2.pitchMatched !== undefined) ? b2.pitchMatched : true
         })}
