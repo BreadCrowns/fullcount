@@ -529,6 +529,109 @@
       // Verify number line in active modals and field
       report(document.querySelector('.diamond-number-line') !== null, 'Diamond battlefield renders live color-coded number line');
 
+      // 10. Test Pitch Result Screen: No cards displayed, only the two pitches, advantage, and new target
+      soloPlayState.currentPA.phase = 'beat1_result';
+      soloPlayState.currentPA.beatResults.beat1 = {
+        winner: 'batter',
+        count: '3-1',
+        pitchType: 'fastball',
+        guessPitch: 'fastball',
+        baseTarget: 4,
+        readFactor: 2,
+        effectiveTarget: 6,
+        pitchMatched: true
+      };
+      handleGameState(soloPlayState);
+      const b1PitchModal = document.getElementById('beat1-result-modal');
+      report(b1PitchModal !== null, 'Beat 1 Pitch Result modal renders');
+      report(b1PitchModal?.querySelectorAll('.number-card').length === 0, 'Beat 1 Result modal shows zero number cards');
+      report(b1PitchModal?.querySelectorAll('.rm-pitch-showcase-tile').length === 2, 'Beat 1 Result modal displays the two pitch tiles');
+      report(b1PitchModal?.querySelector('.rm-target-highlight') !== null, 'Beat 1 Result modal displays new target highlight');
+      report(b1PitchModal?.querySelector('.rm-th-number')?.textContent.trim() === '6', 'Target highlight shows effective target number 6');
+      report(b1PitchModal?.querySelector('.anticipate-banner')?.textContent.includes('BATTER ADVANTAGE'), 'Beat 1 Result modal shows advantage outcome');
+
+      // 11. Test Beat 3 Pitch Selection Lock-In & Result Modal
+      soloPlayState.currentPA.phase = 'placing';
+      soloPlayState.currentPA.beat = 'beat3';
+      soloPlayState.currentPA.committed = { host: false, guest: false };
+      handleGameState(soloPlayState);
+
+      // In Beat 3, player selects pitch (no card needed)
+      localPitchType = 'breaking';
+      localBeatCard = null;
+      let b3CommitUpdates = null;
+      window.db = {
+        ref: () => ({
+          once: (evt, cb) => {
+            const snap = { val: () => soloPlayState };
+            cb(snap);
+            return Promise.resolve(snap);
+          },
+          update: (u) => {
+            b3CommitUpdates = u;
+            return Promise.resolve();
+          }
+        })
+      };
+      commitPlacement();
+      report(b3CommitUpdates !== null, 'Beat 3 pitch lock-in executes successfully without requiring a card');
+      report(b3CommitUpdates?.['currentPA/beatPlacements/beat3/host']?.pitchType === 'breaking', 'Beat 3 commits chosen pitch type');
+      window.db = undefined;
+
+      // 12. Test Beat 3 Result Modal & Transition to Beat 4
+      soloPlayState.currentPA.phase = 'beat3_result';
+      soloPlayState.currentPA.beatResults.beat3 = {
+        winner: 'pitcher',
+        count: '3-2',
+        pitchType: 'breaking',
+        guessPitch: 'fastball',
+        baseTarget: 4,
+        readFactor: 2,
+        effectiveTarget: 4,
+        pitchMatched: false
+      };
+      handleGameState(soloPlayState);
+      const b3Modal = document.getElementById('beat3-result-modal');
+      report(b3Modal !== null, 'Beat 3 Result Modal renders in beat3_result phase');
+      report(b3Modal?.querySelectorAll('.number-card').length === 0, 'Beat 3 Result modal shows zero number cards');
+      report(b3Modal?.querySelectorAll('.rm-pitch-showcase-tile').length === 2, 'Beat 3 Result modal displays the two pitch tiles');
+      report(b3Modal?.querySelector('.rm-target-highlight') !== null, 'Beat 3 Result modal displays new target number');
+      report(b3Modal?.querySelector('.rm-target-highlight .rm-th-number')?.textContent.trim() === '4', 'Target highlight reflects base target 4');
+
+      // Test proceedToBeat4()
+      let b4Updates = null;
+      window.db = {
+        ref: () => ({
+          once: (evt, cb) => {
+            const snap = { val: () => soloPlayState };
+            cb(snap);
+            return Promise.resolve(snap);
+          },
+          update: (u) => {
+            b4Updates = u;
+            return Promise.resolve();
+          }
+        })
+      };
+      proceedToBeat4();
+      report(b4Updates !== null, 'proceedToBeat4 executed gameRef.update()');
+      report(b4Updates?.['currentPA/phase'] === 'placing', 'proceedToBeat4 transitions phase to placing');
+      report(b4Updates?.['currentPA/beat'] === 'beat4', 'proceedToBeat4 transitions beat to beat4');
+      window.db = undefined;
+
+      // 13. Test Beat 4 Placing (Execution Clash on Payoff Pitch)
+      soloPlayState.currentPA.phase = 'placing';
+      soloPlayState.currentPA.beat = 'beat4';
+      soloPlayState.currentPA.committed = { host: false, guest: false };
+      handleGameState(soloPlayState);
+      const b4Html = document.getElementById('app').innerHTML;
+      report(b4Html.length > 100, `Beat 4 placing rendered successfully (${b4Html.length} chars)`);
+      report(document.querySelector('.b2-target-showcase') !== null, 'Beat 4 renders execution clash target showcase');
+      report(b4Html.includes('BREAKING'), 'Beat 4 displays established pitch from Beat 3 (BREAKING)');
+      report(document.querySelector('.b2-card-slot') !== null, 'Beat 4 renders execution card slot');
+      const b4PlayableCards = document.querySelectorAll('.hand-cards-container .number-card.active');
+      report(b4PlayableCards.length > 0, `Beat 4 hand cards are playable for execution clash (found ${b4PlayableCards.length})`);
+
     } catch(e) {
       const p = document.createElement('p');
       p.className = 'fail';

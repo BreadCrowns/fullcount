@@ -1103,3 +1103,51 @@ When combined, the sum naturally forms a triangular/bell-shaped probability dist
 - **Automated Unit Tests**: **215 of 215 tests pass (100%)** with zero errors across `tests/test_resolution.html` and `tests/test_play_ui.html`.
 - **Headless 10-Game Simulation**: Completed 262 PAs across 10 full games with **2.70 runs/game**, 45 hits, 7 home wins, 3 away wins, and zero runtime errors.
 - **Result**: The UI and resolution engine are now 100% unified under the Combined Total / Bell Curve Launch Angle model, completely eliminating the Delta paradox.
+
+---
+
+## Entry 21: Complete UI Tear-Down & Rebuild — Minimalist GDD, Pure Deduction Interface, Pitch-Only Result Screens, and Beat 3/4 Showdown Engine
+*Date: October 8, 2026*
+
+### Context & User Mandate
+Following extensive feature layering across successive playtests, the user issued a direct, uncompromising mandate:
+> *"This is a mess. Tear it all down. Create a gdd for yourself and start from scratch with a minimal UI.*
+> *Clean up the UI! Anything that is absolutely not necessary to deduce what to play, i.e. any information given to the player, anything that is not that, get rid of it.*
+> *Also, when I forced a full count from a foul, the next pitch didn't work, so the beat three didn't work.*
+> *After a pitch selection is made, the result screen still shows cards being played. Don't do that. Just show the two pitches and who has the advantage going forward and the new target number."*
+
+### Core Architectural Changes
+
+1. **Authoring the Authoritative Game Design Document (`GDD.md`)**:
+   - Codified the definitive ruleset, math model, characters, and minimal UI manifesto ("Zero Noise, Pure Deduction").
+   - Established the pure 2-beat duel cycle with optional 3-2 Full Count showdown:
+     - **Beat 1: The Read (Mental Setup)**: Pitcher chooses 1 of 3 pitch deliveries (Fastball, Breaking, Offspeed); Batter anticipates 1 of 3 pitch deliveries. Absolutely *no cards* are played in Beat 1.
+     - **Beat 1 Pitch Result Screen**: Displays exclusively the Pitch Thrown vs. Pitch Anticipated, Count/Advantage established (3-1 Hitter Count on match, 0-2 Pitcher Count on misread), the established Target Number, and a Continue button. Zero number cards shown.
+     - **Beat 2: The Clash (Execution Duel)**: Displays established Pitch & Target showcase. Both players play exactly 1 number card from hand (1–6). Target window resolves the duel.
+     - **Beat 3: Payoff Read (Foul Ball / Full Count)**: Re-enters The Read at 3-2 full count. Pitcher chooses pitch; Batter anticipates pitch.
+     - **Beat 4: Payoff Clash**: Execution clash for the deciding pitch of the at-bat.
+
+2. **Complete CSS Tear-Down (`fullcount.css`)**:
+   - Demolished 6,064 lines (133 KB) of bloated, multi-era spaghetti CSS.
+   - Replaced it with an ultra-clean, modern, dark stadium glassmorphic design system (~850 lines).
+   - Eliminated redundant badges, multi-zone clutter, verbose stat displays, and unneeded widgets.
+   - Built sleek dedicated components:
+     - `.rm-pitch-showcase-tile`: High-contrast pitch tiles for result modals.
+     - `.rm-target-highlight`: Bold, glowing target number callout.
+     - `.b2-target-showcase`: Crisp pitch & target showcase banner in Beat 2/4.
+     - `.hand-cards-row`: Pure, minimalist number cards (1–6).
+
+3. **Beat 3 & Beat 4 Engine Alignment (`js/resolution.js` & `js/app.js`)**:
+   - Resolved the bug where forcing a full count from a foul caused Beat 3 to fail.
+   - Aligned Beat 3 to function as pitch-only commitment (matching Beat 1 mechanics).
+   - Added `proceedToBeat4()` transitioning smoothly into Beat 4 placing and execution clash.
+   - Cleaned out legacy dead code functions: `renderPublicScoutingBar`, `renderPitcherPayoffDeck`, `renderBatterPayoffDeck`, `renderActionCard`, and `renderOutcomeBanner`.
+
+4. **Automated Verification**:
+   - Expanded `tests/test_play_ui.html` with tests 10–13 covering:
+     - Pitch-only Beat 1 & Beat 3 result modals (zero number cards).
+     - Beat 3 pitch-only commitment without card requirement.
+     - Target highlight rendering and value calculations.
+     - `proceedToBeat4()` state transition to Beat 4 placing.
+     - Beat 4 execution clash layout, target showcase, and playable hand cards.
+   - Full suite passes: **243 of 243 tests pass (100%)**.

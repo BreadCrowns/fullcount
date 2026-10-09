@@ -1644,7 +1644,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
     }
 
   } else if (beat === 'beat2' || beat === 'beat4') {
-    const b1 = gameState?.currentPA?.beatResults?.beat1 || gameState?.beatResults?.beat1 || {};
+    const b1 = (beat === 'beat4' ? (gameState?.currentPA?.beatResults?.beat3 || gameState?.beatResults?.beat3) : null) || gameState?.currentPA?.beatResults?.beat1 || gameState?.beatResults?.beat1 || {};
     const target = b1.effectiveTarget || b1.target || 3;
     const oppRevealedCardId = firstRevealedCard || gameState?.currentPA?.firstRevealedCard || null;
     const oppRevealedCard = oppRevealedCardId ? getCard(oppRevealedCardId) : null;
