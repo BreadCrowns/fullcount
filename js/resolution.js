@@ -196,6 +196,27 @@ function advanceBases(bases, spaces) {
   return newBases;
 }
 
+// Returns new bases state after a walk (forced runners advance).
+function advanceBasesOnWalk(bases) {
+  const newBases = { ...(bases || { first:false, second:false, third:false }) };
+  if (!bases?.first) {
+    newBases.first = true;
+  } else if (!bases?.second) {
+    newBases.first = true;
+    newBases.second = true;
+  } else {
+    // 1st and 2nd occupied (or bases loaded): all forced
+    newBases.first = true;
+    newBases.second = true;
+    newBases.third = true;
+  }
+  return newBases;
+}
+
+function runsOnWalk(bases) {
+  return (bases?.first && bases?.second && bases?.third) ? 1 : 0;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // OUTCOME TABLE
 // Returns { type, display, runsScored, outsAdded, newBases, extraAdvance }
@@ -999,24 +1020,26 @@ function resolveBeat1(opts) {
   const effBatterGuess = opts.guessPitch || batterGuess || 'fastball';
   const pitchMatched = (effBatterGuess === effPitchType);
 
-  const baseTarget = (typeof getPitcherBaseTarget === 'function')
-    ? getPitcherBaseTarget(pitcherChar, effPitchType)
-    : (pitcherChar?.baseTargets?.[effPitchType] ?? 3);
+  const baseTarget = 5;
 
   const readFactor = (typeof getBatterReadFactor === 'function')
     ? getBatterReadFactor(batterChar, effPitchType)
-    : (batterChar?.readFactors?.[effPitchType] ?? 1);
+    : (batterChar?.readFactors?.[effPitchType] ?? 2);
+
+  const tunneling = (typeof getPitcherTunneling === 'function')
+    ? getPitcherTunneling(pitcherChar, effPitchType)
+    : (pitcherChar?.tunneling?.[effPitchType] ?? 2);
 
   let winner = 'pitcher';
   let advantageSide = 'pitcher';
-  let effectiveTarget = baseTarget;
+  let effectiveTarget = Math.max(2, baseTarget - tunneling);
   let count = '0-2';
-  let countDisplay = `0-2 Pitcher's Count (Batter Fooled: Target remains ${baseTarget})`;
+  let countDisplay = `0-2 Pitcher's Count (Pitcher Tunneled: Target dragged down to ${effectiveTarget})`;
 
   if (pitchMatched) {
     winner = 'batter';
     advantageSide = 'batter';
-    effectiveTarget = baseTarget + readFactor;
+    effectiveTarget = Math.min(10, baseTarget + readFactor);
     count = '3-1';
     countDisplay = `3-1 Hitter's Count (Anticipated Pitch: Target elevated to ${effectiveTarget})`;
   }
@@ -1039,6 +1062,7 @@ function resolveBeat1(opts) {
     pitchMatched,
     baseTarget,
     readFactor,
+    tunneling,
     effectiveTarget,
     target: effectiveTarget,
     pitcherTarget: effectiveTarget,
@@ -1050,14 +1074,14 @@ function resolveBeat1(opts) {
     batterCardId,
     pitcherCards: pitcherCardId ? [pitcherCardId] : [],
     batterCards: batterCardId ? [batterCardId] : [],
-    margin: pitchMatched ? readFactor : 0,
+    margin: pitchMatched ? readFactor : tunneling,
     isDominant: pitchMatched,
     pitcherCharName: pitcherChar?.name || 'Pitcher',
     batterCharName: batterChar?.name || 'Batter',
   };
 }
 
-// BEAT 2: Execution Clash (The Pitcher Target & Batter Window)
+// BEAT 2: Execution Clash (The Pitcher Target & Batter Window) — One-Two Decisive Resolution
 function resolveBeat2(opts) {
   const {
     count = '3-2',
@@ -1079,22 +1103,23 @@ function resolveBeat2(opts) {
   const effGuessPitch = guessPitch || batterGuess || 'fastball';
   const pitchMatched = (effGuessPitch === pitchType);
 
-  const baseTarget = (typeof getPitcherBaseTarget === 'function')
-    ? getPitcherBaseTarget(pitcherChar, pitchType)
-    : (pitcherChar?.baseTargets?.[pitchType] ?? 3);
-
+  const baseTarget = 5;
   const readFactor = (typeof getBatterReadFactor === 'function')
     ? getBatterReadFactor(batterChar, pitchType)
-    : (batterChar?.readFactors?.[pitchType] ?? 1);
+    : (batterChar?.readFactors?.[pitchType] ?? 2);
+  const tunneling = (typeof getPitcherTunneling === 'function')
+    ? getPitcherTunneling(pitcherChar, pitchType)
+    : (pitcherChar?.tunneling?.[pitchType] ?? 2);
 
-  // If advantageSide or target is passed from Beat 1, respect it; otherwise calculate
   const effAdvantage = opts.advantageSide || (pitchMatched ? 'batter' : 'pitcher');
-  const target = opts.target ?? opts.effectiveTarget ?? (effAdvantage === 'batter' ? (baseTarget + readFactor) : baseTarget);
+  const target = opts.target ?? opts.effectiveTarget ?? (
+    effAdvantage === 'batter' ? Math.min(10, baseTarget + readFactor) : Math.max(2, baseTarget - tunneling)
+  );
 
   const pCard = getCard(pitcherCardId);
-  const pCardVal = pCard ? (pCard.value || 0) : 0;
+  const pCardVal = pCard ? (pCard.value || 0) : (typeof opts.pitcherCardVal === 'number' ? opts.pitcherCardVal : 5);
   const bCard = getCard(batterCardId);
-  const bCardVal = bCard ? (bCard.value || 0) : 0;
+  const bCardVal = bCard ? (bCard.value || 0) : (typeof opts.batterCardVal === 'number' ? opts.batterCardVal : 5);
 
   const pitcherExecuted = (pCardVal >= target);
 
@@ -1105,27 +1130,25 @@ function resolveBeat2(opts) {
   let returnBatterCard = false;
   let isBattleBack = false;
   let isFoulBall = false;
-  let advancesTo = null;
+  let advancesTo = null; // No recursive beats! Pure 1-2 PA resolution!
   let runsScored = 0;
   let outsAdded = 0;
   let newBases = { ...bases };
   let winner = 'pitcher';
 
-  // ── 1. Pitcher Execution Check ──
+  // ── 1. Pitcher Execution Check (P < Target) ──
   if (!pitcherExecuted) {
-    // ⚾ BALL IN THE DIRT!
-    outcomeType = 'ball';
+    outcomeType = 'walk';
     isBall = true;
-    returnBatterCard = true;
-    advancesTo = 'beat3';
-    outcomeDisplay = '⚾ BALL IN THE DIRT! (Pitcher Missed Target)';
-    ruleReason = `Pitcher played ${pCardVal}, missing Target ${target}. Pitcher burns their card; Batter card returned to hand unrevealed. Advances to Payoff Pitch!`;
+    outcomeDisplay = '⚾ WALK (Pitcher Missed Target)';
+    ruleReason = `Pitcher played ${pCardVal}, missing Target ${target}. Batter awarded first base on balls!`;
     winner = 'batter';
     outsAdded = 0;
-    runsScored = 0;
+    runsScored = runsOnWalk(bases);
+    newBases = advanceBasesOnWalk(bases);
 
   } else {
-    // Pitcher executed (pCardVal >= target). Evaluate Batter in the Window:
+    // Pitcher executed (pCardVal >= target). Evaluate Batter vs Pitcher:
     if (bCardVal > pCardVal) {
       // ⚡ STRIKEOUT / WHIFF: Overswung pitcher delivery
       outcomeType = 'k';
@@ -1142,46 +1165,64 @@ function resolveBeat2(opts) {
       outsAdded = 1;
       winner = 'pitcher';
 
-    } else if (target <= bCardVal && bCardVal < pCardVal) {
-      // 🏏 BASE HIT: Cleanly inside the Target Window [Target <= Batter < Pitcher]
-      winner = 'batter';
-      outsAdded = 0;
-      if (bCardVal >= 5) {
-        outcomeType = 'double';
-        outcomeDisplay = '⚡ ROCKET DOUBLE! (In the Target Window)';
-        ruleReason = `Batter placed ${bCardVal} squarely between Target ${target} and Pitcher ${pCardVal} for a Double!`;
-        runsScored = runsOnHit(bases, 2);
-        newBases = advanceBases(bases, 2);
-      } else {
-        outcomeType = 'single';
-        outcomeDisplay = '🏏 CLEAN SINGLE! (In the Target Window)';
-        ruleReason = `Batter placed ${bCardVal} squarely between Target ${target} and Pitcher ${pCardVal} for a Single!`;
-        runsScored = runsOnHit(bases, 1);
-        newBases = advanceBases(bases, 1);
-      }
-
     } else if (bCardVal === pCardVal) {
-      // 💥 EXACT MATCH COLLISION: Batter == Pitcher
-      if (effAdvantage === 'batter') {
-        // Barreled Home Run with Read Advantage
+      // 💥 EXACT MATCH COLLISION (BARRELED!)
+      winner = 'batter';
+      if (target >= 9) {
         outcomeType = 'homerun';
-        outcomeDisplay = '💥 BARRELED HOME RUN! (Exact Match with Read Advantage!)';
-        ruleReason = `Batter matched pitcher delivery (${bCardVal} vs ${pCardVal}) with Beat 1 Read Advantage for a towering Home Run!`;
+        outcomeDisplay = '💥 BARRELED HOME RUN! (Exact Match on High Heat!)';
+        ruleReason = `Batter barreled delivery (${bCardVal} vs ${pCardVal}) on elevated Target ${target} for a towering Home Run!`;
         runsScored = countRunners(bases) + 1;
         newBases = { first: false, second: false, third: false };
         outsAdded = 0;
-        winner = 'batter';
-      } else {
-        // Foul Ball / Battle to Beat 3 with Pitcher Advantage
-        outcomeType = 'battle_back';
-        isBattleBack = true;
-        isFoulBall = true;
-        advancesTo = 'beat3';
-        outcomeDisplay = '⚾ FOUL BALL! (Exact Match with Pitcher Advantage — Battle to Beat 3!)';
-        ruleReason = `Exact match (${bCardVal} vs ${pCardVal}), but pitcher had Beat 1 advantage. Batter fouls it back to stay alive and force Beat 3!`;
-        winner = 'tie';
+      } else if (target >= 7) {
+        outcomeType = 'double';
+        outcomeDisplay = '⚡ ROCKET DOUBLE! (Barreled in the Gap!)';
+        ruleReason = `Batter barreled delivery (${bCardVal} vs ${pCardVal}) on Target ${target} for a Rocket Double!`;
+        runsScored = runsOnHit(bases, 2);
+        newBases = advanceBases(bases, 2);
         outsAdded = 0;
-        runsScored = 0;
+      } else if (target >= 5) {
+        outcomeType = 'single';
+        outcomeDisplay = '🏏 CLEAN SINGLE! (Barreled Line Drive)';
+        ruleReason = `Batter barreled delivery (${bCardVal} vs ${pCardVal}) on base Target ${target} for a Clean Single!`;
+        runsScored = runsOnHit(bases, 1);
+        newBases = advanceBases(bases, 1);
+        outsAdded = 0;
+      } else {
+        // Lowered Target Barrel (Pitcher Advantage): Routine Infield Out
+        outcomeType = 'popout';
+        outcomeDisplay = '⚾ ROUTINE POP FLY (Pitcher Suppressed Exit Velocity)';
+        ruleReason = `Batter matched delivery (${bCardVal} vs ${pCardVal}), but pitcher tunneled Target down to ${target}. Routine out!`;
+        outsAdded = 1;
+        winner = 'pitcher';
+      }
+
+    } else if (target <= bCardVal && bCardVal < pCardVal) {
+      // 🏏 IN THE TARGET WINDOW [Target <= Batter < Pitcher]
+      if (target >= 7) {
+        winner = 'batter';
+        outcomeType = 'single';
+        outcomeDisplay = '🏏 SOLID SINGLE! (In the Target Window)';
+        ruleReason = `Batter placed ${bCardVal} squarely between Target ${target} and Pitcher ${pCardVal} for a Single!`;
+        runsScored = runsOnHit(bases, 1);
+        newBases = advanceBases(bases, 1);
+        outsAdded = 0;
+      } else if (target >= 5) {
+        winner = 'batter';
+        outcomeType = 'single';
+        outcomeDisplay = '🏏 BLOOP SINGLE! (In the Target Window)';
+        ruleReason = `Batter placed ${bCardVal} between Target ${target} and Pitcher ${pCardVal} for a Bloop Single!`;
+        runsScored = runsOnHit(bases, 1);
+        newBases = advanceBases(bases, 1);
+        outsAdded = 0;
+      } else {
+        // Lowered target: Weak contact
+        winner = 'pitcher';
+        outcomeType = 'groundout';
+        outcomeDisplay = '⚾ INFIELD GROUNDOUT (Pitcher Control)';
+        ruleReason = `Batter hit inside pitcher's low target zone for an infield groundout.`;
+        outsAdded = 1;
       }
     }
   }
@@ -1213,6 +1254,7 @@ function resolveBeat2(opts) {
     effectiveTarget: target,
     baseTarget,
     readFactor,
+    tunneling,
     pitchType,
     guessPitch: effGuessPitch,
     batterGuess: effGuessPitch,
@@ -1682,7 +1724,7 @@ function executeBotPlayBeat(gameState, botRole, beat, firstRevealedCard = null) 
 
       if (botHand.length > 0) {
         const pool = botHand.map((id, idx) => ({ id, idx, val: getCard(id)?.value || 0 }));
-        const upperLimit = oppRevealedVal !== null ? oppRevealedVal : 6;
+        const upperLimit = oppRevealedVal !== null ? oppRevealedVal : 10;
         const inWindow = pool.filter(c => c.val >= target && c.val <= upperLimit);
 
         if (inWindow.length > 0) {

@@ -57,11 +57,11 @@
         assert(batterCharKeys.length === 12, `12 Batter characters loaded (found ${batterCharKeys.length})`);
         assert(deckPresetKeys.length === 3, `3 Preset decks loaded (found ${deckPresetKeys.length})`);
 
-        // 2. Pure Number Cards: Full value everywhere (Values 1-6)
+        // 2. Pure Number Cards: Full value everywhere (Values 1-10)
         const fourSeam = getCard('P1');
-        assert(fourSeam && fourSeam.value === 6, `P1 card exists with value 6`);
-        assert(getZoneValue(fourSeam, 'z1') === 6, `P1 retains full value 6 in Beat 1`);
-        assert(getZoneValue(fourSeam, 'z2') === 6, `P1 retains full value 6 in Beat 2 without penalty`);
+        assert(fourSeam && fourSeam.value === 10, `P1 card exists with value 10`);
+        assert(getZoneValue(fourSeam, 'z1') === 10, `P1 retains full value 10 in Beat 1`);
+        assert(getZoneValue(fourSeam, 'z2') === 10, `P1 retains full value 10 in Beat 2 without penalty`);
 
         const allPureNumberCards = Object.values(ACTION_CARDS).every(c => typeof c.value === 'number' && !c.powerBadge && !c.outcomeEffect);
         assert(allPureNumberCards, `All 70 cards are pure number cards with no modifiers or bonuses`);
@@ -89,7 +89,7 @@
         const b1Card = getCard('B1');
         const p1Card = getCard('P1');
         assert(b1Card && b1Card.value === 2, `B1 card is pure number with value 2`);
-        assert(p1Card && p1Card.value === 6, `P1 card is pure number with value 6`);
+        assert(p1Card && p1Card.value === 10, `P1 card is pure number with value 10`);
         assert(!b1Card.counters && !p1Card.pitchCall, `Cards contain no counters or pitchCall modifiers`);
 
 
@@ -170,15 +170,16 @@
         assert(typeof getBatterReadFactor === 'function', 'getBatterReadFactor helper is defined');
         const pJake = PITCHER_CHARACTERS['PC01']; // Big Jake: FB 2, BR 4, OS 5
         const bBear = BATTER_CHARACTERS['BC01'];  // The Bear: FB +2, BR +1, OS 0
-        assert(getPitcherBaseTarget(pJake, 'fastball') === 2, 'Big Jake has Fastball Base Target of 2');
-        assert(getPitcherBaseTarget(pJake, 'breaking') === 4, 'Big Jake has Breaking Base Target of 4');
+        assert(getPitcherBaseTarget(pJake, 'fastball') === 5, 'Big Jake has Fastball Base Target of 5');
+        assert(getPitcherBaseTarget(pJake, 'breaking') === 5, 'Big Jake has Breaking Base Target of 5');
         assert(getPitcherBaseTarget(pJake, 'offspeed') === 5, 'Big Jake has Offspeed Base Target of 5');
-        assert(getBatterReadFactor(bBear, 'fastball') === 2, 'The Bear has Fastball Read Factor of +2');
-        assert(getBatterReadFactor(bBear, 'breaking') === 1, 'The Bear has Breaking Read Factor of +1');
-        assert(getBatterReadFactor(bBear, 'offspeed') === 0, 'The Bear has Offspeed Read Factor of 0');
+        assert(getPitcherTunneling(pJake, 'fastball') === 3, 'Big Jake has Fastball Tunneling of 3');
+        assert(getBatterReadFactor(bBear, 'fastball') === 4, 'The Bear has Fastball Read Factor of +4');
+        assert(getBatterReadFactor(bBear, 'breaking') === 2, 'The Bear has Breaking Read Factor of +2');
+        assert(getBatterReadFactor(bBear, 'offspeed') === 1, 'The Bear has Offspeed Read Factor of +1');
 
         // 13. Sequential Beat 1 Tests (The Read: Pitch Choice & Anticipation)
-        // A. Anticipated Pitch: Batter correctly anticipates Fastball -> Target elevated to 4 (Base 2 + Read 2)
+        // A. Anticipated Pitch: Batter correctly anticipates Fastball -> Target elevated to 9 (Base 5 + Read 4)
         const b1Anticipated = resolveBeat1({
           pitchType: 'fastball',
           guessPitch: 'fastball',
@@ -187,10 +188,10 @@
         });
         assert(b1Anticipated.winner === 'batter', 'Correct anticipation awards batter advantage');
         assert(b1Anticipated.pitchMatched === true, 'pitchMatched is true on correct anticipation');
-        assert(b1Anticipated.effectiveTarget === 4, `Target elevated to 4 (Base 2 + Read 2) (got: ${b1Anticipated.effectiveTarget})`);
+        assert(b1Anticipated.effectiveTarget === 9, `Target elevated to 9 (Base 5 + Read 4) (got: ${b1Anticipated.effectiveTarget})`);
         assert(b1Anticipated.count === '3-1', "Correct anticipation establishes 3-1 Hitter's Count");
 
-        // B. Fooled Batter: Batter anticipates Offspeed, pitcher throws Fastball -> Target remains at Base 2
+        // B. Fooled Batter: Batter anticipates Offspeed, pitcher throws Fastball -> Target dragged to 2 (Base 5 - Tunneling 3)
         const b1Fooled = resolveBeat1({
           pitchType: 'fastball',
           guessPitch: 'offspeed',
@@ -199,48 +200,46 @@
         });
         assert(b1Fooled.winner === 'pitcher', 'Fooled batter awards pitcher advantage');
         assert(b1Fooled.pitchMatched === false, 'pitchMatched is false when fooled');
-        assert(b1Fooled.effectiveTarget === 2, `Target remains at baseline 2 (got: ${b1Fooled.effectiveTarget})`);
+        assert(b1Fooled.effectiveTarget === 2, `Target dragged to 2 (Base 5 - Tunneling 3) (got: ${b1Fooled.effectiveTarget})`);
         assert(b1Fooled.count === '0-2', "Fooled batter establishes 0-2 Pitcher's Count");
 
-        // 14. Sequential Beat 2 Tests (Execution Clash: Pitcher Target & Batter Window)
-        // Check 1: Pitcher Execution Fail (Pitcher < Target) -> Ball in the Dirt
-        // Pitcher plays Card 1 vs Target 3:
+        // 14. Sequential Beat 2 Tests (Execution Clash: One-Two Decisive Resolution)
+        // Check 1: Pitcher Execution Fail (Pitcher < Target) -> Walk
         const b2BallInDirt = resolveBeat2({
-          target: 3,
+          target: 5,
           pitchType: 'fastball',
-          pitcherCardId: 'P19', // Val 1 < Target 3
-          batterCardId: 'B8',   // Val 4
+          pitcherCardId: 'P10', // Val 1 < Target 5
+          batterCardId: 'B8',   // Val 5
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2BallInDirt.pitcherExecuted === false, 'Pitcher failed execution (Card 1 < Target 3)');
-        assert(b2BallInDirt.isBall === true, 'Unexecuted pitch is marked as Ball in the Dirt');
-        assert(b2BallInDirt.returnBatterCard === true, 'Batter card is returned unrevealed to hand');
-        assert(b2BallInDirt.advancesTo === 'beat3', 'Ball in dirt advances to Beat 3 Payoff Pitch');
-        assert(b2BallInDirt.winner === 'batter', 'Ball in dirt awards batter advantage');
+        assert(b2BallInDirt.pitcherExecuted === false, 'Pitcher failed execution (Card 1 < Target 5)');
+        assert(b2BallInDirt.isBall === true, 'Unexecuted pitch is marked as Ball');
+        assert(b2BallInDirt.outcomeType === 'walk', 'Unexecuted pitch awards Walk to 1st base');
+        assert(b2BallInDirt.winner === 'batter', 'Walk awards batter win');
 
         // Check 2: Strikeout / Whiff (Batter > Pitcher)
-        // Pitcher plays Card 4 (Target 3), Batter plays Card 5 (overswung)
+        // Pitcher plays Card 6 (Target 5), Batter plays Card 8 (overswung)
         const b2Strikeout = resolveBeat2({
-          target: 3,
+          target: 5,
           pitchType: 'fastball',
-          pitcherCardId: 'P5', // Val 4 >= Target 3
-          batterCardId: 'B2',  // Val 5 > Pitcher 4
+          pitcherCardId: 'P5', // Val 6 >= Target 5
+          batterCardId: 'B2',  // Val 8 > Pitcher 6
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2Strikeout.pitcherExecuted === true, 'Pitcher executed delivery (Card 4 >= Target 3)');
+        assert(b2Strikeout.pitcherExecuted === true, 'Pitcher executed delivery (Card 6 >= Target 5)');
         assert(b2Strikeout.outcomeType === 'k', 'Batter > Pitcher produces Strikeout (Whiff)');
         assert(b2Strikeout.outsAdded === 1, 'Strikeout adds 1 out');
         assert(b2Strikeout.winner === 'pitcher', 'Strikeout awards pitcher win');
 
         // Check 3: Weak Groundout (Batter < Target)
-        // Pitcher plays Card 5 (Target 4), Batter plays Card 2 (< Target)
+        // Pitcher plays Card 9 (Target 5), Batter plays Card 2 (< Target 5)
         const b2WeakGroundout = resolveBeat2({
-          target: 4,
+          target: 5,
           pitchType: 'fastball',
-          pitcherCardId: 'P2', // Val 5 >= Target 4
-          batterCardId: 'B1', // Val 2 < Target 4
+          pitcherCardId: 'P2', // Val 9 >= Target 5
+          batterCardId: 'B1', // Val 2 < Target 5
           pitcherChar: pJake,
           batterChar: bBear,
         });
@@ -250,102 +249,51 @@
         assert(b2WeakGroundout.winner === 'pitcher', 'Weak groundout awards pitcher win');
 
         // Check 4: Base Hit in the Window (Target <= Batter < Pitcher)
-        // Subcase A: Clean Single (Batter Card <= 4)
+        // Target 5, Pitcher 10, Batter 7
         const b2CleanSingle = resolveBeat2({
-          target: 3,
+          target: 5,
           pitchType: 'fastball',
-          pitcherCardId: 'P1', // Val 6
-          batterCardId: 'B8',  // Val 4 in Window [3..6)
+          pitcherCardId: 'P1', // Val 10
+          batterCardId: 'B5',  // Val 7 in Window [5..10)
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2CleanSingle.outcomeType === 'single', 'Card 4 in Window produces Clean Single');
+        assert(b2CleanSingle.outcomeType === 'single', 'Card 7 in Window produces Single');
         assert(b2CleanSingle.winner === 'batter', 'Clean single awards batter win');
         assert(b2CleanSingle.outsAdded === 0, 'Single adds 0 outs');
 
-        // Subcase B: Gapping Double (Batter Card >= 5)
-        const b2GapDouble = resolveBeat2({
-          target: 3,
-          pitchType: 'fastball',
-          pitcherCardId: 'P1', // Val 6
-          batterCardId: 'B2',  // Val 5 in Window [3..6)
-          pitcherChar: pJake,
-          batterChar: bBear,
-        });
-        assert(b2GapDouble.outcomeType === 'double', 'Card 5 in Window produces Gapping Double');
-        assert(b2GapDouble.winner === 'batter', 'Double awards batter win');
-
         // Check 5: Exact Match Collision (Batter == Pitcher)
-        // Subcase A: Exact Match with Batter Advantage -> Barreled Home Run!
+        // Subcase A: High Target (Target 9) -> Barreled Home Run!
         const b2BarreledHR = resolveBeat2({
-          target: 3,
+          target: 9,
           advantageSide: 'batter',
           pitchType: 'fastball',
-          pitcherCardId: 'P5', // Val 4
-          batterCardId: 'B8',  // Val 4 == Pitcher 4
+          pitcherCardId: 'P2', // Val 9
+          batterCardId: 'B9',  // Val 9 == Pitcher 9
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2BarreledHR.outcomeType === 'homerun', 'Exact match with read advantage produces Home Run');
+        assert(b2BarreledHR.outcomeType === 'homerun', 'Exact match on high target produces Home Run');
         assert(b2BarreledHR.winner === 'batter', 'Home run awards batter win');
 
-        // Subcase B: Exact Match with Pitcher Advantage -> Foul Ball / Battle to Beat 3!
-        const b2FoulBattle = resolveBeat2({
+        // Subcase B: Lowered Target (Target 3) with Pitcher Advantage -> Routine Pop Fly
+        const b2PopFly = resolveBeat2({
           target: 3,
           advantageSide: 'pitcher',
           pitchType: 'fastball',
-          pitcherCardId: 'P5', // Val 4
-          batterCardId: 'B8',  // Val 4 == Pitcher 4
+          pitcherCardId: 'P5', // Val 6
+          batterCardId: 'B11', // Val 6 == Pitcher 6
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2FoulBattle.outcomeType === 'battle_back', 'Exact match with pitcher advantage produces battle_back');
-        assert(b2FoulBattle.isBattleBack === true, 'isBattleBack flagged true on exact match foul');
-        assert(b2FoulBattle.isFoulBall === true, 'isFoulBall flagged true on exact match foul');
-        assert(b2FoulBattle.advancesTo === 'beat3', 'Foul ball advances to Beat 3');
-        assert(b2FoulBattle.winner === 'tie', 'Foul ball is a tie');
+        assert(b2PopFly.outcomeType === 'popout', 'Exact match with pitcher advantage produces popout');
+        assert(b2PopFly.outsAdded === 1, 'Popout adds 1 out');
+        assert(b2PopFly.winner === 'pitcher', 'Popout awards pitcher win');
 
-        // 15. Beat 3 & Beat 4 Payoff Pitch Tests
-        // A. Beat 3 Payoff Read
-        const b3PayoffRead = resolveBeat3({
-          pitchType: 'breaking',
-          guessPitch: 'breaking',
-          pitcherChar: pJake,
-          batterChar: bBear,
-        });
-        assert(b3PayoffRead.winner === 'batter', 'Beat 3 read awards batter advantage on match');
-        assert(b3PayoffRead.effectiveTarget === 5, 'Beat 3 target calculated correctly (Base 4 + Read 1 = 5)');
-
-        // B. Beat 4 Payoff Execution Clash: Pitcher Misses Target -> Ball Four Walk!
-        const b4PayoffWalk = resolveBeat4({
-          target: 4,
-          pitchType: 'fastball',
-          pitcherCardId: 'P7', // Val 3 < Target 4
-          batterCardId: 'B8',  // Val 4
-          pitcherChar: pJake,
-          batterChar: bBear,
-        });
-        assert(b4PayoffWalk.outcomeType === 'walk', 'Payoff pitch missed target resolves to Ball Four Walk');
-        assert(b4PayoffWalk.winner === 'batter', 'Ball Four Walk awards batter win');
-
-        // C. Beat 4 Payoff Execution Clash: Exact Match with Pitcher Advantage falls in for Single
-        const b4PayoffClutchSingle = resolveBeat4({
-          target: 3,
-          advantageSide: 'pitcher',
-          pitchType: 'fastball',
-          pitcherCardId: 'P5', // Val 4
-          batterCardId: 'B8',  // Val 4 == Pitcher 4
-          pitcherChar: pJake,
-          batterChar: bBear,
-        });
-        assert(b4PayoffClutchSingle.outcomeType === 'single', 'Payoff pitch exact match with pitcher advantage falls in for Single');
-        assert(b4PayoffClutchSingle.winner === 'batter', 'Clutch single awards batter win');
-
-        // 17. Sequential 3-Beat PA Resolution
-        const seq3BeatResult = resolveSequentialPA({
-          beat1: b1Fooled,
-          beat2: b2FoulBattle,
-          beat3: b2BarreledHR,
+        // 15. Decisive 2-Beat PA Resolution
+        const seq2BeatResult = resolveSequentialPA({
+          beat1: b1Anticipated,
+          beat2: b2BarreledHR,
           bases: { first:false, second:false, third:false },
           pitcherChar: pJake,
           batterChar: bBear,
@@ -353,8 +301,8 @@
           outs: 0,
           half: 'top'
         });
-        assert(seq3BeatResult && seq3BeatResult.z3 !== undefined, 'Sequential PA preserves Beat 3 outcome in z3');
-        assert(seq3BeatResult.outcome.type === 'homerun', 'Final PA outcome is governed by Beat 3 result');
+        assert(seq2BeatResult && seq2BeatResult.z2 !== undefined, 'Sequential PA preserves Beat 2 outcome in z2');
+        assert(seq2BeatResult.outcome.type === 'homerun', 'Final PA outcome is governed by Beat 2 result');
 
         // 18. Beat-Specific Solo Bot Decision Tests
         const botState = {

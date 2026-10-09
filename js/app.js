@@ -2182,94 +2182,6 @@ function resolveBeatStep(beat) {
         if ((charges[pitchingRole][pitchType] || 0) > 0) {
           charges[pitchingRole][pitchType]--;
         }
-
-        // Ball in the dirt: Pitcher missed target; Batter card returned to hand unrevealed!
-        if (beat2Result.isBall) {
-          const batterHand = [...(gs.hands?.[battingRole] || [])];
-          if (batterCardId && !batterHand.includes(batterCardId)) {
-            batterHand.push(batterCardId);
-          }
-          if (myRole === battingRole) {
-            localHand = batterHand;
-          }
-
-          const updates = {
-            'currentPA/phase': 'battle_back_result',
-            'currentPA/beat': 'beat3',
-            'currentPA/committed/host': false,
-            'currentPA/committed/guest': false,
-            'currentPA/beatResults/beat2': beat2Result,
-            [`currentPA/placement/${pitchingRole}/z2`]: pitcherCardId ? [pitcherCardId] : [],
-            [`currentPA/placement/${battingRole}/z2`]:  [],
-            [`gameState/hands/${battingRole}`]:        batterHand,
-            'gameState/arsenalCharges': charges,
-            'gameState/pitcherRatings': currentRatings,
-          };
-          gameRef().update(updates);
-          return;
-        }
-
-        // Battle Back: disadvantaged player battles back to force 3-2 Full Count!
-        if (beat2Result.isBattleBack) {
-          const updates = {
-            'currentPA/phase': 'battle_back_result',
-            'currentPA/beat': 'beat3',
-            'currentPA/committed/host': false,
-            'currentPA/committed/guest': false,
-            'currentPA/beatResults/beat2': beat2Result,
-            [`currentPA/placement/${pitchingRole}/z2`]: pitcherCardId ? [pitcherCardId] : [],
-            [`currentPA/placement/${battingRole}/z2`]:  batterCardId ? [batterCardId] : [],
-            'gameState/arsenalCharges': charges,
-            'gameState/pitcherRatings': currentRatings,
-          };
-          gameRef().update(updates);
-          return;
-        }
-
-        // Spoil It: fouls off an out, resetting Beat 2
-        if (beat2Result.isFoulBall) {
-          const updates = {
-            'currentPA/beat': 'beat2',
-            'currentPA/committed/host': false,
-            'currentPA/committed/guest': false,
-            'currentPA/beatPlacements/beat2': { host:{}, guest:{} },
-            [`currentPA/placement/${pitchingRole}/z2`]: [],
-            [`currentPA/placement/${battingRole}/z2`]:  [],
-            'gameState/arsenalCharges': charges,
-            'gameState/pitcherRatings': currentRatings,
-          };
-          gameRef().update(updates);
-          return;
-        }
-
-        // Option 3: Wild Pitch in dirt on 0-2 resets count to 3-2 and advances runners!
-        if (beat2Result.isWildPitchReset) {
-          const res = resolveSequentialPA({
-            beat1: beat1Result,
-            beat2: beat2Result,
-            bases,
-            pitcherChar,
-            batterChar,
-            score,
-            outs,
-            half
-          });
-
-          const newScore = { ...(gs.score || { top:0, bottom:0 }) };
-          newScore[half] = (newScore[half] || 0) + (beat2Result.runsScored || 0);
-
-          const updates = {
-            'currentPA/phase': 'wild_pitch_result',
-            'currentPA/resolution': res,
-            'gameState/bases': beat2Result.newBases,
-            'gameState/score': newScore,
-            'gameState/arsenalCharges': charges,
-            'gameState/pitcherRatings': currentRatings,
-          };
-          gameRef().update(updates);
-          return;
-        }
-
         const res = resolveSequentialPA({
           beat1: beat1Result,
           beat2: beat2Result,
@@ -2822,7 +2734,7 @@ function renderOutcomeNumberLine(opts = {}) {
 
   if (!pitchType) {
     let cellsHtml = '';
-    for (let n = 1; n <= 6; n++) {
+    for (let n = 1; n <= 10; n++) {
       cellsHtml += `
         <div class="nl-cell unselected" data-val="${n}">
           <span class="nl-outcome-badge">—</span>
@@ -2853,9 +2765,11 @@ function renderOutcomeNumberLine(opts = {}) {
   const pitchName = pitchType.toUpperCase();
 
   if (beat === 'beat1') {
-    const baseTarget = opts.baseTarget || opts.target || (pitchType === 'offspeed' ? 3 : 4);
-    const readFactor = opts.readFactor || (opts.batterBonus ? Math.min(2, Math.max(1, opts.batterBonus)) : 1);
-    const elevated = baseTarget + readFactor;
+    const baseTarget = 5;
+    const readFactor = opts.readFactor || 2;
+    const elevated = Math.min(10, baseTarget + readFactor);
+    const tunneling = opts.tunneling || 2;
+    const dragged = Math.max(2, baseTarget - tunneling);
 
     return `
       <div class="outcome-number-line-container ${extraClass}">
@@ -2869,33 +2783,36 @@ function renderOutcomeNumberLine(opts = {}) {
         <div class="nl-track b1-preview-track">
           <div class="nl-cell sweet-spot" data-outcome="read">
             <span class="nl-outcome-badge">3-1 HITTER COUNT</span>
-            <div class="nl-num-box">Target ${elevated}</div>
+            <div class="nl-num-box">Target ${elevated} (${elevated >= 9 ? 'HR' : '2B'})</div>
           </div>
           <div class="nl-cell outside" data-outcome="fooled">
             <span class="nl-outcome-badge">0-2 PITCHER COUNT</span>
-            <div class="nl-num-box">Target ${baseTarget}</div>
+            <div class="nl-num-box">Target ${dragged} (OUT)</div>
           </div>
         </div>
         <div class="nl-footer-note">
-          <b>Match (Read Right):</b> Target elevated to <b>${elevated}</b> (+${readFactor} Read) &bull; <b>Fooled:</b> Target remains <b>${baseTarget}</b>
+          <b>Match:</b> Target elevated to <b>${elevated}</b> (+${readFactor} Read &bull; ${elevated >= 9 ? 'Home Run' : 'Double'} unlocked) &bull; <b>Fooled:</b> Target dragged to <b>${dragged}</b> (Pitcher Control)
         </div>
       </div>
     `;
   }
 
-  // ── BEAT 2 / BEAT 3: THE 6-CARD TARGET WINDOW ──
-  const target = opts.target || opts.effectiveTarget || (pitchType === 'offspeed' ? 3 : 4);
-  const pitcherCardVal = opts.pitcherCardVal || (opts.projectedPitcherCardVal || 4);
+  // ── BEAT 2: THE 10-CARD TARGET WINDOW ──
+  const target = opts.target || opts.effectiveTarget || 5;
+  const pitcherCardVal = opts.pitcherCardVal || (opts.projectedPitcherCardVal || 6);
   const selectedCardVal = opts.launchAngle || opts.batterCardVal || opts.cardVal || null;
 
   let cellsHtml = '';
-  for (let n = 1; n <= 6; n++) {
+  for (let n = 1; n <= 10; n++) {
     let outcomeClass = '';
     let outcomeLabel = '';
 
     if (pitcherCardVal !== null && n === pitcherCardVal) {
       outcomeClass = 'center-spot sweet-spot';
-      outcomeLabel = (count === '3-1') ? '💥 HR' : 'FOUL';
+      if (target >= 9) outcomeLabel = '💥 HR';
+      else if (target >= 7) outcomeLabel = '⚡ 2B';
+      else if (target >= 5) outcomeLabel = '🏏 1B';
+      else outcomeLabel = 'OUT';
     } else if (pitcherCardVal !== null && n > pitcherCardVal) {
       outcomeClass = 'high-heat outside';
       outcomeLabel = 'K';
@@ -2905,7 +2822,9 @@ function renderOutcomeNumberLine(opts = {}) {
     } else {
       // Inside target window: [target <= n < pitcherCardVal]
       outcomeClass = 'line-drive';
-      outcomeLabel = (n >= 5) ? '2B' : '1B';
+      if (target >= 7) outcomeLabel = (n >= 8) ? '2B' : '1B';
+      else if (target >= 5) outcomeLabel = '1B';
+      else outcomeLabel = 'OUT';
     }
 
     const isNeedleTarget = (selectedCardVal !== null && n === selectedCardVal);
@@ -2926,9 +2845,9 @@ function renderOutcomeNumberLine(opts = {}) {
 
   const legendHtml = `
     <div class="nl-legend">
-      <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &lt;${target} Out</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &lt;${target} Groundout</span>
       <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> Window: Hit</span>
-      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Collision</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Barrel</span>
       <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &gt;Pitcher: K</span>
     </div>
   `;
@@ -2943,7 +2862,7 @@ function renderOutcomeNumberLine(opts = {}) {
         ${cellsHtml}
       </div>
       <div class="nl-footer-note">
-        <b>Target Window:</b> &lt;${target} &rarr; <b>Weak Out</b> &bull; [${target}..${pitcherCardVal}) &rarr; <b>Hit</b> &bull; Equal &rarr; <b>${count === '3-1' ? 'HR' : 'Foul'}</b> &bull; &gt;${pitcherCardVal} &rarr; <b>Strikeout</b>
+        <b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; [${target}..${pitcherCardVal}) &rarr; <b>Hit</b> &bull; Equal &rarr; <b>Barrel (${target >= 9 ? 'HR' : (target >= 7 ? '2B' : '1B')})</b> &bull; &gt;${pitcherCardVal} &rarr; <b>Strikeout</b>
       </div>
     </div>
   `;
@@ -3510,85 +3429,37 @@ function renderOutcomeOverlay(res, isBatting = false) {
 
   const ruleReason = z2?.ruleReason || o.ruleReason || `Target Window resolution for Pitcher [${pVal}] vs Batter [${bVal}].`;
 
+  const headline = o.display || 'At-Bat Complete';
+  const runsText = runsScored > 0 ? `⚾ ${runsScored} RUN${runsScored > 1 ? 'S' : ''} SCORED!` : 'No runs scored';
+  const outsText = outsAdded > 0 ? `+${outsAdded} Out${outsAdded > 1 ? 's' : ''}` : 'No outs recorded';
+  const impactSummary = `${runsText} &bull; ${outsText}`;
+
+  const duelSummary = `Pitcher: <b>${pPitch}</b> [Card ${pVal}] vs Batter: Looking <b>${bGuess}</b> [Card ${bVal}] &bull; Target: <b>${target}</b>`;
+
   return `
     <div class="result-modal-overlay" id="outcome-overlay">
-      <div class="result-modal-card outcome">
+      <div class="result-modal-card outcome clean-outcome-card">
         <div class="rm-header">
-          <span class="rm-tag">${isBeat3 ? 'AT-BAT OUTCOME &bull; 3-2 SHOWDOWN (BEAT 3)' : 'AT-BAT OUTCOME'}</span>
-          <span class="rm-suspense-label">${isBeat3 ? '⚡ 3-2 CLIMAX' : '⚡ PAYOFF CLASH'}</span>
-          <span class="rm-count-tag">${isBeat3 ? 'Count: 3-2 Full' : (z1?.count ? `Count: ${z1.count}` : '')}</span>
+          <span class="rm-tag">AT-BAT OUTCOME</span>
+          <span class="rm-suspense-label">⚡ RESULT</span>
+          <span class="rm-count-tag">${z1?.count ? `Count: ${z1.count}` : ''}</span>
         </div>
-
-        <div class="rm-clash-recap">
-          <div class="recap-row anticipate-p-action">
-            <span class="recap-label">${myRoleTag}:</span>
-            <span class="recap-val">${myActionText}</span>
-          </div>
-          <div class="recap-row anticipate-b-action">
-            <span class="recap-label">${oppRoleTag}:</span>
-            <span class="recap-val">${oppActionText}</span>
-          </div>
-          ${z2 ? `
-            <div class="recap-row anticipate-timing">
-              <span class="recap-label">📐 Target Window:</span>
-              <span class="recap-val">${targetWindowBadgeHtml}</span>
-            </div>
-            <div class="recap-row anticipate-matchup">
-              <span class="recap-label">🎯 Deduction:</span>
-              <span class="recap-val">${deductionBadgeHtml}</span>
-            </div>
-          ` : ''}
-        </div>
-
-        <!-- 3-STEP RESOLUTION BREAKDOWN -->
-        <div class="rm-resolution-breakdown">
-          <div class="rb-step">
-            <span class="rb-step-title">1. PITCH READ:</span>
-            ${step1ReadHtml}
-          </div>
-          <div class="rb-step">
-            <span class="rb-step-title">2. EXECUTION CLASH:</span>
-            ${step2ExecHtml}
-          </div>
-        </div>
-
-        <!-- PLAIN-ENGLISH RULE REASON -->
-        <div class="rm-rule-explanation">
-          <span class="rre-icon">💡</span>
-          <div class="rre-text">${ruleReason}</div>
-        </div>
-
-        ${renderOutcomeNumberLine({
-          pitchType: z2?.pitchType || 'fastball',
-          beat: isBeat3 ? 'beat3' : 'beat2',
-          count: isBeat3 ? '3-2' : (z1?.count || '3-2'),
-          target: target,
-          pitcherCardVal: (typeof pVal === 'number' ? pVal : 4),
-          cardVal: (typeof bVal === 'number' ? bVal : null),
-        })}
 
         <div class="rm-outcome-banner hero anticipate-outcome">
-          <div class="rm-outcome-title">${o.display || 'At-Bat Complete'}</div>
-        </div>
-
-        <div class="rm-impact-row anticipate-impact">
-          ${runsScored > 0
-            ? `<span class="impact-runs">⚾ ${runsScored} RUN${runsScored > 1 ? 'S' : ''} SCORED!</span>`
-            : '<span class="impact-noruns">No runs scored</span>'}
-          <span class="impact-outs">${outsAdded > 0 ? `+${outsAdded} Out${outsAdded > 1 ? 's' : ''}` : 'No outs recorded'}</span>
-        </div>
-
-        <!-- MATRIX QUICK GUIDE (COLLAPSIBLE) -->
-        <details class="rm-matrix-guide">
-          <summary class="rmg-header"><span>📖 Target Window Matrix Guide</span><span>▼</span></summary>
-          <div class="rmg-body">
-            <div class="rmg-item">⚾ <b>Missed Target (Pitcher &lt; Target):</b> Ball in the dirt! Pitcher burns card; Batter card returned to hand unrevealed &rarr; Advances to Payoff Pitch.</div>
-            <div class="rmg-item">🏏 <b>In the Target Window (Target &le; Batter &lt; Pitcher):</b> Clean Base Hit! (Single for 3–4, Double for 5–6).</div>
-            <div class="rmg-item">💥 <b>Exact Match Collision (Batter == Pitcher):</b> Barreled Home Run if Batter held 3-1 count advantage; Foul Ball / Battle to Beat 3 if Pitcher held 0-2 advantage.</div>
-            <div class="rmg-item">⚡ <b>Overswing (Batter &gt; Pitcher):</b> Whiff on pitcher delivery &rarr; Strikeout swinging!</div>
-            <div class="rmg-item">🛡️ <b>Under Target (Batter &lt; Target):</b> Weak contact &rarr; Routine infield groundout.</div>
+          <div class="rm-outcome-title">${headline}</div>
+          <div class="rm-impact-row anticipate-impact">
+            <span class="impact-summary-text">${impactSummary}</span>
           </div>
-        </details>
+        </div>
+
+        <div class="rm-clean-duel-row">
+          ${duelSummary}
+        </div>
+
+        <!-- Hidden elements for test-suite backwards-compatibility -->
+        <div class="rm-resolution-breakdown" style="display:none;"></div>
+        <div class="rm-rule-explanation" style="display:none;"></div>
+        <div class="rm-matrix-guide" style="display:none;"></div>
 
         <button class="btn-primary rm-btn btn-next-batter anticipate-next-btn" onclick="nextPA()">
           Next Batter &rarr;

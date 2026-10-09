@@ -1261,7 +1261,59 @@ input[type="text"]:focus {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   8. RESPONSIVE TOUCH & VIEWPORT CONSTRAINTS
+   8. CLEAN OUTCOME MODAL
+   ───────────────────────────────────────────────────────────────────────────── */
+.clean-outcome-card {
+  max-width: 400px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+}
+
+.clean-outcome-card .rm-outcome-banner {
+  padding: 14px 10px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.clean-outcome-card .rm-outcome-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text-bright);
+}
+
+.impact-summary-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.rm-clean-duel-row {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.rm-clean-duel-row b {
+  color: var(--gold-bright);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   9. RESPONSIVE TOUCH & VIEWPORT CONSTRAINTS
    ───────────────────────────────────────────────────────────────────────────── */
 @media (max-height: 700px) {
   .battlefield { padding: 4px 8px; }
@@ -1271,3 +1323,4 @@ input[type="text"]:focus {
   .number-card .card-hero-num { font-size: 1.4rem; }
   .btn-snap-lock, .locked-indicator-badge { height: 64px; min-width: 95px; }
 }
+

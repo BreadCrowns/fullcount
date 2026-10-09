@@ -258,14 +258,14 @@
       report(getCardDisplay(5, true) === '5', 'getCardDisplay returns card value string for non-1 cards');
 
       // Test hand rendering with Card 1 (pure number 1 without special badges)
-      const pitcherHandWith1 = renderHand(['P19'], false, true, false, 'beat2');
+      const pitcherHandWith1 = renderHand(['P10'], false, true, false, 'beat2');
       report(pitcherHandWith1.includes('card-hero-num') && pitcherHandWith1.includes('1'), 'Pitcher Card 1 renders as pure number 1');
 
       const batterHandWith1 = renderHand(['B13'], true, false, false, 'beat2');
       report(batterHandWith1.includes('card-hero-num') && batterHandWith1.includes('1'), 'Batter Card 1 renders as pure number 1');
 
       // Test mini placed card
-      const miniP1 = renderMiniPlacedCard('P19', 'mound', true, 0, true);
+      const miniP1 = renderMiniPlacedCard('P10', 'mound', true, 0, true);
       report(miniP1.includes('placed-number-card') && miniP1.includes('1'), 'renderMiniPlacedCard renders card 1 for pitcher');
       const miniB1 = renderMiniPlacedCard('B13', 'plate', true, 0, false);
       report(miniB1.includes('placed-number-card') && miniB1.includes('1'), 'renderMiniPlacedCard renders card 1 for batter');
@@ -499,9 +499,9 @@
       report(document.querySelector('.beat3-arena') !== null, 'Beat 3 arena class applied to battlefield');
       const ratingBadges = document.querySelectorAll('.pt-rating-badge');
       report(ratingBadges.length >= 3, `Base pitch rating badges render on pitch buttons (found ${ratingBadges.length})`);
-      report(ratingBadges[0].textContent.includes('Target 2'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 2');
-      report(ratingBadges[1].textContent.includes('Target 4'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 4');
-      report(ratingBadges[2].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 5');
+      report(ratingBadges[0].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Fastball base target 5');
+      report(ratingBadges[1].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Breaking base target 5');
+      report(ratingBadges[2].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon Offspeed base target 5');
       const b3LockBtn = document.getElementById('lock-btn');
       report(b3LockBtn !== null, 'Lock-in button exists in Beat 3');
       report(b3LockBtn?.textContent.includes('SHOWDOWN'), 'Lock-in button reflects SHOWDOWN context');
