@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Full Count - Modern Mobile Card Game UI</title>
   <style>
     /* ==========================================================================
-       FULL COUNT — HIGH-FIDELITY MOBILE CARD GAME UI (ZERO EXTERNAL DEPENDENCY)
+       FULL COUNT — HIGH-FIDELITY MOBILE CARD GAME UI (RESPONSIVE VIEWPORT)
        ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -35,32 +35,50 @@
       --font-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, monospace;
     }
 
-    body {
-      background-color: var(--bg-canvas);
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: var(--bg-phone);
       color: #f8fafc;
       font-family: var(--font-stack);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
       user-select: none;
       -webkit-user-select: none;
-      overflow-x: hidden;
+      touch-action: manipulation;
+      position: fixed;
     }
 
-    /* ── CONTROLS TOOLBAR ── */
+    /* ── FULL SCREEN MOBILE VIEWPORT ── */
+    .game-container {
+      width: 100%;
+      max-width: 440px;
+      height: 100%;
+      height: 100dvh;
+      margin: 0 auto;
+      background: var(--bg-phone);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── TOP CONTROLS TOOLBAR ── */
     .top-toolbar {
       width: 100%;
-      max-width: 420px;
-      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      padding: 0 4px;
+      padding: max(6px, env(safe-area-inset-top, 0px)) 10px 4px;
+      background: #0e0f24;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+      z-index: 30;
     }
 
     .pill-tabs {
@@ -68,17 +86,17 @@
       background: #181938;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 9999px;
-      padding: 3px;
-      gap: 4px;
+      padding: 2px;
+      gap: 3px;
     }
 
     .pill-tab {
       background: transparent;
       border: none;
       color: #94a3b8;
-      padding: 5px 14px;
+      padding: 4px 10px;
       border-radius: 9999px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 800;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -94,70 +112,31 @@
       background: rgba(245, 158, 11, 0.15);
       border: 1px solid rgba(245, 158, 11, 0.35);
       color: #fbbf24;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 9999px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.15s ease;
     }
     .btn-intel:hover {
       background: rgba(245, 158, 11, 0.25);
     }
 
-    /* ── MOBILE PHONE SHELL ── */
-    .phone-container {
-      width: 100%;
-      max-width: 414px;
-      height: 840px;
-      background: var(--bg-phone);
-      border: 4px solid #334155;
-      border-radius: 46px;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Phone Speaker / Dynamic Island */
-    .phone-island {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90px;
-      height: 20px;
-      background: #000;
-      border-radius: 20px;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .island-lens {
-      width: 9px;
-      height: 9px;
-      background: #111827;
-      border: 1.5px solid #1f2937;
-      border-radius: 50%;
-      margin-left: 45px;
-    }
-
     /* =========================================================================
-       1. TOP 30%: STATUS & OPPONENT ZONE
+       1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP)
        ========================================================================= */
     .game-header {
       background: var(--bg-header);
-      padding: 34px 16px 10px;
+      padding: 6px 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 5px;
+      flex-shrink: 0;
       z-index: 20;
     }
 
@@ -170,22 +149,22 @@
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
     .brand-title {
-      font-size: 1.15rem;
+      font-size: 1rem;
       font-weight: 900;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       color: #ffffff;
       text-transform: uppercase;
     }
     .brand-tag {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 900;
       color: var(--gold);
       background: rgba(245, 158, 11, 0.15);
       border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 4px;
       letter-spacing: 0.5px;
     }
@@ -194,32 +173,31 @@
     .score-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: rgba(245, 158, 11, 0.12);
       border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 9999px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
     .score-led {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       background: #fbbf24;
       border-radius: 50%;
-      box-shadow: 0 0 8px #fbbf24;
+      box-shadow: 0 0 6px #fbbf24;
     }
     .score-text {
-      font-size: 0.8rem;
+      font-size: 0.74rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
     .score-sep { color: #64748b; font-weight: 700; }
     .score-inn {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 900;
       color: #fde047;
       letter-spacing: 0.5px;
@@ -231,14 +209,14 @@
       margin-left: 2px;
     }
     .out-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: #334155;
     }
     .out-dot.filled {
       background: #ef4444;
-      box-shadow: 0 0 6px #ef4444;
+      box-shadow: 0 0 5px #ef4444;
     }
 
     /* Opponent Bar */
@@ -248,24 +226,24 @@
       justify-content: space-between;
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 6px 10px;
+      border-radius: 10px;
+      padding: 4px 8px;
     }
     .opp-profile {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
     .opp-avatar {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background: rgba(245, 158, 11, 0.2);
       border: 1.5px solid rgba(245, 158, 11, 0.5);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
     .opp-details {
       display: flex;
@@ -275,23 +253,23 @@
     .opp-name-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
     .opp-name {
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 900;
       color: #ffffff;
     }
     .opp-badge {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 800;
       color: #fb923c;
       background: rgba(249, 115, 22, 0.18);
-      padding: 1px 5px;
+      padding: 1px 4px;
       border-radius: 3px;
     }
     .opp-sub {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       color: #94a3b8;
       font-weight: 700;
     }
@@ -299,26 +277,26 @@
     .opp-stats-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .opp-hand-counter {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.72rem;
+      gap: 3px;
+      font-size: 0.68rem;
       font-weight: 900;
       color: #e2e8f0;
       background: rgba(255, 255, 255, 0.06);
-      padding: 3px 8px;
+      padding: 2px 7px;
       border-radius: 9999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .opp-status-pill {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 900;
-      padding: 3px 9px;
+      padding: 2px 7px;
       border-radius: 9999px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       background: rgba(245, 158, 11, 0.18);
       color: #fbbf24;
       border: 1px solid rgba(245, 158, 11, 0.35);
@@ -330,16 +308,17 @@
     }
 
     /* =========================================================================
-       2. MIDDLE 40%: ARENA / STADIUM FELT CARD MAT
+       2. MIDDLE: ARENA / STADIUM FELT MAT (FITS TO VIEWPORT)
        ========================================================================= */
     .felt-arena {
       flex: 1;
-      margin: 8px;
-      padding: 12px;
+      min-height: 0;
+      margin: 4px 8px;
+      padding: 8px 10px;
       background: radial-gradient(ellipse at 50% 40%, var(--felt-center) 0%, var(--felt-mid) 60%, var(--felt-dark) 100%);
-      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -347,13 +326,12 @@
       overflow: hidden;
     }
 
-    /* Subtle Diamond Texture Overlay */
     .felt-arena::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 16px 16px;
+      background-size: 14px 14px;
       pointer-events: none;
     }
 
@@ -361,134 +339,52 @@
       width: 100%;
       text-align: center;
       z-index: 10;
+      margin-bottom: 2px;
     }
     .arena-banner-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 9999px;
-      font-size: 0.7rem;
+      font-size: 0.66rem;
       font-weight: 800;
       color: #e2e8f0;
       backdrop-filter: blur(4px);
     }
     .arena-banner-pill b { color: #facc15; }
 
-    /* ── PITCH CARDS ROW (BEAT 1) ── */
-    .pitch-cards-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      width: 100%;
-      z-index: 10;
-      margin: auto 0;
-    }
-
-    .pitch-card {
-      background: var(--card-white);
-      color: var(--text-dark);
-      border-radius: 12px;
-      padding: 10px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 106px;
-      cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-      border: 2.5px solid transparent;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, box-shadow 0.2s;
-      position: relative;
-    }
-
-    .pitch-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
-    }
-
-    .pitch-card.active {
-      border-color: var(--royal-blue);
-      box-shadow: 0 0 0 3px var(--royal-blue), 0 12px 25px var(--royal-blue-glow);
-      transform: translateY(-6px);
-    }
-
-    .pc-top {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .pc-icon { font-size: 1.25rem; }
-    .pc-name {
-      font-size: 0.78rem;
-      font-weight: 900;
-      letter-spacing: -0.2px;
-      text-transform: uppercase;
-    }
-
-    .pc-body {
-      background: #f1f5f9;
-      border-radius: 6px;
-      padding: 3px 5px;
-      width: 100%;
-      text-align: center;
-    }
-    .pc-target {
-      font-size: 0.72rem;
-      font-weight: 900;
-      color: #1e3a8a;
-    }
-    .pc-tunnel {
-      font-size: 0.62rem;
-      font-weight: 800;
-      color: #64748b;
-    }
-
-    .pc-badge {
-      font-size: 0.58rem;
-      font-weight: 900;
-      padding: 2px 7px;
-      border-radius: 9999px;
-      background: #e2e8f0;
-      color: #475569;
-      letter-spacing: 0.4px;
-    }
-    .pitch-card.active .pc-badge {
-      background: var(--royal-blue);
-      color: #ffffff;
-    }
-
-    /* ── CENTER FACE-DOWN CARD (BEAT 1) ── */
+    /* ── OPPONENT FACE-DOWN CARD (TOP OF ARENA) ── */
     .face-down-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       z-index: 10;
-      margin: auto 0;
+      margin: 2px 0;
     }
     .face-down-label {
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       font-weight: 800;
       color: #a7f3d0;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     }
 
     .card-back {
-      width: 72px;
-      height: 102px;
-      border-radius: 12px;
-      border: 3.5px solid #ffffff;
+      width: 58px;
+      height: 80px;
+      border-radius: 10px;
+      border: 2.5px solid #ffffff;
       background-color: #1d4ed8;
       background-image: 
-        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px),
-        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 4px, #2563eb 4px, #2563eb 8px);
+        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 3px, #2563eb 3px, #2563eb 6px),
+        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 3px, #2563eb 3px, #2563eb 6px);
       background-blend-mode: multiply;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -497,80 +393,174 @@
     .card-back::after {
       content: '';
       position: absolute;
-      inset: 4px;
+      inset: 3px;
       border: 1px solid rgba(255, 255, 255, 0.4);
       border-radius: 6px;
     }
     .card-back-stamp {
-      font-size: 0.62rem;
+      font-size: 0.55rem;
       font-weight: 900;
       color: #ffffff;
       background: rgba(0, 0, 0, 0.7);
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 9999px;
       backdrop-filter: blur(4px);
       z-index: 2;
+    }
+
+    .arena-hint-text {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #a7f3d0;
+      font-style: italic;
+      opacity: 0.85;
+      margin: 2px 0;
+    }
+
+    /* ── USER PITCH CARDS ROW (BOTTOM OF ARENA) ── */
+    .pitch-cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+      z-index: 10;
+      margin: 2px 0;
+    }
+
+    .pitch-card {
+      background: var(--card-white);
+      color: var(--text-dark);
+      border-radius: 10px;
+      padding: 6px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 84px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      border: 2px solid transparent;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .pitch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .pitch-card.active {
+      border-color: var(--royal-blue);
+      box-shadow: 0 0 0 2.5px var(--royal-blue), 0 8px 20px var(--royal-blue-glow);
+      transform: translateY(-3px);
+    }
+
+    .pc-top {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .pc-icon { font-size: 1.1rem; }
+    .pc-name {
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      text-transform: uppercase;
+    }
+
+    .pc-body {
+      background: #f1f5f9;
+      border-radius: 5px;
+      padding: 2px 4px;
+      width: 100%;
+      text-align: center;
+    }
+    .pc-target {
+      font-size: 0.66rem;
+      font-weight: 900;
+      color: #1e3a8a;
+    }
+    .pc-tunnel {
+      font-size: 0.56rem;
+      font-weight: 800;
+      color: #64748b;
+    }
+
+    .pc-badge {
+      font-size: 0.54rem;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #475569;
+      letter-spacing: 0.3px;
+    }
+    .pitch-card.active .pc-badge {
+      background: var(--royal-blue);
+      color: #ffffff;
     }
 
     /* ── BEAT 2 CLASH ARENA ── */
     .b2-showcase-card {
       background: #ffffff;
       color: var(--text-dark);
-      border-radius: 14px;
-      padding: 8px 14px;
+      border-radius: 10px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
       z-index: 10;
     }
     .b2-pitch-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
-    .b2-pitch-icon { font-size: 1.5rem; }
+    .b2-pitch-icon { font-size: 1.3rem; }
     .b2-pitch-title {
-      font-size: 0.85rem;
+      font-size: 0.76rem;
       font-weight: 900;
       color: #0f172a;
       letter-spacing: -0.2px;
     }
     .b2-pitch-sub {
-      font-size: 0.65rem;
+      font-size: 0.58rem;
       font-weight: 700;
       color: #64748b;
     }
     .b2-target-pill {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 9999px;
     }
     .b2-target-label {
-      font-size: 0.65rem;
+      font-size: 0.58rem;
       font-weight: 800;
       color: #64748b;
     }
     .b2-target-num {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 900;
       font-family: var(--font-mono);
       background: var(--gold);
       color: #000;
-      padding: 1px 8px;
+      padding: 0 6px;
       border-radius: 9999px;
-      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
     }
 
-    /* Clash Head-to-Head Arena */
-    .clash-duel-row {
+    /* Vertical Clash Head-to-Head Stack (Opponent Top, User Bottom) */
+    .clash-duel-stack {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-around;
+      justify-content: center;
+      gap: 3px;
       width: 100%;
       z-index: 10;
       margin: auto 0;
@@ -580,10 +570,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 2px;
     }
     .slot-title {
-      font-size: 0.68rem;
+      font-size: 0.6rem;
       font-weight: 800;
       color: #a7f3d0;
       text-transform: uppercase;
@@ -591,9 +581,9 @@
     }
 
     .drop-slot {
-      width: 74px;
-      height: 104px;
-      border-radius: 12px;
+      width: 58px;
+      height: 80px;
+      border-radius: 10px;
       border: 2px dashed rgba(255, 255, 255, 0.5);
       background: rgba(0, 0, 0, 0.25);
       display: flex;
@@ -606,49 +596,43 @@
     .drop-slot.filled {
       border: 2px solid #ffffff;
       background: #ffffff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
     }
     .drop-slot-hint {
-      font-size: 0.68rem;
+      font-size: 0.6rem;
       font-weight: 800;
       color: rgba(255, 255, 255, 0.85);
       text-align: center;
-      padding: 4px;
+      padding: 3px;
     }
 
     .clash-vs-badge {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 2px;
+      justify-content: center;
+      margin: 1px 0;
     }
     .vs-tag {
-      font-size: 0.82rem;
+      font-size: 0.72rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #fbbf24;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       border: 1px solid rgba(251, 191, 36, 0.4);
-      padding: 3px 8px;
+      padding: 1px 8px;
       border-radius: 9999px;
-    }
-    .vs-sub {
-      font-size: 0.58rem;
-      font-weight: 800;
-      color: #a7f3d0;
-      letter-spacing: 0.5px;
     }
 
     /* Clash Math Strip */
     .clash-math-strip {
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 6px 12px;
+      border-radius: 8px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       font-weight: 700;
       color: #cbd5e1;
       z-index: 10;
@@ -660,15 +644,16 @@
     }
 
     /* =========================================================================
-       3. BOTTOM 30%: PRIMARY TOUCH / THUMB ZONE
+       3. BOTTOM: PRIMARY TOUCH / THUMB ZONE (USER ON BOTTOM)
        ========================================================================= */
     .game-dock {
       background: var(--bg-dock);
-      padding: 10px 14px 22px;
+      padding: 6px 10px max(8px, env(safe-area-inset-bottom, 0px));
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 5px;
+      flex-shrink: 0;
       z-index: 20;
     }
 
@@ -682,52 +667,52 @@
     .my-info {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .my-avatar {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       background: rgba(37, 99, 235, 0.25);
       border: 1.5px solid rgba(37, 99, 235, 0.5);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
     }
     .my-name {
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 900;
       color: #ffffff;
     }
     .my-sub {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 700;
       color: #60a5fa;
     }
     .role-badge {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 900;
       color: #93c5fd;
       background: rgba(59, 130, 246, 0.2);
       border: 1px solid rgba(59, 130, 246, 0.4);
-      padding: 2px 8px;
+      padding: 1px 6px;
       border-radius: 9999px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
-    /* Status Context Pill (Mirrors Pill above action button) */
+    /* Status Context Pill */
     .status-context-pill {
       background: #0e0f24;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 9999px;
-      padding: 5px 16px;
-      font-size: 0.72rem;
+      padding: 4px 12px;
+      font-size: 0.68rem;
       font-weight: 800;
       color: #cbd5e1;
       text-align: center;
       margin: 0 auto;
-      max-width: 92%;
+      max-width: 95%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -735,36 +720,36 @@
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
     }
 
-    /* Chunky Action Button (Mirrors BET Button) */
+    /* Chunky Action Button */
     .btn-action-lock {
       width: 100%;
-      height: 48px;
+      height: 42px;
       background: var(--royal-blue);
       background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       color: #ffffff;
-      font-size: 0.92rem;
+      font-size: 0.84rem;
       font-weight: 900;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
-      box-shadow: 0 4px 15px var(--royal-blue-glow);
+      box-shadow: 0 4px 12px var(--royal-blue-glow);
       transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .btn-action-lock:hover:not(:disabled) {
       background: #1d4ed8;
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
       transform: translateY(-1px);
     }
     .btn-action-lock:active:not(:disabled) {
-      transform: translateY(2px) scale(0.99);
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
     }
 
     .btn-action-lock:disabled {
@@ -778,18 +763,18 @@
 
     .locked-badge-active {
       width: 100%;
-      height: 48px;
+      height: 42px;
       background: rgba(16, 185, 129, 0.15);
       border: 1.5px solid rgba(16, 185, 129, 0.4);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       color: #34d399;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       font-weight: 900;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
     }
 
     /* Hand Cards Row: Crisp White Number Cards (1–6) */
@@ -797,30 +782,31 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 5px;
       width: 100%;
     }
 
     .number-card {
-      width: 58px;
-      height: 82px;
+      flex: 1;
+      max-width: 58px;
+      height: 72px;
       background: var(--card-white);
       color: var(--text-dark);
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1.5px solid var(--card-border);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 3px 4px;
+      padding: 2px 3px;
       cursor: pointer;
       position: relative;
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.15s;
     }
 
     .card-corner-val {
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #64748b;
@@ -830,7 +816,7 @@
     .card-corner-val.bottom { align-self: flex-end; transform: rotate(180deg); }
 
     .card-center-num {
-      font-size: 1.9rem;
+      font-size: 1.65rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #0f172a;
@@ -838,8 +824,8 @@
     }
 
     .number-card.active:hover {
-      transform: translateY(-8px) scale(1.08);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
+      transform: translateY(-6px) scale(1.06);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
       border-color: rgba(37, 99, 235, 0.5);
       z-index: 10;
     }
@@ -847,8 +833,8 @@
     .number-card.selected {
       border-color: var(--royal-blue);
       border-width: 2.5px;
-      box-shadow: 0 0 16px var(--royal-blue-glow), 0 12px 25px rgba(0, 0, 0, 0.6);
-      transform: translateY(-16px) scale(1.12);
+      box-shadow: 0 0 14px var(--royal-blue-glow), 0 10px 20px rgba(0, 0, 0, 0.6);
+      transform: translateY(-10px) scale(1.08);
       z-index: 20;
     }
 
@@ -868,11 +854,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 4px;
+      padding: 3px;
       position: relative;
     }
     .pcv-num {
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #1e3a8a;
@@ -880,7 +866,7 @@
       margin: auto 0;
     }
     .pcv-remove {
-      font-size: 0.62rem;
+      font-size: 0.56rem;
       font-weight: 800;
       color: #ef4444;
       cursor: pointer;
@@ -896,7 +882,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
       transition: opacity 0.2s ease;
     }
     .modal-overlay.hidden { display: none; }
@@ -905,12 +891,12 @@
       width: 100%;
       background: #181938;
       border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 14px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .modal-header {
@@ -918,10 +904,10 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
     .modal-title {
-      font-size: 0.9rem;
+      font-size: 0.84rem;
       font-weight: 900;
       color: #ffffff;
       display: flex;
@@ -940,19 +926,19 @@
     .scout-box {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
     .sb-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .sb-name { font-size: 0.8rem; font-weight: 900; color: #fff; }
-    .sb-archetype { font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; }
+    .sb-name { font-size: 0.76rem; font-weight: 900; color: #fff; }
+    .sb-archetype { font-size: 0.6rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
     .sb-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -961,33 +947,30 @@
     }
     .sb-cell {
       background: rgba(255, 255, 255, 0.04);
-      padding: 4px 2px;
-      border-radius: 6px;
+      padding: 3px 2px;
+      border-radius: 5px;
     }
-    .sb-cell-label { font-size: 0.62rem; color: #94a3b8; font-weight: 700; display: block; }
-    .sb-cell-val { font-size: 0.72rem; color: #f8fafc; font-weight: 900; }
+    .sb-cell-label { font-size: 0.58rem; color: #94a3b8; font-weight: 700; display: block; }
+    .sb-cell-val { font-size: 0.68rem; color: #f8fafc; font-weight: 900; }
   </style>
 </head>
 <body>
 
-  <!-- Controls Toolbar -->
-  <div class="top-toolbar">
-    <div class="pill-tabs">
-      <button class="pill-tab active" id="tab-b1" onclick="switchBeat('beat1')">Beat 1: The Read</button>
-      <button class="pill-tab" id="tab-b2" onclick="switchBeat('beat2')">Beat 2: The Clash</button>
-    </div>
-    <button class="btn-intel" onclick="toggleModal(true)">
-      <span>ℹ️</span> Scout Intel
-    </button>
-  </div>
-
-  <!-- Mobile Phone Viewport -->
-  <div class="phone-container">
+  <!-- Game Container (Edge-to-Edge Mobile Viewport, Centered on Desktop) -->
+  <div class="game-container">
     
-    <!-- Phone Camera Island -->
-    <div class="phone-island"><div class="island-lens"></div></div>
+    <!-- Controls Toolbar -->
+    <div class="top-toolbar">
+      <div class="pill-tabs">
+        <button class="pill-tab active" id="tab-b1" onclick="switchBeat('beat1')">Beat 1: The Read</button>
+        <button class="pill-tab" id="tab-b2" onclick="switchBeat('beat2')">Beat 2: The Clash</button>
+      </div>
+      <button class="btn-intel" onclick="toggleModal(true)">
+        <span>ℹ️</span> Scout Intel
+      </button>
+    </div>
 
-    <!-- 1. TOP 30%: STATUS & OPPONENT ZONE -->
+    <!-- 1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP) -->
     <header class="game-header">
       
       <!-- Brand & Gold Score Pill -->
@@ -1036,7 +1019,7 @@
       </div>
     </header>
 
-    <!-- 2. MIDDLE 40%: STADIUM FELT MAT -->
+    <!-- 2. MIDDLE: STADIUM FELT MAT -->
     <main class="felt-arena">
       
       <!-- Banner Indicator -->
@@ -1047,10 +1030,23 @@
         </div>
       </div>
 
-      <!-- ── BEAT 1 CONTENT: 3 PITCH CARDS + OPPONENT FACE-DOWN CARD ── -->
-      <div id="view-beat1" style="display: flex; flex-direction: column; justify-content: space-between; flex: 1; width: 100%;">
+      <!-- ── BEAT 1 CONTENT: OPPONENT ANTICIPATION (TOP) + USER PITCH CARDS (BOTTOM) ── -->
+      <div id="view-beat1" style="display: flex; flex-direction: column; justify-content: space-between; flex: 1; width: 100%; min-height: 0;">
         
-        <!-- 3 Pitch Cards Laid Side-by-Side Across Felt -->
+        <!-- TOP: Opponent Face-Down Anticipation Card -->
+        <div class="face-down-container">
+          <span class="face-down-label">Opponent Anticipation Call</span>
+          <div class="card-back">
+            <span class="card-back-stamp" id="card-back-stamp">HIDDEN</span>
+          </div>
+        </div>
+
+        <!-- Middle: Explanation Hint -->
+        <div class="arena-hint-text">
+          Delivery choice establishes target difficulty for Beat 2 execution.
+        </div>
+
+        <!-- BOTTOM: 3 Pitch Selection Cards Laid Side-by-Side (User on Bottom) -->
         <div class="pitch-cards-row">
           
           <!-- Fastball -->
@@ -1093,21 +1089,10 @@
           </div>
         </div>
 
-        <!-- Center: Opponent Face-Down Anticipation Card -->
-        <div class="face-down-container">
-          <span class="face-down-label">Opponent Anticipation Call</span>
-          <div class="card-back">
-            <span class="card-back-stamp" id="card-back-stamp">HIDDEN</span>
-          </div>
-        </div>
-
-        <div style="text-align: center; font-size: 0.65rem; color: #a7f3d0; font-style: italic; opacity: 0.85;">
-          Delivery choice establishes the target difficulty for Beat 2 execution.
-        </div>
       </div>
 
-      <!-- ── BEAT 2 CONTENT: TARGET SHOWCASE + HEAD-TO-HEAD CLASH ── -->
-      <div id="view-beat2" style="display: none; flex-direction: column; justify-content: space-between; flex: 1; width: 100%;">
+      <!-- ── BEAT 2 CONTENT: TARGET SHOWCASE + VERTICAL HEAD-TO-HEAD CLASH ── -->
+      <div id="view-beat2" style="display: none; flex-direction: column; justify-content: space-between; flex: 1; width: 100%; min-height: 0;">
         
         <!-- Pitch & Target Showcase Plaque -->
         <div class="b2-showcase-card">
@@ -1124,12 +1109,12 @@
           </div>
         </div>
 
-        <!-- Center Clash Head-to-Head -->
-        <div class="clash-duel-row">
+        <!-- Vertical Head-to-Head Clash Stack (Opponent on TOP, User on BOTTOM) -->
+        <div class="clash-duel-stack">
           
-          <!-- Opponent Side (Face Down) -->
+          <!-- Opponent Side: Batter Swing (TOP) -->
           <div class="clash-slot-wrapper">
-            <span class="slot-title">Batter Swing</span>
+            <span class="slot-title">Batter Swing (Opponent)</span>
             <div class="card-back">
               <span class="card-back-stamp">FACE DOWN</span>
             </div>
@@ -1138,16 +1123,16 @@
           <!-- VS Badge -->
           <div class="clash-vs-badge">
             <span class="vs-tag">VS</span>
-            <span class="vs-sub">CLASH</span>
           </div>
 
-          <!-- Player Delivery Card Slot -->
+          <!-- Player Delivery Card Slot (BOTTOM) -->
           <div class="clash-slot-wrapper">
-            <span class="slot-title">Your Delivery</span>
+            <span class="slot-title">Your Delivery (Pitcher)</span>
             <div class="drop-slot" id="drop-slot" onclick="removePlacedCard()">
               <div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>
             </div>
           </div>
+
         </div>
 
         <!-- Clash Threshold Math Strip -->
@@ -1159,7 +1144,7 @@
 
     </main>
 
-    <!-- 3. BOTTOM 30%: PRIMARY TOUCH / THUMB ZONE -->
+    <!-- 3. BOTTOM: PRIMARY TOUCH / THUMB ZONE (USER ON BOTTOM) -->
     <footer class="game-dock">
       
       <!-- Player Profile Line -->
@@ -1179,7 +1164,7 @@
         SELECT FASTBALL, BREAKING, OR OFFSPEED
       </div>
 
-      <!-- Chunky Action Button (Mirrors BET Button) -->
+      <!-- Chunky Action Button -->
       <div id="action-btn-area">
         <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
           <span>🔒</span>
@@ -1189,7 +1174,7 @@
 
       <!-- Player Hand: 5 Pure Number Cards -->
       <div>
-        <div style="font-size: 0.65rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; display: flex; justify-content: space-between; padding: 0 4px;">
+        <div style="font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 3px; display: flex; justify-content: space-between; padding: 0 2px;">
           <span id="hand-heading">CARDS RESERVED FOR BEAT 2</span>
           <span style="color: #64748b;">VALUES 1–6</span>
         </div>
@@ -1289,7 +1274,7 @@
           </div>
         </div>
 
-        <button onclick="toggleModal(false)" style="width: 100%; height: 38px; background: var(--royal-blue); border: none; border-radius: 10px; color: #fff; font-weight: 800; font-size: 0.8rem; cursor: pointer;">
+        <button onclick="toggleModal(false)" style="width: 100%; height: 38px; background: var(--royal-blue); border: none; border-radius: 8px; color: #fff; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
           RETURN TO DUEL
         </button>
       </div>
@@ -1438,7 +1423,7 @@
       slot.classList.add('filled');
       slot.innerHTML = `
         <div class="placed-card-view">
-          <span style="font-size:0.65rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
+          <span style="font-size:0.6rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
           <span class="pcv-num">${val}</span>
           <span class="pcv-remove">✕ Remove</span>
         </div>
