@@ -1182,48 +1182,31 @@ function resolveBeat2(opts) {
         runsScored = runsOnHit(bases, 2);
         newBases = advanceBases(bases, 2);
         outsAdded = 0;
-      } else if (target >= 5) {
+      } else {
+        // Base Target 5 or Tunneled Target: Clean Single!
         outcomeType = 'single';
         outcomeDisplay = '🏏 CLEAN SINGLE! (Barreled Line Drive)';
-        ruleReason = `Batter barreled delivery (${bCardVal} vs ${pCardVal}) on base Target ${target} for a Clean Single!`;
+        ruleReason = `Batter barreled delivery (${bCardVal} vs ${pCardVal}) on Target ${target} for a Clean Single!`;
         runsScored = runsOnHit(bases, 1);
         newBases = advanceBases(bases, 1);
         outsAdded = 0;
-      } else {
-        // Lowered Target Barrel (Pitcher Advantage): Routine Infield Out
-        outcomeType = 'popout';
-        outcomeDisplay = '⚾ ROUTINE POP FLY (Pitcher Suppressed Exit Velocity)';
-        ruleReason = `Batter matched delivery (${bCardVal} vs ${pCardVal}), but pitcher tunneled Target down to ${target}. Routine out!`;
-        outsAdded = 1;
-        winner = 'pitcher';
       }
 
     } else if (target <= bCardVal && bCardVal < pCardVal) {
       // 🏏 IN THE TARGET WINDOW [Target <= Batter < Pitcher]
+      winner = 'batter';
       if (target >= 7) {
-        winner = 'batter';
         outcomeType = 'single';
         outcomeDisplay = '🏏 SOLID SINGLE! (In the Target Window)';
         ruleReason = `Batter placed ${bCardVal} squarely between Target ${target} and Pitcher ${pCardVal} for a Single!`;
-        runsScored = runsOnHit(bases, 1);
-        newBases = advanceBases(bases, 1);
-        outsAdded = 0;
-      } else if (target >= 5) {
-        winner = 'batter';
-        outcomeType = 'single';
-        outcomeDisplay = '🏏 BLOOP SINGLE! (In the Target Window)';
-        ruleReason = `Batter placed ${bCardVal} between Target ${target} and Pitcher ${pCardVal} for a Bloop Single!`;
-        runsScored = runsOnHit(bases, 1);
-        newBases = advanceBases(bases, 1);
-        outsAdded = 0;
       } else {
-        // Lowered target: Weak contact
-        winner = 'pitcher';
-        outcomeType = 'groundout';
-        outcomeDisplay = '⚾ INFIELD GROUNDOUT (Pitcher Control)';
-        ruleReason = `Batter hit inside pitcher's low target zone for an infield groundout.`;
-        outsAdded = 1;
+        outcomeType = 'single';
+        outcomeDisplay = '🏏 CONTACT SINGLE! (In the Target Window)';
+        ruleReason = `Batter placed ${bCardVal} between Target ${target} and Pitcher ${pCardVal} for a Contact Single!`;
       }
+      runsScored = runsOnHit(bases, 1);
+      newBases = advanceBases(bases, 1);
+      outsAdded = 0;
     }
   }
 

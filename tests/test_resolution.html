@@ -276,8 +276,8 @@
         assert(b2BarreledHR.outcomeType === 'homerun', 'Exact match on high target produces Home Run');
         assert(b2BarreledHR.winner === 'batter', 'Home run awards batter win');
 
-        // Subcase B: Lowered Target (Target 3) with Pitcher Advantage -> Routine Pop Fly
-        const b2PopFly = resolveBeat2({
+        // Subcase B: Lowered Target (Target 3) with Pitcher Advantage -> Capped at Single
+        const b2LowTargetMatch = resolveBeat2({
           target: 3,
           advantageSide: 'pitcher',
           pitchType: 'fastball',
@@ -286,9 +286,9 @@
           pitcherChar: pJake,
           batterChar: bBear,
         });
-        assert(b2PopFly.outcomeType === 'popout', 'Exact match with pitcher advantage produces popout');
-        assert(b2PopFly.outsAdded === 1, 'Popout adds 1 out');
-        assert(b2PopFly.winner === 'pitcher', 'Popout awards pitcher win');
+        assert(b2LowTargetMatch.outcomeType === 'single', 'Exact match with pitcher advantage produces Single (power capped)');
+        assert(b2LowTargetMatch.outsAdded === 0, 'Single adds 0 outs');
+        assert(b2LowTargetMatch.winner === 'batter', 'Single awards batter win');
 
         // 15. Decisive 2-Beat PA Resolution
         const seq2BeatResult = resolveSequentialPA({

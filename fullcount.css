@@ -1263,16 +1263,32 @@ input[type="text"]:focus {
 
 .nl-cell {
   flex: 1;
-  height: 24px;
+  min-height: 38px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 800;
+  gap: 2px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.04);
   color: #64748b;
+  position: relative;
+  padding: 2px 0;
+}
+
+.nl-outcome-badge {
+  font-size: 0.52rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.2px;
+}
+
+.nl-num-box {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
 }
 
 .nl-cell.sweet-spot, .nl-cell.center-spot {
@@ -1289,7 +1305,7 @@ input[type="text"]:focus {
 
 .nl-cell.under-target {
   background: rgba(239, 68, 68, 0.08);
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .nl-cell.above-target {
@@ -1325,6 +1341,47 @@ input[type="text"]:focus {
   background: rgba(148, 163, 184, 0.15);
   color: #94a3b8;
   border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.nl-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 2px 0;
+}
+
+.nl-legend-item {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nl-card-eval {
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.nl-card-eval.hint {
+  color: #94a3b8;
+}
+
+.nl-card-eval.good {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.nl-card-eval.warn {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .nl-header-title {

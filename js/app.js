@@ -2859,24 +2859,22 @@ function renderOutcomeNumberLine(opts = {}) {
       outcomeClass = 'center-spot sweet-spot';
       if (target >= 9) outcomeLabel = '💥 HR';
       else if (target >= 7) outcomeLabel = '⚡ 2B';
-      else if (target >= 5) outcomeLabel = '🏏 1B';
-      else outcomeLabel = 'OUT';
+      else outcomeLabel = '🏏 1B';
     } else if (pitcherCardVal !== null && n > pitcherCardVal) {
       outcomeClass = 'high-heat outside';
-      outcomeLabel = 'K';
+      outcomeLabel = '⚡ K';
     } else if (n < target) {
       outcomeClass = 'outside under-target low-contact';
       outcomeLabel = 'OUT';
     } else if (n === target && pitcherCardVal === null) {
       outcomeClass = 'target-pin sweet-spot';
-      outcomeLabel = (target >= 9) ? '💥 HR' : (target >= 7 ? '⚡ 2B' : (target >= 5 ? '🎯 TGT' : 'OUT'));
+      outcomeLabel = '🎯 TGT';
     } else {
-      // Inside target window: [target <= n]
+      // Inside in-play window [target <= n]
       outcomeClass = 'line-drive above-target';
       if (target >= 9) outcomeLabel = (n >= 9) ? '💥 HR' : '2B';
       else if (target >= 7) outcomeLabel = (n >= 8) ? '⚡ 2B' : '1B';
-      else if (target >= 5) outcomeLabel = '1B';
-      else outcomeLabel = 'OUT';
+      else outcomeLabel = 'HIT';
     }
 
     const isNeedleTarget = (selectedCardVal !== null && n === selectedCardVal);
@@ -2898,34 +2896,50 @@ function renderOutcomeNumberLine(opts = {}) {
   const advPill = (advSide === 'batter' || target > 5)
     ? `<span class="nl-adv-pill hitter">🏏 BATTER ADVANTAGE (+${readFactor} Read &bull; ${target >= 9 ? '💥 HR Tier' : (target >= 7 ? '⚡ 2B Tier' : '1B Tier')})</span>`
     : ((advSide === 'pitcher' || target < 5)
-      ? `<span class="nl-adv-pill pitcher">⚾ PITCHER ADVANTAGE (-${tunneling} Tunneling &bull; Target ${target})</span>`
+      ? `<span class="nl-adv-pill pitcher">⚾ PITCHER ADVANTAGE (-${tunneling} Tunneling &bull; Low Target ${target})</span>`
       : `<span class="nl-adv-pill neutral">⚖️ EVEN COUNT</span>`);
 
   const legendHtml = `
-    <div class="nl-legend">
+    <div class="nl-legend-row">
       <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &lt;${target} Groundout</span>
-      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Target ${target}</span>
-      <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> Window: Hit</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot sweet-spot"></span> Target ${target} Floor</span>
+      <span class="nl-legend-item"><span class="nl-legend-dot line-drive"></span> &ge;${target} In-Play</span>
       <span class="nl-legend-item"><span class="nl-legend-dot outside"></span> &gt;Pitcher: K</span>
     </div>
   `;
 
-  const footerNote = (advSide === 'batter' || target > 5)
-    ? `<b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; Target elevated to <b>${target}</b> (+${readFactor} Read) &bull; Barreled = <b>${target >= 9 ? '💥 Home Run' : (target >= 7 ? '⚡ Double' : 'Clean Single')}</b>`
-    : `<b>Target Window:</b> &lt;${target} &rarr; <b>Groundout</b> &bull; Target tunneled to <b>${target}</b> (-${tunneling} Tunneling &bull; Pitcher Control) &bull; &gt;Pitcher = <b>Strikeout</b>`;
+  let footerEvalHtml = '';
+  if (selectedCardVal !== null) {
+    if (opts.iAmBatting || !opts.pitcherDelivery) {
+      if (selectedCardVal < target) {
+        footerEvalHtml = `<div class="nl-card-eval warn">⚠️ <b>CARD [${selectedCardVal}] SELECTED:</b> Below Target ${target} &rarr; <b>Weak Groundout (Out)</b></div>`;
+      } else {
+        const barrelName = target >= 9 ? '💥 Home Run' : (target >= 7 ? '⚡ Double' : '🏏 Single');
+        footerEvalHtml = `<div class="nl-card-eval good">🏏 <b>CARD [${selectedCardVal}] SELECTED:</b> In Play! Single if Pitcher &ge; ${selectedCardVal} &bull; Strikeout (K) if Pitcher &lt; ${selectedCardVal} &bull; <b>${barrelName}</b> if Pitcher = ${selectedCardVal}!</div>`;
+      }
+    } else {
+      if (selectedCardVal < target) {
+        footerEvalHtml = `<div class="nl-card-eval warn">⚠️ <b>CARD [${selectedCardVal}] SELECTED:</b> Below Target ${target} &rarr; <b>Missed Target (Walk / Ball)</b></div>`;
+      } else {
+        footerEvalHtml = `<div class="nl-card-eval good">⚾ <b>CARD [${selectedCardVal}] SELECTED:</b> Pitch Executes! Safe from walk. Strikeout if Batter &gt; ${selectedCardVal}.</div>`;
+      }
+    }
+  } else {
+    footerEvalHtml = `<div class="nl-card-eval hint">💡 <b>How it works:</b> Target ${target} is the floor. Cards &lt;${target} = Groundout. Cards &ge;${target} = In Play. Exact match with Pitcher = Barreled!</div>`;
+  }
 
   return `
     <div class="outcome-number-line-container ${extraClass}">
       <div class="nl-header-row">
         <span class="nl-pitch-badge">${pitchIcon} ${pitchName} &bull; Target <b>${target}</b></span>
         ${advPill}
-        ${legendHtml}
       </div>
+      ${legendHtml}
       <div class="nl-track">
         ${cellsHtml}
       </div>
       <div class="nl-footer-note">
-        ${footerNote}
+        ${footerEvalHtml}
       </div>
     </div>
   `;
