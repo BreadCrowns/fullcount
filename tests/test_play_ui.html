@@ -173,14 +173,14 @@
       selectCard('P1');
       report(localBeatCard === null, 'Tapping card in Beat 1 does not play card (cards reserved for Beat 2)');
 
-      // Test pointer-events on Beat 1 pitch trays (must not be 'none')
-      const moundTrays = document.querySelectorAll('.diamond-mound .pitch-tray');
-      report(moundTrays.length === 3, `Found 3 mound pitch trays in Beat 1`);
+      // Test pointer-events on Beat 1 pitch buttons (must not be 'none')
+      const pitchTrays = document.querySelectorAll('.pitch-selection-dock .pitch-tray');
+      report(pitchTrays.length === 3, `Found 3 pitch buttons above user cards in Beat 1`);
       let allPeAuto = true;
-      moundTrays.forEach(t => {
+      pitchTrays.forEach(t => {
         if (window.getComputedStyle(t).pointerEvents !== 'auto') allPeAuto = false;
       });
-      report(allPeAuto, 'All Beat 1 mound pitch trays have pointer-events auto (interactive for clicks and drops)');
+      report(allPeAuto, 'All Beat 1 pitch buttons have pointer-events auto (interactive for clicks and drops)');
 
       // Test selecting Fastball pitch
       handleTrayClick('fastball', 'mound');
@@ -498,7 +498,10 @@
       report(document.querySelector('.beat3-banner') !== null, 'Beat 3 Full Count Showdown banner renders');
       report(document.querySelector('.beat3-arena') !== null, 'Beat 3 arena class applied to battlefield');
       const ratingBadges = document.querySelectorAll('.pt-rating-badge');
-      report(ratingBadges.length >= 3, `Base pitch rating badges render on diamond trays (found ${ratingBadges.length})`);
+      report(ratingBadges.length >= 3, `Base pitch rating badges render on pitch buttons (found ${ratingBadges.length})`);
+      report(ratingBadges[0].textContent.includes('Target 2'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 2');
+      report(ratingBadges[1].textContent.includes('Target 4'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 4');
+      report(ratingBadges[2].textContent.includes('Target 5'), 'Beat 3 pitch targets reflect Big Jake Harmon base target 5');
       const b3LockBtn = document.getElementById('lock-btn');
       report(b3LockBtn !== null, 'Lock-in button exists in Beat 3');
       report(b3LockBtn?.textContent.includes('SHOWDOWN'), 'Lock-in button reflects SHOWDOWN context');
@@ -526,7 +529,9 @@
       report(unselectedNl.includes('SELECT PITCH TO PREVIEW'), 'Unselected displays SELECT PITCH TO PREVIEW badge');
       report(unselectedNl.includes('unselected'), 'Unselected number line cells contain unselected class');
 
-      // Verify number line in active modals and field
+      // Verify number line in Beat 2 execution clash
+      soloPlayState.currentPA.beat = 'beat2';
+      handleGameState(soloPlayState);
       report(document.querySelector('.diamond-number-line') !== null, 'Diamond battlefield renders live color-coded number line');
 
       // 10. Test Pitch Result Screen: No cards displayed, only the two pitches, advantage, and new target
