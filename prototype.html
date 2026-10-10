@@ -28,6 +28,8 @@
       --royal-blue-glow: rgba(37, 99, 235, 0.5);
       --gold: #f59e0b;
       --gold-glow: rgba(245, 158, 11, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.4);
       --card-white: #ffffff;
       --card-border: #e2e8f0;
       --text-dark: #0f172a;
@@ -66,72 +68,12 @@
       position: relative;
     }
 
-    /* ── TOP CONTROLS TOOLBAR ── */
-    .top-toolbar {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: max(6px, env(safe-area-inset-top, 0px)) 10px 4px;
-      background: #0e0f24;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      flex-shrink: 0;
-      z-index: 30;
-    }
-
-    .pill-tabs {
-      display: flex;
-      background: #181938;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 9999px;
-      padding: 2px;
-      gap: 3px;
-    }
-
-    .pill-tab {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .pill-tab.active {
-      background: var(--royal-blue);
-      color: #ffffff;
-      box-shadow: 0 2px 8px var(--royal-blue-glow);
-    }
-
-    .btn-intel {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      color: #fbbf24;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-    }
-    .btn-intel:hover {
-      background: rgba(245, 158, 11, 0.25);
-    }
-
     /* =========================================================================
        1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP)
        ========================================================================= */
     .game-header {
       background: var(--bg-header);
-      padding: 6px 10px;
+      padding: max(8px, env(safe-area-inset-top, 0px)) 10px 6px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
@@ -152,42 +94,42 @@
       gap: 5px;
     }
     .brand-title {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 900;
       letter-spacing: 1.2px;
       color: #ffffff;
       text-transform: uppercase;
     }
     .brand-tag {
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       font-weight: 900;
       color: var(--gold);
       background: rgba(245, 158, 11, 0.15);
       border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1px 5px;
+      padding: 1px 4px;
       border-radius: 4px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
     /* Gold Score Pill */
     .score-badge {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(245, 158, 11, 0.12);
       border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 3px 10px;
+      padding: 3px 8px;
       border-radius: 9999px;
     }
     .score-led {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       background: #fbbf24;
       border-radius: 50%;
-      box-shadow: 0 0 6px #fbbf24;
+      box-shadow: 0 0 5px #fbbf24;
     }
     .score-text {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #ffffff;
@@ -197,15 +139,15 @@
     }
     .score-sep { color: #64748b; font-weight: 700; }
     .score-inn {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 900;
       color: #fde047;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
     .outs-group {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       margin-left: 2px;
     }
     .out-dot {
@@ -217,6 +159,30 @@
     .out-dot.filled {
       background: #ef4444;
       box-shadow: 0 0 5px #ef4444;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-icon-header {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-icon-header:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
     }
 
     /* Opponent Bar */
@@ -235,15 +201,15 @@
       gap: 7px;
     }
     .opp-avatar {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       background: rgba(245, 158, 11, 0.2);
       border: 1.5px solid rgba(245, 158, 11, 0.5);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .opp-details {
       display: flex;
@@ -256,12 +222,12 @@
       gap: 5px;
     }
     .opp-name {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 900;
       color: #ffffff;
     }
     .opp-badge {
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       font-weight: 800;
       color: #fb923c;
       background: rgba(249, 115, 22, 0.18);
@@ -269,7 +235,7 @@
       border-radius: 3px;
     }
     .opp-sub {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       color: #94a3b8;
       font-weight: 700;
     }
@@ -277,26 +243,26 @@
     .opp-stats-right {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
     .opp-hand-counter {
       display: flex;
       align-items: center;
       gap: 3px;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 900;
       color: #e2e8f0;
       background: rgba(255, 255, 255, 0.06);
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 9999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .opp-status-pill {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       font-weight: 900;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 9999px;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
       background: rgba(245, 158, 11, 0.18);
       color: #fbbf24;
       border: 1px solid rgba(245, 158, 11, 0.35);
@@ -314,7 +280,7 @@
       flex: 1;
       min-height: 0;
       margin: 4px 8px;
-      padding: 8px 10px;
+      padding: 8px;
       background: radial-gradient(ellipse at 50% 40%, var(--felt-center) 0%, var(--felt-mid) 60%, var(--felt-dark) 100%);
       box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
       border-radius: 16px;
@@ -335,226 +301,364 @@
       pointer-events: none;
     }
 
-    .arena-banner {
+    /* ── BEAT 1: 3 MATCHUP LANES (OPPONENT ACROSS FROM USER) ── */
+    .b1-matchup-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
       width: 100%;
-      text-align: center;
+      min-height: 0;
       z-index: 10;
-      margin-bottom: 2px;
     }
-    .arena-banner-pill {
+
+    .matchup-header-tag {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .matchup-header-pill {
       display: inline-flex;
       align-items: center;
       gap: 5px;
       background: rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 3px 10px;
+      padding: 2px 10px;
       border-radius: 9999px;
-      font-size: 0.66rem;
-      font-weight: 800;
-      color: #e2e8f0;
-      backdrop-filter: blur(4px);
-    }
-    .arena-banner-pill b { color: #facc15; }
-
-    /* ── OPPONENT FACE-DOWN CARD (TOP OF ARENA) ── */
-    .face-down-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      z-index: 10;
-      margin: 2px 0;
-    }
-    .face-down-label {
       font-size: 0.62rem;
       font-weight: 800;
       color: #a7f3d0;
-      text-transform: uppercase;
       letter-spacing: 0.4px;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     }
 
-    .card-back {
-      width: 58px;
-      height: 80px;
-      border-radius: 10px;
-      border: 2.5px solid #ffffff;
-      background-color: #1d4ed8;
-      background-image: 
-        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 3px, #2563eb 3px, #2563eb 6px),
-        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 3px, #2563eb 3px, #2563eb 6px);
-      background-blend-mode: multiply;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .card-back::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 6px;
-    }
-    .card-back-stamp {
-      font-size: 0.55rem;
-      font-weight: 900;
-      color: #ffffff;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 2px 6px;
-      border-radius: 9999px;
-      backdrop-filter: blur(4px);
-      z-index: 2;
-    }
-
-    .arena-hint-text {
-      text-align: center;
-      font-size: 0.6rem;
-      color: #a7f3d0;
-      font-style: italic;
-      opacity: 0.85;
-      margin: 2px 0;
-    }
-
-    /* ── USER PITCH CARDS ROW (BOTTOM OF ARENA) ── */
-    .pitch-cards-row {
+    .matchup-columns-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       width: 100%;
-      z-index: 10;
+      flex: 1;
+      min-height: 0;
       margin: 2px 0;
     }
 
-    .pitch-card {
-      background: var(--card-white);
-      color: var(--text-dark);
-      border-radius: 10px;
-      padding: 6px 4px;
+    /* Individual Matchup Lane Column */
+    .matchup-lane {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: space-between;
-      min-height: 84px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 5px 4px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      border: 2px solid transparent;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, box-shadow 0.2s;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
       position: relative;
     }
 
-    .pitch-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+    .matchup-lane:hover {
+      background: rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .pitch-card.active {
+    .matchup-lane.active {
+      background: rgba(37, 99, 235, 0.18);
       border-color: var(--royal-blue);
-      box-shadow: 0 0 0 2.5px var(--royal-blue), 0 8px 20px var(--royal-blue-glow);
-      transform: translateY(-3px);
+      box-shadow: 0 0 16px var(--royal-blue-glow);
     }
 
-    .pc-top {
+    /* Opponent Choice Card (Top of Lane) */
+    .opp-choice-card {
+      width: 100%;
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 3px;
     }
-    .pc-icon { font-size: 1.1rem; }
-    .pc-name {
-      font-size: 0.72rem;
+    .choice-role-tag {
+      font-size: 0.54rem;
       font-weight: 900;
-      letter-spacing: -0.2px;
+      color: #fb923c;
+      letter-spacing: 0.3px;
       text-transform: uppercase;
     }
-
-    .pc-body {
-      background: #f1f5f9;
-      border-radius: 5px;
-      padding: 2px 4px;
-      width: 100%;
+    .opp-card-mini {
+      width: 48px;
+      height: 58px;
+      border-radius: 7px;
+      border: 2px solid #ffffff;
+      background-color: #1e3a8a;
+      background-image: 
+        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px),
+        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px);
+      background-blend-mode: multiply;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      position: relative;
+    }
+    .opp-card-icon { font-size: 0.85rem; }
+    .opp-mod-badge {
+      font-size: 0.52rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: rgba(239, 68, 68, 0.85);
+      color: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+    .opp-sub-calc {
+      font-size: 0.54rem;
+      font-weight: 800;
+      color: #cbd5e1;
       text-align: center;
     }
-    .pc-target {
-      font-size: 0.66rem;
-      font-weight: 900;
-      color: #1e3a8a;
+
+    /* Center Lane Divider */
+    .lane-divider {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      margin: 3px 0;
     }
-    .pc-tunnel {
+    .lane-name {
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      color: #fde047;
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1px 6px;
+      border-radius: 9999px;
+      border: 1px solid rgba(253, 224, 71, 0.3);
+    }
+
+    /* User Choice Card (Bottom of Lane) */
+    .user-choice-card {
+      width: 100%;
+      background: var(--card-white);
+      color: var(--text-dark);
+      border-radius: 8px;
+      padding: 5px 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .matchup-lane.active .user-choice-card {
+      border-color: var(--royal-blue);
+      box-shadow: 0 0 10px var(--royal-blue-glow);
+      transform: translateY(-2px);
+    }
+
+    .user-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 2px;
+    }
+    .uc-icon { font-size: 0.95rem; }
+    .uc-base {
       font-size: 0.56rem;
       font-weight: 800;
       color: #64748b;
     }
 
-    .pc-badge {
+    .uc-mod-row {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .tunnel-mod-pill {
       font-size: 0.54rem;
       font-weight: 900;
-      padding: 1px 6px;
+      color: #1e3a8a;
+      background: #dbeafe;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .uc-target-callout {
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: 5px;
+      padding: 2px 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+      margin: 1px 0;
+    }
+    .tgt-label {
+      font-size: 0.48rem;
+      font-weight: 800;
+      color: #475569;
+      letter-spacing: 0.3px;
+    }
+    .tgt-val {
+      font-size: 0.9rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #0f172a;
+    }
+
+    .uc-action-btn {
+      font-size: 0.54rem;
+      font-weight: 900;
+      padding: 2px 6px;
       border-radius: 9999px;
       background: #e2e8f0;
       color: #475569;
       letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
-    .pitch-card.active .pc-badge {
+    .matchup-lane.active .uc-action-btn {
       background: var(--royal-blue);
       color: #ffffff;
     }
 
-    /* ── BEAT 2 CLASH ARENA ── */
-    .b2-showcase-card {
-      background: #ffffff;
-      color: var(--text-dark);
+    .arena-hint-text {
+      text-align: center;
+      font-size: 0.58rem;
+      color: #a7f3d0;
+      font-style: italic;
+      opacity: 0.85;
+      margin-top: 3px;
+    }
+
+    /* =========================================================================
+       BEAT 2: CENTER SHOWCASE (PITCH CHOSEN + FOOLED RESULT + FINAL TARGET)
+       ========================================================================= */
+    .b2-play-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      z-index: 10;
+    }
+
+    /* Center Play Area Showcase Card */
+    .b2-center-showcase {
+      background: rgba(14, 15, 36, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+    }
+
+    .b2-chosen-pitch-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+    .b2-badge-icon { font-size: 1.15rem; }
+    .b2-badge-title {
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Result: Fooled or Not Banner */
+    .b2-fooled-banner {
       border-radius: 10px;
       padding: 6px 10px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-      z-index: 10;
+      gap: 2px;
+      text-align: center;
     }
-    .b2-pitch-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .b2-fooled-banner.fooled-yes {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
     }
-    .b2-pitch-icon { font-size: 1.3rem; }
-    .b2-pitch-title {
-      font-size: 0.76rem;
-      font-weight: 900;
-      color: #0f172a;
-      letter-spacing: -0.2px;
+    .b2-fooled-banner.fooled-no {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
     }
-    .b2-pitch-sub {
-      font-size: 0.58rem;
-      font-weight: 700;
-      color: #64748b;
-    }
-    .b2-target-pill {
+
+    .fooled-status-tag {
       display: flex;
       align-items: center;
       gap: 5px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 2px 8px;
-      border-radius: 9999px;
-    }
-    .b2-target-label {
-      font-size: 0.58rem;
-      font-weight: 800;
-      color: #64748b;
-    }
-    .b2-target-num {
-      font-size: 0.95rem;
+      font-size: 0.82rem;
       font-weight: 900;
-      font-family: var(--font-mono);
-      background: var(--gold);
-      color: #000;
-      padding: 0 6px;
-      border-radius: 9999px;
-      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+      letter-spacing: 0.5px;
+    }
+    .fooled-yes .fooled-status-tag { color: #34d399; }
+    .fooled-no .fooled-status-tag { color: #fbbf24; }
+
+    .fooled-subtext {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #cbd5e1;
     }
 
-    /* Vertical Clash Head-to-Head Stack (Opponent Top, User Bottom) */
+    /* Final Target Number Display */
+    .b2-final-target-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
+    .ft-left {
+      display: flex;
+      flex-direction: column;
+    }
+    .ft-label {
+      font-size: 0.6rem;
+      font-weight: 900;
+      color: #94a3b8;
+      letter-spacing: 0.4px;
+    }
+    .ft-formula {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      font-family: var(--font-mono);
+    }
+    .ft-target-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #000000;
+      font-size: 1.35rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    /* Vertical Duel Clash Stack (Opponent Top, Player Bottom) */
     .clash-duel-stack {
       display: flex;
       flex-direction: column;
@@ -562,8 +666,7 @@
       justify-content: center;
       gap: 3px;
       width: 100%;
-      z-index: 10;
-      margin: auto 0;
+      margin: 2px 0;
     }
 
     .clash-slot-wrapper {
@@ -573,17 +676,43 @@
       gap: 2px;
     }
     .slot-title {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 800;
       color: #a7f3d0;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
+    }
+
+    .card-back {
+      width: 52px;
+      height: 70px;
+      border-radius: 8px;
+      border: 2px solid #ffffff;
+      background-color: #1d4ed8;
+      background-image: 
+        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px),
+        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px);
+      background-blend-mode: multiply;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-back-stamp {
+      font-size: 0.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 1px 5px;
+      border-radius: 9999px;
+      backdrop-filter: blur(4px);
     }
 
     .drop-slot {
-      width: 58px;
-      height: 80px;
-      border-radius: 10px;
+      width: 52px;
+      height: 70px;
+      border-radius: 8px;
       border: 2px dashed rgba(255, 255, 255, 0.5);
       background: rgba(0, 0, 0, 0.25);
       display: flex;
@@ -596,14 +725,14 @@
     .drop-slot.filled {
       border: 2px solid #ffffff;
       background: #ffffff;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
     }
     .drop-slot-hint {
-      font-size: 0.6rem;
+      font-size: 0.56rem;
       font-weight: 800;
       color: rgba(255, 255, 255, 0.85);
       text-align: center;
-      padding: 3px;
+      padding: 2px;
     }
 
     .clash-vs-badge {
@@ -613,13 +742,13 @@
       margin: 1px 0;
     }
     .vs-tag {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #fbbf24;
       background: rgba(0, 0, 0, 0.55);
       border: 1px solid rgba(251, 191, 36, 0.4);
-      padding: 1px 8px;
+      padding: 1px 6px;
       border-radius: 9999px;
     }
 
@@ -628,14 +757,13 @@
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      padding: 4px 10px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       font-weight: 700;
       color: #cbd5e1;
-      z-index: 10;
     }
     .math-highlight {
       font-weight: 900;
@@ -670,35 +798,35 @@
       gap: 6px;
     }
     .my-avatar {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       background: rgba(37, 99, 235, 0.25);
       border: 1.5px solid rgba(37, 99, 235, 0.5);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
     .my-name {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 900;
       color: #ffffff;
     }
     .my-sub {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 700;
       color: #60a5fa;
     }
     .role-badge {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 900;
       color: #93c5fd;
       background: rgba(59, 130, 246, 0.2);
       border: 1px solid rgba(59, 130, 246, 0.4);
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 9999px;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
     }
 
     /* Status Context Pill */
@@ -706,8 +834,8 @@
       background: #0e0f24;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 9999px;
-      padding: 4px 12px;
-      font-size: 0.68rem;
+      padding: 3px 10px;
+      font-size: 0.65rem;
       font-weight: 800;
       color: #cbd5e1;
       text-align: center;
@@ -723,13 +851,13 @@
     /* Chunky Action Button */
     .btn-action-lock {
       width: 100%;
-      height: 42px;
+      height: 40px;
       background: var(--royal-blue);
       background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
       border: none;
       border-radius: 10px;
       color: #ffffff;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 900;
       letter-spacing: 0.6px;
       text-transform: uppercase;
@@ -763,7 +891,7 @@
 
     .locked-badge-active {
       width: 100%;
-      height: 42px;
+      height: 40px;
       background: rgba(16, 185, 129, 0.15);
       border: 1.5px solid rgba(16, 185, 129, 0.4);
       border-radius: 10px;
@@ -772,7 +900,7 @@
       justify-content: center;
       gap: 6px;
       color: #34d399;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 900;
       letter-spacing: 0.5px;
     }
@@ -789,7 +917,7 @@
     .number-card {
       flex: 1;
       max-width: 58px;
-      height: 72px;
+      height: 68px;
       background: var(--card-white);
       color: var(--text-dark);
       border-radius: 8px;
@@ -806,7 +934,7 @@
     }
 
     .card-corner-val {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #64748b;
@@ -816,7 +944,7 @@
     .card-corner-val.bottom { align-self: flex-end; transform: rotate(180deg); }
 
     .card-center-num {
-      font-size: 1.65rem;
+      font-size: 1.55rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #0f172a;
@@ -824,8 +952,8 @@
     }
 
     .number-card.active:hover {
-      transform: translateY(-6px) scale(1.06);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+      transform: translateY(-5px) scale(1.06);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
       border-color: rgba(37, 99, 235, 0.5);
       z-index: 10;
     }
@@ -833,13 +961,13 @@
     .number-card.selected {
       border-color: var(--royal-blue);
       border-width: 2.5px;
-      box-shadow: 0 0 14px var(--royal-blue-glow), 0 10px 20px rgba(0, 0, 0, 0.6);
-      transform: translateY(-10px) scale(1.08);
+      box-shadow: 0 0 14px var(--royal-blue-glow), 0 8px 18px rgba(0, 0, 0, 0.6);
+      transform: translateY(-8px) scale(1.08);
       z-index: 20;
     }
 
     .number-card.view-only {
-      opacity: 0.72;
+      opacity: 0.68;
       cursor: default;
     }
     .number-card.view-only:hover {
@@ -854,11 +982,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 3px;
+      padding: 2px;
       position: relative;
     }
     .pcv-num {
-      font-size: 1.8rem;
+      font-size: 1.65rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: #1e3a8a;
@@ -866,7 +994,7 @@
       margin: auto 0;
     }
     .pcv-remove {
-      font-size: 0.56rem;
+      font-size: 0.54rem;
       font-weight: 800;
       color: #ef4444;
       cursor: pointer;
@@ -907,7 +1035,7 @@
       padding-bottom: 6px;
     }
     .modal-title {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 900;
       color: #ffffff;
       display: flex;
@@ -937,8 +1065,8 @@
       align-items: center;
       justify-content: space-between;
     }
-    .sb-name { font-size: 0.76rem; font-weight: 900; color: #fff; }
-    .sb-archetype { font-size: 0.6rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
+    .sb-name { font-size: 0.74rem; font-weight: 900; color: #fff; }
+    .sb-archetype { font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
     .sb-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -950,26 +1078,15 @@
       padding: 3px 2px;
       border-radius: 5px;
     }
-    .sb-cell-label { font-size: 0.58rem; color: #94a3b8; font-weight: 700; display: block; }
-    .sb-cell-val { font-size: 0.68rem; color: #f8fafc; font-weight: 900; }
+    .sb-cell-label { font-size: 0.56rem; color: #94a3b8; font-weight: 700; display: block; }
+    .sb-cell-val { font-size: 0.65rem; color: #f8fafc; font-weight: 900; }
   </style>
 </head>
 <body>
 
-  <!-- Game Container (Edge-to-Edge Mobile Viewport, Centered on Desktop) -->
+  <!-- Game Container (Edge-to-Edge Mobile Viewport) -->
   <div class="game-container">
     
-    <!-- Controls Toolbar -->
-    <div class="top-toolbar">
-      <div class="pill-tabs">
-        <button class="pill-tab active" id="tab-b1" onclick="switchBeat('beat1')">Beat 1: The Read</button>
-        <button class="pill-tab" id="tab-b2" onclick="switchBeat('beat2')">Beat 2: The Clash</button>
-      </div>
-      <button class="btn-intel" onclick="toggleModal(true)">
-        <span>ℹ️</span> Scout Intel
-      </button>
-    </div>
-
     <!-- 1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP) -->
     <header class="game-header">
       
@@ -991,6 +1108,11 @@
             <span class="out-dot filled"></span>
             <span class="out-dot"></span>
           </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-icon-header" onclick="toggleModal(true)" title="Matchup Scouting Intel">ℹ️</button>
+          <button class="btn-icon-header" onclick="resetPrototype()" title="Reset Duel">↺</button>
         </div>
       </div>
 
@@ -1022,91 +1144,157 @@
     <!-- 2. MIDDLE: STADIUM FELT MAT -->
     <main class="felt-arena">
       
-      <!-- Banner Indicator -->
-      <div class="arena-banner">
-        <div class="arena-banner-pill" id="arena-banner-text">
-          <span>⚡</span>
-          <span>BEAT 1: <b>THE READ</b> — Call Pitch Delivery</span>
-        </div>
-      </div>
-
-      <!-- ── BEAT 1 CONTENT: OPPONENT ANTICIPATION (TOP) + USER PITCH CARDS (BOTTOM) ── -->
-      <div id="view-beat1" style="display: flex; flex-direction: column; justify-content: space-between; flex: 1; width: 100%; min-height: 0;">
+      <!-- ── BEAT 1: 3-COLUMN MATCHUP LANES (OPPONENT ACROSS FROM USER) ── -->
+      <div id="view-beat1" class="b1-matchup-container">
         
-        <!-- TOP: Opponent Face-Down Anticipation Card -->
-        <div class="face-down-container">
-          <span class="face-down-label">Opponent Anticipation Call</span>
-          <div class="card-back">
-            <span class="card-back-stamp" id="card-back-stamp">HIDDEN</span>
-          </div>
+        <div class="matchup-header-tag">
+          <span class="matchup-header-pill">⚡ OPPONENT READ vs YOUR DELIVERY • SELECT PITCH LANE</span>
         </div>
 
-        <!-- Middle: Explanation Hint -->
-        <div class="arena-hint-text">
-          Delivery choice establishes target difficulty for Beat 2 execution.
-        </div>
-
-        <!-- BOTTOM: 3 Pitch Selection Cards Laid Side-by-Side (User on Bottom) -->
-        <div class="pitch-cards-row">
+        <!-- 3 Matchup Lanes (Fastball | Breaking | Offspeed) -->
+        <div class="matchup-columns-grid">
           
-          <!-- Fastball -->
-          <div class="pitch-card" id="pc-fastball" onclick="selectPitch('fastball')">
-            <div class="pc-top">
-              <span class="pc-icon">🔥</span>
-              <span class="pc-name">Fastball</span>
+          <!-- COLUMN 1: FASTBALL LANE -->
+          <div class="matchup-lane" id="lane-fastball" onclick="selectPitch('fastball')">
+            <!-- Opponent Choice Across (Top) -->
+            <div class="opp-choice-card">
+              <span class="choice-role-tag">BATTER READ</span>
+              <div class="opp-card-mini">
+                <span class="opp-card-icon">🔥</span>
+                <span class="opp-mod-badge">+2 READ</span>
+              </div>
+              <span class="opp-sub-calc">If Read: Tgt 7</span>
             </div>
-            <div class="pc-body">
-              <div class="pc-target">Base Tgt 5</div>
-              <div class="pc-tunnel">Tunnel -3 (Tgt 2)</div>
+
+            <!-- Center Lane Divider -->
+            <div class="lane-divider">
+              <span class="lane-name">FASTBALL</span>
             </div>
-            <span class="pc-badge">CALL PITCH</span>
+
+            <!-- User Choice (Bottom) -->
+            <div class="user-choice-card" id="pc-fastball">
+              <div class="user-card-header">
+                <span class="uc-icon">🔥</span>
+                <span class="uc-base">Base 5</span>
+              </div>
+              <div class="uc-mod-row">
+                <span class="tunnel-mod-pill">Tun -3</span>
+              </div>
+              <div class="uc-target-callout">
+                <span class="tgt-label">FOOLED TGT</span>
+                <span class="tgt-val">2</span>
+              </div>
+              <span class="uc-action-btn" id="badge-fastball">CALL</span>
+            </div>
           </div>
 
-          <!-- Breaking -->
-          <div class="pitch-card" id="pc-breaking" onclick="selectPitch('breaking')">
-            <div class="pc-top">
-              <span class="pc-icon">🌀</span>
-              <span class="pc-name">Breaking</span>
+          <!-- COLUMN 2: BREAKING LANE -->
+          <div class="matchup-lane" id="lane-breaking" onclick="selectPitch('breaking')">
+            <!-- Opponent Choice Across (Top) -->
+            <div class="opp-choice-card">
+              <span class="choice-role-tag">BATTER READ</span>
+              <div class="opp-card-mini">
+                <span class="opp-card-icon">🌀</span>
+                <span class="opp-mod-badge">+1 READ</span>
+              </div>
+              <span class="opp-sub-calc">If Read: Tgt 6</span>
             </div>
-            <div class="pc-body">
-              <div class="pc-target">Base Tgt 5</div>
-              <div class="pc-tunnel">Tunnel -2 (Tgt 3)</div>
+
+            <!-- Center Lane Divider -->
+            <div class="lane-divider">
+              <span class="lane-name">BREAKING</span>
             </div>
-            <span class="pc-badge">CALL PITCH</span>
+
+            <!-- User Choice (Bottom) -->
+            <div class="user-choice-card" id="pc-breaking">
+              <div class="user-card-header">
+                <span class="uc-icon">🌀</span>
+                <span class="uc-base">Base 5</span>
+              </div>
+              <div class="uc-mod-row">
+                <span class="tunnel-mod-pill">Tun -2</span>
+              </div>
+              <div class="uc-target-callout">
+                <span class="tgt-label">FOOLED TGT</span>
+                <span class="tgt-val">3</span>
+              </div>
+              <span class="uc-action-btn" id="badge-breaking">CALL</span>
+            </div>
           </div>
 
-          <!-- Offspeed -->
-          <div class="pitch-card" id="pc-offspeed" onclick="selectPitch('offspeed')">
-            <div class="pc-top">
-              <span class="pc-icon">⏱️</span>
-              <span class="pc-name">Offspeed</span>
+          <!-- COLUMN 3: OFFSPEED LANE -->
+          <div class="matchup-lane" id="lane-offspeed" onclick="selectPitch('offspeed')">
+            <!-- Opponent Choice Across (Top) -->
+            <div class="opp-choice-card">
+              <span class="choice-role-tag">BATTER READ</span>
+              <div class="opp-card-mini">
+                <span class="opp-card-icon">⏱️</span>
+                <span class="opp-mod-badge">+3 READ</span>
+              </div>
+              <span class="opp-sub-calc">If Read: Tgt 8</span>
             </div>
-            <div class="pc-body">
-              <div class="pc-target">Base Tgt 5</div>
-              <div class="pc-tunnel">Tunnel -1 (Tgt 4)</div>
+
+            <!-- Center Lane Divider -->
+            <div class="lane-divider">
+              <span class="lane-name">OFFSPEED</span>
             </div>
-            <span class="pc-badge">CALL PITCH</span>
+
+            <!-- User Choice (Bottom) -->
+            <div class="user-choice-card" id="pc-offspeed">
+              <div class="user-card-header">
+                <span class="uc-icon">⏱️</span>
+                <span class="uc-base">Base 5</span>
+              </div>
+              <div class="uc-mod-row">
+                <span class="tunnel-mod-pill">Tun -1</span>
+              </div>
+              <div class="uc-target-callout">
+                <span class="tgt-label">FOOLED TGT</span>
+                <span class="tgt-val">4</span>
+              </div>
+              <span class="uc-action-btn" id="badge-offspeed">CALL</span>
+            </div>
           </div>
+
         </div>
 
+        <div class="arena-hint-text">
+          Opponent sits on a pitch. Choose your delivery to establish execution target.
+        </div>
       </div>
 
-      <!-- ── BEAT 2 CONTENT: TARGET SHOWCASE + VERTICAL HEAD-TO-HEAD CLASH ── -->
-      <div id="view-beat2" style="display: none; flex-direction: column; justify-content: space-between; flex: 1; width: 100%; min-height: 0;">
+      <!-- ── BEAT 2: CENTER RESULTS & FINAL TARGET SHOWCASE + EXECUTION CLASH ── -->
+      <div id="view-beat2" class="b2-play-container" style="display: none;">
         
-        <!-- Pitch & Target Showcase Plaque -->
-        <div class="b2-showcase-card">
-          <div class="b2-pitch-left">
-            <span class="b2-pitch-icon" id="b2-pitch-icon">🔥</span>
-            <div>
-              <div class="b2-pitch-title" id="b2-pitch-title">FASTBALL DELIVERY</div>
-              <div class="b2-pitch-sub">Big Jake Harmon • Tunneling Applied</div>
+        <!-- CENTER OF PLAY AREA: CHOSEN PITCH + FOOLED RESULT + FINAL TARGET NUMBER -->
+        <div class="b2-center-showcase">
+          
+          <!-- Pitch Chosen Plaque -->
+          <div class="b2-chosen-pitch-badge" id="b2-chosen-pitch-badge">
+            <span class="b2-badge-icon" id="b2-pitch-icon">🔥</span>
+            <span class="b2-badge-title" id="b2-pitch-title">FASTBALL DELIVERY</span>
+          </div>
+
+          <!-- Result: Fooled or Not Banner -->
+          <div class="b2-fooled-banner fooled-yes" id="b2-fooled-banner">
+            <div class="fooled-status-tag" id="fooled-status-tag">
+              <span id="fooled-icon">🎯</span>
+              <span id="fooled-text">BATTER FOOLED!</span>
+            </div>
+            <span class="fooled-subtext" id="fooled-subtext">Batter anticipated Breaking • Tunneling -3 applied</span>
+          </div>
+
+          <!-- Final Target Number Showcase -->
+          <div class="b2-final-target-card">
+            <div class="ft-left">
+              <span class="ft-label">FINAL TARGET NUMBER</span>
+              <span class="ft-formula" id="ft-formula">Base Target 5 - Tunneling 3</span>
+            </div>
+            <div class="ft-target-circle" id="ft-target-val">
+              2
             </div>
           </div>
-          <div class="b2-target-pill">
-            <span class="b2-target-label">TARGET</span>
-            <span class="b2-target-num" id="b2-target-num">4</span>
-          </div>
+
         </div>
 
         <!-- Vertical Head-to-Head Clash Stack (Opponent on TOP, User on BOTTOM) -->
@@ -1116,7 +1304,7 @@
           <div class="clash-slot-wrapper">
             <span class="slot-title">Batter Swing (Opponent)</span>
             <div class="card-back">
-              <span class="card-back-stamp">FACE DOWN</span>
+              <span class="card-back-stamp" id="b2-opp-card-stamp">SWINGING</span>
             </div>
           </div>
 
@@ -1137,8 +1325,8 @@
 
         <!-- Clash Threshold Math Strip -->
         <div class="clash-math-strip">
-          <span id="clash-math-desc">Select 1 card from hand to execute pitch.</span>
-          <span class="math-highlight" id="clash-math-val">CARD [?] vs TGT [4]</span>
+          <span id="clash-math-desc">Select 1 card from hand to throw.</span>
+          <span class="math-highlight" id="clash-math-val">CARD [?] vs TGT [2]</span>
         </div>
       </div>
 
@@ -1174,7 +1362,7 @@
 
       <!-- Player Hand: 5 Pure Number Cards -->
       <div>
-        <div style="font-size: 0.62rem; font-weight: 800; color: #94a3b8; margin-bottom: 3px; display: flex; justify-content: space-between; padding: 0 2px;">
+        <div style="font-size: 0.6rem; font-weight: 800; color: #94a3b8; margin-bottom: 3px; display: flex; justify-content: space-between; padding: 0 2px;">
           <span id="hand-heading">CARDS RESERVED FOR BEAT 2</span>
           <span style="color: #64748b;">VALUES 1–6</span>
         </div>
@@ -1239,15 +1427,15 @@
           <div class="sb-grid">
             <div class="sb-cell">
               <span class="sb-cell-label">Fastball</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -3</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -3 (2)</span>
             </div>
             <div class="sb-cell">
               <span class="sb-cell-label">Breaking</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -2</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -2 (3)</span>
             </div>
             <div class="sb-cell">
               <span class="sb-cell-label">Offspeed</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -1</span>
+              <span class="sb-cell-val">Tgt 5 • Tun -1 (4)</span>
             </div>
           </div>
         </div>
@@ -1261,15 +1449,15 @@
           <div class="sb-grid">
             <div class="sb-cell">
               <span class="sb-cell-label">Read Fastball</span>
-              <span class="sb-cell-val">Read +2 (Tgt 7)</span>
+              <span class="sb-cell-val">+2 Read (Tgt 7)</span>
             </div>
             <div class="sb-cell">
               <span class="sb-cell-label">Read Breaking</span>
-              <span class="sb-cell-val">Read +1 (Tgt 6)</span>
+              <span class="sb-cell-val">+1 Read (Tgt 6)</span>
             </div>
             <div class="sb-cell">
               <span class="sb-cell-label">Read Offspeed</span>
-              <span class="sb-cell-val">Read +3 (Tgt 8)</span>
+              <span class="sb-cell-val">+3 Read (Tgt 8)</span>
             </div>
           </div>
         </div>
@@ -1284,7 +1472,7 @@
 
   <!-- JavaScript State & Tactile Audio Engine -->
   <script>
-    // Web Audio Synthesizer for tactile card click feedback
+    // Web Audio Synthesizer for tactile feedback
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTactileSound(type) {
       if (!audioCtx) return;
@@ -1318,56 +1506,28 @@
         gain.gain.linearRampToValueAtTime(0, now + 0.18);
         osc.start(now);
         osc.stop(now + 0.18);
+      } else if (type === 'fanfare') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880, now + 0.08); // A5
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
       }
     }
+
+    const pitchData = {
+      fastball: { name: 'Fastball', icon: '🔥', base: 5, tunnel: 3, fooledTgt: 2, readMod: 2, readTgt: 7 },
+      breaking: { name: 'Breaking', icon: '🌀', base: 5, tunnel: 2, fooledTgt: 3, readMod: 1, readTgt: 6 },
+      offspeed: { name: 'Offspeed', icon: '⏱️', base: 5, tunnel: 1, fooledTgt: 4, readMod: 3, readTgt: 8 }
+    };
 
     let activeBeat = 'beat1';
     let selectedPitch = null;
     let selectedHandCard = null;
-    let effectiveTarget = 4;
-
-    function switchBeat(beat) {
-      activeBeat = beat;
-      playTactileSound('click');
-
-      const tab1 = document.getElementById('tab-b1');
-      const tab2 = document.getElementById('tab-b2');
-      const view1 = document.getElementById('view-beat1');
-      const view2 = document.getElementById('view-beat2');
-      const bannerText = document.getElementById('arena-banner-text');
-      const handHeading = document.getElementById('hand-heading');
-      const handCards = document.querySelectorAll('.number-card');
-
-      if (beat === 'beat1') {
-        tab1.classList.add('active');
-        tab2.classList.remove('active');
-        view1.style.display = 'flex';
-        view2.style.display = 'none';
-        bannerText.innerHTML = '<span>⚡</span> <span>BEAT 1: <b>THE READ</b> — Call Pitch Delivery</span>';
-        handHeading.textContent = 'CARDS RESERVED FOR BEAT 2';
-
-        handCards.forEach(c => {
-          c.classList.add('view-only');
-          c.classList.remove('active', 'selected');
-        });
-
-        updateBeat1ActionState();
-      } else {
-        tab2.classList.add('active');
-        tab1.classList.remove('active');
-        view2.style.display = 'flex';
-        view1.style.display = 'none';
-        bannerText.innerHTML = '<span>⚡</span> <span>BEAT 2: <b>THE CLASH</b> — Execute Pitch Delivery</span>';
-        handHeading.textContent = 'TAP 1 CARD TO THROW PITCH';
-
-        handCards.forEach(c => {
-          c.classList.remove('view-only');
-          c.classList.add('active');
-        });
-
-        updateBeat2ActionState();
-      }
-    }
+    let isBatterFooled = true;
+    let effectiveTarget = 2;
 
     function selectPitch(pitchKey) {
       if (activeBeat !== 'beat1') return;
@@ -1375,14 +1535,14 @@
       selectedPitch = pitchKey;
 
       ['fastball', 'breaking', 'offspeed'].forEach(p => {
-        const el = document.getElementById(`pc-${p}`);
-        const badge = el.querySelector('.pc-badge');
+        const lane = document.getElementById(`lane-${p}`);
+        const badge = document.getElementById(`badge-${p}`);
         if (p === pitchKey) {
-          el.classList.add('active');
-          badge.textContent = '✓ SELECTED';
+          lane.classList.add('active');
+          badge.textContent = '✓ CALLED';
         } else {
-          el.classList.remove('active');
-          badge.textContent = 'CALL PITCH';
+          lane.classList.remove('active');
+          badge.textContent = 'CALL';
         }
       });
 
@@ -1399,10 +1559,113 @@
         label.textContent = 'CHOOSE PITCH';
         pill.textContent = 'SELECT FASTBALL, BREAKING, OR OFFSPEED';
       } else {
+        const p = pitchData[selectedPitch];
         btn.disabled = false;
-        label.textContent = `LOCK IN ${selectedPitch.toUpperCase()} DELIVERY`;
-        pill.textContent = `${selectedPitch.toUpperCase()} • TUNNEL TARGET READY`;
+        label.textContent = `LOCK IN ${p.name.toUpperCase()} DELIVERY`;
+        pill.textContent = `${p.name.toUpperCase()} • FOOLED TARGET: ${p.fooledTgt} / READ TARGET: ${p.readTgt}`;
       }
+    }
+
+    function commitAction() {
+      playTactileSound('lock');
+      const area = document.getElementById('action-btn-area');
+      area.innerHTML = `
+        <div class="locked-badge-active">
+          <span>✅</span>
+          <span>LOCKED IN ✓ WAITING…</span>
+        </div>
+      `;
+
+      const oppPill = document.getElementById('opp-status-pill');
+      oppPill.className = 'opp-status-pill ready';
+      oppPill.textContent = 'READY ✓';
+
+      if (activeBeat === 'beat1') {
+        // Opponent anticipation simulation:
+        // 70% of the time, the batter anticipates a different pitch -> BATTER FOOLED!
+        // 30% of the time, the batter sits on this pitch -> BATTER READ PITCH!
+        const rand = Math.random();
+        isBatterFooled = rand < 0.7;
+
+        setTimeout(() => {
+          transitionToBeat2();
+        }, 650);
+      } else if (activeBeat === 'beat2') {
+        playTactileSound('fanfare');
+        const pill = document.getElementById('status-pill');
+        const isStrike = selectedHandCard >= effectiveTarget;
+        if (isStrike) {
+          pill.textContent = `STRIKE THREE! OUT PRODUCED 💥`;
+        } else {
+          pill.textContent = `BALL IN DIRT! COUNT ADVANCES 🔴`;
+        }
+      }
+    }
+
+    function transitionToBeat2() {
+      activeBeat = 'beat2';
+      playTactileSound('fanfare');
+
+      document.getElementById('view-beat1').style.display = 'none';
+      document.getElementById('view-beat2').style.display = 'flex';
+
+      const p = pitchData[selectedPitch];
+
+      // Update Center Pitch Plaque
+      document.getElementById('b2-pitch-icon').textContent = p.icon;
+      document.getElementById('b2-pitch-title').textContent = `${p.name.toUpperCase()} DELIVERY`;
+
+      // Update Fooled or Not Result & Final Target
+      const banner = document.getElementById('b2-fooled-banner');
+      const icon = document.getElementById('fooled-icon');
+      const text = document.getElementById('fooled-text');
+      const sub = document.getElementById('fooled-subtext');
+      const formula = document.getElementById('ft-formula');
+      const targetCircle = document.getElementById('ft-target-val');
+
+      if (isBatterFooled) {
+        effectiveTarget = p.fooledTgt;
+        banner.className = 'b2-fooled-banner fooled-yes';
+        icon.textContent = '🎯';
+        text.textContent = 'BATTER FOOLED!';
+        
+        // Find other pitch the batter sat on
+        const otherPitches = ['fastball', 'breaking', 'offspeed'].filter(x => x !== selectedPitch);
+        const guessedPitch = pitchData[otherPitches[Math.floor(Math.random() * otherPitches.length)]].name;
+        sub.textContent = `Batter sat on ${guessedPitch} • Tunneling -${p.tunnel} active`;
+        formula.textContent = `Base ${p.base} - Tunnel ${p.tunnel} = Target ${effectiveTarget}`;
+        targetCircle.style.background = 'var(--gold)';
+        targetCircle.textContent = effectiveTarget;
+      } else {
+        effectiveTarget = p.readTgt;
+        banner.className = 'b2-fooled-banner fooled-no';
+        icon.textContent = '⚠️';
+        text.textContent = 'BATTER READ THE PITCH!';
+        sub.textContent = `Batter anticipated ${p.name} • Batter Advantage +${p.readMod} active`;
+        formula.textContent = `Base ${p.base} + Read ${p.readMod} = Target ${effectiveTarget}`;
+        targetCircle.style.background = '#ef4444';
+        targetCircle.style.color = '#ffffff';
+        targetCircle.textContent = effectiveTarget;
+      }
+
+      // Unlock hand cards
+      const handHeading = document.getElementById('hand-heading');
+      handHeading.textContent = 'TAP 1 CARD TO THROW PITCH';
+      document.querySelectorAll('.number-card').forEach(c => {
+        c.classList.remove('view-only');
+        c.classList.add('active');
+      });
+
+      // Update Action Area
+      const area = document.getElementById('action-btn-area');
+      area.innerHTML = `
+        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
+          <span>🔒</span>
+          <span id="action-btn-label">CHOOSE EXECUTION CARD</span>
+        </button>
+      `;
+
+      updateBeat2ActionState();
     }
 
     function tapHandCard(val, elId) {
@@ -1423,7 +1686,7 @@
       slot.classList.add('filled');
       slot.innerHTML = `
         <div class="placed-card-view">
-          <span style="font-size:0.6rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
+          <span style="font-size:0.56rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
           <span class="pcv-num">${val}</span>
           <span class="pcv-remove">✕ Remove</span>
         </div>
@@ -1454,7 +1717,7 @@
       if (selectedHandCard === null) {
         btn.disabled = true;
         label.textContent = 'CHOOSE EXECUTION CARD';
-        pill.textContent = 'PICK 1 CARD FROM HAND TO THROW';
+        pill.textContent = `TARGET: ${effectiveTarget} • PICK 1 CARD TO THROW`;
         mathDesc.textContent = 'Select 1 card from hand to execute pitch.';
         mathVal.textContent = `CARD [?] vs TGT [${effectiveTarget}]`;
       } else {
@@ -1464,7 +1727,7 @@
         const isStrike = selectedHandCard >= effectiveTarget;
         if (isStrike) {
           pill.textContent = `CARD [${selectedHandCard}] ≥ TARGET [${effectiveTarget}] • STRIKE IN ZONE 🟢`;
-          mathDesc.textContent = 'Execution succeeds: Strike thrown in the zone!';
+          mathDesc.textContent = 'Execution succeeds: Strike in the zone!';
           mathVal.textContent = `[${selectedHandCard}] ≥ [${effectiveTarget}] STRIKE`;
         } else {
           pill.textContent = `CARD [${selectedHandCard}] < TARGET [${effectiveTarget}] • BALL IN DIRT 🔴`;
@@ -1474,31 +1737,47 @@
       }
     }
 
-    function commitAction() {
-      playTactileSound('lock');
-      const area = document.getElementById('action-btn-area');
-      area.innerHTML = `
-        <div class="locked-badge-active">
-          <span>✅</span>
-          <span>LOCKED IN ✓ WAITING…</span>
-        </div>
-      `;
+    function resetPrototype() {
+      playTactileSound('click');
+      activeBeat = 'beat1';
+      selectedPitch = null;
+      selectedHandCard = null;
+
+      document.getElementById('view-beat1').style.display = 'flex';
+      document.getElementById('view-beat2').style.display = 'none';
+
+      ['fastball', 'breaking', 'offspeed'].forEach(p => {
+        document.getElementById(`lane-${p}`).classList.remove('active');
+        document.getElementById(`badge-${p}`).textContent = 'CALL';
+      });
 
       const oppPill = document.getElementById('opp-status-pill');
-      oppPill.className = 'opp-status-pill ready';
-      oppPill.textContent = 'READY ✓';
+      oppPill.className = 'opp-status-pill';
+      oppPill.textContent = 'CHOOSING…';
 
-      if (activeBeat === 'beat1') {
-        setTimeout(() => {
-          switchBeat('beat2');
-          area.innerHTML = `
-            <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
-              <span>🔒</span>
-              <span id="action-btn-label">CHOOSE EXECUTION CARD</span>
-            </button>
-          `;
-        }, 800);
+      const handHeading = document.getElementById('hand-heading');
+      handHeading.textContent = 'CARDS RESERVED FOR BEAT 2';
+
+      document.querySelectorAll('.number-card').forEach(c => {
+        c.classList.add('view-only');
+        c.classList.remove('active', 'selected');
+      });
+
+      const slot = document.getElementById('drop-slot');
+      if (slot) {
+        slot.classList.remove('filled');
+        slot.innerHTML = `<div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>`;
       }
+
+      const area = document.getElementById('action-btn-area');
+      area.innerHTML = `
+        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
+          <span>🔒</span>
+          <span id="action-btn-label">CHOOSE PITCH</span>
+        </button>
+      `;
+
+      updateBeat1ActionState();
     }
 
     function toggleModal(open) {
