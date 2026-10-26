@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Lightning Pitcher",
+    "position": "Pitcher",
+    "power": "Thunderbolt Throw – Add 2 to any pitch roll.",
+    "maxUses": 3,
+    "description": "When you use this power, roll a d6. On 4-6 the pitch gets a +2 bonus. On 1-3 the pitcher strains and loses a momentum die."
+  },
+  {
+    "name": "Mystic Catcher",
+    "position": "Catcher",
+    "power": "Ghostly Glove – Negate one out at a time.",
+    "maxUses": 2,
+    "description": "Roll a d6. 5-6 negates the out, 1-4 the catcher is injured and loses a momentum die."
+  },
+  {
+    "name": "Dragon Slugger",
+    "position": "First Base",
+    "power": "Fire Blast – Turn any hit into a home run.",
+    "maxUses": 1,
+    "description": "Roll a d6. 6 = home run, otherwise the batter is knocked out and loses a momentum die."
+  },
+  {
+    "name": "Arcane Shortstop",
+    "position": "Shortstop",
+    "power": "Time Warp – Re‑roll a failed steal.",
+    "maxUses": 2,
+    "description": "Roll a d6. 4-6 allows a re‑roll, 1-3 the shortstop trips and loses a momentum die."
+  },
+  {
+    "name": "Shadow Outfielder",
+    "position": "Outfielder",
+    "power": "Phantom Leap – Catch any ball in the air.",
+    "maxUses": 3,
+    "description": "Roll a d6. 5-6 makes the catch, 1-4 the outfielder is bruised and loses a momentum die."
+  }
+]

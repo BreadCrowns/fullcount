@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Count – Mobile Prototype (V2)</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {font-family: Arial, sans-serif; margin:0; padding:0; background:#fafafa;}
+    header {background:#004080; color:#fff; padding:1rem; text-align:center;}
+    .card-list {display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; padding:1rem;}
+    .card {background:#fff; border:1px solid #ccc; border-radius:8px; width:150px; padding:0.5rem; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+    .card h3 {margin:0; font-size:1rem;}
+    .card p {margin:0.3rem 0; font-size:0.9rem;}
+    .btn {background:#004080; color:#fff; border:none; border-radius:4px; padding:0.3rem 0.6rem; cursor:pointer; margin-top:0.5rem;}
+    .log {max-height:150px; overflow-y:auto; background:#eee; padding:0.5rem; margin:1rem; border-radius:4px; font-size:0.85rem;}
+    @media (max-width:600px) { .card {width:45%;} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Full Count – Mobile Prototype (V2)</h1>
+  </header>
+  <section class="card-list" id="cardContainer"></section>
+  <section class="log" id="log"></section>
+  <script src="app.js"></script>
+</body>
+</html>
