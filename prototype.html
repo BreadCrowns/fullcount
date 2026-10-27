@@ -1188,13 +1188,29 @@
             <div class="oh-degrade" id="duel-outcome-degrade" style="display:none;"></div>
           </div>
 
+          <!-- Interactive 3rd-Base Coach Decision: Send Runner from 2nd on a Single -->
+          <div id="send-runner-box" style="display:none; background:rgba(245,158,11,0.16); border:1.5px solid #f59e0b; border-radius:8px; padding:7px 9px; text-align:center;">
+            <div id="send-runner-prompt" style="font-size:0.7rem; font-weight:900; color:#fef08a; margin-bottom:5px;">
+              👋 3RD BASE COACH: Send runner from 2nd home?
+            </div>
+            <div id="send-runner-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <button class="bp-btn" style="background:#334155; padding:6px;" onclick="holdRunnerAt3rd()">
+                🛑 HOLD AT 3RD (Safe)
+              </button>
+              <button class="bp-btn" id="btn-send-home" style="background:#d97706; color:#0f172a; font-weight:900; padding:6px;" onclick="sendRunnerHome()">
+                🏃 SEND HOME! (SPD 4+)
+              </button>
+            </div>
+            <div id="send-runner-result" style="display:none; font-size:0.72rem; font-weight:900; margin-top:4px;"></div>
+          </div>
+
           <table class="mini-outcome-table" id="duel-mini-table">
             <tbody>
               <tr data-band="k"><td>+6 or more</td><td>STRIKEOUT (K)</td><td>Batter out; runners hold</td></tr>
               <tr data-band="out"><td>+1 to +5</td><td>ROUTINE OUT</td><td>Fly/Pop out; runners hold</td></tr>
               <tr data-band="sac"><td>0 to -2</td><td>FIELDED / SAC</td><td>Out; Runner on 3rd scores!</td></tr>
               <tr data-band="bb"><td>-3</td><td>WALK (BB)</td><td>1st base; forces runners</td></tr>
-              <tr data-band="1b"><td>-4 to -6</td><td>CLEAN SINGLE</td><td>Runners +1 (2nd scores 4-6)</td></tr>
+              <tr data-band="1b"><td>-4 to -6</td><td>CLEAN SINGLE</td><td>Runners +1 (Send 2nd: SPD 4+)</td></tr>
               <tr data-band="xbh"><td>-7 or less</td><td>EXTRA-BASE / HR</td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
             </tbody>
           </table>
@@ -1218,7 +1234,8 @@
         <div style="font-size:0.72rem; color:#cbd5e1; line-height:1.4;">
           <strong>FORMULA:</strong> <code>Margin = Pitcher Score − Batter Score</code><br>
           <strong>🎯 MATCH (Same Color):</strong> Batter reads the pitch &amp; claims ⚡ Momentum!<br>
-          <strong>🌀 MISMATCH (Different Color):</strong> Pitcher fools the batter &amp; claims ⚡ Momentum!
+          <strong>🌀 MISMATCH (Different Color):</strong> Pitcher fools the batter &amp; claims ⚡ Momentum!<br>
+          <strong>🏃 SEND RUNNER ON SINGLE:</strong> Manager may Hold runner on 2nd at 3rd (safe) OR Send Home (roll runner's <code>SPD</code> die: <strong>4+ Safe</strong> / <strong>1-3 Out at Home</strong>)!
         </div>
 
         <table class="outcome-ref-table" id="outcome-ref-table">
@@ -1253,7 +1270,7 @@
             <tr class="hit-row" data-band="1b">
               <td><strong>-4 to -6</strong></td>
               <td><strong>CLEAN SINGLE</strong></td>
-              <td>Runners +1 (2nd scores 4-6)</td>
+              <td>Runners +1 (Send 2nd: SPD 4+)</td>
             </tr>
             <tr class="hit-row" data-band="xbh">
               <td><strong>-7 or less</strong></td>
@@ -1634,6 +1651,23 @@
         degEl.style.display = 'none';
       }
 
+      // Interactive Send Runner from 2nd on a Single box
+      const sendBox = document.getElementById('send-runner-box');
+      const sendActions = document.getElementById('send-runner-actions');
+      const sendResult = document.getElementById('send-runner-result');
+      if (outcomeInfo.pendingSendRunner) {
+        const r2 = outcomeInfo.pendingSendRunner;
+        sendBox.style.display = 'block';
+        sendActions.style.display = 'grid';
+        sendResult.style.display = 'none';
+        document.getElementById('send-runner-prompt').innerHTML =
+          `👋 <strong>3RD-BASE COACH:</strong> <strong>${r2.name}</strong> (SPD: <code>${r2.spd}</code>) is rounding 3rd! Send home?`;
+        document.getElementById('btn-send-home').textContent =
+          `🏃 SEND HOME! (Roll ${r2.spd}: 4+ Safe / 1-3 Out)`;
+      } else {
+        sendBox.style.display = 'none';
+      }
+
       document.getElementById('duel-score-status').textContent =
         `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
 
@@ -1651,6 +1685,56 @@
       openDuelOverlay();
     }
 
+    function holdRunnerAt3rd() {
+      const r2 = state.pendingSendRunner;
+      if (!r2) return;
+      state.pendingSendRunner = null;
+      document.getElementById('send-runner-actions').style.display = 'none';
+      const resEl = document.getElementById('send-runner-result');
+      resEl.style.display = 'block';
+      resEl.style.color = '#93c5fd';
+      resEl.textContent = `🛑 Held ${r2.name} safely at 3rd base.`;
+      renderAll();
+    }
+
+    function sendRunnerHome() {
+      const r2 = state.pendingSendRunner;
+      if (!r2) return;
+      state.pendingSendRunner = null;
+      const spdRoll = rollDie(r2.spd);
+      const offKey = r2.offKey;
+      document.getElementById('send-runner-actions').style.display = 'none';
+      const resEl = document.getElementById('send-runner-result');
+      resEl.style.display = 'block';
+
+      // Clear runner from 3rd base (either scores or is out at home!)
+      state.bases[2] = null;
+
+      if (spdRoll >= 4) {
+        state.score[offKey] += 1;
+        resEl.style.color = '#86efac';
+        resEl.innerHTML = `🎉 <strong>SAFE AT THE PLATE!</strong> ${r2.name} rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (4+ Safe) ➔ <strong>+1 RUN!</strong>`;
+      } else {
+        state.outs += 1;
+        resEl.style.color = '#fca5a5';
+        resEl.innerHTML = `🚨 <strong>THROWN OUT AT HOME!</strong> ${r2.name} rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (1-3 Out) ➔ <strong>+1 OUT!</strong>`;
+        if (state.outs >= 3) {
+          state.outs = 0;
+          state.bases = [null, null, null];
+          const defKey = getDefenseTeamKey();
+          const defTeam = state.teams[defKey];
+          const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
+          if (!activeP.isStarter) activeP.mom = stepDownDie(activeP.mom);
+          if (state.half === 'top') state.half = 'bot';
+          else { state.half = 'top'; state.inning += 1; }
+        }
+      }
+
+      document.getElementById('duel-score-status').textContent =
+        `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
+      renderAll();
+    }
+
     function openDuelOverlay() {
       document.getElementById('duel-overlay').classList.add('open');
     }
@@ -1665,10 +1749,14 @@
       const usedExtraBase = state.abilityArmed.batter && b.abilityType === 'extra_base';
       const usedMoonshot = state.abilityArmed.batter && b.abilityType === 'moonshot';
 
+      state.pendingSendRunner = null;
+      const runnerObj = { name: b.name, spd: b.spd, offKey: getOffenseTeamKey() };
+
       let runs = 0;
       let outs = 0;
       let title = '';
       let detail = '';
+      let pendingSendRunner = null;
 
       if (margin >= 6) {
         state.lastBand = 'k';
@@ -1714,25 +1802,32 @@
           }
           if (state.bases[0] && state.bases[1]) state.bases[2] = state.bases[1];
           if (state.bases[0]) state.bases[1] = state.bases[0];
-          state.bases[0] = b.name;
+          state.bases[0] = runnerObj;
         }
       } else if (margin >= -6 && !usedUpgrade1B) {
         state.lastBand = '1b';
         title = '💥 CLEAN SINGLE';
         if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-        let r2Scores = false;
-        if (state.bases[1]) {
-          const d6 = rollDie('d6');
-          r2Scores = (d6 >= 4) || usedExtraBase;
-          if (r2Scores) { runs += 1; state.bases[1] = null; }
-          else { state.bases[2] = state.bases[1]; state.bases[1] = null; }
+        const r2 = state.bases[1];
+        if (r2) {
+          if (usedExtraBase) {
+            runs += 1;
+            state.bases[1] = null;
+          } else {
+            state.bases[2] = r2;
+            state.bases[1] = null;
+            pendingSendRunner = r2;
+            state.pendingSendRunner = r2;
+          }
         }
         if (state.bases[0]) {
           if (usedExtraBase && !state.bases[2]) state.bases[2] = state.bases[0];
           else state.bases[1] = state.bases[0];
         }
-        state.bases[0] = b.name;
-        detail = `${b.name} singles to 1st! Runners advance +1${r2Scores ? ' (Runner from 2nd scored!)' : ''}.`;
+        state.bases[0] = runnerObj;
+        detail = pendingSendRunner
+          ? `${b.name} singles! ${pendingSendRunner.name} (${pendingSendRunner.spd}) reaches 3rd — decide whether to send home!`
+          : `${b.name} singles to 1st! Runners advance +1 base.`;
       } else {
         state.lastBand = 'xbh';
         const d6 = rollDie('d6');
@@ -1740,7 +1835,7 @@
         if (d6 === 5 && !isHR) {
           title = '🚀 TRIPLE (3B)!';
           runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
-          state.bases = [null, null, b.name];
+          state.bases = [null, null, runnerObj];
           detail = `Extra-Base d6 rolled ${d6}: Bases cleared! ${b.name} to 3rd base.`;
         } else if (isHR) {
           title = '💣 HOME RUN!';
@@ -1752,12 +1847,12 @@
           if (state.bases[2]) { runs += 1; state.bases[2] = null; }
           if (state.bases[1]) { runs += 1; state.bases[1] = null; }
           if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
-          state.bases[1] = b.name;
+          state.bases[1] = runnerObj;
           detail = `Extra-Base d6 rolled ${d6}: ${b.name} doubles to 2nd!`;
         }
       }
 
-      return { outsAdded: outs, runsAdded: runs, title, detail };
+      return { outsAdded: outs, runsAdded: runs, title, detail, pendingSendRunner };
     }
 
     function advanceLineupAndInning(outsAdded, runsAdded) {
