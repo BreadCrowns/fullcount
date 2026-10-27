@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Full Count — Portrait Half-Cards &amp; 11×8.5 Landscape Single-Row Playmat</title>
+<title>Full Count — Portrait Half-Cards &amp; 11×17 Landscape Playmat (Split Across Two 8.5×11 Pages)</title>
 <style>
   @page {
-    size: 11.0in 8.5in;
+    size: 8.5in 11.0in;
     margin: 0;
   }
 
@@ -60,13 +60,13 @@
   }
   .print-btn:hover { background: #1d4ed8; }
 
-  /* 11.0in x 8.5in Landscape Letter Page */
+  /* Standard 8.5in x 11in Portrait Page for Every Sheet */
   .page {
-    width: 11.0in;
-    height: 8.5in;
+    width: 8.5in;
+    height: 11.0in;
     margin: 18px auto;
     background: white;
-    padding: 0.22in 0.23in;
+    padding: 0.25in 0.34in;
     box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     page-break-after: always;
     break-after: page;
@@ -74,19 +74,48 @@
     position: relative;
   }
 
+  /* Side-by-side preview wrapper on wide screens so you can see the 17"x11" Playmat joined together! */
+  .playmat-pair-preview {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 18px auto;
+  }
+  .playmat-pair-preview .page {
+    margin: 0;
+  }
+
   @media print {
     body { background: white; margin: 0; padding: 0; }
-    .screen-header { display: none !important; }
+    .screen-header, .screen-join-banner { display: none !important; }
+    .playmat-pair-preview {
+      display: block !important;
+      margin: 0 !important;
+    }
     .page {
       margin: 0 !important;
-      padding: 0.22in 0.23in !important;
-      width: 11.0in !important;
-      height: 8.5in !important;
+      padding: 0.25in 0.34in !important;
+      width: 8.5in !important;
+      height: 11.0in !important;
       box-shadow: none !important;
       page-break-after: always;
       break-after: page;
       overflow: hidden;
     }
+  }
+
+  .screen-join-banner {
+    max-width: 17.0in;
+    margin: 22px auto 6px auto;
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
   }
 
   /* Page Banner for Cutout Sheets */
@@ -98,42 +127,41 @@
     color: white;
     padding: 3px 10px;
     border-radius: 5px;
-    margin-bottom: 0.08in;
+    margin-bottom: 0.06in;
     height: 0.26in;
   }
   .sheet-banner.titans-banner { background: #991b1b; }
   .sheet-banner.serpents-banner { background: #065f46; }
   .sheet-banner-title {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
+    font-size: 10.5px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
   .sheet-banner-sub {
-    font-size: 7.5px;
+    font-size: 7px;
     font-weight: 700;
     color: #e2e8f0;
   }
 
   /* ====================================================================== */
-  /* PORTRAIT CARDS SIZED SO ALL 9 FIT IN 1 ROW ON 11" LANDSCAPE (1.14"x2.38") */
-  /* Cutout Grid on 11"x8.5" Sheet: 7 columns x 3 rows (up to 21 cards)     */
+  /* PORTRAIT HALF-SIZE PLAYING CARDS (1.50" wide x 2.38" tall)             */
+  /* 5 columns x 4 rows = 20 Portrait Half-Cards per 8.5" x 11" sheet       */
   /* ====================================================================== */
   .portrait-card-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1.14in);
-    grid-template-rows: repeat(3, 2.38in);
-    gap: 0.08in 0.12in;
-    justify-content: center;
-    width: 10.54in;
+    grid-template-columns: repeat(5, 1.50in);
+    grid-template-rows: repeat(4, 2.38in);
+    gap: 0.06in 0.075in;
+    width: 7.80in;
   }
 
   .card {
-    width: 1.14in;
+    width: 1.50in;
     height: 2.38in;
     border: 1.5px solid #0f172a;
     border-radius: 6px;
-    padding: 3px 3px;
+    padding: 3.5px 4px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -171,31 +199,31 @@
     margin-bottom: 1px;
   }
   .card-role {
-    font-size: 5.5px;
+    font-size: 6px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.3px;
     color: #64748b;
   }
   .card-badge {
     background: #0f172a;
     color: white;
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 6.5px;
-    padding: 1px 2.5px;
-    border-radius: 2.5px;
-    letter-spacing: 0.1px;
+    font-size: 7.2px;
+    padding: 1px 3.5px;
+    border-radius: 3px;
+    letter-spacing: 0.2px;
     white-space: nowrap;
   }
   .card-badge.spd-badge { background: #0369a1; }
   .card-badge.mom-badge { background: #d97706; color: #0f172a; }
   .card-name {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 8.8px;
+    font-size: 11px;
     line-height: 1.02;
     color: #0f172a;
     text-transform: uppercase;
-    letter-spacing: 0.1px;
+    letter-spacing: 0.2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -208,9 +236,9 @@
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 1.5px 0.5px;
+    padding: 1.5px 1px;
     text-align: center;
-    font-size: 4.8px;
+    font-size: 5.5px;
     font-weight: 800;
     color: #64748b;
     line-height: 1.05;
@@ -223,7 +251,7 @@
   .core-stats span strong {
     color: #0f172a;
     font-family: "Courier New", monospace;
-    font-size: 6px;
+    font-size: 6.8px;
     font-weight: 900;
   }
 
@@ -231,18 +259,18 @@
   .stances-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 5.8px;
+    font-size: 6.6px;
   }
   .stances-table tr {
     border-bottom: 1px solid #f1f5f9;
   }
   .stances-table td {
-    padding: 1.8px 0.5px;
+    padding: 2px 1px;
     vertical-align: middle;
   }
   .stance-tag {
     font-weight: 900;
-    font-size: 5.8px;
+    font-size: 6.5px;
     display: block;
     line-height: 1;
   }
@@ -252,24 +280,24 @@
   .stance-dice {
     font-family: "Courier New", Courier, monospace;
     font-weight: 800;
-    font-size: 5.2px;
+    font-size: 6px;
     color: #334155;
     display: block;
     line-height: 1.05;
   }
   .stars {
     color: #d97706;
-    font-size: 4.8px;
+    font-size: 5.8px;
     text-align: right;
     white-space: nowrap;
   }
   .stance-rating {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 9.5px;
+    font-size: 11px;
     text-align: right;
     color: #0f172a;
-    width: 12px;
-    padding-left: 1px;
+    width: 15px;
+    padding-left: 2px;
   }
 
   /* Momentum / Endurance Track Bar */
@@ -277,8 +305,8 @@
     background: #0f172a;
     color: #f8fafc;
     border-radius: 3px;
-    padding: 1.5px 3px;
-    font-size: 5.2px;
+    padding: 1.5px 4px;
+    font-size: 5.8px;
     font-weight: 800;
     display: flex;
     justify-content: space-between;
@@ -295,11 +323,11 @@
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 2px 2.5px;
-    font-size: 5.2px;
-    line-height: 1.15;
+    padding: 2.5px 3.5px;
+    font-size: 5.9px;
+    line-height: 1.18;
     color: #1e293b;
-    min-height: 0.48in;
+    min-height: 0.46in;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -313,68 +341,115 @@
   .mat-outcome-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 5px;
+    font-size: 5.8px;
   }
   .mat-outcome-table td {
-    padding: 1.2px 1.5px;
+    padding: 1.5px 2px;
     border-bottom: 1px solid #e2e8f0;
   }
   .mat-outcome-table tr.p-win { background: #f0fdf4; font-weight: 700; }
   .mat-outcome-table tr.b-win { background: #fef2f2; font-weight: 700; }
 
   /* ====================================================================== */
-  /* LANDSCAPE 11.0" x 8.5" PLAYMAT: ACTIVE PITCHER + ALL 9 BATTERS IN 1 ROW*/
+  /* 17" x 11" LANDSCAPE PLAYMAT SPLIT ACROSS TWO 8.5" x 11" PORTRAIT PAGES */
+  /* Left 8.5"x11" Page  = Active Pitcher + Batters #1, #2, #3, #4, #5      */
+  /* Right 8.5"x11" Page = Batters #6, #7, #8, #9 (Aligned in 1 Single Row!)*/
   /* ====================================================================== */
-  .landscape-playmat {
+  .page.playmat-left-page {
+    padding: 0.35in 0.14in 0.35in 0.42in !important;
+    border-right: 2px dashed #94a3b8;
+  }
+  .page.playmat-right-page {
+    padding: 0.35in 0.42in 0.35in 0.14in !important;
+    border-left: 2px dashed #94a3b8;
+  }
+
+  .half-mat-container {
+    width: 100%;
+    height: 10.30in;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    width: 10.54in;
-    height: 8.0in;
-    padding: 0.15in 0;
+    position: relative;
   }
 
-  .clean-mat-title {
+  .half-mat-header {
+    height: 0.55in;
+    border-bottom: 3px solid #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .half-mat-title {
     font-family: Impact, "Arial Black", sans-serif;
     font-size: 18px;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     color: #0f172a;
     text-transform: uppercase;
-    text-align: center;
-    border-bottom: 2.5px solid #0f172a;
-    width: 100%;
-    padding-bottom: 6px;
   }
 
-  .clean-pitcher-zone {
+  .seam-badge {
+    font-size: 8px;
+    font-weight: 900;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px dashed #64748b;
+    padding: 3px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Upper Zone of the 17"x11" Playmat (Holds Active Pitcher) */
+  .half-mat-upper {
+    height: 4.50in;
+    display: flex;
+    align-items: center;
+  }
+  .half-mat-upper.left-upper {
+    justify-content: flex-end;
+    padding-right: 0.20in;
+  }
+  .half-mat-upper.right-upper {
+    justify-content: flex-start;
+    padding-left: 0.20in;
+  }
+
+  /* Lower Zone of the 17"x11" Playmat: The Single Unbroken 9-Card Row! */
+  .half-mat-lower {
+    height: 4.20in;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    flex: 1;
   }
 
-  .clean-row-9 {
+  .single-row-left-5 {
     display: grid;
-    grid-template-columns: repeat(9, 1.14in);
-    gap: 0.035in;
-    width: 10.54in;
-    justify-content: center;
+    grid-template-columns: repeat(5, 1.50in);
+    gap: 0.08in;
+    justify-content: end;
+  }
+
+  .single-row-right-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1.50in);
+    gap: 0.08in;
+    justify-content: start;
   }
 
   .clean-slot {
-    width: 1.14in;
+    width: 1.50in;
     height: 2.38in;
     border: 2px dashed #334155;
-    border-radius: 6px;
+    border-radius: 7px;
     background: #f8fafc;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 6px 4px;
+    padding: 8px;
   }
 
   .clean-slot.pitcher-slot {
@@ -384,18 +459,29 @@
 
   .clean-slot-number {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 28px;
+    font-size: 32px;
     color: #94a3b8;
     line-height: 1;
   }
 
   .clean-slot-label {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11.5px;
+    font-size: 13px;
     color: #475569;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
     margin-top: 4px;
+  }
+
+  .half-mat-footer {
+    height: 0.30in;
+    border-top: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #64748b;
   }
 </style>
 </head>
@@ -403,21 +489,21 @@
 
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT — PORTRAIT CARDS (1.14" × 2.38") &amp; 11×8.5 LANDSCAPE 1-ROW PLAYMAT</h1>
-    <span style="font-size: 12px; color: #94a3b8;">Landscape Playmat Fits All 9 Batters (#1–#9) Across in a Single Unbroken Row + Active Pitcher Above</span>
+    <h1>FULL COUNT — PORTRAIT HALF-CARDS (1.50" × 2.38") &amp; 11×17 TWO-PAGE PLAYMAT</h1>
+    <span style="font-size: 12px; color: #94a3b8;">Every Sheet Prints on Standard 8.5" × 11" Paper • Place Playmat Left Page &amp; Right Page Side-by-Side to Form a 17" × 11" Landscape Playmat with All 9 Batters in 1 Row!</span>
   </div>
   <div class="header-actions">
-    <button class="print-btn" onclick="window.print()">🖨️ Print All Sheets (11" × 8.5" Landscape)</button>
+    <button class="print-btn" onclick="window.print()">🖨️ Print All 8.5" × 11" Sheets</button>
   </div>
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 1: METRO TITANS COMPLETE 20-CARD SHEET (1.14" x 2.38" PORTRAIT)   -->
+<!-- PAGE 1: METRO TITANS COMPLETE 20-CARD PORTRAIT SHEET (8.5" x 11")      -->
 <!-- ====================================================================== -->
 <div class="page">
   <div class="sheet-banner titans-banner">
-    <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — PORTRAIT ROSTER &amp; STANCE SHEET (1.14" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Sized so All 9 Batters Fit in 1 Row Across the Landscape Playmat!</span>
+    <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
+    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Prints on Standard 8.5" × 11" Paper</span>
   </div>
 
   <div class="portrait-card-grid">
@@ -435,13 +521,13 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d10</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d12</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d10</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d10</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ RABBIT JUMP:</span> +2 Bat; +1 extra base on any Single.</div>
+        <div><span class="ability-title">⚡ RABBIT JUMP:</span> +2 Batter roll; advance +1 extra base on any Clean Single.</div>
       </div>
     </div>
 
@@ -458,13 +544,13 @@
         <span>POW<strong>d10</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d10</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d10 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d8 + d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ PURE BARREL:</span> +2 Bat; Strikeout (+6+) is Routine Out.</div>
+        <div><span class="ability-title">⚡ PURE BARREL:</span> +2 Batter roll; Strikeout (+6+) becomes Routine Out.</div>
       </div>
     </div>
 
@@ -481,11 +567,11 @@
         <span>POW<strong>d8</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d8 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ CLUTCH DRIVE:</span> Add +3 to your Batter total roll.</div>
       </div>
@@ -504,13 +590,13 @@
         <span>POW<strong>d12</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d4</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d12 + d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d4 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d6 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d12+Con d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Bat; Extra-Base (-7) is HR on d6 4–6!</div>
+        <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on d6 roll of 4–6!</div>
       </div>
     </div>
 
@@ -527,11 +613,11 @@
         <span>POW<strong>d8</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ HOT CORNER:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -550,13 +636,13 @@
         <span>POW<strong>d6</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ GRITTY AB:</span> +2 Bat; Margin +1 becomes 0 (Field/Sac).</div>
+        <div><span class="ability-title">⚡ GRITTY AB:</span> +2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).</div>
       </div>
     </div>
 
@@ -573,11 +659,11 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ GAP SPARK:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -596,11 +682,11 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d4 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ CONTACT POKE:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -619,13 +705,13 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d4</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d4 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d4 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ UNDERDOG SPARK:</span> Roll an extra +d6 &amp; add to Batter roll!</div>
+        <div><span class="ability-title">⚡ UNDERDOG SPARK:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
@@ -642,13 +728,13 @@
         <span>VEL<strong>d12</strong></span><span>CMD<strong>d6</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d10</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d12 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d6 + d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d12+Grt d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ SONIC BOOM:</span> Reroll highest pitch die &amp; keep higher (+1).</div>
+        <div><span class="ability-title">⚡ SONIC BOOM:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
       </div>
     </div>
 
@@ -665,13 +751,13 @@
         <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d10 + d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ IRON SINK:</span> +2 Pitch; Sac/Field Outs (0..-2) hold runners.</div>
+        <div><span class="ability-title">⚡ IRON SINK:</span> +2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.</div>
       </div>
     </div>
 
@@ -688,11 +774,11 @@
         <span>VEL<strong>d6</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ INNING EATER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
@@ -711,11 +797,11 @@
         <span>VEL<strong>d10</strong></span><span>CMD<strong>d4</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d4</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d4 + d8</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d8 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d10+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ FLAMETHROWER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
@@ -734,11 +820,11 @@
         <span>VEL<strong>d6</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ SOUTHPAW SWEEP:</span> Add +2 to your Pitcher total roll.</div>
       </div>
@@ -757,94 +843,94 @@
         <span>VEL<strong>d12</strong></span><span>CMD<strong>d4</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d4</strong></span><span>GRT<strong>d12</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d12 + d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">13</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d4 + d12</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d6 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d12+Grt d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">13</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d12</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum &amp; +2 Pitch roll!</div>
+        <div><span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum Token &amp; +2 Pitcher roll!</div>
       </div>
     </div>
 
     <!-- 16. RED STANCE CARD -->
     <div class="card stance-red">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
         <div class="card-name" style="color:#dc2626;">🔴 HEAT / POWER</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🔥💥</div>
-      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>VEL + GRT</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>POW + CON</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🔥💥</div>
+      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (HEAT):</strong><br>Roll <strong>VEL + GRT</strong><br>
+        <strong>BATTING (POWER):</strong><br>Roll <strong>POW + CON</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🔴):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 17. BLUE STANCE CARD -->
     <div class="card stance-blue">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
         <div class="card-name" style="color:#2563eb;">🔵 ZONE / EYE</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🎯👁️</div>
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>CMD + GRT</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>EYE + FOC</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🎯👁️</div>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (ZONE):</strong><br>Roll <strong>CMD + GRT</strong><br>
+        <strong>BATTING (EYE):</strong><br>Roll <strong>EYE + FOC</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🔵):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 18. GREEN STANCE CARD -->
     <div class="card stance-green">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
         <div class="card-name" style="color:#16a34a;">🟢 BREAK / TIMING</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🌪️⚡</div>
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>MOV + DEC</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>CON + SPD</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🌪️⚡</div>
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (BREAK):</strong><br>Roll <strong>MOV + DEC</strong><br>
+        <strong>BATTING (TIMING):</strong><br>Roll <strong>CON + SPD</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🟢):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 19. POCKET OUTCOME CHART -->
     <div class="card ref-card">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">CHART</span><span class="card-badge">MARGIN</span></div>
+        <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
         <div class="card-name">OUTCOME TABLE</div>
       </div>
       <table class="mat-outcome-table">
-        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT</strong></td></tr>
+        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
         <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
-        <tr class="p-win"><td>0..-2</td><td><strong>SAC/FIELD OUT</strong></td></tr>
+        <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
         <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
-        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (SPD 4+)</strong></td></tr>
-        <tr class="b-win"><td>-7-</td><td><strong>XBH (1-4 2B,5 3B,6 HR)</strong></td></tr>
+        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
       </table>
       <div class="ability-box">
-        <div><strong>Pitcher − Batter</strong><br>Send 2B: SPD 4+ Safe!</div>
+        <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
       </div>
     </div>
 
     <!-- 20. TITANS CUTOUT TOKENS -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">TOKENS</span><span class="card-badge" style="background:#b91c1c;">SLICE</span></div>
+        <div class="card-top-meta"><span class="card-role">SLICE INTO 4 TOKENS</span><span class="card-badge" style="background:#b91c1c;">TOKENS</span></div>
         <div class="card-name">TITANS MARKERS</div>
       </div>
       <div style="display:grid; grid-template-columns:1fr; gap:2.5px; flex:1; margin-top:2px;">
-        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#991b1b;">⚡ MOMENTUM TOKEN</div>
-        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#991b1b;">🏏 AT-BAT MARKER</div>
-        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #1</div>
-        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #2</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">⚡ MOMENTUM TOKEN</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏏 AT-BAT LINEUP MARKER</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #1</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #2</div>
       </div>
     </div>
 
@@ -852,12 +938,12 @@
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 2: SHADOW SERPENTS COMPLETE 20-CARD SHEET (1.14" x 2.38" PORTRAIT)-->
+<!-- PAGE 2: SHADOW SERPENTS COMPLETE 20-CARD PORTRAIT SHEET (8.5" x 11")   -->
 <!-- ====================================================================== -->
 <div class="page">
   <div class="sheet-banner serpents-banner">
-    <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — PORTRAIT ROSTER &amp; STANCE SHEET (1.14" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Sized so All 9 Batters Fit in 1 Row Across the Landscape Playmat!</span>
+    <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
+    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Prints on Standard 8.5" × 11" Paper</span>
   </div>
 
   <div class="portrait-card-grid">
@@ -875,13 +961,13 @@
         <span>POW<strong>d6</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d12</strong></span><span>FOC<strong>d10</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d6 + d10</span></td><td class="stars">⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d12 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d10</span></td><td class="stars">⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d12+Foc d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ EAGLE EYE:</span> +2 Bat; draw a Walk on Margin -2 or -3!</div>
+        <div><span class="ability-title">⚡ EAGLE EYE:</span> +2 Batter roll; draw a Walk on Margin -2 or -3!</div>
       </div>
     </div>
 
@@ -898,13 +984,13 @@
         <span>POW<strong>d10</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d10</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d10</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d10 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ FIVE-TOOL GENIUS:</span> Auto-win Pitch Guess &amp; claim ⚡!</div>
+        <div><span class="ability-title">⚡ FIVE-TOOL GENIUS:</span> Auto-win Pitch Guess &amp; claim ⚡ Momentum!</div>
       </div>
     </div>
 
@@ -921,13 +1007,13 @@
         <span>POW<strong>d8</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d8 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ GAP HUNTER:</span> +2 Bat; upgrade any Single to a Double!</div>
+        <div><span class="ability-title">⚡ GAP HUNTER:</span> +2 Batter roll; upgrade any Single into a Double!</div>
       </div>
     </div>
 
@@ -944,11 +1030,11 @@
         <span>POW<strong>d10</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ SHOWTIME:</span> Add +3 to your Batter total roll.</div>
       </div>
@@ -967,11 +1053,11 @@
         <span>POW<strong>d8</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ LINE DRIVE:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -990,11 +1076,11 @@
         <span>POW<strong>d6</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ MR. SMILE:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -1013,13 +1099,13 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ BAT CONTROL:</span> Reroll highest batter die &amp; keep higher (+1).</div>
+        <div><span class="ability-title">⚡ BAT CONTROL:</span> Reroll highest batter die &amp; keep higher (+1 Bat).</div>
       </div>
     </div>
 
@@ -1036,11 +1122,11 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d4</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d6 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ VETERAN EYE:</span> Add +2 to your Batter total roll.</div>
       </div>
@@ -1059,13 +1145,13 @@
         <span>POW<strong>d4</strong></span><span>CON<strong>d4</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">d4 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">d4 + d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">d4 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOM:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ PURE HUSTLE:</span> Roll an extra +d6 &amp; add to Batter roll!</div>
+        <div><span class="ability-title">⚡ PURE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
@@ -1082,11 +1168,11 @@
         <span>VEL<strong>d6</strong></span><span>CMD<strong>d12</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d10</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d12 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d10 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d12+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ BLACK PAINT:</span> +2 Pitch; Margin -3 is Fielded Out (not BB).</div>
       </div>
@@ -1105,13 +1191,13 @@
         <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d12</strong></span><span>GRT<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d8 + d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d8 + d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ TUNNELING:</span> Reroll highest pitch die &amp; keep higher (+1).</div>
+        <div><span class="ability-title">⚡ TUNNELING:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
       </div>
     </div>
 
@@ -1128,13 +1214,13 @@
         <span>VEL<strong>d6</strong></span><span>CMD<strong>d10</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>END:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ VETERAN POISE:</span> +2 Pitch; downgrade Extra-Base to Single.</div>
+        <div><span class="ability-title">⚡ VETERAN POISE:</span> +2 Pitch; downgrade Extra-Base Hit to Single.</div>
       </div>
     </div>
 
@@ -1151,11 +1237,11 @@
         <span>VEL<strong>d8</strong></span><span>CMD<strong>d6</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d10 + d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d6▸d4▸—</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ RISING SLIDER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
@@ -1174,11 +1260,11 @@
         <span>VEL<strong>d6</strong></span><span>CMD<strong>d10</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d6 + d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d10 + d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d6 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d4▸—</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ FIREMAN:</span> Add +2 to your Pitcher total roll.</div>
       </div>
@@ -1197,11 +1283,11 @@
         <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d12</strong></span><span>DEC<strong>d10</strong></span><span>GRT<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">d8 + d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">d12 + d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d12+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
-      <div class="fatigue-bar"><span>REL:</span><span class="tiers">⚡ d8▸d6▸d4</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ NASTY BITE:</span> Add +3 to your Pitcher total roll.</div>
       </div>
@@ -1210,81 +1296,81 @@
     <!-- 16. RED STANCE CARD -->
     <div class="card stance-red">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
         <div class="card-name" style="color:#dc2626;">🔴 HEAT / POWER</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🔥💥</div>
-      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>VEL + GRT</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>POW + CON</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🔥💥</div>
+      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (HEAT):</strong><br>Roll <strong>VEL + GRT</strong><br>
+        <strong>BATTING (POWER):</strong><br>Roll <strong>POW + CON</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🔴):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 17. BLUE STANCE CARD -->
     <div class="card stance-blue">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
         <div class="card-name" style="color:#2563eb;">🔵 ZONE / EYE</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🎯👁️</div>
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>CMD + GRT</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>EYE + FOC</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🎯👁️</div>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (ZONE):</strong><br>Roll <strong>CMD + GRT</strong><br>
+        <strong>BATTING (EYE):</strong><br>Roll <strong>EYE + FOC</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🔵):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 18. GREEN STANCE CARD -->
     <div class="card stance-green">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
         <div class="card-name" style="color:#16a34a;">🟢 BREAK / TIMING</div>
       </div>
-      <div style="text-align:center; font-size:18px; line-height:1; margin:2px 0;">🌪️⚡</div>
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:3px; font-size:5.5px; line-height:1.3;">
-        <strong>PITCHING:</strong><br>Roll <strong>MOV + DEC</strong><br>
-        <strong>BATTING:</strong><br>Roll <strong>CON + SPD</strong>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🌪️⚡</div>
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (BREAK):</strong><br>Roll <strong>MOV + DEC</strong><br>
+        <strong>BATTING (TIMING):</strong><br>Roll <strong>CON + SPD</strong>
       </div>
       <div class="ability-box">
-        <div><strong>🎯 Match:</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+        <div><strong>🎯 Match (Both 🟢):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
     <!-- 19. POCKET OUTCOME CHART -->
     <div class="card ref-card">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">CHART</span><span class="card-badge">MARGIN</span></div>
+        <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
         <div class="card-name">OUTCOME TABLE</div>
       </div>
       <table class="mat-outcome-table">
-        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT</strong></td></tr>
+        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
         <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
-        <tr class="p-win"><td>0..-2</td><td><strong>SAC/FIELD OUT</strong></td></tr>
+        <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
         <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
-        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (SPD 4+)</strong></td></tr>
-        <tr class="b-win"><td>-7-</td><td><strong>XBH (1-4 2B,5 3B,6 HR)</strong></td></tr>
+        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
       </table>
       <div class="ability-box">
-        <div><strong>Pitcher − Batter</strong><br>Send 2B: SPD 4+ Safe!</div>
+        <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
       </div>
     </div>
 
     <!-- 20. SERPENTS CUTOUT TOKENS -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-top-meta"><span class="card-role">TOKENS</span><span class="card-badge" style="background:#047857;">SLICE</span></div>
+        <div class="card-top-meta"><span class="card-role">SLICE INTO 4 TOKENS</span><span class="card-badge" style="background:#047857;">TOKENS</span></div>
         <div class="card-name">SERPENTS MARKERS</div>
       </div>
       <div style="display:grid; grid-template-columns:1fr; gap:2.5px; flex:1; margin-top:2px;">
-        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#065f46;">⚡ MOMENTUM TOKEN</div>
-        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#065f46;">🏏 AT-BAT MARKER</div>
-        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#065f46;">🏃 BASERUNNER #1</div>
-        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:5.3px; font-weight:900; color:#065f46;">🏃 BASERUNNER #2</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">⚡ MOMENTUM TOKEN</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏏 AT-BAT LINEUP MARKER</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏃 BASERUNNER #1</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏃 BASERUNNER #2</div>
       </div>
     </div>
 
@@ -1292,115 +1378,104 @@
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 3: LANDSCAPE PLAYMAT (ACTIVE PITCHER + ALL 9 BATTERS IN ONE ROW)  -->
+<!-- PAGES 3 & 4: 17" x 11" LANDSCAPE PLAYMAT (SPLIT ACROSS TWO 8.5" x 11") -->
+<!-- Print Pages 3 & 4 for Player 1, and print an extra copy for Player 2!  -->
 <!-- ====================================================================== -->
-<div class="page">
-  <div class="landscape-playmat">
-    <div class="clean-mat-title">FULL COUNT — MANAGER PLAYMAT</div>
-
-    <!-- Active Pitcher Slot -->
-    <div class="clean-pitcher-zone">
-      <div class="clean-slot pitcher-slot">
-        <div class="clean-slot-label" style="color:#0f172a; font-size:13px;">ACTIVE PITCHER</div>
-      </div>
-    </div>
-
-    <!-- All 9 Batting Order Slots Across in One Single Row -->
-    <div class="clean-row-9">
-      <div class="clean-slot">
-        <div class="clean-slot-number">1</div>
-        <div class="clean-slot-label">BATTER #1</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">2</div>
-        <div class="clean-slot-label">BATTER #2</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">3</div>
-        <div class="clean-slot-label">BATTER #3</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">4</div>
-        <div class="clean-slot-label">BATTER #4</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">5</div>
-        <div class="clean-slot-label">BATTER #5</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">6</div>
-        <div class="clean-slot-label">BATTER #6</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">7</div>
-        <div class="clean-slot-label">BATTER #7</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">8</div>
-        <div class="clean-slot-label">BATTER #8</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">9</div>
-        <div class="clean-slot-label">BATTER #9</div>
-      </div>
-    </div>
-  </div>
+<div class="screen-join-banner">
+  🔗 <strong>17" × 11" LANDSCAPE PLAYMAT (2 × 8.5" × 11" PAGES SIDE-BY-SIDE):</strong> Page 3 (Left Half) + Page 4 (Right Half) join at the center seam so all 9 Batters (#1–#9) sit in a single unbroken row!
 </div>
 
-<!-- ====================================================================== -->
-<!-- PAGE 4: SECOND LANDSCAPE PLAYMAT (ACTIVE PITCHER + ALL 9 IN ONE ROW)   -->
-<!-- ====================================================================== -->
-<div class="page">
-  <div class="landscape-playmat">
-    <div class="clean-mat-title">FULL COUNT — MANAGER PLAYMAT</div>
+<div class="playmat-pair-preview">
 
-    <!-- Active Pitcher Slot -->
-    <div class="clean-pitcher-zone">
-      <div class="clean-slot pitcher-slot">
-        <div class="clean-slot-label" style="color:#0f172a; font-size:13px;">ACTIVE PITCHER</div>
+  <!-- PAGE 3: LEFT 8.5" x 11" SHEET OF THE 17" x 11" PLAYMAT -->
+  <div class="page playmat-left-page">
+    <div class="half-mat-container">
+      <div class="half-mat-header">
+        <div class="half-mat-title">FULL COUNT — MANAGER PLAYMAT</div>
+        <div class="seam-badge">LEFT HALF (PAGE 1 OF 2) ➔ JOIN TO RIGHT HALF</div>
       </div>
-    </div>
 
-    <!-- All 9 Batting Order Slots Across in One Single Row -->
-    <div class="clean-row-9">
-      <div class="clean-slot">
-        <div class="clean-slot-number">1</div>
-        <div class="clean-slot-label">BATTER #1</div>
+      <!-- Upper Zone: Active Pitcher Slot -->
+      <div class="half-mat-upper left-upper">
+        <div class="clean-slot pitcher-slot">
+          <div class="clean-slot-label" style="color:#0f172a; font-size:15px;">ACTIVE PITCHER</div>
+        </div>
       </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">2</div>
-        <div class="clean-slot-label">BATTER #2</div>
+
+      <!-- Lower Zone: Batters #1, #2, #3, #4, #5 in a Single Row -->
+      <div class="half-mat-lower">
+        <div class="single-row-left-5">
+          <div class="clean-slot">
+            <div class="clean-slot-number">1</div>
+            <div class="clean-slot-label">BATTER #1</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">2</div>
+            <div class="clean-slot-label">BATTER #2</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">3</div>
+            <div class="clean-slot-label">BATTER #3</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">4</div>
+            <div class="clean-slot-label">BATTER #4</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">5</div>
+            <div class="clean-slot-label">BATTER #5</div>
+          </div>
+        </div>
       </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">3</div>
-        <div class="clean-slot-label">BATTER #3</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">4</div>
-        <div class="clean-slot-label">BATTER #4</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">5</div>
-        <div class="clean-slot-label">BATTER #5</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">6</div>
-        <div class="clean-slot-label">BATTER #6</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">7</div>
-        <div class="clean-slot-label">BATTER #7</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">8</div>
-        <div class="clean-slot-label">BATTER #8</div>
-      </div>
-      <div class="clean-slot">
-        <div class="clean-slot-number">9</div>
-        <div class="clean-slot-label">BATTER #9</div>
+
+      <div class="half-mat-footer">
+        <span>11" × 17" LANDSCAPE PLAYMAT (LEFT 8.5" × 11" SHEET)</span>
+        <span>PLACE RIGHT SHEET ALONGSIDE THIS EDGE ➔</span>
       </div>
     </div>
   </div>
+
+  <!-- PAGE 4: RIGHT 8.5" x 11" SHEET OF THE 17" x 11" PLAYMAT -->
+  <div class="page playmat-right-page">
+    <div class="half-mat-container">
+      <div class="half-mat-header">
+        <div class="seam-badge">⬅ JOIN TO LEFT HALF (PAGE 2 OF 2 — RIGHT HALF)</div>
+        <div class="half-mat-title">BATTING LINEUP (#1 – #9)</div>
+      </div>
+
+      <!-- Upper Zone (Matches Left Upper Zone Height) -->
+      <div class="half-mat-upper right-upper">
+      </div>
+
+      <!-- Lower Zone: Batters #6, #7, #8, #9 Continuing the Exact Same Single Row! -->
+      <div class="half-mat-lower">
+        <div class="single-row-right-4">
+          <div class="clean-slot">
+            <div class="clean-slot-number">6</div>
+            <div class="clean-slot-label">BATTER #6</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">7</div>
+            <div class="clean-slot-label">BATTER #7</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">8</div>
+            <div class="clean-slot-label">BATTER #8</div>
+          </div>
+          <div class="clean-slot">
+            <div class="clean-slot-number">9</div>
+            <div class="clean-slot-label">BATTER #9</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="half-mat-footer">
+        <span>⬅ PLACE LEFT SHEET ALONGSIDE THIS EDGE</span>
+        <span>11" × 17" LANDSCAPE PLAYMAT (RIGHT 8.5" × 11" SHEET)</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 </body>
