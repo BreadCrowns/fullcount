@@ -515,26 +515,64 @@
       </div>
     </div>
 
-    <!-- TABLE SETUP & LINEUP ORDER RULES -->
+    <!-- STANCE TRIANGLE: WHAT BEATS WHAT -->
     <div class="card playmat-card">
       <div class="card-header">
         <div>
-          <div class="card-role">TABLETOP SETUP</div>
-          <div class="card-name">LINEUP & DICE</div>
+          <div class="card-role">RPS MATCHUP GUIDE</div>
+          <div class="card-name">WHAT BEATS WHAT</div>
         </div>
-        <div class="card-badge">RULES</div>
+        <div class="card-badge" style="background:#0f172a;">TRIANGLE</div>
       </div>
-      <div style="font-size:7px; line-height:1.25; margin: auto 0;">
-        <strong>1. TABLE LAYOUT:</strong><br>
-        • Lay out your <strong>9 Batters from left to right</strong> (#1 Leadoff on the far left to #9 on the far right).<br>
-        • Place your <strong>Starting Pitcher above your lineup</strong>.<br><br>
-        <strong>2. DICE ROLLING:</strong><br>
-        • Reveal Red, Blue, or Green simultaneously.<br>
-        • Both players roll the <strong>2 polyhedral dice</strong> listed for that color on their active player card.<br>
-        • The player holding the <strong>Momentum Token</strong> ALSO rolls their personal <strong>Momentum Die</strong> (3 dice total vs. opponent's 2 dice).
+      <div style="margin: auto 0; text-align: center;">
+        <svg viewBox="0 0 220 158" style="width: 100%; height: 142px; display: block; margin: 0 auto;">
+          <defs>
+            <marker id="arrow-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+            </marker>
+            <marker id="arrow-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+            </marker>
+          </defs>
+
+          <!-- RED -> BLUE Arrow (Right Side) -->
+          <line x1="134" y1="42" x2="168" y2="100" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+          <text x="163" y="68" font-size="7.5" font-weight="900" fill="#dc2626" text-anchor="start" transform="rotate(59, 154, 70)">BEATS ▶</text>
+
+          <!-- BLUE -> GREEN Arrow (Bottom Side) -->
+          <line x1="142" y1="128" x2="78" y2="128" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <text x="110" y="143" font-size="7.5" font-weight="900" fill="#2563eb" text-anchor="middle">◀ BEATS</text>
+
+          <!-- GREEN -> RED Arrow (Left Side) -->
+          <line x1="52" y1="100" x2="86" y2="42" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow-green)"/>
+          <text x="57" y="68" font-size="7.5" font-weight="900" fill="#16a34a" text-anchor="end" transform="rotate(-59, 66, 70)">BEATS ▶</text>
+
+          <!-- Center Label -->
+          <text x="110" y="88" font-size="6.8" font-weight="800" fill="#475569" text-anchor="middle">WINNER CLAIMS</text>
+          <text x="110" y="97" font-size="7.2" font-weight="900" fill="#0f172a" text-anchor="middle">⚡ MOMENTUM DIE</text>
+
+          <!-- TOP NODE: RED -->
+          <rect x="65" y="4" width="90" height="32" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+          <text x="110" y="18" font-size="9.5" font-weight="900" fill="#dc2626" text-anchor="middle">🔴 RED</text>
+          <text x="110" y="29" font-size="6.8" font-weight="800" fill="#7f1d1d" text-anchor="middle">HEAT / POWER</text>
+
+          <!-- BOTTOM RIGHT NODE: BLUE -->
+          <rect x="136" y="106" width="80" height="32" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+          <text x="176" y="120" font-size="9.5" font-weight="900" fill="#2563eb" text-anchor="middle">🔵 BLUE</text>
+          <text x="176" y="131" font-size="6.8" font-weight="800" fill="#1e3a8a" text-anchor="middle">ZONE / EYE</text>
+
+          <!-- BOTTOM LEFT NODE: GREEN -->
+          <rect x="4" y="106" width="80" height="32" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+          <text x="44" y="120" font-size="9.5" font-weight="900" fill="#16a34a" text-anchor="middle">🟢 GREEN</text>
+          <text x="44" y="131" font-size="6.8" font-weight="800" fill="#14532d" text-anchor="middle">BREAK / TIMING</text>
+        </svg>
       </div>
-      <div class="ability-box">
-        <strong>DEGRADATION:</strong> A player's Momentum Die steps down (d8 ➔ d6 ➔ d4) as endurance degrades over time.
+      <div class="ability-box" style="font-size:6.6px; line-height:1.22;">
+        • <strong style="color:#dc2626;">🔴 RED beats 🔵 BLUE</strong> &nbsp;• <strong style="color:#2563eb;">🔵 BLUE beats 🟢 GREEN</strong><br>
+        • <strong style="color:#16a34a;">🟢 GREEN beats 🔴 RED</strong> &nbsp;• <strong>TIE:</strong> Token stays put!
       </div>
     </div>
 
