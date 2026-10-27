@@ -1190,12 +1190,12 @@
 
           <table class="mini-outcome-table" id="duel-mini-table">
             <tbody>
-              <tr data-band="k"><td>+4 or more</td><td>STRIKEOUT (K)</td><td>Batter out; runners hold</td></tr>
-              <tr data-band="out"><td>0 to +3</td><td>ROUTINE OUT</td><td>Fly/Pop out; runners hold</td></tr>
-              <tr data-band="sac"><td>-1 to -3</td><td>FIELDED / SAC</td><td>Out; Runner on 3rd scores!</td></tr>
-              <tr data-band="bb"><td>-4 to -5</td><td>WALK (BB)</td><td>1st base; forces runners</td></tr>
-              <tr data-band="1b"><td>-6 to -8</td><td>CLEAN SINGLE</td><td>Runners +1 (2nd scores 4-6)</td></tr>
-              <tr data-band="xbh"><td>-9 or less</td><td>EXTRA-BASE / HR</td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
+              <tr data-band="k"><td>+6 or more</td><td>STRIKEOUT (K)</td><td>Batter out; runners hold</td></tr>
+              <tr data-band="out"><td>+1 to +5</td><td>ROUTINE OUT</td><td>Fly/Pop out; runners hold</td></tr>
+              <tr data-band="sac"><td>0 to -2</td><td>FIELDED / SAC</td><td>Out; Runner on 3rd scores!</td></tr>
+              <tr data-band="bb"><td>-3</td><td>WALK (BB)</td><td>1st base; forces runners</td></tr>
+              <tr data-band="1b"><td>-4 to -6</td><td>CLEAN SINGLE</td><td>Runners +1 (2nd scores 4-6)</td></tr>
+              <tr data-band="xbh"><td>-7 or less</td><td>EXTRA-BASE / HR</td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
             </tbody>
           </table>
         </div>
@@ -1231,32 +1231,32 @@
           </thead>
           <tbody>
             <tr class="out-row" data-band="k">
-              <td><strong>+4 or more</strong></td>
+              <td><strong>+6 or more</strong></td>
               <td><strong>STRIKEOUT (K)</strong></td>
               <td>Batter out; runners hold</td>
             </tr>
             <tr class="out-row" data-band="out">
-              <td><strong>0 to +3</strong></td>
+              <td><strong>+1 to +5</strong></td>
               <td><strong>ROUTINE OUT</strong></td>
               <td>Fly/Pop out; runners hold</td>
             </tr>
             <tr class="out-row" data-band="sac">
-              <td><strong>-1 to -3</strong></td>
+              <td><strong>0 to -2</strong></td>
               <td><strong>FIELDED / SAC</strong></td>
               <td>Out; Runner on 3rd scores!</td>
             </tr>
             <tr class="hit-row" data-band="bb">
-              <td><strong>-4 to -5</strong></td>
+              <td><strong>-3</strong></td>
               <td><strong>WALK (BB)</strong></td>
               <td>1st base; forces runners</td>
             </tr>
             <tr class="hit-row" data-band="1b">
-              <td><strong>-6 to -8</strong></td>
+              <td><strong>-4 to -6</strong></td>
               <td><strong>CLEAN SINGLE</strong></td>
               <td>Runners +1 (2nd scores 4-6)</td>
             </tr>
             <tr class="hit-row" data-band="xbh">
-              <td><strong>-9 or less</strong></td>
+              <td><strong>-7 or less</strong></td>
               <td><strong>EXTRA-BASE / HR</strong></td>
               <td>d6: 1-4 2B, 5 3B, 6 HR!</td>
             </tr>
@@ -1355,7 +1355,7 @@
         short: 'SER',
         cardClass: 'serpents-card',
         pitchers: [
-          { id: 's_sp1', role: 'SP #1 (Ace)', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 to Pitcher roll (-4 Walk becomes Out)', abilityType: 'black_paint' },
+          { id: 's_sp1', role: 'SP #1 (Ace)', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 to Pitcher roll (-3 Walk becomes Out)', abilityType: 'black_paint' },
           { id: 's_sp2', role: 'SP #2 (Spin)', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll Deception d12 & keep higher', abilityType: 'reroll_dec' },
           { id: 's_sp3', role: 'SP #3 (Vet)', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
           { id: 's_rp1', role: 'RP #1 (Setup)', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: '+2 to Green Break roll', abilityType: 'pitch_plus2' },
@@ -1363,7 +1363,7 @@
           { id: 's_cl',  role: 'Closer', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: '+3 when throwing Green Break', abilityType: 'pitch_plus2' }
         ],
         batters: [
-          { order: 1, pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: 'Draws Walk on Margin -3, -4, or -5 (+2 roll)', abilityType: 'eagle_eye' },
+          { order: 1, pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: 'Draws Walk on Margin -2 or -3 (+2 roll)', abilityType: 'eagle_eye' },
           { order: 2, pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Stance Read & claim Momentum!', abilityType: 'auto_read' },
           { order: 3, pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: 'Upgrade Single to Double (+2 roll)', abilityType: 'upgrade_1b' },
           { order: 4, pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: '+3 to Batter roll on Red Power', abilityType: 'clutch_plus3' },
@@ -1670,17 +1670,17 @@
       let title = '';
       let detail = '';
 
-      if (margin >= 4) {
+      if (margin >= 6) {
         state.lastBand = 'k';
         outs = 1;
         title = '🔥 STRIKEOUT (K)';
         detail = `${b.name} strikes out! Baserunners hold.`;
-      } else if (margin >= 0) {
+      } else if (margin >= 1) {
         state.lastBand = 'out';
         outs = 1;
         title = '🧤 ROUTINE OUT';
         detail = `${b.name} flies/pops out. Baserunners hold.`;
-      } else if (margin >= -3 && !(usedEagleEye && margin === -3)) {
+      } else if (margin >= -2 && !(usedEagleEye && margin === -2)) {
         state.lastBand = 'sac';
         outs = 1;
         title = '⚾ FIELDED / SAC OUT';
@@ -1699,12 +1699,12 @@
         } else {
           detail = `${b.name} out at 1st (3rd Out of the half-inning!).`;
         }
-      } else if (margin >= -5 || (usedEagleEye && margin === -3)) {
-        if (usedBlackPaint && margin === -4) {
+      } else if (margin >= -3 || (usedEagleEye && margin === -2)) {
+        if (usedBlackPaint && margin === -3) {
           state.lastBand = 'sac';
           outs = 1;
           title = '🎨 BLACK PAINT OUT';
-          detail = `Margin -4 converted from Walk into Fielded Out!`;
+          detail = `Margin -3 converted from Walk into Fielded Out!`;
         } else {
           state.lastBand = 'bb';
           title = '👁️ WALK (BB)';
@@ -1716,7 +1716,7 @@
           if (state.bases[0]) state.bases[1] = state.bases[0];
           state.bases[0] = b.name;
         }
-      } else if (margin >= -8 && !usedUpgrade1B) {
+      } else if (margin >= -6 && !usedUpgrade1B) {
         state.lastBand = '1b';
         title = '💥 CLEAN SINGLE';
         if (state.bases[2]) { runs += 1; state.bases[2] = null; }
