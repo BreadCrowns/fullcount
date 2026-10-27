@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Full Count — Half-Size Cards &amp; Single-Sheet 8.5×11 Playmats</title>
+<title>Full Count — Portrait Half-Size Cards (1.50" × 2.35") &amp; 8.5×11 Playmats</title>
 <style>
   @page {
     size: 8.5in 11.0in;
@@ -38,7 +38,7 @@
   }
   .screen-header h1 {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 21px;
+    font-size: 20px;
     letter-spacing: 0.8px;
     color: #f8fafc;
   }
@@ -66,7 +66,7 @@
     height: 11.0in;
     margin: 18px auto;
     background: white;
-    padding: 0.26in 0.38in;
+    padding: 0.25in 0.36in;
     box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     page-break-after: always;
     break-after: page;
@@ -79,7 +79,7 @@
     .screen-header { display: none !important; }
     .page {
       margin: 0 !important;
-      padding: 0.26in 0.38in !important;
+      padding: 0.25in 0.36in !important;
       width: 8.5in !important;
       height: 11.0in !important;
       box-shadow: none !important;
@@ -105,32 +105,34 @@
   .sheet-banner.serpents-banner { background: #065f46; }
   .sheet-banner-title {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.6px;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
   }
   .sheet-banner-sub {
-    font-size: 7.5px;
+    font-size: 7px;
     font-weight: 700;
     color: #e2e8f0;
   }
 
-  /* Half-Size Card Grid: 3 columns x 6 rows = 18 Half-Poker Cards (2.5" x 1.64") per 8.5"x11" page */
-  .half-card-grid {
+  /* ====================================================================== */
+  /* PORTRAIT HALF-SIZE PLAYING CARDS (1.50" wide x 2.35" tall)             */
+  /* 5 columns x 4 rows = 20 Portrait Half-Cards per 8.5" x 11" sheet!      */
+  /* ====================================================================== */
+  .portrait-card-grid {
     display: grid;
-    grid-template-columns: 2.5in 2.5in 2.5in;
-    grid-template-rows: repeat(6, 1.64in);
-    gap: 0.05in 0.11in;
-    width: 7.72in;
+    grid-template-columns: repeat(5, 1.50in);
+    grid-template-rows: repeat(4, 2.38in);
+    gap: 0.06in 0.065in;
+    width: 7.76in;
   }
 
-  /* Half-Size Card: 2.5in wide x 1.64in tall (Exact Half of a 2.5" x 3.3" Playing Card) */
   .card {
-    width: 2.5in;
-    height: 1.64in;
+    width: 1.50in;
+    height: 2.38in;
     border: 1.5px solid #0f172a;
     border-radius: 6px;
-    padding: 3px 5px;
+    padding: 3.5px 4px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -143,166 +145,179 @@
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    border: 1px dashed rgba(15,23,42,0.18);
+    border: 1px dashed rgba(15,23,42,0.16);
     border-radius: 5px;
     pointer-events: none;
   }
 
   /* Team & Stance Top Accents */
-  .card.titans { border-top: 4px solid #b91c1c; }
-  .card.serpents { border-top: 4px solid #047857; }
-  .card.stance-red { border-top: 4.5px solid #dc2626; }
-  .card.stance-blue { border-top: 4.5px solid #2563eb; }
-  .card.stance-green { border-top: 4.5px solid #16a34a; }
-  .card.ref-card { border-top: 4px solid #0f172a; }
+  .card.titans { border-top: 4.5px solid #b91c1c; }
+  .card.serpents { border-top: 4.5px solid #047857; }
+  .card.stance-red { border-top: 5px solid #dc2626; }
+  .card.stance-blue { border-top: 5px solid #2563eb; }
+  .card.stance-green { border-top: 5px solid #16a34a; }
+  .card.ref-card { border-top: 4.5px solid #0f172a; }
 
-  /* Compact Header */
+  /* Portrait Card Header */
   .card-header {
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 2px;
+  }
+  .card-top-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #cbd5e1;
-    padding-bottom: 1.5px;
-  }
-  .card-title-group {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
+    margin-bottom: 1px;
   }
   .card-role {
-    font-size: 6px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    color: #64748b;
-  }
-  .card-name {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
-    line-height: 1.05;
-    color: #0f172a;
+    font-size: 5.8px;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.2px;
-  }
-  .card-badges {
-    display: flex;
-    gap: 2.5px;
-    align-items: center;
+    color: #64748b;
   }
   .card-badge {
     background: #0f172a;
     color: white;
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 8px;
-    padding: 1.5px 4px;
+    font-size: 7.2px;
+    padding: 1px 3.5px;
     border-radius: 3px;
     letter-spacing: 0.2px;
     white-space: nowrap;
   }
-  .card-badge.spd-badge {
-    background: #0369a1;
-  }
-  .card-badge.mom-badge {
-    background: #d97706;
+  .card-badge.spd-badge { background: #0369a1; }
+  .card-badge.mom-badge { background: #d97706; color: #0f172a; }
+  .card-name {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 11px;
+    line-height: 1.02;
     color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Core Attributes Strip */
+  /* 5-Column Mini Core Attribute Strip */
   .core-stats {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 1px 4px;
-    font-size: 6px;
-    font-weight: 700;
-    color: #475569;
+    padding: 1.5px 1px;
+    text-align: center;
+    font-size: 5.5px;
+    font-weight: 800;
+    color: #64748b;
+    line-height: 1.05;
+  }
+  .core-stats span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .core-stats span strong {
     color: #0f172a;
     font-family: "Courier New", monospace;
-    font-size: 6.4px;
+    font-size: 6.8px;
+    font-weight: 900;
   }
 
-  /* Compact Stances Table */
+  /* Portrait Stances Table */
   .stances-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 6.8px;
+    font-size: 6.6px;
   }
   .stances-table tr {
     border-bottom: 1px solid #f1f5f9;
   }
   .stances-table td {
-    padding: 1px 1px;
+    padding: 2px 1px;
     vertical-align: middle;
   }
   .stance-tag {
     font-weight: 900;
-    font-size: 6.6px;
-    white-space: nowrap;
+    font-size: 6.5px;
+    display: block;
+    line-height: 1;
   }
   .stance-tag.red { color: #dc2626; }
   .stance-tag.blue { color: #2563eb; }
   .stance-tag.green { color: #16a34a; }
   .stance-dice {
     font-family: "Courier New", Courier, monospace;
-    font-weight: 700;
-    font-size: 6.5px;
-    color: #1e293b;
-  }
-  .stance-avg {
-    font-size: 5.5px;
-    color: #64748b;
-    font-family: sans-serif;
-    margin-left: 2px;
+    font-weight: 800;
+    font-size: 6px;
+    color: #334155;
+    display: block;
+    line-height: 1.05;
   }
   .stars {
     color: #d97706;
-    font-size: 6.2px;
+    font-size: 5.8px;
     text-align: right;
     white-space: nowrap;
   }
   .stance-rating {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     text-align: right;
     color: #0f172a;
-    width: 16px;
+    width: 15px;
+    padding-left: 2px;
   }
 
-  /* Special Ability + Fatigue Strip */
+  /* Momentum / Endurance Track Bar */
+  .fatigue-bar {
+    background: #0f172a;
+    color: #f8fafc;
+    border-radius: 3px;
+    padding: 1.5px 4px;
+    font-size: 5.8px;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .fatigue-bar span.tiers {
+    font-family: "Courier New", monospace;
+    color: #fbbf24;
+    font-weight: 900;
+  }
+
+  /* Portrait Special Ability Box */
   .ability-box {
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 2px 3.5px;
-    font-size: 6px;
-    line-height: 1.15;
+    padding: 2.5px 3.5px;
+    font-size: 5.9px;
+    line-height: 1.18;
     color: #1e293b;
+    min-height: 0.46in;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   .ability-title {
     font-weight: 900;
     color: #0f172a;
     text-transform: uppercase;
   }
-  .fatigue-inline {
-    font-family: "Courier New", monospace;
-    font-weight: 800;
-    color: #b45309;
-    font-size: 5.8px;
-  }
 
   /* ====================================================================== */
-  /* SINGLE-SHEET 8.5" x 11" PLAYER PLAYMAT STYLES (PAGES 3 & 4)            */
+  /* SINGLE-SHEET 8.5" x 11" MANAGER PLAYMAT (PORTRAIT CARD SLOTS)          */
   /* ====================================================================== */
   .playmat-sheet {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 10.48in;
-    width: 7.74in;
+    width: 7.78in;
   }
 
   .playmat-top-bar {
@@ -311,9 +326,9 @@
     align-items: center;
     background: #0f172a;
     color: white;
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 6px;
-    height: 0.48in;
+    height: 0.44in;
   }
   .playmat-top-bar.titans-mat {
     background: linear-gradient(90deg, #7f1d1d 0%, #991b1b 50%, #0f172a 100%);
@@ -325,18 +340,18 @@
   }
   .playmat-team-title {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.8px;
+    font-size: 15px;
+    letter-spacing: 0.7px;
     text-transform: uppercase;
   }
   .playmat-team-sub {
-    font-size: 7px;
+    font-size: 6.8px;
     font-weight: 700;
     color: #cbd5e1;
   }
   .playmat-rule-pills {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
   }
   .playmat-pill {
@@ -344,135 +359,53 @@
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 4px;
     padding: 2px 6px;
-    font-size: 6.8px;
-    font-weight: 700;
-    line-height: 1.2;
-  }
-
-  /* Outcome & Field Dashboard Strip on Playmat */
-  .playmat-dashboard {
-    display: grid;
-    grid-template-columns: 3.15in 2.45in 2.0in;
-    gap: 0.07in;
-    height: 1.82in;
-  }
-
-  .dash-panel {
-    border: 1.5px solid #0f172a;
-    border-radius: 6px;
-    padding: 4px 6px;
-    background: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .dash-panel-title {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 9.5px;
-    letter-spacing: 0.4px;
-    color: #0f172a;
-    border-bottom: 1.5px solid #cbd5e1;
-    padding-bottom: 1.5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .dash-panel-title span {
-    font-family: sans-serif;
-    font-size: 6px;
-    font-weight: 800;
-    color: #475569;
-  }
-
-  .mat-outcome-table {
-    width: 100%;
-    border-collapse: collapse;
     font-size: 6.5px;
-  }
-  .mat-outcome-table td {
-    padding: 1.5px 3px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .mat-outcome-table tr.p-win { background: #f0fdf4; font-weight: 700; }
-  .mat-outcome-table tr.b-win { background: #fef2f2; font-weight: 700; }
-
-  /* Mini Diamond inside Playmat Dashboard */
-  .mini-diamond-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    flex: 1;
-  }
-  .mini-base-row {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 8px;
-  }
-  .mini-base-box {
-    border: 1.5px dashed #047857;
-    background: #ecfdf5;
-    border-radius: 4px;
-    padding: 3px 7px;
-    font-size: 6.8px;
-    font-weight: 900;
-    color: #065f46;
-    text-align: center;
-    min-width: 0.88in;
-  }
-  .mini-home-box {
-    border: 1.5px solid #b91c1c;
-    background: #fef2f2;
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 6.8px;
-    font-weight: 900;
-    color: #991b1b;
-    text-align: center;
+    font-weight: 700;
+    line-height: 1.18;
   }
 
   /* Section Divider Label */
   .mat-section-label {
     background: #1e293b;
     color: #f8fafc;
-    font-size: 7px;
+    font-size: 6.8px;
     font-weight: 900;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     padding: 2px 8px;
     border-radius: 3px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 0.18in;
+    height: 0.17in;
   }
 
-  /* Card Drop-Slot Grid on Playmat: 3 columns of 2.52in x 1.66in slots */
-  .mat-row-3 {
+  /* Upper Row on Playmat: 3 Portrait Card Slots (Mound, Stance, Bullpen) + Outcome/Score Dashboard */
+  .mat-upper-row {
     display: grid;
-    grid-template-columns: 2.52in 2.52in 2.52in;
-    grid-template-rows: 1.68in;
-    gap: 0.09in;
-    width: 7.74in;
+    grid-template-columns: 1.52in 1.52in 1.52in 3.04in;
+    grid-template-rows: 2.40in;
+    gap: 0.06in;
+    width: 7.78in;
   }
 
-  .mat-lineup-grid {
+  /* 5-Column Portrait Card Row for Batters (#1-#5 and #6-#9 + Diamond) */
+  .mat-portrait-row-5 {
     display: grid;
-    grid-template-columns: 2.52in 2.52in 2.52in;
-    grid-template-rows: repeat(3, 1.68in);
-    gap: 0.06in 0.09in;
-    width: 7.74in;
+    grid-template-columns: repeat(5, 1.52in);
+    grid-template-rows: 2.40in;
+    gap: 0.045in;
+    width: 7.78in;
   }
 
+  /* Portrait Card Slot (1.52" wide x 2.40" tall) */
   .card-slot {
-    width: 2.52in;
-    height: 1.68in;
+    width: 1.52in;
+    height: 2.40in;
     border: 2px dashed #64748b;
     border-radius: 7px;
     background: #f8fafc;
-    padding: 5px 7px;
+    padding: 4px 5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -508,16 +441,16 @@
   }
   .slot-num {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     color: #0f172a;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
   }
   .slot-pos {
-    font-size: 6.5px;
+    font-size: 5.8px;
     font-weight: 800;
     color: #475569;
     background: #e2e8f0;
-    padding: 1px 4px;
+    padding: 1px 3px;
     border-radius: 3px;
   }
   .slot-center {
@@ -526,25 +459,80 @@
   }
   .slot-player-hint {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
+    font-size: 10.5px;
     color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
   }
   .slot-sub-hint {
-    font-size: 6.5px;
+    font-size: 6px;
     color: #64748b;
     font-weight: 700;
-    margin-top: 2px;
+    margin-top: 3px;
     line-height: 1.25;
   }
   .slot-footer {
-    font-size: 6px;
+    font-size: 5.6px;
     color: #64748b;
     text-align: center;
     border-top: 1px dashed #cbd5e1;
     padding-top: 2px;
     font-weight: 700;
+  }
+
+  /* Outcome & Scoreboard Panel in Upper Right of Playmat */
+  .dash-panel {
+    border: 1.5px solid #0f172a;
+    border-radius: 7px;
+    padding: 4px 6px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 2.40in;
+  }
+  .dash-panel-title {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.4px;
+    color: #0f172a;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 1.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dash-panel-title span {
+    font-family: sans-serif;
+    font-size: 6px;
+    font-weight: 800;
+    color: #475569;
+  }
+
+  .mat-outcome-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 6.3px;
+  }
+  .mat-outcome-table td {
+    padding: 1.5px 2.5px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .mat-outcome-table tr.p-win { background: #f0fdf4; font-weight: 700; }
+  .mat-outcome-table tr.b-win { background: #fef2f2; font-weight: 700; }
+
+  /* Full-Width Inning Scoreboard & Basepath Strip on Playmat */
+  .mat-scoreboard-strip {
+    border: 1.5px solid #0f172a;
+    border-radius: 7px;
+    background: #f8fafc;
+    padding: 5px 8px;
+    display: grid;
+    grid-template-columns: 3.1in 2.6in 1.8in;
+    gap: 0.08in;
+    align-items: center;
+    height: 1.92in;
   }
 </style>
 </head>
@@ -552,448 +540,452 @@
 
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT — HALF-SIZE CARDS (2.5" × 1.64") &amp; 1-PAGE 8.5×11 PLAYMATS</h1>
-    <span style="font-size: 12px; color: #94a3b8;">Page 1: Metro Titans (18 Half-Cards) • Page 2: Shadow Serpents (18 Half-Cards) • Page 3: Titans 8.5×11 Playmat • Page 4: Serpents 8.5×11 Playmat • Page 5: Shared Diamond &amp; Tokens</span>
+    <h1>FULL COUNT — PORTRAIT HALF-SIZE CARDS (1.50" × 2.38") &amp; 1-PAGE 8.5×11 PLAYMATS</h1>
+    <span style="font-size: 12px; color: #94a3b8;">Portrait Orientation for Ultra-Short Left-to-Right Lineups • Page 1: Metro Titans (20 Cards) • Page 2: Shadow Serpents (20 Cards) • Pages 3–4: 8.5×11 Playmats</span>
   </div>
   <div class="header-actions">
-    <button class="print-btn" onclick="window.print()">🖨️ Print All 5 Sheets (8.5" × 11")</button>
+    <button class="print-btn" onclick="window.print()">🖨️ Print All Sheets (8.5" × 11")</button>
   </div>
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 1: METRO TITANS COMPLETE 18-CARD CUTOUT SHEET (HALF-POKER SIZE)   -->
+<!-- PAGE 1: METRO TITANS COMPLETE 20-CARD PORTRAIT SHEET (1.50" x 2.38")   -->
 <!-- ====================================================================== -->
 <div class="page">
   <div class="sheet-banner titans-banner">
-    <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — COMPLETE 18-CARD ROSTER &amp; STANCE SHEET (HALF-SIZE: 2.5" × 1.64")</span>
-    <span class="sheet-banner-sub">6 Pitchers + 9 Starting Batters (#1–#9) + 3 Stance Selection Cards • Cut Along Borders &amp; Place on Page 3 Playmat</span>
+    <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
+    <span class="sheet-banner-sub">9 Batters (#1–#9) + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Narrow Portrait Cards Line Up Left-to-Right in Minimal Space!</span>
   </div>
 
-  <div class="half-card-grid">
+  <div class="portrait-card-grid">
 
-    <!-- 1. TITANS SP1: APEX GARRISON -->
+    <!-- ROW 1: TITANS BATTERS #1 TO #5 -->
+    <!-- 1. FLASH MERCER -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • SP #1 (ACE)</span>
-          <span class="card-name">"APEX" GARRISON</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d8▸d6▸d4</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d12</strong></span><span>CMD <strong>d6</strong></span><span>MOV <strong>d8</strong></span><span>DEC <strong>d6</strong></span><span>GRT <strong>d10</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d12 + Grt d10<span class="stance-avg">(12.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d6 + Grt d10<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d8 + Dec d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ SONIC BOOM:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch). <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 2. TITANS SP2: BRICK KOWALSKI -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • SP #2 (SINKER)</span>
-          <span class="card-name">"BRICK" KOWALSKI</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d8</strong></span><span>CMD <strong>d8</strong></span><span>MOV <strong>d10</strong></span><span>DEC <strong>d6</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d10 + Dec d6<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ IRON SINK:</span> +2 Pitcher roll; Fielded/Sac Outs (0..-2) hold all runners. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 3. TITANS SP3: DAKOTA RIDGE -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • SP #3 (WORKHORSE)</span>
-          <span class="card-name">DAKOTA RIDGE</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d6</strong></span><span>CMD <strong>d8</strong></span><span>MOV <strong>d6</strong></span><span>DEC <strong>d6</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d6 + Grt d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d6 + Dec d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ INNING EATER:</span> Add +2 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 4. TITANS RP1: SPITFIRE RAMOS -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • RP #1 (SETUP)</span>
-          <span class="card-name">"SPITFIRE" RAMOS</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d10</strong></span><span>CMD <strong>d4</strong></span><span>MOV <strong>d8</strong></span><span>DEC <strong>d4</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d10 + Grt d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d4 + Grt d8<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d8 + Dec d4<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ FLAMETHROWER:</span> Add +2 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 5. TITANS RP2: LEFTY VANCE -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • RP #2 (MIDDLE)</span>
-          <span class="card-name">"LEFTY" VANCE</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d6</strong></span><span>CMD <strong>d8</strong></span><span>MOV <strong>d8</strong></span><span>DEC <strong>d8</strong></span><span>GRT <strong>d6</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d6 + Grt d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d8 + Grt d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d8 + Dec d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ SOUTHPAW SWEEP:</span> Add +2 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 6. TITANS CL: THE BEAST TANKER -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • CLOSER (CL)</span>
-          <span class="card-name">"THE BEAST" TANKER</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d8▸d6▸d4</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d12</strong></span><span>CMD <strong>d4</strong></span><span>MOV <strong>d6</strong></span><span>DEC <strong>d4</strong></span><span>GRT <strong>d12</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d12 + Grt d12<span class="stance-avg">(13.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">13</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d4 + Grt d12<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d6 + Dec d4<span class="stance-avg">(6.0)</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum Token &amp; add +2 to Pitcher roll! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 7. TITANS BATTER #1: FLASH MERCER -->
-    <div class="card titans">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #1 LEADOFF (CF)</span>
-          <span class="card-name">"FLASH" MERCER</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#1 LEADOFF • CF</span>
           <span class="card-badge spd-badge">SPD d12</span>
-          <span class="card-badge mom-badge">⚡ d6▸d4</span>
         </div>
+        <div class="card-name">"FLASH" MERCER</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d10</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d12</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d10</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d12</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d10<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d10 + Foc d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d12<span class="stance-avg">(12.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d10</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ RABBIT JUMP:</span> +2 Batter roll; advance +1 extra base on any Single. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ RABBIT JUMP:</span> +2 Batter roll; advance +1 extra base on any Clean Single.</div>
       </div>
     </div>
 
-    <!-- 8. TITANS BATTER #2: AARON VANCE -->
+    <!-- 2. AARON VANCE -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #2 MVP (RF)</span>
-          <span class="card-name">AARON VANCE</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#2 MVP • RF</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">AARON VANCE</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d10</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d8</strong></span><span>FOC <strong>d10</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d10</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d10</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d10 + Con d10<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d8 + Foc d10<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ PURE BARREL:</span> +2 Batter roll; Strikeout (+6+) becomes Routine Out. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ PURE BARREL:</span> +2 Batter roll; Strikeout (+6+) becomes Routine Out.</div>
       </div>
     </div>
 
-    <!-- 9. TITANS BATTER #3: CORBIN REYES -->
+    <!-- 3. CORBIN REYES -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #3 ANCHOR (LF)</span>
-          <span class="card-name">CORBIN REYES</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#3 ANCHOR • LF</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">CORBIN REYES</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d8</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d8</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d8</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d8 + Con d10<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d8 + Foc d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d6<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ CLUTCH DRIVE:</span> Add +3 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ CLUTCH DRIVE:</span> Add +3 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 10. TITANS BATTER #4: COLOSSUS STONE -->
+    <!-- 4. COLOSSUS STONE -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #4 CLEANUP (1B)</span>
-          <span class="card-name">"COLOSSUS" STONE</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#4 CLEANUP • 1B</span>
           <span class="card-badge spd-badge">SPD d4</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">"COLOSSUS" STONE</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d12</strong></span><span>CON <strong>d6</strong></span><span>EYE <strong>d4</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d4</strong></span>
+        <span>POW<strong>d12</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d4</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d12 + Con d6<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d4 + Foc d8<span class="stance-avg">(7.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d6 + Spd d4<span class="stance-avg">(6.0)</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d12+Con d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on d6 roll 4–6! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on d6 roll of 4–6!</div>
       </div>
     </div>
 
-    <!-- 11. TITANS BATTER #5: MARCUS COLE -->
+    <!-- 5. MARCUS COLE -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #5 SLUGGER (3B)</span>
-          <span class="card-name">MARCUS COLE</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#5 SLUGGER • 3B</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d6▸d4</span>
         </div>
+        <div class="card-name">MARCUS COLE</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d8</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d6</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d8</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d8 + Con d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ HOT CORNER:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ HOT CORNER:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 12. TITANS BATTER #6: BLUE COLLAR DAN -->
+    <!-- ROW 2: TITANS BATTERS #6 TO #9 + SP #1 -->
+    <!-- 6. BLUE COLLAR DAN -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #6 CATCHER (C)</span>
-          <span class="card-name">"BLUE COLLAR" DAN</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#6 CATCHER • C</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">"BLUE COLLAR" DAN</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d6</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d6</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d6</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d6 + Con d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ GRITTY AB:</span> +2 Batter roll; Margin +1 becomes 0 (Fielded/Sac). <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ GRITTY AB:</span> +2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).</div>
       </div>
     </div>
 
-    <!-- 13. TITANS BATTER #7: TOBY CHEN -->
+    <!-- 7. TOBY CHEN -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #7 CONTACT (2B)</span>
-          <span class="card-name">TOBY CHEN</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#7 CONTACT • 2B</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">TOBY CHEN</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d4</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d8<span class="stance-avg">(7.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d4<span class="stance-avg">(6.0)</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ SECOND LEADOFF:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ SECOND LEADOFF:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 14. TITANS BATTER #8: GLOVE-MAN PETE -->
+    <!-- 8. GLOVE-MAN PETE -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #8 DEFENSE (SS)</span>
-          <span class="card-name">"GLOVE-MAN" PETE</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#8 DEFENSE • SS</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">"GLOVE-MAN" PETE</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d6</strong></span><span>EYE <strong>d4</strong></span><span>FOC <strong>d4</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d6<span class="stance-avg">(6.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d4 + Foc d4<span class="stance-avg">(5.0)</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d6 + Spd d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ CONTACT POKE:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ CONTACT POKE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 15. TITANS BATTER #9: ELI THE KID -->
+    <!-- 9. ELI THE KID -->
     <div class="card titans">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">TITANS • #9 ROOKIE (DH)</span>
-          <span class="card-name">ELI "THE KID"</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#9 ROOKIE • DH</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">ELI "THE KID"</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d4</strong></span><span>EYE <strong>d4</strong></span><span>FOC <strong>d4</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d4</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d4<span class="stance-avg">(5.0)</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d4 + Foc d4<span class="stance-avg">(5.0)</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d4 + Spd d6<span class="stance-avg">(6.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ UNDERDOG SPARK:</span> Roll an extra +d6 bonus die &amp; add to Batter roll! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ UNDERDOG SPARK:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
-    <!-- 16. TITANS STANCE CARD: RED -->
+    <!-- 10. SP1: APEX GARRISON -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • SP #1</span>
+          <span class="card-badge mom-badge">ACE</span>
+        </div>
+        <div class="card-name">"APEX" GARRISON</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d12</strong></span><span>CMD<strong>d6</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d10</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d12+Grt d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ SONIC BOOM:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
+      </div>
+    </div>
+
+    <!-- ROW 3: TITANS PITCHERS (SP2, SP3, RP1, RP2, CL) -->
+    <!-- 11. SP2: BRICK KOWALSKI -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • SP #2</span>
+          <span class="card-badge mom-badge">SINKER</span>
+        </div>
+        <div class="card-name">"BRICK" KOWALSKI</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ IRON SINK:</span> +2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.</div>
+      </div>
+    </div>
+
+    <!-- 12. SP3: DAKOTA RIDGE -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • SP #3</span>
+          <span class="card-badge mom-badge">STARTER</span>
+        </div>
+        <div class="card-name">DAKOTA RIDGE</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d6</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ INNING EATER:</span> Add +2 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- 13. RP1: SPITFIRE RAMOS -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • RP #1</span>
+          <span class="card-badge">SETUP</span>
+        </div>
+        <div class="card-name">"SPITFIRE" RAMOS</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d10</strong></span><span>CMD<strong>d4</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d4</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d10+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ FLAMETHROWER:</span> Add +2 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- 14. RP2: LEFTY VANCE -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • RP #2</span>
+          <span class="card-badge">MIDDLE</span>
+        </div>
+        <div class="card-name">"LEFTY" VANCE</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d6</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d6</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ SOUTHPAW SWEEP:</span> Add +2 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- 15. CL: THE BEAST TANKER -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">TITANS • CLOSER</span>
+          <span class="card-badge" style="background:#b91c1c;">CLOSER</span>
+        </div>
+        <div class="card-name">"THE BEAST" TANKER</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d12</strong></span><span>CMD<strong>d4</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d4</strong></span><span>GRT<strong>d12</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d12+Grt d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">13</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d12</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>CLOSER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum Token &amp; +2 Pitcher roll!</div>
+      </div>
+    </div>
+
+    <!-- ROW 4: 3 STANCE CARDS + OUTCOME CARD + TOKENS -->
+    <!-- 16. RED STANCE CARD -->
     <div class="card stance-red">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">METRO TITANS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#dc2626;">🔴 RED: HEAT / POWER</span>
-        </div>
-        <span class="card-badge" style="background:#dc2626;">🔴 RED</span>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
+        <div class="card-name" style="color:#dc2626;">🔴 HEAT / POWER</div>
       </div>
-      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🔥 <strong>WHEN PITCHING (HEAT):</strong> Roll <strong>VEL + GRT</strong></div>
-        <div>💥 <strong>WHEN BATTING (POWER):</strong> Roll <strong>POW + CON</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🔥💥</div>
+      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (HEAT):</strong><br>Roll <strong>VEL + GRT</strong><br>
+        <strong>BATTING (POWER):</strong><br>Roll <strong>POW + CON</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🔴):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🔴):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
-    <!-- 17. TITANS STANCE CARD: BLUE -->
+    <!-- 17. BLUE STANCE CARD -->
     <div class="card stance-blue">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">METRO TITANS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#2563eb;">🔵 BLUE: ZONE / EYE</span>
-        </div>
-        <span class="card-badge" style="background:#2563eb;">🔵 BLUE</span>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
+        <div class="card-name" style="color:#2563eb;">🔵 ZONE / EYE</div>
       </div>
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🎯 <strong>WHEN PITCHING (ZONE):</strong> Roll <strong>CMD + GRT</strong></div>
-        <div>👁️ <strong>WHEN BATTING (EYE):</strong> Roll <strong>EYE + FOC</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🎯👁️</div>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (ZONE):</strong><br>Roll <strong>CMD + GRT</strong><br>
+        <strong>BATTING (EYE):</strong><br>Roll <strong>EYE + FOC</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🔵):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🔵):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
-    <!-- 18. TITANS STANCE CARD: GREEN -->
+    <!-- 18. GREEN STANCE CARD -->
     <div class="card stance-green">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">METRO TITANS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#16a34a;">🟢 GREEN: BREAK / TIMING</span>
-        </div>
-        <span class="card-badge" style="background:#16a34a;">🟢 GREEN</span>
+        <div class="card-top-meta"><span class="card-role">TITANS STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
+        <div class="card-name" style="color:#16a34a;">🟢 BREAK / TIMING</div>
       </div>
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🌪️ <strong>WHEN PITCHING (BREAK):</strong> Roll <strong>MOV + DEC</strong></div>
-        <div>⚡ <strong>WHEN BATTING (TIMING):</strong> Roll <strong>CON + SPD</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🌪️⚡</div>
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (BREAK):</strong><br>Roll <strong>MOV + DEC</strong><br>
+        <strong>BATTING (TIMING):</strong><br>Roll <strong>CON + SPD</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🟢):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🟢):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+      </div>
+    </div>
+
+    <!-- 19. POCKET OUTCOME CHART -->
+    <div class="card ref-card">
+      <div class="card-header">
+        <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
+        <div class="card-name">OUTCOME TABLE</div>
+      </div>
+      <table class="mat-outcome-table" style="font-size:5.8px;">
+        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
+        <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
+        <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
+        <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
+        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
+      </table>
+      <div class="ability-box">
+        <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
+      </div>
+    </div>
+
+    <!-- 20. TITANS CUTOUT TOKENS -->
+    <div class="card titans">
+      <div class="card-header">
+        <div class="card-top-meta"><span class="card-role">SLICE INTO 4 TOKENS</span><span class="card-badge" style="background:#b91c1c;">TOKENS</span></div>
+        <div class="card-name">TITANS MARKERS</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr; gap:2.5px; flex:1; margin-top:2px;">
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">⚡ MOMENTUM TOKEN</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏏 AT-BAT LINEUP MARKER</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #1</div>
+        <div style="border:1px dashed #b91c1c; border-radius:3px; background:#fef2f2; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#991b1b;">🏃 BASERUNNER #2</div>
       </div>
     </div>
 
@@ -1001,439 +993,443 @@
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 2: SHADOW SERPENTS COMPLETE 18-CARD CUTOUT SHEET (HALF-POKER SIZE)-->
+<!-- PAGE 2: SHADOW SERPENTS COMPLETE 20-CARD PORTRAIT SHEET (1.50" x 2.38")-->
 <!-- ====================================================================== -->
 <div class="page">
   <div class="sheet-banner serpents-banner">
-    <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — COMPLETE 18-CARD ROSTER &amp; STANCE SHEET (HALF-SIZE: 2.5" × 1.64")</span>
-    <span class="sheet-banner-sub">6 Pitchers + 9 Starting Batters (#1–#9) + 3 Stance Selection Cards • Cut Along Borders &amp; Place on Page 4 Playmat</span>
+    <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
+    <span class="sheet-banner-sub">9 Batters (#1–#9) + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Narrow Portrait Cards Line Up Left-to-Right in Minimal Space!</span>
   </div>
 
-  <div class="half-card-grid">
+  <div class="portrait-card-grid">
 
-    <!-- 1. SERPENTS SP1: PROFESSOR WEBB -->
+    <!-- ROW 1: SERPENTS BATTERS #1 TO #5 -->
+    <!-- 1. PROFESSOR SOTO -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • SP #1 (ACE)</span>
-          <span class="card-name">"PROFESSOR" WEBB</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d8▸d6▸d4</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d6</strong></span><span>CMD <strong>d12</strong></span><span>MOV <strong>d10</strong></span><span>DEC <strong>d10</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d6 + Grt d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d12 + Grt d8<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d10 + Dec d10<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ BLACK PAINT:</span> +2 Pitcher roll; Margin -3 is Fielded Out (not BB). <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 2. SERPENTS SP2: GHOST STRIDER -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • SP #2 (SPIN)</span>
-          <span class="card-name">"GHOST" STRIDER</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d8</strong></span><span>CMD <strong>d8</strong></span><span>MOV <strong>d8</strong></span><span>DEC <strong>d12</strong></span><span>GRT <strong>d6</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d8 + Grt d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d8 + Grt d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d8 + Dec d12<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ TUNNELING:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch). <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 3. SERPENTS SP3: COLD-EYE CARTER -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • SP #3 (VET)</span>
-          <span class="card-name">"COLD-EYE" CARTER</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d6</strong></span><span>CMD <strong>d10</strong></span><span>MOV <strong>d6</strong></span><span>DEC <strong>d6</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d6 + Grt d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d10 + Grt d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d6 + Dec d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ VETERAN POISE:</span> +2 Pitcher roll; downgrade Extra-Base Hit to Single. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 4. SERPENTS RP1: SUBMARINE SKENES -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • RP #1 (SETUP)</span>
-          <span class="card-name">"SUBMARINE" SKENES</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d6▸d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d8</strong></span><span>CMD <strong>d6</strong></span><span>MOV <strong>d10</strong></span><span>DEC <strong>d8</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d6 + Grt d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d10 + Dec d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ RISING SLIDER:</span> Add +2 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 5. SERPENTS RP2: ICEBOX KELLER -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • RP #2 (MIDDLE)</span>
-          <span class="card-name">"ICEBOX" KELLER</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d6</strong></span><span>CMD <strong>d10</strong></span><span>MOV <strong>d6</strong></span><span>DEC <strong>d8</strong></span><span>GRT <strong>d6</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d6 + Grt d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d10 + Grt d6<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d6 + Dec d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ FIREMAN:</span> Add +2 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 6. SERPENTS CL: VIPER CRUZ -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • CLOSER (CL)</span>
-          <span class="card-name">"VIPER" CRUZ</span>
-        </div>
-        <div class="card-badges">
-          <span class="card-badge mom-badge">⚡ d8▸d6▸d4</span>
-        </div>
-      </div>
-      <div class="core-stats">
-        <span>VEL <strong>d8</strong></span><span>CMD <strong>d8</strong></span><span>MOV <strong>d12</strong></span><span>DEC <strong>d10</strong></span><span>GRT <strong>d8</strong></span>
-      </div>
-      <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 HEAT</td><td class="stance-dice">Vel d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 ZONE</td><td class="stance-dice">Cmd d8 + Grt d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 BREAK</td><td class="stance-dice">Mov d12 + Dec d10<span class="stance-avg">(12.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
-      </table>
-      <div class="ability-box">
-        <span class="ability-title">⚡ NASTY BITE:</span> Add +3 to your Pitcher total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
-      </div>
-    </div>
-
-    <!-- 7. SERPENTS BATTER #1: PROFESSOR SOTO -->
-    <div class="card serpents">
-      <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #1 LEADOFF (LF)</span>
-          <span class="card-name">"PROFESSOR" SOTO</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#1 LEADOFF • LF</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">"PROFESSOR" SOTO</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d6</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d12</strong></span><span>FOC <strong>d10</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d6</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d12</strong></span><span>FOC<strong>d10</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d6 + Con d10<span class="stance-avg">(9.0)</span></td><td class="stars">⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d12 + Foc d10<span class="stance-avg">(12.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d10</span></td><td class="stars">⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d12+Foc d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ EAGLE EYE:</span> +2 Batter roll; draw a Walk on Margin -2 or -3! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ EAGLE EYE:</span> +2 Batter roll; draw a Walk on Margin -2 or -3!</div>
       </div>
     </div>
 
-    <!-- 8. SERPENTS BATTER #2: SHOHEI VIPER CRUZ -->
+    <!-- 2. SHOHEI VIPER CRUZ -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #2 STAR (DH)</span>
-          <span class="card-name">SHOHEI "VIPER" CRUZ</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#2 STAR • DH</span>
           <span class="card-badge spd-badge">SPD d10</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">SHOHEI "VIPER" CRUZ</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d10</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d10</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d10</strong></span>
+        <span>POW<strong>d10</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d10</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d10</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d10 + Con d10<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d10 + Foc d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d10<span class="stance-avg">(11.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ FIVE-TOOL GENIUS:</span> Auto-win Pitch Guess &amp; claim ⚡ Momentum Token! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ FIVE-TOOL GENIUS:</span> Auto-win Pitch Guess &amp; claim ⚡ Momentum!</div>
       </div>
     </div>
 
-    <!-- 9. SERPENTS BATTER #3: GUNNAR HENDERSON -->
+    <!-- 3. GUNNAR HENDERSON -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #3 ANCHOR (SS)</span>
-          <span class="card-name">GUNNAR HENDERSON</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#3 ANCHOR • SS</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d8▸d6</span>
         </div>
+        <div class="card-name">GUNNAR HENDERSON</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d8</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d8</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d8</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d8 + Con d10<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d8 + Foc d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ GAP HUNTER:</span> +2 Batter roll; upgrade any Single into a Double! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ GAP HUNTER:</span> +2 Batter roll; upgrade any Single into a Double!</div>
       </div>
     </div>
 
-    <!-- 10. SERPENTS BATTER #4: BRYCE HARPER -->
+    <!-- 4. BRYCE HARPER -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #4 CLEANUP (1B)</span>
-          <span class="card-name">BRYCE HARPER</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#4 CLEANUP • 1B</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d6▸d4</span>
         </div>
+        <div class="card-name">BRYCE HARPER</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d10</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d8</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d10</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d8</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d10 + Con d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d8 + Foc d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d10+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ SHOWTIME:</span> Add +3 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ SHOWTIME:</span> Add +3 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 11. SERPENTS BATTER #5: MANNY MACHADO -->
+    <!-- 5. MANNY MACHADO -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #5 THREAT (3B)</span>
-          <span class="card-name">MANNY MACHADO</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#5 THREAT • 3B</span>
           <span class="card-badge spd-badge">SPD d6</span>
-          <span class="card-badge mom-badge">⚡ d6▸d4</span>
         </div>
+        <div class="card-name">MANNY MACHADO</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d8</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d8</strong></span><span>SPD <strong>d6</strong></span>
+        <span>POW<strong>d8</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d8</strong></span><span>SPD<strong>d6</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d8 + Con d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d6<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d8+Con d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ LINE DRIVE:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ LINE DRIVE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 12. SERPENTS BATTER #6: FRANCISCO LINDOR -->
+    <!-- ROW 2: SERPENTS BATTERS #6 TO #9 + SP #1 -->
+    <!-- 6. FRANCISCO LINDOR -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #6 SWITCH (CF)</span>
-          <span class="card-name">FRANCISCO LINDOR</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#6 SWITCH • CF</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">FRANCISCO LINDOR</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d6</strong></span><span>CON <strong>d8</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d6</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d6</strong></span><span>CON<strong>d8</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d6 + Con d8<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d8 + Spd d8<span class="stance-avg">(9.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d6+Con d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ MR. SMILE:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ MR. SMILE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 13. SERPENTS BATTER #7: NICO HOERNER -->
+    <!-- 7. NICO HOERNER -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #7 CONTACT (2B)</span>
-          <span class="card-name">NICO HOERNER</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#7 CONTACT • 2B</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">NICO HOERNER</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d10</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d4</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d10</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d10<span class="stance-avg">(8.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d4<span class="stance-avg">(6.0)</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d10 + Spd d8<span class="stance-avg">(10.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ BAT CONTROL:</span> Reroll highest batter die &amp; keep higher (+1 Bat). <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ BAT CONTROL:</span> Reroll highest batter die &amp; keep higher (+1 Bat).</div>
       </div>
     </div>
 
-    <!-- 14. SERPENTS BATTER #8: AUSTIN HEDGES -->
+    <!-- 8. AUSTIN HEDGES -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #8 DEFENSE (C)</span>
-          <span class="card-name">AUSTIN HEDGES</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#8 DEFENSE • C</span>
           <span class="card-badge spd-badge">SPD d4</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">AUSTIN HEDGES</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d6</strong></span><span>EYE <strong>d6</strong></span><span>FOC <strong>d6</strong></span><span>SPD <strong>d4</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d6</strong></span><span>EYE<strong>d6</strong></span><span>FOC<strong>d6</strong></span><span>SPD<strong>d4</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d6<span class="stance-avg">(6.0)</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d6 + Foc d6<span class="stance-avg">(7.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d6 + Spd d4<span class="stance-avg">(6.0)</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ VETERAN EYE:</span> Add +2 to your Batter total roll. <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ VETERAN EYE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 15. SERPENTS BATTER #9: LEO THE SPARK -->
+    <!-- 9. LEO THE SPARK -->
     <div class="card serpents">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SERPENTS • #9 ROOKIE (RF)</span>
-          <span class="card-name">LEO "THE SPARK"</span>
-        </div>
-        <div class="card-badges">
+        <div class="card-top-meta">
+          <span class="card-role">#9 ROOKIE • RF</span>
           <span class="card-badge spd-badge">SPD d8</span>
-          <span class="card-badge mom-badge">⚡ d4▸—</span>
         </div>
+        <div class="card-name">LEO "THE SPARK"</div>
       </div>
       <div class="core-stats">
-        <span>POW <strong>d4</strong></span><span>CON <strong>d4</strong></span><span>EYE <strong>d4</strong></span><span>FOC <strong>d4</strong></span><span>SPD <strong>d8</strong></span>
+        <span>POW<strong>d4</strong></span><span>CON<strong>d4</strong></span><span>EYE<strong>d4</strong></span><span>FOC<strong>d4</strong></span><span>SPD<strong>d8</strong></span>
       </div>
       <table class="stances-table">
-        <tr><td class="stance-tag red">🔴 POWER</td><td class="stance-dice">Pow d4 + Con d4<span class="stance-avg">(5.0)</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td class="stance-tag blue">🔵 EYE</td><td class="stance-dice">Eye d4 + Foc d4<span class="stance-avg">(5.0)</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
-        <tr><td class="stance-tag green">🟢 TIMING</td><td class="stance-dice">Con d4 + Spd d8<span class="stance-avg">(7.0)</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag red">🔴 POWER</span><span class="stance-dice">Pow d4+Con d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
+        <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
+      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <span class="ability-title">⚡ NINE-HOLE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll! <span class="fatigue-inline">[Steps ⚡ down 1]</span>
+        <div><span class="ability-title">⚡ NINE-HOLE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
-    <!-- 16. SERPENTS STANCE CARD: RED -->
+    <!-- 10. SP1: PROFESSOR WEBB -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • SP #1</span>
+          <span class="card-badge mom-badge">ACE</span>
+        </div>
+        <div class="card-name">"PROFESSOR" WEBB</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d6</strong></span><span>CMD<strong>d12</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d10</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d12+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ BLACK PAINT:</span> +2 Pitch; Margin -3 is Fielded Out (not BB).</div>
+      </div>
+    </div>
+
+    <!-- ROW 3: SERPENTS PITCHERS (SP2, SP3, RP1, RP2, CL) -->
+    <!-- 11. SP2: GHOST STRIDER -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • SP #2</span>
+          <span class="card-badge mom-badge">SPIN</span>
+        </div>
+        <div class="card-name">"GHOST" STRIDER</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d8</strong></span><span>DEC<strong>d12</strong></span><span>GRT<strong>d6</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ TUNNELING:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
+      </div>
+    </div>
+
+    <!-- 12. SP3: COLD-EYE CARTER -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • SP #3</span>
+          <span class="card-badge mom-badge">STARTER</span>
+        </div>
+        <div class="card-name">"COLD-EYE" CARTER</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d6</strong></span><span>CMD<strong>d10</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d6</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ VETERAN POISE:</span> +2 Pitch; downgrade Extra-Base Hit to Single.</div>
+      </div>
+    </div>
+
+    <!-- 13. RP1: SUBMARINE SKENES -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • RP #1</span>
+          <span class="card-badge">SETUP</span>
+        </div>
+        <div class="card-name">"SUBMARINE" SKENES</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d8</strong></span><span>CMD<strong>d6</strong></span><span>MOV<strong>d10</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ RISING SLIDER:</span> Add +2 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- 14. RP2: ICEBOX KELLER -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • RP #2</span>
+          <span class="card-badge">MIDDLE</span>
+        </div>
+        <div class="card-name">"ICEBOX" KELLER</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d6</strong></span><span>CMD<strong>d10</strong></span><span>MOV<strong>d6</strong></span><span>DEC<strong>d8</strong></span><span>GRT<strong>d6</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d6+Grt d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ FIREMAN:</span> Add +2 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- 15. CL: VIPER CRUZ -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta">
+          <span class="card-role">SERPENTS • CLOSER</span>
+          <span class="card-badge" style="background:#047857;">CLOSER</span>
+        </div>
+        <div class="card-name">"VIPER" CRUZ</div>
+      </div>
+      <div class="core-stats">
+        <span>VEL<strong>d8</strong></span><span>CMD<strong>d8</strong></span><span>MOV<strong>d12</strong></span><span>DEC<strong>d10</strong></span><span>GRT<strong>d8</strong></span>
+      </div>
+      <table class="stances-table">
+        <tr><td><span class="stance-tag red">🔴 HEAT</span><span class="stance-dice">Vel d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
+        <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d12+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
+      </table>
+      <div class="fatigue-bar"><span>CLOSER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="ability-box">
+        <div><span class="ability-title">⚡ NASTY BITE:</span> Add +3 to your Pitcher total roll.</div>
+      </div>
+    </div>
+
+    <!-- ROW 4: 3 STANCE CARDS + OUTCOME CARD + TOKENS -->
+    <!-- 16. RED STANCE CARD -->
     <div class="card stance-red">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SHADOW SERPENTS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#dc2626;">🔴 RED: HEAT / POWER</span>
-        </div>
-        <span class="card-badge" style="background:#dc2626;">🔴 RED</span>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#dc2626;">🔴 RED</span></div>
+        <div class="card-name" style="color:#dc2626;">🔴 HEAT / POWER</div>
       </div>
-      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🔥 <strong>WHEN PITCHING (HEAT):</strong> Roll <strong>VEL + GRT</strong></div>
-        <div>💥 <strong>WHEN BATTING (POWER):</strong> Roll <strong>POW + CON</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🔥💥</div>
+      <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (HEAT):</strong><br>Roll <strong>VEL + GRT</strong><br>
+        <strong>BATTING (POWER):</strong><br>Roll <strong>POW + CON</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🔴):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🔴):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
-    <!-- 17. SERPENTS STANCE CARD: BLUE -->
+    <!-- 17. BLUE STANCE CARD -->
     <div class="card stance-blue">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SHADOW SERPENTS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#2563eb;">🔵 BLUE: ZONE / EYE</span>
-        </div>
-        <span class="card-badge" style="background:#2563eb;">🔵 BLUE</span>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#2563eb;">🔵 BLUE</span></div>
+        <div class="card-name" style="color:#2563eb;">🔵 ZONE / EYE</div>
       </div>
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🎯 <strong>WHEN PITCHING (ZONE):</strong> Roll <strong>CMD + GRT</strong></div>
-        <div>👁️ <strong>WHEN BATTING (EYE):</strong> Roll <strong>EYE + FOC</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🎯👁️</div>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (ZONE):</strong><br>Roll <strong>CMD + GRT</strong><br>
+        <strong>BATTING (EYE):</strong><br>Roll <strong>EYE + FOC</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🔵):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🔵):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
       </div>
     </div>
 
-    <!-- 18. SERPENTS STANCE CARD: GREEN -->
+    <!-- 18. GREEN STANCE CARD -->
     <div class="card stance-green">
       <div class="card-header">
-        <div class="card-title-group">
-          <span class="card-role">SHADOW SERPENTS • SECRET STANCE CARD</span>
-          <span class="card-name" style="color:#16a34a;">🟢 GREEN: BREAK / TIMING</span>
-        </div>
-        <span class="card-badge" style="background:#16a34a;">🟢 GREEN</span>
+        <div class="card-top-meta"><span class="card-role">SERPENTS STANCE</span><span class="card-badge" style="background:#16a34a;">🟢 GREEN</span></div>
+        <div class="card-name" style="color:#16a34a;">🟢 BREAK / TIMING</div>
       </div>
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px 6px; font-size:7px; line-height:1.35;">
-        <div>🌪️ <strong>WHEN PITCHING (BREAK):</strong> Roll <strong>MOV + DEC</strong></div>
-        <div>⚡ <strong>WHEN BATTING (TIMING):</strong> Roll <strong>CON + SPD</strong></div>
+      <div style="text-align:center; font-size:20px; line-height:1; margin:2px 0;">🌪️⚡</div>
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:4px; font-size:6.2px; line-height:1.35;">
+        <strong>PITCHING (BREAK):</strong><br>Roll <strong>MOV + DEC</strong><br>
+        <strong>BATTING (TIMING):</strong><br>Roll <strong>CON + SPD</strong>
       </div>
       <div class="ability-box">
-        <strong>🎯 MATCH (Both 🟢):</strong> Batter claims ⚡ Momentum Die!<br>
-        <strong>🌀 MISMATCH:</strong> Pitcher claims ⚡ Momentum Die!
+        <div><strong>🎯 Match (Both 🟢):</strong> Batter ⚡!<br><strong>🌀 Mismatch:</strong> Pitcher ⚡!</div>
+      </div>
+    </div>
+
+    <!-- 19. POCKET OUTCOME CHART -->
+    <div class="card ref-card">
+      <div class="card-header">
+        <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
+        <div class="card-name">OUTCOME TABLE</div>
+      </div>
+      <table class="mat-outcome-table" style="font-size:5.8px;">
+        <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
+        <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
+        <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
+        <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
+        <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
+      </table>
+      <div class="ability-box">
+        <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
+      </div>
+    </div>
+
+    <!-- 20. SERPENTS CUTOUT TOKENS -->
+    <div class="card serpents">
+      <div class="card-header">
+        <div class="card-top-meta"><span class="card-role">SLICE INTO 4 TOKENS</span><span class="card-badge" style="background:#047857;">TOKENS</span></div>
+        <div class="card-name">SERPENTS MARKERS</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr; gap:2.5px; flex:1; margin-top:2px;">
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">⚡ MOMENTUM TOKEN</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏏 AT-BAT LINEUP MARKER</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏃 BASERUNNER #1</div>
+        <div style="border:1px dashed #047857; border-radius:3px; background:#ecfdf5; text-align:center; padding:2px; font-size:6px; font-weight:900; color:#065f46;">🏃 BASERUNNER #2</div>
       </div>
     </div>
 
@@ -1450,205 +1446,206 @@
     <div class="playmat-top-bar titans-mat">
       <div>
         <div class="playmat-team-title">⚡ THE METRO TITANS — SINGLE-SHEET MANAGER PLAYMAT (8.5" × 11")</div>
-        <div class="playmat-team-sub">Do Not Cut This Sheet! Lay Out Your Active Pitcher, Secret Stance Card &amp; All 9 Batters (#1–#9) Inside the Slots Below</div>
+        <div class="playmat-team-sub">Portrait Card Slots (1.50" × 2.38") • 5 Cards Fit Side-by-Side Across 8.5" (Or Line Up All 9 Left-to-Right in Only 13.5"!)</div>
       </div>
       <div class="playmat-rule-pills">
-        <div class="playmat-pill">🎯 <strong>MATCH (Same Color):</strong><br>Batter Rolls ⚡ Mom. Die</div>
-        <div class="playmat-pill">🌀 <strong>MISMATCH (Diff Color):</strong><br>Pitcher Rolls ⚡ Mom. Die</div>
+        <div class="playmat-pill">🎯 <strong>MATCH:</strong> Batter ⚡</div>
+        <div class="playmat-pill">🌀 <strong>MISMATCH:</strong> Pitcher ⚡</div>
       </div>
     </div>
 
-    <!-- Integrated Outcome Table + Mini Diamond + Inning/Outs Dashboard -->
-    <div class="playmat-dashboard">
-      <!-- Left: At-Bat Outcome Table -->
+    <!-- Section 1: Active Pitcher, Secret Stance, Bullpen + Outcome Lookup Table -->
+    <div class="mat-section-label" style="background:#991b1b;">
+      <span>⚾ PITCHING MOUND, SECRET STANCE, BULLPEN &amp; AT-BAT OUTCOME CHART</span>
+      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER WHEN #1 BATS OR AFTER SPECIAL</span>
+    </div>
+
+    <div class="mat-upper-row">
+      <div class="card-slot mound-slot">
+        <div class="slot-header"><span class="slot-num">⚾ MOUND</span><span class="slot-pos" style="background:#991b1b; color:white;">SP / RP</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">ACTIVE PITCHER</div>
+          <div class="slot-sub-hint">Garrison (SP1)<br>Kowalski (SP2)<br>Ridge (SP3)</div>
+        </div>
+        <div class="slot-footer">⚡ Tier: d8 ▸ d6 ▸ d4</div>
+      </div>
+
+      <div class="card-slot stance-slot">
+        <div class="slot-header"><span class="slot-num" style="color:#1d4ed8;">🎯 STANCE</span><span class="slot-pos" style="background:#2563eb; color:white;">🔴🔵🟢</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint" style="color:#3b82f6;">SECRET COLOR</div>
+          <div class="slot-sub-hint">Place 🔴, 🔵, or 🟢<br>Face-Down &amp; Reveal!</div>
+        </div>
+        <div class="slot-footer">Match=Bat ⚡ | Diff=Pit ⚡</div>
+      </div>
+
+      <div class="card-slot bullpen-slot">
+        <div class="slot-header"><span class="slot-num">🔥 BULLPEN</span><span class="slot-pos">STACK</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">RELIEVERS</div>
+          <div class="slot-sub-hint">Ramos (d6)<br>Vance (d4)<br>Tanker (CL d8)</div>
+        </div>
+        <div class="slot-footer">-1 ⚡ tier / inn pitched</div>
+      </div>
+
+      <!-- Outcome Lookup Panel -->
       <div class="dash-panel">
         <div class="dash-panel-title">
-          AT-BAT OUTCOME TABLE
+          AT-BAT OUTCOME CHART
           <span>Margin = Pitcher − Batter</span>
         </div>
         <table class="mat-outcome-table">
           <tr class="p-win"><td><strong>+6 or more</strong></td><td><strong>STRIKEOUT (K)</strong></td><td>Batter out; runners hold</td></tr>
           <tr class="p-win"><td><strong>+1 to +5</strong></td><td><strong>ROUTINE OUT</strong></td><td>Fly/Pop out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; Runner on 3rd scores!</td></tr>
+          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; 3rd scores (&lt;2 out)!</td></tr>
           <tr class="b-win"><td><strong>-3</strong></td><td><strong>WALK (BB)</strong></td><td>1st base; forces runners</td></tr>
-          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>Runners +1 (2nd: SPD 4+ Safe)</td></tr>
+          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>+1 base (2nd: SPD 4+ Safe)</td></tr>
           <tr class="b-win"><td><strong>-7 or less</strong></td><td><strong>EXTRA-BASE / HR</strong></td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
+        </table>
+        <div style="font-size:6px; font-weight:800; color:#475569; text-align:center; background:#e2e8f0; border-radius:3px; padding:2px;">
+          UNCONDITIONAL SPECIALS: Spend 1 ⚡ Tier on ANY At-Bat (Steps Down After Play)
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Batting Order Row 1 (#1 to #5 Left-to-Right) -->
+    <div class="mat-section-label">
+      <span>🏏 BATTING ORDER #1 TO #5 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 1 OF 2)</span>
+      <span>ADVANCE AT-BAT MARKER LEFT ➔ RIGHT</span>
+    </div>
+
+    <div class="mat-portrait-row-5">
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">CF</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">"FLASH" MERCER</div>
+          <div class="slot-sub-hint">🟢 12 | 🔵 10 | 🔴 8<br>SPD d12 • ⚡ d6</div>
+        </div>
+        <div class="slot-footer">2nd+ AB: Opp SP -1 ⚡</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">RF</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">AARON VANCE</div>
+          <div class="slot-sub-hint">🔴 11 | 🔵 10 | 🟢 10<br>SPD d8 • ⚡ d8</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #2</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">LF</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">CORBIN REYES</div>
+          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 9<br>SPD d6 • ⚡ d8</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #3</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">"COLOSSUS" STONE</div>
+          <div class="slot-sub-hint">🔴 10 | 🔵 7 | 🟢 6<br>SPD d4 • ⚡ d8</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #4</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">MARCUS COLE</div>
+          <div class="slot-sub-hint">🔴 9 | 🟢 8 | 🔵 7<br>SPD d6 • ⚡ d6</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #5</div>
+      </div>
+    </div>
+
+    <!-- Section 3: Batting Order Row 2 (#6 to #9 Left-to-Right + On-Mat Diamond) -->
+    <div class="mat-section-label">
+      <span>🏏 BATTING ORDER #6 TO #9 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 2 OF 2) + ON-MAT DIAMOND</span>
+      <span>AFTER #9 BATS, LOOP BACK TO #1 LEADOFF</span>
+    </div>
+
+    <div class="mat-portrait-row-5">
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">C</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">"BLUE COLLAR" DAN</div>
+          <div class="slot-sub-hint">🔴 8 | 🟢 8 | 🔵 7<br>SPD d6 • ⚡ d4</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #6</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">TOBY CHEN</div>
+          <div class="slot-sub-hint">🟢 9 | 🔴 7 | 🔵 6<br>SPD d8 • ⚡ d4</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #7</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">SS</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">"GLOVE-MAN" PETE</div>
+          <div class="slot-sub-hint">🟢 7 | 🔴 6 | 🔵 5<br>SPD d6 • ⚡ d4</div>
+        </div>
+        <div class="slot-footer">Lineup Slot #8</div>
+      </div>
+
+      <div class="card-slot titans-slot">
+        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">DH</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">ELI "THE KID"</div>
+          <div class="slot-sub-hint">🟢 6 | 🔴 5 | 🔵 5<br>SPD d6 • ⚡ d4</div>
+        </div>
+        <div class="slot-footer">Loops Back to #1</div>
+      </div>
+
+      <!-- 5th Slot: Integrated Mini Diamond & Momentum Dock -->
+      <div class="card-slot" style="border:2px solid #047857; background:#ecfdf5;">
+        <div class="slot-header"><span class="slot-num" style="color:#065f46;">⚾ DIAMOND</span><span class="slot-pos" style="background:#047857; color:white;">BASES</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; margin:auto 0;">
+          <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 8px; font-size:6.5px; font-weight:900; color:#065f46;">◆ 2ND BASE</div>
+          <div style="display:flex; justify-content:space-between; width:100%; gap:3px;">
+            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">◆ 3RD</div>
+            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">1ST ◆</div>
+          </div>
+          <div style="border:1.5px solid #b91c1c; background:#fef2f2; border-radius:4px; padding:2px 6px; font-size:6px; font-weight:900; color:#991b1b;">⬖ HOME (SPD 4+)</div>
+        </div>
+        <div class="slot-footer" style="color:#065f46;">Send 2B on 1B: 4+ Safe</div>
+      </div>
+    </div>
+
+    <!-- Bottom Scoreboard, Outs & Momentum Strip -->
+    <div class="mat-scoreboard-strip">
+      <div>
+        <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; margin-bottom:3px;">📊 INNING-BY-INNING SCOREBOARD</div>
+        <table style="width:100%; border-collapse:collapse; font-size:6.8px; text-align:center; background:white;">
+          <tr style="background:#e2e8f0; font-weight:900;"><td>TEAM</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>R</td><td>H</td></tr>
+          <tr><td style="text-align:left; font-weight:900; color:#b91c1c; padding:2px;">TITANS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
+          <tr><td style="text-align:left; font-weight:900; color:#047857; padding:2px;">SERPENTS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
         </table>
       </div>
 
-      <!-- Center: Basepath Diamond & 3rd-Base Coach Rule -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          DIAMOND &amp; BASERUNNING
-          <span>Send 2nd on 1B: SPD 4+ Safe</span>
+      <div style="display:flex; flex-direction:column; gap:4px; font-size:7px; font-weight:800; color:#1e293b;">
+        <div>OUTS THIS HALF-INNING:</div>
+        <div style="display:flex; gap:6px;">
+          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 1</span>
+          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 2</span>
+          <span style="border:1.5px solid #b91c1c; background:#fef2f2; padding:3px 8px; border-radius:4px; color:#991b1b;">❌ OUT 3</span>
         </div>
-        <div class="mini-diamond-wrap">
-          <div class="mini-base-box">◆ 2ND BASE</div>
-          <div class="mini-base-row">
-            <div class="mini-base-box">◆ 3RD BASE</div>
-            <div class="mini-base-box">1ST BASE ◆</div>
-          </div>
-          <div class="mini-home-box">⬖ HOME PLATE (1-3 OUT / 4+ SAFE) ⬖</div>
-        </div>
+        <div style="font-size:6.2px; color:#475569;">3 Outs = Clear Bases &amp; Flip Top/Bottom</div>
       </div>
 
-      <!-- Right: Momentum Dock, Outs & Innings -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          GAME &amp; MOMENTUM
-          <span>Track State</span>
+      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:6px; padding:6px; text-align:center;">
+        <div style="font-family:Impact, sans-serif; font-size:11px; color:#92400e;">⚡ MOMENTUM DOCK</div>
+        <div style="font-size:6.2px; font-weight:800; color:#78350f; margin-top:2px;">
+          Place ⚡ Token Here When You Win Pitch Guess!<br>
+          <strong>Roll 3rd Die (d8 / d6 / d4)</strong>
         </div>
-        <div style="background:#fef3c7; border:1.5px solid #f59e0b; border-radius:4px; padding:3px 5px; text-align:center; font-size:6.8px; font-weight:900; color:#92400e;">
-          ⚡ MOMENTUM TOKEN DOCK<br>
-          <span style="font-size:6px; font-weight:700;">Holder Rolls 3rd Die (d8 / d6 / d4)</span>
-        </div>
-        <div style="font-size:6.5px; font-weight:800; color:#1e293b; line-height:1.35;">
-          <div><strong>OUTS:</strong> &nbsp;[ ⚪ 1 ] &nbsp;[ ⚪ 2 ] &nbsp;[ ❌ 3 ]</div>
-          <div><strong>INN:</strong> [1][2][3][4][5][6][7][8][9][+]</div>
-          <div><strong>SCORE:</strong> TITANS [____] &nbsp;OPP [____]</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 1: Pitching Mound, Secret Stance & Bullpen Row -->
-    <div class="mat-section-label" style="background:#991b1b;">
-      <span>⚾ PITCHING MOUND, SECRET STANCE &amp; BULLPEN ZONE (3 HALF-CARD SLOTS: 2.5" × 1.64")</span>
-      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER EACH TIME #1 LEADOFF BATS OR AFTER USING SPECIAL</span>
-    </div>
-
-    <div class="mat-row-3">
-      <div class="card-slot mound-slot">
-        <div class="slot-header">
-          <span class="slot-num">⚾ ACTIVE PITCHER (MOUND)</span>
-          <span class="slot-pos" style="background:#991b1b; color:white;">SP / RP</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint">PLACE ACTIVE PITCHER HERE</div>
-          <div class="slot-sub-hint">
-            Garrison (SP1) • Kowalski (SP2) • Ridge (SP3)<br>
-            Or Active Reliever from Bullpen
-          </div>
-        </div>
-        <div class="slot-footer">Current ⚡ Tier: [ d8 ] ➔ [ d6 ] ➔ [ d4 ] ➔ [ None ]</div>
-      </div>
-
-      <div class="card-slot stance-slot">
-        <div class="slot-header">
-          <span class="slot-num" style="color:#1d4ed8;">🎯 SECRET STANCE REVEAL</span>
-          <span class="slot-pos" style="background:#2563eb; color:white;">🔴 🔵 🟢</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint" style="color:#3b82f6;">PLACE CHOSEN COLOR CARD</div>
-          <div class="slot-sub-hint">
-            Select <strong>🔴 Red</strong>, <strong>🔵 Blue</strong>, or <strong>🟢 Green</strong><br>
-            Place Face-Down, Then Flip Simultaneously!
-          </div>
-        </div>
-        <div class="slot-footer">Match = Batter ⚡ Mom. | Mismatch = Pitcher ⚡ Mom.</div>
-      </div>
-
-      <div class="card-slot bullpen-slot">
-        <div class="slot-header">
-          <span class="slot-num">🔥 BULLPEN &amp; BENCH STACK</span>
-          <span class="slot-pos">DUGOUT</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint">STACK RELIEVERS HERE</div>
-          <div class="slot-sub-hint">
-            "Spitfire" Ramos (d6) • "Lefty" Vance (d4)<br>
-            Closer: "The Beast" Tanker (d8)
-          </div>
-        </div>
-        <div class="slot-footer">Relievers step ⚡ down 1 tier after each inning pitched</div>
-      </div>
-    </div>
-
-    <!-- Section 2: 9-Batter Lineup Grid (3x3) -->
-    <div class="mat-section-label">
-      <span>🏏 STARTING 9 BATTING LINEUP GRID (LAY OUT BATTERS #1 TO #9 FACE-UP • MOVE AT-BAT TOKEN ALONG ORDER)</span>
-      <span>ABILITY COST: DEGRADES BATTER'S ⚡ DIE 1 STEP AFTER USE</span>
-    </div>
-
-    <div class="mat-lineup-grid">
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">CF • TTOP TRIGGER</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"FLASH" MERCER</div>
-          <div class="slot-sub-hint">🟢 12 | 🔵 10 | 🔴 8 • SPD d12 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">When #1 Bats (2nd+ Time): Step Opp. SP ⚡ Down 1</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">RF • MVP</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">AARON VANCE</div>
-          <div class="slot-sub-hint">🔴 11 | 🔵 10 | 🟢 10 • SPD d8 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #2</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">LF • ANCHOR</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">CORBIN REYES</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 9 • SPD d6 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #3</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B • SLUGGER</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"COLOSSUS" STONE</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 7 | 🟢 6 • SPD d4 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #4</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B • HOT CORNER</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">MARCUS COLE</div>
-          <div class="slot-sub-hint">🔴 9 | 🟢 8 | 🔵 7 • SPD d6 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #5</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">C • CATCHER</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"BLUE COLLAR" DAN</div>
-          <div class="slot-sub-hint">🔴 8 | 🟢 8 | 🔵 7 • SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #6</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B • CONTACT</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">TOBY CHEN</div>
-          <div class="slot-sub-hint">🟢 9 | 🔴 7 | 🔵 6 • SPD d8 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #7</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">SS • DEFENSE</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"GLOVE-MAN" PETE</div>
-          <div class="slot-sub-hint">🟢 7 | 🔴 6 | 🔵 5 • SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #8</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">DH • ROOKIE</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">ELI "THE KID"</div>
-          <div class="slot-sub-hint">🟢 6 | 🔴 5 | 🔵 5 • SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Batting Order Slot #9 (Loops Back to #1)</div>
       </div>
     </div>
 
@@ -1665,400 +1662,207 @@
     <div class="playmat-top-bar serpents-mat">
       <div>
         <div class="playmat-team-title">🐍 THE SHADOW SERPENTS — SINGLE-SHEET MANAGER PLAYMAT (8.5" × 11")</div>
-        <div class="playmat-team-sub">Do Not Cut This Sheet! Lay Out Your Active Pitcher, Secret Stance Card &amp; All 9 Batters (#1–#9) Inside the Slots Below</div>
+        <div class="playmat-team-sub">Portrait Card Slots (1.50" × 2.38") • 5 Cards Fit Side-by-Side Across 8.5" (Or Line Up All 9 Left-to-Right in Only 13.5"!)</div>
       </div>
       <div class="playmat-rule-pills">
-        <div class="playmat-pill">🎯 <strong>MATCH (Same Color):</strong><br>Batter Rolls ⚡ Mom. Die</div>
-        <div class="playmat-pill">🌀 <strong>MISMATCH (Diff Color):</strong><br>Pitcher Rolls ⚡ Mom. Die</div>
+        <div class="playmat-pill">🎯 <strong>MATCH:</strong> Batter ⚡</div>
+        <div class="playmat-pill">🌀 <strong>MISMATCH:</strong> Pitcher ⚡</div>
       </div>
     </div>
 
-    <!-- Integrated Outcome Table + Mini Diamond + Inning/Outs Dashboard -->
-    <div class="playmat-dashboard">
-      <!-- Left: At-Bat Outcome Table -->
+    <!-- Section 1: Active Pitcher, Secret Stance, Bullpen + Outcome Lookup Table -->
+    <div class="mat-section-label" style="background:#065f46;">
+      <span>⚾ PITCHING MOUND, SECRET STANCE, BULLPEN &amp; AT-BAT OUTCOME CHART</span>
+      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER WHEN #1 BATS OR AFTER SPECIAL</span>
+    </div>
+
+    <div class="mat-upper-row">
+      <div class="card-slot mound-slot">
+        <div class="slot-header"><span class="slot-num">⚾ MOUND</span><span class="slot-pos" style="background:#065f46; color:white;">SP / RP</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">ACTIVE PITCHER</div>
+          <div class="slot-sub-hint">Webb (SP1)<br>Strider (SP2)<br>Carter (SP3)</div>
+        </div>
+        <div class="slot-footer">⚡ Tier: d8 ▸ d6 ▸ d4</div>
+      </div>
+
+      <div class="card-slot stance-slot">
+        <div class="slot-header"><span class="slot-num" style="color:#1d4ed8;">🎯 STANCE</span><span class="slot-pos" style="background:#2563eb; color:white;">🔴🔵🟢</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint" style="color:#3b82f6;">SECRET COLOR</div>
+          <div class="slot-sub-hint">Place 🔴, 🔵, or 🟢<br>Face-Down &amp; Reveal!</div>
+        </div>
+        <div class="slot-footer">Match=Bat ⚡ | Diff=Pit ⚡</div>
+      </div>
+
+      <div class="card-slot bullpen-slot">
+        <div class="slot-header"><span class="slot-num">🔥 BULLPEN</span><span class="slot-pos">STACK</span></div>
+        <div class="slot-center">
+          <div class="slot-player-hint">RELIEVERS</div>
+          <div class="slot-sub-hint">Skenes (d6)<br>Keller (d4)<br>Viper Cruz (CL d8)</div>
+        </div>
+        <div class="slot-footer">-1 ⚡ tier / inn pitched</div>
+      </div>
+
+      <!-- Outcome Lookup Panel -->
       <div class="dash-panel">
         <div class="dash-panel-title">
-          AT-BAT OUTCOME TABLE
+          AT-BAT OUTCOME CHART
           <span>Margin = Pitcher − Batter</span>
         </div>
         <table class="mat-outcome-table">
           <tr class="p-win"><td><strong>+6 or more</strong></td><td><strong>STRIKEOUT (K)</strong></td><td>Batter out; runners hold</td></tr>
           <tr class="p-win"><td><strong>+1 to +5</strong></td><td><strong>ROUTINE OUT</strong></td><td>Fly/Pop out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; Runner on 3rd scores!</td></tr>
+          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; 3rd scores (&lt;2 out)!</td></tr>
           <tr class="b-win"><td><strong>-3</strong></td><td><strong>WALK (BB)</strong></td><td>1st base; forces runners</td></tr>
-          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>Runners +1 (2nd: SPD 4+ Safe)</td></tr>
+          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>+1 base (2nd: SPD 4+ Safe)</td></tr>
           <tr class="b-win"><td><strong>-7 or less</strong></td><td><strong>EXTRA-BASE / HR</strong></td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
         </table>
-      </div>
-
-      <!-- Center: Basepath Diamond & 3rd-Base Coach Rule -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          DIAMOND &amp; BASERUNNING
-          <span>Send 2nd on 1B: SPD 4+ Safe</span>
-        </div>
-        <div class="mini-diamond-wrap">
-          <div class="mini-base-box">◆ 2ND BASE</div>
-          <div class="mini-base-row">
-            <div class="mini-base-box">◆ 3RD BASE</div>
-            <div class="mini-base-box">1ST BASE ◆</div>
-          </div>
-          <div class="mini-home-box">⬖ HOME PLATE (1-3 OUT / 4+ SAFE) ⬖</div>
-        </div>
-      </div>
-
-      <!-- Right: Momentum Dock, Outs & Innings -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          GAME &amp; MOMENTUM
-          <span>Track State</span>
-        </div>
-        <div style="background:#fef3c7; border:1.5px solid #f59e0b; border-radius:4px; padding:3px 5px; text-align:center; font-size:6.8px; font-weight:900; color:#92400e;">
-          ⚡ MOMENTUM TOKEN DOCK<br>
-          <span style="font-size:6px; font-weight:700;">Holder Rolls 3rd Die (d8 / d6 / d4)</span>
-        </div>
-        <div style="font-size:6.5px; font-weight:800; color:#1e293b; line-height:1.35;">
-          <div><strong>OUTS:</strong> &nbsp;[ ⚪ 1 ] &nbsp;[ ⚪ 2 ] &nbsp;[ ❌ 3 ]</div>
-          <div><strong>INN:</strong> [1][2][3][4][5][6][7][8][9][+]</div>
-          <div><strong>SCORE:</strong> SERPENTS [____] &nbsp;OPP [____]</div>
+        <div style="font-size:6px; font-weight:800; color:#475569; text-align:center; background:#e2e8f0; border-radius:3px; padding:2px;">
+          UNCONDITIONAL SPECIALS: Spend 1 ⚡ Tier on ANY At-Bat (Steps Down After Play)
         </div>
       </div>
     </div>
 
-    <!-- Section 1: Pitching Mound, Secret Stance & Bullpen Row -->
-    <div class="mat-section-label" style="background:#065f46;">
-      <span>⚾ PITCHING MOUND, SECRET STANCE &amp; BULLPEN ZONE (3 HALF-CARD SLOTS: 2.5" × 1.64")</span>
-      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER EACH TIME #1 LEADOFF BATS OR AFTER USING SPECIAL</span>
-    </div>
-
-    <div class="mat-row-3">
-      <div class="card-slot mound-slot">
-        <div class="slot-header">
-          <span class="slot-num">⚾ ACTIVE PITCHER (MOUND)</span>
-          <span class="slot-pos" style="background:#065f46; color:white;">SP / RP</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint">PLACE ACTIVE PITCHER HERE</div>
-          <div class="slot-sub-hint">
-            Webb (SP1) • Strider (SP2) • Carter (SP3)<br>
-            Or Active Reliever from Bullpen
-          </div>
-        </div>
-        <div class="slot-footer">Current ⚡ Tier: [ d8 ] ➔ [ d6 ] ➔ [ d4 ] ➔ [ None ]</div>
-      </div>
-
-      <div class="card-slot stance-slot">
-        <div class="slot-header">
-          <span class="slot-num" style="color:#1d4ed8;">🎯 SECRET STANCE REVEAL</span>
-          <span class="slot-pos" style="background:#2563eb; color:white;">🔴 🔵 🟢</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint" style="color:#3b82f6;">PLACE CHOSEN COLOR CARD</div>
-          <div class="slot-sub-hint">
-            Select <strong>🔴 Red</strong>, <strong>🔵 Blue</strong>, or <strong>🟢 Green</strong><br>
-            Place Face-Down, Then Flip Simultaneously!
-          </div>
-        </div>
-        <div class="slot-footer">Match = Batter ⚡ Mom. | Mismatch = Pitcher ⚡ Mom.</div>
-      </div>
-
-      <div class="card-slot bullpen-slot">
-        <div class="slot-header">
-          <span class="slot-num">🔥 BULLPEN &amp; BENCH STACK</span>
-          <span class="slot-pos">DUGOUT</span>
-        </div>
-        <div class="slot-center">
-          <div class="slot-player-hint">STACK RELIEVERS HERE</div>
-          <div class="slot-sub-hint">
-            "Submarine" Skenes (d6) • "Icebox" Keller (d4)<br>
-            Closer: "Viper" Cruz (d8)
-          </div>
-        </div>
-        <div class="slot-footer">Relievers step ⚡ down 1 tier after each inning pitched</div>
-      </div>
-    </div>
-
-    <!-- Section 2: 9-Batter Lineup Grid (3x3) -->
+    <!-- Section 2: Batting Order Row 1 (#1 to #5 Left-to-Right) -->
     <div class="mat-section-label">
-      <span>🏏 STARTING 9 BATTING LINEUP GRID (LAY OUT BATTERS #1 TO #9 FACE-UP • MOVE AT-BAT TOKEN ALONG ORDER)</span>
-      <span>ABILITY COST: DEGRADES BATTER'S ⚡ DIE 1 STEP AFTER USE</span>
+      <span>🏏 BATTING ORDER #1 TO #5 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 1 OF 2)</span>
+      <span>ADVANCE AT-BAT MARKER LEFT ➔ RIGHT</span>
     </div>
 
-    <div class="mat-lineup-grid">
+    <div class="mat-portrait-row-5">
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">LF • TTOP TRIGGER</span></div>
+        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">LF</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">"PROFESSOR" SOTO</div>
-          <div class="slot-sub-hint">🔵 12 | 🟢 10 | 🔴 9 • SPD d8 • ⚡ d8</div>
+          <div class="slot-sub-hint">🔵 12 | 🟢 10 | 🔴 9<br>SPD d8 • ⚡ d8</div>
         </div>
-        <div class="slot-footer">When #1 Bats (2nd+ Time): Step Opp. SP ⚡ Down 1</div>
+        <div class="slot-footer">2nd+ AB: Opp SP -1 ⚡</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">DH • STAR</span></div>
+        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">DH</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">SHOHEI "VIPER" CRUZ</div>
-          <div class="slot-sub-hint">🔴 11 | 🟢 11 | 🔵 10 • SPD d10 • ⚡ d8</div>
+          <div class="slot-sub-hint">🔴 11 | 🟢 11 | 🔵 10<br>SPD d10 • ⚡ d8</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #2</div>
+        <div class="slot-footer">Lineup Slot #2</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">SS • ANCHOR</span></div>
+        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">SS</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">GUNNAR HENDERSON</div>
-          <div class="slot-sub-hint">🔴 10 | 🟢 10 | 🔵 9 • SPD d8 • ⚡ d8</div>
+          <div class="slot-sub-hint">🔴 10 | 🟢 10 | 🔵 9<br>SPD d8 • ⚡ d8</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #3</div>
+        <div class="slot-footer">Lineup Slot #3</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B • CLEANUP</span></div>
+        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">BRYCE HARPER</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 8 • SPD d6 • ⚡ d6</div>
+          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 8<br>SPD d6 • ⚡ d6</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #4</div>
+        <div class="slot-footer">Lineup Slot #4</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B • THREAT</span></div>
+        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">MANNY MACHADO</div>
-          <div class="slot-sub-hint">🔴 9 | 🔵 8 | 🟢 8 • SPD d6 • ⚡ d6</div>
+          <div class="slot-sub-hint">🔴 9 | 🔵 8 | 🟢 8<br>SPD d6 • ⚡ d6</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #5</div>
+        <div class="slot-footer">Lineup Slot #5</div>
       </div>
+    </div>
 
+    <!-- Section 3: Batting Order Row 2 (#6 to #9 Left-to-Right + On-Mat Diamond) -->
+    <div class="mat-section-label">
+      <span>🏏 BATTING ORDER #6 TO #9 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 2 OF 2) + ON-MAT DIAMOND</span>
+      <span>AFTER #9 BATS, LOOP BACK TO #1 LEADOFF</span>
+    </div>
+
+    <div class="mat-portrait-row-5">
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">CF • SWITCH</span></div>
+        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">CF</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">FRANCISCO LINDOR</div>
-          <div class="slot-sub-hint">🟢 9 | 🔴 8 | 🔵 7 • SPD d8 • ⚡ d4</div>
+          <div class="slot-sub-hint">🟢 9 | 🔴 8 | 🔵 7<br>SPD d8 • ⚡ d4</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #6</div>
+        <div class="slot-footer">Lineup Slot #6</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B • CONTACT</span></div>
+        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">NICO HOERNER</div>
-          <div class="slot-sub-hint">🟢 10 | 🔴 8 | 🔵 6 • SPD d8 • ⚡ d4</div>
+          <div class="slot-sub-hint">🟢 10 | 🔴 8 | 🔵 6<br>SPD d8 • ⚡ d4</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #7</div>
+        <div class="slot-footer">Lineup Slot #7</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">C • DEFENSE</span></div>
+        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">C</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">AUSTIN HEDGES</div>
-          <div class="slot-sub-hint">🔵 7 | 🔴 6 | 🟢 6 • SPD d4 • ⚡ d4</div>
+          <div class="slot-sub-hint">🔵 7 | 🔴 6 | 🟢 6<br>SPD d4 • ⚡ d4</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #8</div>
+        <div class="slot-footer">Lineup Slot #8</div>
       </div>
 
       <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">RF • ROOKIE</span></div>
+        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">RF</span></div>
         <div class="slot-center">
           <div class="slot-player-hint">LEO "THE SPARK"</div>
-          <div class="slot-sub-hint">🟢 7 | 🔴 5 | 🔵 5 • SPD d8 • ⚡ d4</div>
+          <div class="slot-sub-hint">🟢 7 | 🔴 5 | 🔵 5<br>SPD d8 • ⚡ d4</div>
         </div>
-        <div class="slot-footer">Batting Order Slot #9 (Loops Back to #1)</div>
+        <div class="slot-footer">Loops Back to #1</div>
+      </div>
+
+      <!-- 5th Slot: Integrated Mini Diamond & Momentum Dock -->
+      <div class="card-slot" style="border:2px solid #047857; background:#ecfdf5;">
+        <div class="slot-header"><span class="slot-num" style="color:#065f46;">⚾ DIAMOND</span><span class="slot-pos" style="background:#047857; color:white;">BASES</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; margin:auto 0;">
+          <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 8px; font-size:6.5px; font-weight:900; color:#065f46;">◆ 2ND BASE</div>
+          <div style="display:flex; justify-content:space-between; width:100%; gap:3px;">
+            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">◆ 3RD</div>
+            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">1ST ◆</div>
+          </div>
+          <div style="border:1.5px solid #b91c1c; background:#fef2f2; border-radius:4px; padding:2px 6px; font-size:6px; font-weight:900; color:#991b1b;">⬖ HOME (SPD 4+)</div>
+        </div>
+        <div class="slot-footer" style="color:#065f46;">Send 2B on 1B: 4+ Safe</div>
       </div>
     </div>
 
-  </div>
-</div>
-
-<!-- ====================================================================== -->
-<!-- PAGE 5: SHARED DIAMOND MAT, SCOREBOARD & CUTOUT TOKENS (8.5" x 11")    -->
-<!-- ====================================================================== -->
-<div class="page">
-  <div class="sheet-banner">
-    <span class="sheet-banner-title">⚾ PAGE 5: SHARED BALLPARK DIAMOND, SCOREBOARD &amp; CUTOUT TOKENS (HALF-SIZE COMPATIBLE)</span>
-    <span class="sheet-banner-sub">Use Top Half as a Center-Table Ballpark Mat (Fits Half-Cards on 1B/2B/3B!) &amp; Cut Out the Bottom Row of Tokens/Reference Cards</span>
-  </div>
-
-  <div class="playmat-sheet" style="height: 10.15in;">
-
-    <!-- Center-Table Ballpark Diamond with Full 2.5" x 1.64" Basepath Card Slots! -->
-    <div style="border: 2px solid #047857; border-radius: 8px; background: #f0fdf4; padding: 10px 12px; display:flex; flex-direction:column; justify-content:space-between; height: 5.65in;">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #a7f3d0; padding-bottom:4px;">
-        <span style="font-family:Impact, sans-serif; font-size:13px; color:#065f46; letter-spacing:0.5px;">⚾ SHARED BALLPARK DIAMOND (PLACE BASERUNNER HALF-CARDS OR TOKENS ON 1ST, 2ND &amp; 3RD BASE)</span>
-        <span style="font-size:7.5px; font-weight:800; color:#047857;">SINGLE W/ RUNNER ON 2ND: HOLD AT 3RD (SAFE) OR ROLL RUNNER'S SPD DIE (4+ SAFE / 1-3 OUT AT HOME)</span>
-      </div>
-
-      <!-- Top Row of Diamond: 2nd Base Centered -->
-      <div style="display:grid; grid-template-columns: 2.5in 2.5in 2.5in; gap: 0.09in; align-items:center;">
-        <div style="background:white; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px; height:1.64in; display:flex; flex-direction:column; justify-content:space-between;">
-          <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; border-bottom:1px solid #e2e8f0;">📊 INNING-BY-INNING SCOREBOARD</div>
-          <table style="width:100%; border-collapse:collapse; font-size:6.5px; text-align:center;">
-            <tr style="background:#f1f5f9; font-weight:800;"><td>TEAM</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>R</td><td>H</td></tr>
-            <tr><td style="text-align:left; font-weight:800; color:#b91c1c;">TITANS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-            <tr><td style="text-align:left; font-weight:800; color:#047857;">SERPENTS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-          </table>
-          <div style="font-size:6.5px; font-weight:800; color:#334155; text-align:center;">
-            OUTS: &nbsp;[ ⚪ OUT 1 ] &nbsp;&nbsp;[ ⚪ OUT 2 ] &nbsp;&nbsp;[ ❌ OUT 3 ]
-          </div>
-        </div>
-
-        <!-- 2ND BASE SLOT (2.5" x 1.64") -->
-        <div class="card-slot" style="width:2.5in; height:1.64in; border:2.5px solid #047857; background:white;">
-          <div class="slot-header"><span class="slot-num" style="color:#047857;">◆ 2ND BASE (SCORING POS.)</span><span class="slot-pos" style="background:#047857; color:white;">2B</span></div>
-          <div class="slot-center">
-            <div class="slot-player-hint" style="color:#10b981;">RUNNER ON 2ND</div>
-            <div class="slot-sub-hint">On Clean Single (-4 to -6):<br>Hold at 3rd OR Roll <strong>SPD Die</strong> (<strong>4+ Safe</strong> / <strong>1-3 Out</strong>)</div>
-          </div>
-          <div class="slot-footer">Scores on any Double (2B), Triple (3B), or HR</div>
-        </div>
-
-        <div style="background:white; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px; height:1.64in; display:flex; flex-direction:column; justify-content:space-between;">
-          <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; border-bottom:1px solid #e2e8f0;">🎲 EXTRA-BASE HIT ROLL (-7 OR LESS)</div>
-          <div style="font-size:6.8px; line-height:1.35; color:#1e293b;">
-            When Margin is <strong>-7 or less</strong>, Batter rolls <strong>1d6</strong>:<br>
-            • <strong>1–4: DOUBLE (2B)</strong> — Runners advance 2 bases (2nd &amp; 3rd score; 1st to 3rd).<br>
-            • <strong>5: TRIPLE (3B)</strong> — All runners on base score; Batter to 3rd.<br>
-            • <strong>6: HOME RUN (HR!)</strong> — Clear the bases! Everyone scores!
-          </div>
-          <div style="font-size:6px; font-weight:800; color:#64748b; text-align:center;">("Colossus" Stone Moonshot: HR on d6 4–6!)</div>
-        </div>
-      </div>
-
-      <!-- Bottom Row of Diamond: 3rd Base, Home Plate, 1st Base -->
-      <div style="display:grid; grid-template-columns: 2.5in 2.5in 2.5in; gap: 0.09in; align-items:center;">
-        <!-- 3RD BASE SLOT -->
-        <div class="card-slot" style="width:2.5in; height:1.64in; border:2.5px solid #047857; background:white;">
-          <div class="slot-header"><span class="slot-num" style="color:#047857;">◆ 3RD BASE (90 FT AWAY)</span><span class="slot-pos" style="background:#047857; color:white;">3B</span></div>
-          <div class="slot-center">
-            <div class="slot-player-hint" style="color:#10b981;">RUNNER ON 3RD</div>
-            <div class="slot-sub-hint">Scores on any Hit AND on<br><strong>Fielded / Sac Out (Margin 0 to -2)</strong> w/ &lt; 2 outs!</div>
-          </div>
-          <div class="slot-footer">Holds on Strikeout (+6+) or Routine Out (+1..+5)</div>
-        </div>
-
-        <!-- HOME PLATE DUEL ZONE -->
-        <div class="card-slot" style="width:2.5in; height:1.64in; border:2.5px solid #b91c1c; background:#fef2f2;">
-          <div class="slot-header"><span class="slot-num" style="color:#b91c1c;">⬖ HOME PLATE (BATTER BOX)</span><span class="slot-pos" style="background:#b91c1c; color:white;">DUEL</span></div>
-          <div class="slot-center">
-            <div class="slot-player-hint" style="color:#dc2626;">AT-BAT DUEL ZONE</div>
-            <div class="slot-sub-hint">
-              1. Both pick 🔴, 🔵, or 🟢.<br>
-              2. Match = Batter ⚡ | Mismatch = Pitcher ⚡.<br>
-              3. Margin = Pitcher Total − Batter Total.
-            </div>
-          </div>
-          <div class="slot-footer">Send Runner from 2nd on 1B: SPD 4+ Safe / 1-3 Out!</div>
-        </div>
-
-        <!-- 1ST BASE SLOT -->
-        <div class="card-slot" style="width:2.5in; height:1.64in; border:2.5px solid #047857; background:white;">
-          <div class="slot-header"><span class="slot-num" style="color:#047857;">1ST BASE ◆</span><span class="slot-pos" style="background:#047857; color:white;">1B</span></div>
-          <div class="slot-center">
-            <div class="slot-player-hint" style="color:#10b981;">RUNNER ON 1ST</div>
-            <div class="slot-sub-hint">Advances to 2nd on Walk (BB) or Single (1B).<br>Advances to 3rd on Double (2B).</div>
-          </div>
-          <div class="slot-footer">("Flash" Mercer Rabbit Jump: +1 extra base on 1B)</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom 2 Rows: 6 Cutout Reference & Token Half-Cards (2.5" x 1.64") -->
-    <div class="mat-section-label">
-      <span>✂️ OPTIONAL CUTOUT REFERENCE &amp; TABLE TOKEN HALF-CARDS (6 HALF-CARDS: 2.5" × 1.64")</span>
-      <span>CUT ALONG DASHED BORDERS IF DESIRED</span>
-    </div>
-
-    <div class="half-card-grid" style="grid-template-rows: repeat(2, 1.64in);">
-
-      <!-- Ref 1: Outcome Lookup Card -->
-      <div class="card ref-card">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">POCKET REFERENCE</span><span class="card-name">AT-BAT OUTCOME CHART</span></div>
-          <span class="card-badge">MARGIN</span>
-        </div>
-        <table class="mat-outcome-table">
-          <tr class="p-win"><td>+6+</td><td>STRIKEOUT (K)</td><td>Out; runners hold</td></tr>
-          <tr class="p-win"><td>+1..+5</td><td>ROUTINE OUT</td><td>Out; runners hold</td></tr>
-          <tr class="p-win"><td>0..-2</td><td>FIELDED / SAC</td><td>Out; 3rd scores (&lt;2 out)</td></tr>
-          <tr class="b-win"><td>-3</td><td>WALK (BB)</td><td>1B; forces runners</td></tr>
-          <tr class="b-win"><td>-4..-6</td><td>CLEAN SINGLE</td><td>+1 base (2nd: SPD 4+)</td></tr>
-          <tr class="b-win"><td>-7-</td><td>EXTRA-BASE</td><td>d6: 1-4 2B, 5 3B, 6 HR</td></tr>
+    <!-- Bottom Scoreboard, Outs & Momentum Strip -->
+    <div class="mat-scoreboard-strip">
+      <div>
+        <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; margin-bottom:3px;">📊 INNING-BY-INNING SCOREBOARD</div>
+        <table style="width:100%; border-collapse:collapse; font-size:6.8px; text-align:center; background:white;">
+          <tr style="background:#e2e8f0; font-weight:900;"><td>TEAM</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>R</td><td>H</td></tr>
+          <tr><td style="text-align:left; font-weight:900; color:#b91c1c; padding:2px;">TITANS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
+          <tr><td style="text-align:left; font-weight:900; color:#047857; padding:2px;">SERPENTS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
         </table>
       </div>
 
-      <!-- Ref 2: Momentum Token Card -->
-      <div class="card ref-card" style="background:#fffbeb; border-top-color:#f59e0b;">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">CUTOUT TABLE TOKEN</span><span class="card-name">⚡ MOMENTUM DIE TOKEN</span></div>
-          <span class="card-badge mom-badge">⚡ 3RD DIE</span>
+      <div style="display:flex; flex-direction:column; gap:4px; font-size:7px; font-weight:800; color:#1e293b;">
+        <div>OUTS THIS HALF-INNING:</div>
+        <div style="display:flex; gap:6px;">
+          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 1</span>
+          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 2</span>
+          <span style="border:1.5px solid #b91c1c; background:#fef2f2; padding:3px 8px; border-radius:4px; color:#991b1b;">❌ OUT 3</span>
         </div>
-        <div style="text-align:center; margin:auto 0; font-size:7px; line-height:1.3;">
-          <div style="font-size:15px; font-family:Impact, sans-serif; color:#b45309;">⚡ MOMENTUM HOLDER ⚡</div>
-          <strong>🎯 Match:</strong> Batter claims token &amp; rolls ⚡ Die!<br>
-          <strong>🌀 Mismatch:</strong> Pitcher claims token &amp; rolls ⚡ Die!
-        </div>
-        <div class="ability-box">
-          Pass this card to whoever wins the Pitch Guess each at-bat!
-        </div>
+        <div style="font-size:6.2px; color:#475569;">3 Outs = Clear Bases &amp; Flip Top/Bottom</div>
       </div>
 
-      <!-- Ref 3: Die Averages & Star Ratings -->
-      <div class="card ref-card">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">MATH REFERENCE</span><span class="card-name">DIE AVERAGES &amp; RATINGS</span></div>
-          <span class="card-badge">DICE</span>
-        </div>
-        <table class="mat-outcome-table">
-          <tr><td><strong>d4</strong> (1–4)</td><td>Avg: <strong>2.5</strong></td><td><strong>d10</strong> (1–10)</td><td>Avg: <strong>5.5</strong></td></tr>
-          <tr><td><strong>d6</strong> (1–6)</td><td>Avg: <strong>3.5</strong></td><td><strong>d12</strong> (1–12)</td><td>Avg: <strong>6.5</strong></td></tr>
-          <tr><td><strong>d8</strong> (1–8)</td><td>Avg: <strong>4.5</strong></td><td><strong>Rating</strong></td><td><strong>Avg1+Avg2</strong></td></tr>
-        </table>
-        <div class="ability-box">
-          <strong>Example:</strong> d12 (6.5) + d10 (5.5) = <strong>Rating 12 (⭐⭐⭐)</strong>.
+      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:6px; padding:6px; text-align:center;">
+        <div style="font-family:Impact, sans-serif; font-size:11px; color:#92400e;">⚡ MOMENTUM DOCK</div>
+        <div style="font-size:6.2px; font-weight:800; color:#78350f; margin-top:2px;">
+          Place ⚡ Token Here When You Win Pitch Guess!<br>
+          <strong>Roll 3rd Die (d8 / d6 / d4)</strong>
         </div>
       </div>
-
-      <!-- Ref 4: Titans At-Bat Marker & Runner Tokens -->
-      <div class="card titans">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">CUTOUT MINI-TOKENS (SLICE IN 4)</span><span class="card-name">⚡ TITANS GAME TOKENS</span></div>
-          <span class="card-badge" style="background:#b91c1c;">TITANS</span>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; flex:1; margin-top:2px;">
-          <div style="border:1.5px dashed #b91c1c; border-radius:4px; background:#fef2f2; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#991b1b;">🏏 TITANS AT-BAT<br>LINEUP MARKER</div>
-          <div style="border:1.5px dashed #b91c1c; border-radius:4px; background:#fef2f2; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#991b1b;">🏃 TITANS<br>RUNNER #1</div>
-          <div style="border:1.5px dashed #b91c1c; border-radius:4px; background:#fef2f2; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#991b1b;">🏃 TITANS<br>RUNNER #2</div>
-          <div style="border:1.5px dashed #b91c1c; border-radius:4px; background:#fef2f2; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#991b1b;">🏃 TITANS<br>RUNNER #3</div>
-        </div>
-      </div>
-
-      <!-- Ref 5: Serpents At-Bat Marker & Runner Tokens -->
-      <div class="card serpents">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">CUTOUT MINI-TOKENS (SLICE IN 4)</span><span class="card-name">🐍 SERPENTS GAME TOKENS</span></div>
-          <span class="card-badge" style="background:#047857;">SERPENTS</span>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; flex:1; margin-top:2px;">
-          <div style="border:1.5px dashed #047857; border-radius:4px; background:#ecfdf5; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#065f46;">🏏 SERPENTS AT-BAT<br>LINEUP MARKER</div>
-          <div style="border:1.5px dashed #047857; border-radius:4px; background:#ecfdf5; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#065f46;">🏃 SERPENTS<br>RUNNER #1</div>
-          <div style="border:1.5px dashed #047857; border-radius:4px; background:#ecfdf5; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#065f46;">🏃 SERPENTS<br>RUNNER #2</div>
-          <div style="border:1.5px dashed #047857; border-radius:4px; background:#ecfdf5; text-align:center; padding:3px; font-size:6.5px; font-weight:900; color:#065f46;">🏃 SERPENTS<br>RUNNER #3</div>
-        </div>
-      </div>
-
-      <!-- Ref 6: Quick Play & Endurance Rules -->
-      <div class="card ref-card">
-        <div class="card-header">
-          <div class="card-title-group"><span class="card-role">RULES SUMMARY</span><span class="card-name">FATIGUE &amp; SPECIALS</span></div>
-          <span class="card-badge">V4 RULES</span>
-        </div>
-        <div style="font-size:6.3px; line-height:1.28; color:#1e293b; margin:auto 0;">
-          • <strong>Unconditional Specials:</strong> Any player with a ⚡ Momentum Die tier (d8/d6/d4) may activate their Special on ANY at-bat; step their ⚡ die down 1 tier after the at-bat.<br>
-          • <strong>Starter Fatigue (TTOP):</strong> Step SP's ⚡ die down 1 tier each time #1 Leadoff steps up (2nd+ loop).<br>
-          • <strong>Reliever Fatigue:</strong> Step RP's ⚡ die down 1 tier after each inning pitched.
-        </div>
-      </div>
-
     </div>
 
   </div>
