@@ -16,15 +16,15 @@
       --bg-dark: #0b1120;
       --bg-panel: #111827;
       --bg-card: #1e293b;
-      --border-subtle: rgba(255, 255, 255, 0.1);
+      --border-subtle: rgba(255, 255, 255, 0.12);
       --red: #ef4444;
-      --red-bg: rgba(239, 68, 68, 0.16);
+      --red-bg: rgba(239, 68, 68, 0.18);
       --blue: #3b82f6;
-      --blue-bg: rgba(59, 130, 246, 0.16);
+      --blue-bg: rgba(59, 130, 246, 0.18);
       --green: #22c55e;
-      --green-bg: rgba(34, 197, 94, 0.16);
+      --green-bg: rgba(34, 197, 94, 0.18);
       --gold: #f59e0b;
-      --gold-bg: rgba(245, 158, 11, 0.18);
+      --gold-bg: rgba(245, 158, 11, 0.2);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -59,7 +59,7 @@
       border-right: 1px solid var(--border-subtle);
     }
 
-    /* ── 1. TOP SCOREBOARD & DIAMOND BAR ── */
+    /* ── 1. TOP SCOREBOARD & BATTING ORDER BAR ── */
     .top-bar {
       background: #0f172a;
       padding: max(6px, env(safe-area-inset-top, 6px)) 10px 6px;
@@ -103,11 +103,6 @@
       font-family: var(--font-mono);
       font-size: 0.75rem;
       font-weight: 800;
-    }
-    .team-score {
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
     .team-score.titans { color: #fca5a5; }
     .team-score.serpents { color: #6ee7b7; }
@@ -171,22 +166,21 @@
       color: var(--text-muted);
       font-weight: 700;
       white-space: nowrap;
-      cursor: pointer;
     }
     .lineup-chip.active {
-      background: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.22);
       border-color: #f59e0b;
       color: #fef08a;
       font-weight: 900;
     }
 
-    /* ── 2. CENTER ARENA: PITCHER ABOVE, FIELD/OUTCOME MIDDLE, BATTER BELOW ── */
+    /* ── 2. CENTER ARENA ── */
     .arena {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 6px 8px;
+      padding: 5px 8px;
       gap: 5px;
       overflow-y: auto;
     }
@@ -196,16 +190,16 @@
       background: var(--bg-card);
       border: 1.5px solid rgba(255,255,255,0.14);
       border-radius: 10px;
-      padding: 6px 8px;
+      padding: 5px 8px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
       position: relative;
     }
     .player-card.titans-card { border-top: 4px solid #dc2626; }
     .player-card.serpents-card { border-top: 4px solid #10b981; }
     .player-card.has-momentum {
-      box-shadow: 0 0 0 1.5px #f59e0b, 0 0 14px rgba(245, 158, 11, 0.25);
+      box-shadow: 0 0 0 1.5px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.25);
     }
 
     .pc-header {
@@ -231,7 +225,7 @@
       white-space: nowrap;
     }
     .pc-name {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 900;
       color: #fff;
       white-space: nowrap;
@@ -279,7 +273,7 @@
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 5px;
       padding: 2px 6px;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       color: #94a3b8;
       font-weight: 700;
     }
@@ -297,7 +291,7 @@
     }
     .stance-cell {
       border-radius: 5px;
-      padding: 3px 5px;
+      padding: 2px 5px;
       display: flex;
       flex-direction: column;
       gap: 1px;
@@ -310,25 +304,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 900;
     }
     .sc-rating {
       font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 900;
       color: #fff;
     }
     .sc-dice {
       font-family: var(--font-mono);
-      font-size: 0.56rem;
+      font-size: 0.55rem;
       color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .sc-stars {
-      font-size: 0.52rem;
+      font-size: 0.5rem;
       color: #fbbf24;
       letter-spacing: -1px;
     }
@@ -343,11 +337,11 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 5px;
       padding: 3px 6px;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
     }
     .ability-text {
       color: #cbd5e1;
-      line-height: 1.2;
+      line-height: 1.15;
       flex: 1;
     }
     .ability-text strong {
@@ -363,7 +357,6 @@
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.15s;
     }
     .btn-ability.active {
       background: #f59e0b;
@@ -377,7 +370,7 @@
       cursor: not-allowed;
     }
 
-    /* ── CENTER PLAYMAT: DIAMOND, TRIANGLE & ROLL RESOLUTION ── */
+    /* ── CENTER PLAYMAT: DIAMOND, LAST PLAY SUMMARY & TRIANGLE ── */
     .center-playmat {
       background: radial-gradient(circle at center, #14532d 0%, #062e16 100%);
       border: 1px solid rgba(34, 197, 94, 0.35);
@@ -387,54 +380,52 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      min-height: 92px;
+      min-height: 82px;
     }
 
     /* Mini Diamond */
     .diamond-box {
-      width: 74px;
-      height: 74px;
+      width: 68px;
+      height: 68px;
       position: relative;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
     }
     .base-sq {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       background: rgba(255,255,255,0.18);
       border: 1.5px solid rgba(255,255,255,0.5);
       transform: rotate(45deg);
       position: absolute;
-      transition: all 0.2s;
     }
     .base-sq.occupied {
       background: #f59e0b;
       border-color: #fff;
       box-shadow: 0 0 8px #f59e0b;
     }
-    .base-2b { top: 6px; left: 30px; }
-    .base-3b { top: 30px; left: 6px; }
-    .base-1b { top: 30px; right: 6px; }
+    .base-2b { top: 5px; left: 27px; }
+    .base-3b { top: 27px; left: 5px; }
+    .base-1b { top: 27px; right: 5px; }
     .base-home {
-      bottom: 6px;
-      left: 30px;
+      bottom: 5px;
+      left: 27px;
       background: rgba(255,255,255,0.35);
       border-color: #fca5a5;
     }
     .diamond-center-label {
-      font-size: 0.52rem;
+      font-size: 0.5rem;
       font-weight: 800;
       color: #bbf7d0;
       text-align: center;
       line-height: 1.1;
       z-index: 2;
-      pointer-events: none;
     }
 
-    /* Center Resolution Feed */
-    .resolution-stage {
+    .center-status-box {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -442,60 +433,45 @@
       gap: 3px;
       min-width: 0;
     }
-    .res-headline {
-      font-size: 0.74rem;
+    .cs-title {
+      font-size: 0.72rem;
       font-weight: 900;
-      color: #ffffff;
-      letter-spacing: 0.3px;
+      color: #fff;
     }
-    .res-sub {
-      font-size: 0.62rem;
+    .cs-sub {
+      font-size: 0.6rem;
       color: #d1fae5;
       line-height: 1.25;
     }
-    .dice-clash-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
+    .btn-reopen-last {
+      align-self: flex-start;
       margin-top: 2px;
-    }
-    .roll-pill {
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 5px;
-      padding: 2px 6px;
-      font-family: var(--font-mono);
-      font-size: 0.63rem;
+      background: rgba(245, 158, 11, 0.25);
+      border: 1px solid #fbbf24;
+      color: #fef08a;
+      font-size: 0.58rem;
       font-weight: 800;
-      color: #fff;
-    }
-    .margin-pill {
-      background: #f59e0b;
-      color: #0f172a;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      font-weight: 900;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 5px;
+      cursor: pointer;
     }
 
-    /* Mini Triangle Reference on Right of Playmat */
+    /* Mini Triangle Reference */
     .mini-triangle-box {
       background: rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 8px;
-      padding: 4px 6px;
+      padding: 3px 5px;
       text-align: center;
       flex-shrink: 0;
       cursor: pointer;
     }
     .mt-title {
-      font-size: 0.5rem;
+      font-size: 0.48rem;
       font-weight: 900;
       color: #94a3b8;
       letter-spacing: 0.4px;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
 
     /* ── 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE HAND ── */
@@ -513,7 +489,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       font-weight: 800;
       color: #cbd5e1;
     }
@@ -523,7 +499,7 @@
       color: #93c5fd;
       padding: 1px 7px;
       border-radius: 999px;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 900;
     }
 
@@ -547,31 +523,28 @@
       background: #1e293b;
     }
     .stance-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
     .stance-btn.red-card {
-      background: linear-gradient(180deg, rgba(220, 38, 38, 0.32) 0%, rgba(127, 29, 29, 0.45) 100%);
+      background: linear-gradient(180deg, rgba(220, 38, 38, 0.35) 0%, rgba(127, 29, 29, 0.5) 100%);
       border-color: #ef4444;
     }
     .stance-btn.blue-card {
-      background: linear-gradient(180deg, rgba(37, 99, 235, 0.32) 0%, rgba(30, 58, 138, 0.45) 100%);
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.35) 0%, rgba(30, 58, 138, 0.5) 100%);
       border-color: #3b82f6;
     }
     .stance-btn.green-card {
-      background: linear-gradient(180deg, rgba(22, 163, 74, 0.32) 0%, rgba(20, 83, 45, 0.45) 100%);
+      background: linear-gradient(180deg, rgba(22, 163, 74, 0.35) 0%, rgba(20, 83, 45, 0.5) 100%);
       border-color: #22c55e;
-    }
-    .stance-btn:hover {
-      box-shadow: 0 4px 14px rgba(255,255,255,0.12);
     }
 
     .sb-color-title {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 900;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
     }
     .sb-beats {
-      font-size: 0.55rem;
+      font-size: 0.54rem;
       font-weight: 800;
       padding: 1px 5px;
       border-radius: 999px;
@@ -586,9 +559,303 @@
       margin-top: 1px;
     }
     .sb-rating-line {
-      font-size: 0.58rem;
+      font-size: 0.56rem;
       color: #cbd5e1;
       font-weight: 700;
+    }
+
+    /* =========================================================================
+       AT-BAT DUEL RESOLUTION OVERLAY (3 CLEAR STEPS: DUEL -> DICE -> OUTCOME)
+       ========================================================================= */
+    .duel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(4px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    .duel-overlay.open {
+      display: flex;
+    }
+    .duel-card {
+      width: 100%;
+      max-width: 450px;
+      max-height: 94dvh;
+      background: #0f172a;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+    }
+
+    .step-box {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .step-header {
+      font-size: 0.62rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Step 1: Stance Duel Cards */
+    .stance-clash-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+    .played-stance-pill {
+      border-radius: 8px;
+      padding: 6px 8px;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+    .played-stance-pill.red { background: rgba(220, 38, 38, 0.25); border-color: #ef4444; }
+    .played-stance-pill.blue { background: rgba(37, 99, 235, 0.25); border-color: #3b82f6; }
+    .played-stance-pill.green { background: rgba(22, 163, 74, 0.25); border-color: #22c55e; }
+    .played-stance-pill.winner {
+      box-shadow: 0 0 0 2px #f59e0b, 0 0 14px rgba(245, 158, 11, 0.45);
+    }
+    .psp-who {
+      font-size: 0.56rem;
+      font-weight: 800;
+      color: #cbd5e1;
+      text-transform: uppercase;
+    }
+    .psp-color {
+      font-size: 0.82rem;
+      font-weight: 900;
+      color: #fff;
+      margin-top: 1px;
+    }
+    .psp-sub {
+      font-size: 0.58rem;
+      color: #fde047;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+    .vs-circle {
+      font-size: 0.68rem;
+      font-weight: 900;
+      color: #64748b;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .duel-winner-banner {
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: 6px;
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #fef08a;
+    }
+
+    /* Step 2: Visual Dice Rolled */
+    .dice-side-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+    .ds-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .ds-player-label {
+      font-size: 0.65rem;
+      font-weight: 900;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dice-cubes-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .die-cube {
+      background: #1e293b;
+      border: 1.5px solid #64748b;
+      border-radius: 6px;
+      padding: 3px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 52px;
+    }
+    .die-cube.mom-cube {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+    }
+    .die-cube.bonus-cube {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+    }
+    .dc-meta {
+      font-size: 0.52rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+    .die-cube.mom-cube .dc-meta { color: #fde047; }
+    .dc-val {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .plus-sign {
+      font-weight: 900;
+      color: #64748b;
+      font-size: 0.8rem;
+    }
+    .ds-total-box {
+      background: #0f172a;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 4px 8px;
+      text-align: center;
+      min-width: 52px;
+    }
+    .dst-label {
+      font-size: 0.5rem;
+      font-weight: 800;
+      color: #94a3b8;
+    }
+    .dst-num {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .margin-calc-bar {
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+    .mc-badge {
+      background: #f59e0b;
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    /* Step 3: Outcome Banner & Mini Table */
+    .outcome-hero {
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+    .outcome-hero.pitcher-win {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: #22c55e;
+    }
+    .outcome-hero.batter-win {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+    }
+    .oh-title {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .oh-desc {
+      font-size: 0.72rem;
+      color: #e2e8f0;
+      margin-top: 2px;
+      font-weight: 700;
+    }
+    .oh-degrade {
+      margin-top: 4px;
+      font-size: 0.64rem;
+      color: #fde047;
+      font-weight: 800;
+    }
+
+    .mini-outcome-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.62rem;
+      margin-top: 2px;
+    }
+    .mini-outcome-table td {
+      padding: 3px 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: #94a3b8;
+    }
+    .mini-outcome-table tr.active-band {
+      background: rgba(245, 158, 11, 0.28);
+      outline: 1.5px solid #f59e0b;
+    }
+    .mini-outcome-table tr.active-band td {
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .btn-next-ab {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+    }
+    .btn-next-ab:active {
+      transform: scale(0.98);
     }
 
     /* ── MODALS (OUTCOME TABLE & BULLPEN/ROSTER) ── */
@@ -748,7 +1015,7 @@
         </div>
       </section>
 
-      <!-- CENTER PLAYMAT: DIAMOND, RESOLUTION FEED & WHAT BEATS WHAT TRIANGLE -->
+      <!-- CENTER PLAYMAT: DIAMOND, LAST PLAY SUMMARY & WHAT BEATS WHAT TRIANGLE -->
       <section class="center-playmat">
         <div class="diamond-box" onclick="openModal('modal-table')">
           <div class="base-sq base-2b" id="base-2"></div>
@@ -758,19 +1025,21 @@
           <div class="diamond-center-label" id="runners-label">BASES<br>EMPTY</div>
         </div>
 
-        <div class="resolution-stage" id="resolution-stage">
-          <div class="res-headline" id="res-headline">CHOOSE 🔴 RED, 🔵 BLUE, OR 🟢 GREEN</div>
-          <div class="res-sub" id="res-sub">
+        <div class="center-status-box">
+          <div class="cs-title" id="res-headline">READY FOR PITCH — PICK YOUR COLOR BELOW</div>
+          <div class="cs-sub" id="res-sub">
             🔴 Red beats 🔵 Blue • 🔵 Blue beats 🟢 Green • 🟢 Green beats 🔴 Red.<br>
             Winner claims ⚡ Momentum &amp; rolls 3 dice (2 Base + Momentum Die)!
           </div>
-          <div class="dice-clash-row" id="dice-clash-row"></div>
+          <button class="btn-reopen-last" id="btn-reopen-last" style="display:none;" onclick="openDuelOverlay()">
+            🔍 View Last Duel &amp; Dice Breakdown
+          </button>
         </div>
 
         <!-- Mini What Beats What Triangle -->
         <div class="mini-triangle-box" onclick="openModal('modal-table')" title="Tap for Outcome Chart & Triangle">
           <div class="mt-title">WHAT BEATS WHAT</div>
-          <svg width="62" height="52" viewBox="0 0 80 68">
+          <svg width="60" height="50" viewBox="0 0 80 68">
             <line x1="48" y1="16" x2="64" y2="46" stroke="#ef4444" stroke-width="2.5" />
             <line x1="56" y1="56" x2="24" y2="56" stroke="#3b82f6" stroke-width="2.5" />
             <line x1="16" y1="46" x2="32" y2="16" stroke="#22c55e" stroke-width="2.5" />
@@ -812,7 +1081,7 @@
     <!-- 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE SELECTION -->
     <footer class="bottom-dock">
       <div class="dock-header">
-        <span id="dock-prompt">TAP YOUR STANCE CARD TO RESOLVE AT-BAT</span>
+        <span id="dock-prompt">TAP YOUR STANCE CARD TO PLAY AT-BAT</span>
         <span class="role-indicator" id="user-role-pill">YOU ARE BATTING (TITANS)</span>
       </div>
 
@@ -839,6 +1108,110 @@
         </button>
       </div>
     </footer>
+
+    <!-- =======================================================================
+         FULL 3-STEP AT-BAT DUEL RESOLUTION BREAKDOWN OVERLAY
+         ======================================================================= -->
+    <div class="duel-overlay" id="duel-overlay">
+      <div class="duel-card">
+
+        <!-- STEP 1: WHO WON THE STANCE DUEL -->
+        <div class="step-box">
+          <div class="step-header">
+            <span>1. STANCE DUEL (WHAT BEATS WHAT)</span>
+            <span>🔴 &gt; 🔵 &gt; 🟢 &gt; 🔴</span>
+          </div>
+
+          <div class="stance-clash-row">
+            <div class="played-stance-pill" id="duel-p-card">
+              <div class="psp-who" id="duel-p-who">⚾ PITCHER</div>
+              <div class="psp-color" id="duel-p-color">🔴 RED</div>
+              <div class="psp-sub" id="duel-p-sub">HEAT</div>
+            </div>
+
+            <div class="vs-circle">VS</div>
+
+            <div class="played-stance-pill" id="duel-b-card">
+              <div class="psp-who" id="duel-b-who">🏏 BATTER</div>
+              <div class="psp-color" id="duel-b-color">🔵 BLUE</div>
+              <div class="psp-sub" id="duel-b-sub">EYE</div>
+            </div>
+          </div>
+
+          <div class="duel-winner-banner" id="duel-winner-banner">
+            🏆 PITCHER WINS THE DUEL! Claims ⚡ Momentum Die!
+          </div>
+        </div>
+
+        <!-- STEP 2: WHICH DICE WERE ROLLED -->
+        <div class="step-box">
+          <div class="step-header">
+            <span>2. DICE ROLLED (HOLDER ROLLS 3 DICE vs. 2 DICE)</span>
+            <span id="duel-holder-tag" style="color:#fde047;">⚡ Holder: Pitcher</span>
+          </div>
+
+          <!-- Pitcher Dice Row -->
+          <div class="dice-side-row">
+            <div class="ds-left">
+              <div class="ds-player-label" id="duel-p-dice-label">⚾ Pitcher</div>
+              <div class="dice-cubes-wrap" id="duel-p-cubes"></div>
+            </div>
+            <div class="ds-total-box">
+              <div class="dst-label">PITCHER</div>
+              <div class="dst-num" id="duel-p-total">0</div>
+            </div>
+          </div>
+
+          <!-- Batter Dice Row -->
+          <div class="dice-side-row">
+            <div class="ds-left">
+              <div class="ds-player-label" id="duel-b-dice-label">🏏 Batter</div>
+              <div class="dice-cubes-wrap" id="duel-b-cubes"></div>
+            </div>
+            <div class="ds-total-box">
+              <div class="dst-label">BATTER</div>
+              <div class="dst-num" id="duel-b-total">0</div>
+            </div>
+          </div>
+
+          <!-- Margin Calculation Bar -->
+          <div class="margin-calc-bar">
+            <span id="duel-margin-formula">Pitcher (15) − Batter (10)</span>
+            <span class="mc-badge" id="duel-margin-badge">MARGIN: +5</span>
+          </div>
+        </div>
+
+        <!-- STEP 3: AT-BAT OUTCOME & HIGHLIGHTED CHART -->
+        <div class="step-box">
+          <div class="step-header">
+            <span>3. AT-BAT OUTCOME (SINGLE LOOKUP TABLE)</span>
+            <span id="duel-score-status">TIT 0 - SER 0</span>
+          </div>
+
+          <div class="outcome-hero" id="duel-outcome-hero">
+            <div class="oh-title" id="duel-outcome-title">🔥 STRIKEOUT (K)</div>
+            <div class="oh-desc" id="duel-outcome-desc">Batter out; baserunners hold.</div>
+            <div class="oh-degrade" id="duel-outcome-degrade" style="display:none;"></div>
+          </div>
+
+          <table class="mini-outcome-table" id="duel-mini-table">
+            <tbody>
+              <tr data-band="k"><td>+4 or more</td><td>STRIKEOUT (K)</td><td>Batter out; runners hold</td></tr>
+              <tr data-band="out"><td>0 to +3</td><td>ROUTINE OUT</td><td>Fly/Pop out; runners hold</td></tr>
+              <tr data-band="sac"><td>-1 to -3</td><td>FIELDED / SAC</td><td>Out; Runner on 3rd scores!</td></tr>
+              <tr data-band="bb"><td>-4 to -5</td><td>WALK (BB)</td><td>1st base; forces runners</td></tr>
+              <tr data-band="1b"><td>-6 to -8</td><td>CLEAN SINGLE</td><td>Runners +1 (2nd scores 4-6)</td></tr>
+              <tr data-band="xbh"><td>-9 or less</td><td>EXTRA-BASE / HR</td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn-next-ab" onclick="closeDuelOverlay()">
+          CONTINUE TO NEXT AT-BAT ▶
+        </button>
+
+      </div>
+    </div>
 
     <!-- MODAL 1: AT-BAT OUTCOME TABLE & STANCE TRIANGLE -->
     <div class="modal-backdrop" id="modal-table" onclick="closeModalOnBg(event, 'modal-table')">
@@ -1013,13 +1386,13 @@
     function initGame(userTeamKey = 'titans') {
       const clone = JSON.parse(JSON.stringify(TEAMS_TEMPLATE));
       state = {
-        userTeam: userTeamKey, // 'titans' (Away) or 'serpents' (Home)
+        userTeam: userTeamKey,
         inning: 1,
-        half: 'top', // 'top' = Titans batting, Serpents pitching; 'bot' = Serpents batting, Titans pitching
+        half: 'top',
         outs: 0,
         score: { titans: 0, serpents: 0 },
-        bases: [null, null, null], // [1B, 2B, 3B]
-        momentumHolder: 'pitcher', // 'pitcher' or 'batter'
+        bases: [null, null, null],
+        momentumHolder: 'pitcher',
         teams: {
           titans: {
             ...clone.titans,
@@ -1087,7 +1460,6 @@
         const info = isPitcher ? getPitcherStanceDice(botPlayer, c) : getBatterStanceDice(botPlayer, c);
         return calcRating(info.d1, info.d2);
       });
-      // Weighted random choice favoring stronger stances
       const total = weights.reduce((a, b) => a + b, 0);
       let r = Math.random() * total;
       for (let i = 0; i < 3; i++) {
@@ -1095,6 +1467,15 @@
         if (r <= 0) return colors[i];
       }
       return 'red';
+    }
+
+    function makeCubeHTML(meta, val, extraClass = '') {
+      return `
+        <div class="die-cube ${extraClass}">
+          <span class="dc-meta">${meta}</span>
+          <span class="dc-val">${val}</span>
+        </div>
+      `;
     }
 
     function playStance(userColor) {
@@ -1136,13 +1517,10 @@
       let bRoll2 = rollDie(bStance.d2);
 
       // Momentum Die Roll (uses current un-degraded Momentum Die!)
-      let pMomRoll = 0;
-      let bMomRoll = 0;
-      if (state.momentumHolder === 'pitcher' && p.mom !== 'None') {
-        pMomRoll = rollDie(p.mom);
-      } else if (state.momentumHolder === 'batter' && b.mom !== 'None') {
-        bMomRoll = rollDie(b.mom);
-      }
+      const pMomDieUsed = (state.momentumHolder === 'pitcher' && p.mom !== 'None') ? p.mom : null;
+      const bMomDieUsed = (state.momentumHolder === 'batter' && b.mom !== 'None') ? b.mom : null;
+      const pMomRoll = pMomDieUsed ? rollDie(pMomDieUsed) : 0;
+      const bMomRoll = bMomDieUsed ? rollDie(bMomDieUsed) : 0;
 
       // Special Ability Bonuses
       let pBonus = 0;
@@ -1168,41 +1546,115 @@
       if (state.abilityArmed.pitcher) {
         const oldDie = p.mom;
         p.mom = stepDownDie(p.mom);
-        postAbilityNotes.push(`${p.name} used ${p.abilityName} (${oldDie} ➔ ${p.mom})`);
+        postAbilityNotes.push(`${p.name} used ${p.abilityName} (Mom. Die degraded after use: ${oldDie} ➔ ${p.mom})`);
         state.abilityArmed.pitcher = false;
       }
       if (state.abilityArmed.batter) {
         const oldDie = b.mom;
         b.mom = stepDownDie(b.mom);
-        postAbilityNotes.push(`${b.name} used ${b.abilityName} (${oldDie} ➔ ${b.mom})`);
+        postAbilityNotes.push(`${b.name} used ${b.abilityName} (Mom. Die degraded after use: ${oldDie} ➔ ${b.mom})`);
         state.abilityArmed.batter = false;
       }
 
-      // 5. Update Center Feed UI
-      const colorIcon = { red: '🔴 RED', blue: '🔵 BLUE', green: '🟢 GREEN' };
-      const readMsg = readWinner === 'tie'
-        ? `TIE (${colorIcon[pColor]}) — ⚡ Token stays with ${state.momentumHolder.toUpperCase()}!`
-        : `${readWinner === 'pitcher' ? 'PITCHER' : 'BATTER'} wins Read (${colorIcon[pColor]} vs ${colorIcon[bColor]}) & claims ⚡ Momentum!`;
+      // 5. Populate the 3-Step Duel Breakdown Overlay
+      const colorNames = { red: '🔴 RED', blue: '🔵 BLUE', green: '🟢 GREEN' };
+      const pCardEl = document.getElementById('duel-p-card');
+      const bCardEl = document.getElementById('duel-b-card');
+      pCardEl.className = `played-stance-pill ${pColor}${readWinner === 'pitcher' ? ' winner' : ''}`;
+      bCardEl.className = `played-stance-pill ${bColor}${readWinner === 'batter' ? ' winner' : ''}`;
+      document.getElementById('duel-p-who').textContent = `⚾ ${p.name}`;
+      document.getElementById('duel-p-color').textContent = colorNames[pColor];
+      document.getElementById('duel-p-sub').textContent = `${pStance.label} (${pStance.a1}+${pStance.a2})`;
 
-      const pDiceFormula = `${pStance.a1} ${pStance.d1}(${pRoll1}) + ${pStance.a2} ${pStance.d2}(${pRoll2})` +
-        (pMomRoll ? ` + ⚡${p.mom}(${pMomRoll})` : '') + (pBonus ? ` +${pBonus}` : '') + ` = ${pTotal}`;
-      const bDiceFormula = `${bStance.a1} ${bStance.d1}(${bRoll1}) + ${bStance.a2} ${bStance.d2}(${bRoll2})` +
-        (bMomRoll ? ` + ⚡${b.mom}(${bMomRoll})` : '') + (bBonus ? ` +${bBonus}` : '') + ` = ${bTotal}`;
+      document.getElementById('duel-b-who').textContent = `🏏 ${b.name}`;
+      document.getElementById('duel-b-color').textContent = colorNames[bColor];
+      document.getElementById('duel-b-sub').textContent = `${bStance.label} (${bStance.a1}+${bStance.a2})`;
 
-      document.getElementById('res-headline').textContent = `${outcomeInfo.title} (Margin: ${margin >= 0 ? '+' + margin : margin})`;
-      document.getElementById('res-sub').innerHTML =
-        `${readMsg}<br>${outcomeInfo.detail}` +
-        (postAbilityNotes.length ? `<br><span style="color:#fde047;">⚡ Post-Use Degrade: ${postAbilityNotes.join(' • ')}</span>` : '');
+      const winnerBanner = document.getElementById('duel-winner-banner');
+      if (readWinner === 'pitcher') {
+        winnerBanner.textContent = `🏆 PITCHER WINS STANCE DUEL! (${colorNames[pColor]} beats ${colorNames[bColor]}) ➔ Claims ⚡ Momentum!`;
+      } else if (readWinner === 'batter') {
+        winnerBanner.textContent = `🏆 BATTER WINS STANCE DUEL! (${colorNames[bColor]} beats ${colorNames[pColor]}) ➔ Claims ⚡ Momentum!`;
+      } else {
+        winnerBanner.textContent = `🤝 STANCE TIE! (Both played ${colorNames[pColor]}) ➔ ⚡ Momentum stays with ${state.momentumHolder.toUpperCase()}!`;
+      }
 
-      document.getElementById('dice-clash-row').innerHTML = `
-        <span class="roll-pill">⚾ P: ${pDiceFormula}</span>
-        <span class="roll-pill">🏏 B: ${bDiceFormula}</span>
-        <span class="margin-pill">P−B: ${margin >= 0 ? '+' + margin : margin}</span>
-      `;
+      document.getElementById('duel-holder-tag').textContent =
+        `⚡ Holder: ${state.momentumHolder === 'pitcher' ? p.name : b.name}`;
 
-      // 6. Advance to Next Batter in Left-to-Right Order & Check TTOP Pitcher Endurance
+      // Step 2: Build Visual Dice Cubes
+      document.getElementById('duel-p-dice-label').innerHTML =
+        `⚾ <strong>${p.name}</strong> ${state.momentumHolder === 'pitcher' ? '<span class="mom-token-pill">⚡ 3 DICE</span>' : '<span style="color:#94a3b8;font-size:0.58rem;">(2 Base Dice)</span>'}`;
+      let pCubesHTML =
+        makeCubeHTML(`${pStance.a1} (${pStance.d1})`, pRoll1) +
+        `<span class="plus-sign">+</span>` +
+        makeCubeHTML(`${pStance.a2} (${pStance.d2})`, pRoll2);
+      if (pMomDieUsed) {
+        pCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, pMomRoll, 'mom-cube');
+      }
+      if (pBonus) {
+        pCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`ABILITY`, `+${pBonus}`, 'bonus-cube');
+      }
+      document.getElementById('duel-p-cubes').innerHTML = pCubesHTML;
+      document.getElementById('duel-p-total').textContent = pTotal;
+
+      document.getElementById('duel-b-dice-label').innerHTML =
+        `🏏 <strong>${b.name}</strong> ${state.momentumHolder === 'batter' ? '<span class="mom-token-pill">⚡ 3 DICE</span>' : '<span style="color:#94a3b8;font-size:0.58rem;">(2 Base Dice)</span>'}`;
+      let bCubesHTML =
+        makeCubeHTML(`${bStance.a1} (${bStance.d1})`, bRoll1) +
+        `<span class="plus-sign">+</span>` +
+        makeCubeHTML(`${bStance.a2} (${bStance.d2})`, bRoll2);
+      if (bMomDieUsed) {
+        bCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, bMomRoll, 'mom-cube');
+      }
+      if (bBonus) {
+        bCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`ABILITY`, `+${bBonus}`, 'bonus-cube');
+      }
+      document.getElementById('duel-b-cubes').innerHTML = bCubesHTML;
+      document.getElementById('duel-b-total').textContent = bTotal;
+
+      const marginStr = margin >= 0 ? `+${margin}` : `${margin}`;
+      document.getElementById('duel-margin-formula').textContent = `Pitcher (${pTotal}) − Batter (${bTotal})`;
+      document.getElementById('duel-margin-badge').textContent = `MARGIN: ${marginStr}`;
+
+      // Step 3: Advance state and show Outcome Hero + Highlighted Row
       advanceLineupAndInning(outcomeInfo.outsAdded, outcomeInfo.runsAdded);
+
+      const heroEl = document.getElementById('duel-outcome-hero');
+      heroEl.className = `outcome-hero ${outcomeInfo.outsAdded > 0 ? 'pitcher-win' : 'batter-win'}`;
+      document.getElementById('duel-outcome-title').textContent = `${outcomeInfo.title} (Margin ${marginStr})`;
+      document.getElementById('duel-outcome-desc').textContent = outcomeInfo.detail;
+
+      const degEl = document.getElementById('duel-outcome-degrade');
+      if (postAbilityNotes.length) {
+        degEl.style.display = 'block';
+        degEl.textContent = `⚡ ${postAbilityNotes.join(' | ')}`;
+      } else {
+        degEl.style.display = 'none';
+      }
+
+      document.getElementById('duel-score-status').textContent =
+        `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
+
+      document.querySelectorAll('#duel-mini-table tbody tr').forEach(tr => {
+        tr.classList.toggle('active-band', tr.dataset.band === state.lastBand);
+      });
+
+      // Also update compact center playmat summary
+      document.getElementById('res-headline').textContent = `LAST PLAY: ${outcomeInfo.title} (Margin ${marginStr})`;
+      document.getElementById('res-sub').innerHTML =
+        `P ${colorNames[pColor]} (${pTotal}) vs B ${colorNames[bColor]} (${bTotal}) • ${outcomeInfo.detail}`;
+      document.getElementById('btn-reopen-last').style.display = 'inline-block';
+
       renderAll();
+      openDuelOverlay();
+    }
+
+    function openDuelOverlay() {
+      document.getElementById('duel-overlay').classList.add('open');
+    }
+    function closeDuelOverlay() {
+      document.getElementById('duel-overlay').classList.remove('open');
     }
 
     function resolveOutcomeTable(margin, p, b) {
@@ -1221,12 +1673,12 @@
         state.lastBand = 'k';
         outs = 1;
         title = '🔥 STRIKEOUT (K)';
-        detail = 'Batter out; baserunners hold.';
+        detail = `${b.name} strikes out! Baserunners hold.`;
       } else if (margin >= 0) {
         state.lastBand = 'out';
         outs = 1;
         title = '🧤 ROUTINE OUT';
-        detail = 'Fly/Pop out; baserunners hold.';
+        detail = `${b.name} flies/pops out. Baserunners hold.`;
       } else if (margin >= -3 && !(usedEagleEye && margin === -3)) {
         state.lastBand = 'sac';
         outs = 1;
@@ -1235,27 +1687,27 @@
           if (state.bases[2]) {
             runs += 1;
             state.bases[2] = null;
-            detail = 'Batter out; Runner on 3rd scores!';
+            detail = `${b.name} grounded/sac out; Runner on 3rd scores!`;
           } else {
-            detail = 'Batter out at 1st.';
+            detail = `${b.name} thrown out at 1st.`;
           }
           if (state.bases[1]) {
             state.bases[2] = state.bases[1];
             state.bases[1] = null;
           }
         } else {
-          detail = '3rd Out of the half-inning!';
+          detail = `${b.name} out at 1st (3rd Out of the half-inning!).`;
         }
       } else if (margin >= -5 || (usedEagleEye && margin === -3)) {
         if (usedBlackPaint && margin === -4) {
           state.lastBand = 'sac';
           outs = 1;
           title = '🎨 BLACK PAINT OUT';
-          detail = 'Margin -4 converted from Walk into Fielded Out!';
+          detail = `Margin -4 converted from Walk into Fielded Out!`;
         } else {
           state.lastBand = 'bb';
           title = '👁️ WALK (BB)';
-          detail = 'Batter takes 1st base; forced runners advance.';
+          detail = `${b.name} takes 1st base; forced runners advance.`;
           if (state.bases[0] && state.bases[1] && state.bases[2]) {
             runs += 1;
           }
@@ -1279,7 +1731,7 @@
           else state.bases[1] = state.bases[0];
         }
         state.bases[0] = b.name;
-        detail = `Runners advance +1${r2Scores ? ' (Runner on 2nd scored!)' : ''}.`;
+        detail = `${b.name} singles to 1st! Runners advance +1${r2Scores ? ' (Runner from 2nd scored!)' : ''}.`;
       } else {
         state.lastBand = 'xbh';
         const d6 = rollDie('d6');
@@ -1288,19 +1740,19 @@
           title = '🚀 TRIPLE (3B)!';
           runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
           state.bases = [null, null, b.name];
-          detail = `Rolled d6=${d6}: Bases cleared! Batter to 3rd base.`;
+          detail = `Extra-Base d6 rolled ${d6}: Bases cleared! ${b.name} to 3rd base.`;
         } else if (isHR) {
           title = '💣 HOME RUN!';
           runs += 1 + (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
           state.bases = [null, null, null];
-          detail = `Rolled d6=${d6}: Out of the park! ${runs} run(s) score!`;
+          detail = `Extra-Base d6 rolled ${d6}: HOME RUN! ${runs} run(s) score!`;
         } else {
           title = '⚡ DOUBLE (2B)!';
           if (state.bases[2]) { runs += 1; state.bases[2] = null; }
           if (state.bases[1]) { runs += 1; state.bases[1] = null; }
           if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
           state.bases[1] = b.name;
-          detail = `Rolled d6=${d6}: Runners on 2nd/3rd score; 1st to 3rd; batter to 2nd.`;
+          detail = `Extra-Base d6 rolled ${d6}: ${b.name} doubles to 2nd!`;
         }
       }
 
@@ -1316,10 +1768,8 @@
       state.score[offKey] += runsAdded;
       state.outs += outsAdded;
 
-      // Advance to next batter (#1 to #9 left-to-right)
       offTeam.batterIdx = (offTeam.batterIdx + 1) % 9;
 
-      // Check Pitcher Endurance (Times Through the Order when #1 Leadoff steps up)
       if (offTeam.batterIdx === 0) {
         offTeam.lineupLoops += 1;
         const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
@@ -1328,11 +1778,9 @@
         }
       }
 
-      // Check 3 Outs -> Flip Half-Inning
       if (state.outs >= 3) {
         state.outs = 0;
         state.bases = [null, null, null];
-        // Reliever endurance: step down after inning pitched
         const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
         if (!activeP.isStarter) {
           activeP.mom = stepDownDie(activeP.mom);
@@ -1358,7 +1806,6 @@
       momDieEl.textContent = `MOM: ${player.mom}`;
       momDieEl.className = `mom-die-pill${player.mom === 'None' ? ' exhausted' : ''}`;
 
-      // 5 Core Attributes
       const attrsEl = document.getElementById(`${prefix}-core-attrs`);
       if (isPitcher) {
         attrsEl.innerHTML = `
@@ -1378,7 +1825,6 @@
         `;
       }
 
-      // 3 Color Stances
       const stancesEl = document.getElementById(`${prefix}-stances-grid`);
       const colors = ['red', 'blue', 'green'];
       const icons = { red: '🔴', blue: '🔵', green: '🟢' };
@@ -1397,9 +1843,8 @@
         `;
       }).join('');
 
-      // Special Ability Row
       document.getElementById(`${prefix}-ability-text`).innerHTML =
-        `<strong>${player.abilityName}:</strong> ${player.abilityDesc} <em>(Degrades Mom. Die after use)</em>`;
+        `<strong>${player.abilityName}:</strong> ${player.abilityDesc} <em>(Degrades after use)</em>`;
       const btn = document.getElementById(`${prefix}-ability-btn`);
       btn.disabled = (player.mom === 'None');
       btn.className = `btn-ability${abilityArmed ? ' active' : ''}`;
@@ -1416,14 +1861,12 @@
       const p = getActivePitcher();
       const b = getActiveBatter();
 
-      // Scoreboard
       document.getElementById('score-away').textContent = `TIT ${state.score.titans}`;
       document.getElementById('score-home').textContent = `SER ${state.score.serpents}`;
       document.getElementById('inn-display').textContent = `${state.half === 'top' ? '▲' : '▼'} INN ${state.inning}`;
       document.getElementById('out-1').className = `out-dot${state.outs >= 1 ? ' on' : ''}`;
       document.getElementById('out-2').className = `out-dot${state.outs >= 2 ? ' on' : ''}`;
 
-      // Lineup Strip (#1 to #9 Left to Right)
       const stripEl = document.getElementById('lineup-strip');
       stripEl.innerHTML = offTeam.batters.map((bat, idx) => `
         <div class="lineup-chip${idx === offTeam.batterIdx ? ' active' : ''}">
@@ -1431,11 +1874,9 @@
         </div>
       `).join('');
 
-      // Pitcher & Batter Cards
       renderPlayerCard('p', p, true, defTeam.cardClass, state.momentumHolder === 'pitcher', state.abilityArmed.pitcher);
       renderPlayerCard('b', b, false, offTeam.cardClass, state.momentumHolder === 'batter', state.abilityArmed.batter);
 
-      // Diamond Bases
       document.getElementById('base-1').className = `base-sq base-1b${state.bases[0] ? ' occupied' : ''}`;
       document.getElementById('base-2').className = `base-sq base-2b${state.bases[1] ? ' occupied' : ''}`;
       document.getElementById('base-3').className = `base-sq base-3b${state.bases[2] ? ' occupied' : ''}`;
@@ -1444,7 +1885,6 @@
         ? 'BASES<br>EMPTY'
         : `${occCount} ON<br>BASE`;
 
-      // Bottom Hand Buttons (Reflects User's Active Player)
       const userIsBatting = (offKey === state.userTeam);
       const userPlayer = userIsBatting ? b : p;
       document.getElementById('user-role-pill').textContent =
@@ -1459,12 +1899,10 @@
         document.getElementById(`btn-${c}-rating`).textContent = `Rating ${r} ${getStars(r)}`;
       });
 
-      // Highlight last outcome row in modal table
       document.querySelectorAll('#outcome-ref-table tbody tr').forEach(tr => {
         tr.classList.toggle('highlight-row', tr.dataset.band === state.lastBand);
       });
 
-      // Bullpen modal list
       document.getElementById('user-team-label').textContent = state.teams[state.userTeam].name;
       const bpList = document.getElementById('bullpen-list');
       bpList.innerHTML = defTeam.pitchers.map((arm, idx) => `
