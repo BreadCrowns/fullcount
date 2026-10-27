@@ -457,24 +457,110 @@
     letter-spacing: 0.5px;
   }
 
-  /* Upper Zone of the 17"x11" Playmat (Holds Active Pitcher) */
+  /* Upper Zone of the 17"x11" Playmat (Holds Quick Rules, Active Pitcher & Results Chart) */
   .half-mat-upper {
-    height: 4.50in;
+    height: 4.80in;
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    padding: 0.12in 0;
   }
   .half-mat-upper.left-upper {
-    justify-content: flex-end;
-    padding-right: 0.20in;
+    justify-content: space-between;
+    gap: 0.18in;
+    padding-right: 0.10in;
   }
   .half-mat-upper.right-upper {
-    justify-content: flex-start;
-    padding-left: 0.20in;
+    justify-content: space-between;
+    gap: 0.18in;
+    padding-left: 0.10in;
+  }
+
+  .playmat-ref-panel {
+    flex: 1;
+    border: 2px solid #0f172a;
+    border-radius: 7px;
+    background: #ffffff;
+    padding: 0.12in 0.15in;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .playmat-ref-header {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #0f172a;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .playmat-rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.10in;
+    margin-top: 0.06in;
+    flex: 1;
+  }
+
+  .playmat-rule-block {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 8.3px;
+    line-height: 1.32;
+    color: #1e293b;
+  }
+
+  .playmat-rule-block h4 {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #0f172a;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 2px;
+  }
+
+  .playmat-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.8px;
+    margin-top: 4px;
+  }
+  .playmat-chart-table th {
+    background: #1e293b;
+    color: #ffffff;
+    text-align: left;
+    padding: 4px 6px;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .playmat-chart-table td {
+    padding: 4.5px 6px;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  .playmat-chart-table tr.p-row { background: #f0fdf4; }
+  .playmat-chart-table tr.b-row { background: #fef2f2; }
+
+  .playmat-subcharts {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 0.10in;
+    margin-top: 0.06in;
   }
 
   /* Lower Zone of the 17"x11" Playmat: The Single Unbroken 9-Card Row! */
   .half-mat-lower {
-    height: 4.20in;
+    height: 3.90in;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -694,7 +780,7 @@
         </div>
       </div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on d6 roll of 4–6!</div>
+        <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on POW roll of 5+!</div>
       </div>
     </div>
 
@@ -1104,7 +1190,7 @@
         <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
         <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
         <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
-        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (POW:1-5 2B,6 3B,7+ HR)</strong></td></tr>
       </table>
       <div class="ability-box">
         <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
@@ -1679,7 +1765,7 @@
         <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
         <tr class="b-win"><td>-3</td><td><strong>WALK (BB)</strong></td></tr>
         <tr class="b-win"><td>-4..-6</td><td><strong>SINGLE (2B: SPD 4+)</strong></td></tr>
-        <tr class="b-win"><td>-7-</td><td><strong>XBH (d6:1-4 2B,5 3B,6 HR)</strong></td></tr>
+        <tr class="b-win"><td>-7-</td><td><strong>XBH (POW:1-5 2B,6 3B,7+ HR)</strong></td></tr>
       </table>
       <div class="ability-box">
         <div><strong>Margin = Pitcher − Batter</strong><br>Send 2nd on 1B: SPD 4+ Safe!</div>
@@ -1720,10 +1806,48 @@
         <div class="seam-badge">LEFT HALF (PAGE 1 OF 2) ➔ JOIN TO RIGHT HALF</div>
       </div>
 
-      <!-- Upper Zone: Active Pitcher Slot -->
+      <!-- Upper Zone: Quick Rules Write-Up + Active Pitcher Slot -->
       <div class="half-mat-upper left-upper">
-        <div class="clean-slot pitcher-slot">
-          <div class="clean-slot-label" style="color:#0f172a; font-size:15px;">ACTIVE PITCHER</div>
+        <div class="playmat-ref-panel">
+          <div class="playmat-ref-header">
+            <span>⚾ FULL COUNT — QUICK RULES REFERENCE</span>
+            <span style="font-size: 9px; font-family: Arial, sans-serif; color: #fde68a;">SIMULTANEOUS 3-COLOR DUEL</span>
+          </div>
+          <div class="playmat-rules-grid">
+            <div class="playmat-rule-block">
+              <h4>1. Simultaneous Pitch Guess (🔴 / 🔵 / 🟢)</h4>
+              Both managers secretly select and simultaneously reveal one Color Stance card:<br>
+              • <strong>🔴 Red:</strong> Pitcher <code>VEL+GRT</code> vs. Batter <code>POW+CON</code><br>
+              • <strong>🔵 Blue:</strong> Pitcher <code>CMD+GRT</code> vs. Batter <code>EYE+FOC</code><br>
+              • <strong>🟢 Green:</strong> Pitcher <code>MOV+DEC</code> vs. Batter <code>CON+SPD</code><br>
+              <strong>🎯 MATCH (Same Color):</strong> Batter reads the pitch &amp; claims the <strong>⚡ Momentum Token</strong>!<br>
+              <strong>🌀 MISMATCH (Different Colors):</strong> Pitcher fools the batter &amp; claims the <strong>⚡ Momentum Token</strong>!
+            </div>
+            <div class="playmat-rule-block">
+              <h4>2. Roll Attribute Dice &amp; ⚡ Momentum Die</h4>
+              • <strong>Non-Momentum Player (2 Dice):</strong> Rolls the <strong>2 Attribute Dice</strong> on their card for the color they personally chose.<br>
+              • <strong>⚡ Momentum Holder (3 Dice):</strong> Rolls their <strong>2 Chosen Attribute Dice + Current Momentum Die</strong> (<code>d8</code>, <code>d6</code>, or <code>d4</code> shown by their cube on the track).<br>
+              • <strong>Calculate Margin:</strong><br>
+              <strong><code>Margin = (Pitcher Total) − (Batter Total)</code></strong>
+            </div>
+            <div class="playmat-rule-block">
+              <h4>3. Special Abilities (Spend 1 Momentum Step)</h4>
+              • Any active Pitcher or Batter may activate their card's <strong>⚡ Special Ability</strong> on <strong>any at-bat</strong> as long as their cube is on <code>d8</code>, <code>d6</code>, or <code>d4</code> (no situational restrictions).<br>
+              • Declare before rolling dice (unless noted). The player still rolls their current Momentum Die on that play, then <strong>slides their cube 1 box right</strong> (<code>d8 ▸ d6 ▸ d4 ▸ OUT ✕</code>) after the at-bat resolves.
+            </div>
+            <div class="playmat-rule-block">
+              <h4>4. Pitcher Endurance &amp; Lineup Order</h4>
+              • Arrange your 9 batters left-to-right (<code>#1</code>–<code>#9</code>) and place a cube on each player's <strong><code>START</code></strong> box.<br>
+              • <strong>Starting Pitcher (SP):</strong> Slides their cube <strong>1 box right</strong> each time <code>BATTER #1</code> steps to the plate after the 1st inning.<br>
+              • <strong>Reliever (RP):</strong> Enters at <code>START</code> and slides their cube <strong>1 box right</strong> at the start of each new inning they stay in.
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+          <div class="clean-slot pitcher-slot">
+            <div class="clean-slot-label" style="color:#0f172a; font-size:15px;">ACTIVE PITCHER</div>
+          </div>
         </div>
       </div>
 
@@ -1768,8 +1892,73 @@
         <div class="half-mat-title">BATTING LINEUP (#1 – #9)</div>
       </div>
 
-      <!-- Upper Zone (Matches Left Upper Zone Height) -->
+      <!-- Upper Zone: Results Chart & Extra-Base / Baserunning Tables -->
       <div class="half-mat-upper right-upper">
+        <div class="playmat-ref-panel">
+          <div class="playmat-ref-header">
+            <span>📊 AT-BAT OUTCOME &amp; EXTRA-BASE RESULTS CHART</span>
+            <span style="font-size: 9px; font-family: Arial, sans-serif; color: #fde68a;">MARGIN = (PITCHER TOTAL) − (BATTER TOTAL)</span>
+          </div>
+
+          <table class="playmat-chart-table">
+            <thead>
+              <tr>
+                <th style="width: 16%;">MARGIN</th>
+                <th style="width: 24%;">RESULT</th>
+                <th>PLAY RESOLUTION &amp; BASERUNNER ADVANCEMENT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="p-row">
+                <td><strong>+6 or more</strong></td>
+                <td><strong>🔥 STRIKEOUT (K)</strong></td>
+                <td>Batter is <strong>OUT (+1 Out)</strong>. All baserunners must hold their bases.</td>
+              </tr>
+              <tr class="p-row">
+                <td><strong>+1 to +5</strong></td>
+                <td><strong>⚾ ROUTINE OUT</strong></td>
+                <td>Pop-up or routine groundout; Batter is <strong>OUT (+1 Out)</strong>. Baserunners hold.</td>
+              </tr>
+              <tr class="p-row">
+                <td><strong>0 to −2</strong></td>
+                <td><strong>🏃 FIELDED / SAC OUT</strong></td>
+                <td>Batter is <strong>OUT (+1 Out)</strong>. If fewer than 3 outs: <strong>Runner on 3rd SCORES!</strong> Runner on 2nd advances to 3rd.</td>
+              </tr>
+              <tr class="b-row">
+                <td><strong>−3</strong></td>
+                <td><strong>👁️ WALK (BB)</strong></td>
+                <td>Batter takes <strong>1st Base</strong>. Existing baserunners advance 1 base only if forced.</td>
+              </tr>
+              <tr class="b-row">
+                <td><strong>−4 to −6</strong></td>
+                <td><strong>💥 CLEAN SINGLE (1B)</strong></td>
+                <td>Batter to <strong>1st Base</strong>; Runner on 3rd scores; Runner on 1st to 2nd. <strong>Runner on 2nd: Hold at 3rd OR Send Home (<code>SPD</code> Die)!</strong></td>
+              </tr>
+              <tr class="b-row">
+                <td><strong>−7 or less</strong></td>
+                <td><strong>🚀 EXTRA-BASE HIT (XBH)</strong></td>
+                <td><strong>Roll the Batter's Power (<code>POW</code>) Die (<code>d4</code>–<code>d12</code>):</strong> <strong><code>1–5</code> = Double (2B)</strong> | <strong><code>6</code> = Triple (3B)</strong> | <strong><code>7+</code> = Home Run (HR)!</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="playmat-subcharts">
+            <div class="playmat-rule-block" style="background:#fff1f2; border-color:#fecdd3;">
+              <h4 style="color:#9f1239; border-color:#fecdd3;">🚀 EXTRA-BASE HIT (−7 OR LESS) — ROLL BATTER'S POW DIE</h4>
+              • <strong>Roll <code>1 – 5</code> ➔ DOUBLE (2B):</strong> Runners on 2nd &amp; 3rd score; Runner on 1st advances to 3rd; Batter to 2nd Base.<br>
+              • <strong>Roll <code>6</code> ➔ TRIPLE (3B):</strong> All baserunners score; Batter to 3rd Base.<br>
+              • <strong>Roll <code>7 or higher</code> ➔ HOME RUN (HR):</strong> Batter &amp; all baserunners score! <em>(Requires <code>d8</code>, <code>d10</code>, or <code>d12</code> POW unless boosted by ability.)</em>
+            </div>
+            <div class="playmat-rule-block" style="background:#f0f9ff; border-color:#bae6fd;">
+              <h4 style="color:#075985; border-color:#bae6fd;">🏃 SEND RUNNER FROM 2ND ON A SINGLE — ROLL RUNNER'S SPD DIE</h4>
+              When a <strong>Single (−4 to −6)</strong> is hit with a runner on <strong>2nd Base</strong>:<br>
+              • <strong>🛑 Hold at 3rd:</strong> Runner advances safely to 3rd Base (no roll).<br>
+              • <strong>🏃 Send Home:</strong> Roll that baserunner's <strong><code>SPD</code> die (<code>d4</code>–<code>d12</code>)</strong>:<br>
+              &nbsp;&nbsp;— <strong><code>4 or higher</code>: SAFE AT HOME (+1 Run!)</strong><br>
+              &nbsp;&nbsp;— <strong><code>1 to 3</code>: THROWN OUT AT THE PLATE (+1 Out)</strong>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Lower Zone: Batters #6, #7, #8, #9 Continuing the Exact Same Single Row! -->
