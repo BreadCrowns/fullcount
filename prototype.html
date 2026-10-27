@@ -1028,28 +1028,22 @@
         <div class="center-status-box">
           <div class="cs-title" id="res-headline">READY FOR PITCH — PICK YOUR COLOR BELOW</div>
           <div class="cs-sub" id="res-sub">
-            🔴 Red beats 🔵 Blue • 🔵 Blue beats 🟢 Green • 🟢 Green beats 🔴 Red.<br>
-            Winner claims ⚡ Momentum &amp; rolls 3 dice (2 Base + Momentum Die)!
+            🎯 <strong>MATCH</strong> (Same Color) = <strong>Batter</strong> reads the pitch &amp; claims ⚡ Momentum!<br>
+            🌀 <strong>MISMATCH</strong> (Different Color) = <strong>Pitcher</strong> fools batter &amp; claims ⚡ Momentum!
           </div>
           <button class="btn-reopen-last" id="btn-reopen-last" style="display:none;" onclick="openDuelOverlay()">
             🔍 View Last Duel &amp; Dice Breakdown
           </button>
         </div>
 
-        <!-- Mini What Beats What Triangle -->
-        <div class="mini-triangle-box" onclick="openModal('modal-table')" title="Tap for Outcome Chart & Triangle">
-          <div class="mt-title">WHAT BEATS WHAT</div>
-          <svg width="60" height="50" viewBox="0 0 80 68">
-            <line x1="48" y1="16" x2="64" y2="46" stroke="#ef4444" stroke-width="2.5" />
-            <line x1="56" y1="56" x2="24" y2="56" stroke="#3b82f6" stroke-width="2.5" />
-            <line x1="16" y1="46" x2="32" y2="16" stroke="#22c55e" stroke-width="2.5" />
-            <circle cx="40" cy="12" r="9" fill="#dc2626" />
-            <text x="40" y="15" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">RED</text>
-            <circle cx="66" cy="54" r="9" fill="#2563eb" />
-            <text x="66" y="57" font-size="6.5" font-weight="900" fill="#fff" text-anchor="middle">BLU</text>
-            <circle cx="14" cy="54" r="9" fill="#16a34a" />
-            <text x="14" y="57" font-size="6.5" font-weight="900" fill="#fff" text-anchor="middle">GRN</text>
-          </svg>
+        <!-- Mini Pitch Guess Reference -->
+        <div class="mini-triangle-box" onclick="openModal('modal-table')" title="Tap for Outcome Chart & Rules">
+          <div class="mt-title">PITCH GUESS</div>
+          <div style="font-size:0.55rem; font-weight:900; color:#fde047; line-height:1.35; padding:2px 2px;">
+            🎯 MATCH<br><span style="color:#fca5a5;">Batter ⚡</span><br>
+            <span style="color:#64748b;">───</span><br>
+            🌀 DIFF<br><span style="color:#86efac;">Pitcher ⚡</span>
+          </div>
         </div>
       </section>
 
@@ -1081,28 +1075,28 @@
     <!-- 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE SELECTION -->
     <footer class="bottom-dock">
       <div class="dock-header">
-        <span id="dock-prompt">TAP YOUR STANCE CARD TO PLAY AT-BAT</span>
+        <span id="dock-prompt">🎯 MATCH PITCHER = BATTER ⚡ | 🌀 MISMATCH = PITCHER ⚡</span>
         <span class="role-indicator" id="user-role-pill">YOU ARE BATTING (TITANS)</span>
       </div>
 
       <div class="stance-hand">
         <button class="stance-btn red-card" onclick="playStance('red')">
           <span class="sb-color-title" id="btn-red-title">🔴 RED</span>
-          <span class="sb-beats">BEATS 🔵 BLUE</span>
+          <span class="sb-beats" id="btn-red-hint">🎯 Match = Batter ⚡</span>
           <span class="sb-dice-pair" id="btn-red-dice">d4 + d10</span>
           <span class="sb-rating-line" id="btn-red-rating">Rating 8 ⭐</span>
         </button>
 
         <button class="stance-btn blue-card" onclick="playStance('blue')">
           <span class="sb-color-title" id="btn-blue-title">🔵 BLUE</span>
-          <span class="sb-beats">BEATS 🟢 GREEN</span>
+          <span class="sb-beats" id="btn-blue-hint">🎯 Match = Batter ⚡</span>
           <span class="sb-dice-pair" id="btn-blue-dice">d10 + d8</span>
           <span class="sb-rating-line" id="btn-blue-rating">Rating 10 ⭐⭐</span>
         </button>
 
         <button class="stance-btn green-card" onclick="playStance('green')">
           <span class="sb-color-title" id="btn-green-title">🟢 GREEN</span>
-          <span class="sb-beats">BEATS 🔴 RED</span>
+          <span class="sb-beats" id="btn-green-hint">🎯 Match = Batter ⚡</span>
           <span class="sb-dice-pair" id="btn-green-dice">d10 + d12</span>
           <span class="sb-rating-line" id="btn-green-rating">Rating 12 ⭐⭐⭐</span>
         </button>
@@ -1115,11 +1109,11 @@
     <div class="duel-overlay" id="duel-overlay">
       <div class="duel-card">
 
-        <!-- STEP 1: WHO WON THE STANCE DUEL -->
+        <!-- STEP 1: WHO WON THE PITCH GUESS -->
         <div class="step-box">
           <div class="step-header">
-            <span>1. STANCE DUEL (WHAT BEATS WHAT)</span>
-            <span>🔴 &gt; 🔵 &gt; 🟢 &gt; 🔴</span>
+            <span>1. PITCH GUESS (MATCH vs. MISMATCH)</span>
+            <span>🎯 Match = Batter ⚡ | 🌀 Diff = Pitcher ⚡</span>
           </div>
 
           <div class="stance-clash-row">
@@ -1129,7 +1123,7 @@
               <div class="psp-sub" id="duel-p-sub">HEAT</div>
             </div>
 
-            <div class="vs-circle">VS</div>
+            <div class="vs-circle" id="duel-vs-symbol">≠</div>
 
             <div class="played-stance-pill" id="duel-b-card">
               <div class="psp-who" id="duel-b-who">🏏 BATTER</div>
@@ -1139,7 +1133,7 @@
           </div>
 
           <div class="duel-winner-banner" id="duel-winner-banner">
-            🏆 PITCHER WINS THE DUEL! Claims ⚡ Momentum Die!
+            🌀 CROSSED UP! Pitcher claims ⚡ Momentum Die!
           </div>
         </div>
 
@@ -1217,13 +1211,14 @@
     <div class="modal-backdrop" id="modal-table" onclick="closeModalOnBg(event, 'modal-table')">
       <div class="modal-sheet">
         <div class="modal-top">
-          <h3>📊 AT-BAT OUTCOME TABLE &amp; TRIANGLE</h3>
+          <h3>📊 AT-BAT OUTCOME TABLE &amp; PITCH GUESS</h3>
           <button class="close-btn" onclick="closeModal('modal-table')">✕</button>
         </div>
 
-        <div style="font-size:0.72rem; color:#cbd5e1;">
+        <div style="font-size:0.72rem; color:#cbd5e1; line-height:1.4;">
           <strong>FORMULA:</strong> <code>Margin = Pitcher Score − Batter Score</code><br>
-          <strong>TIES ON STANCE READ:</strong> Token does NOT move; current holder keeps &amp; rolls their Momentum Die!
+          <strong>🎯 MATCH (Same Color):</strong> Batter reads the pitch &amp; claims ⚡ Momentum!<br>
+          <strong>🌀 MISMATCH (Different Color):</strong> Pitcher fools the batter &amp; claims ⚡ Momentum!
         </div>
 
         <table class="outcome-ref-table" id="outcome-ref-table">
@@ -1440,11 +1435,9 @@
       return { label: 'TIMING', a1: 'Con', d1: b.con, a2: 'Spd', d2: b.spd };
     }
 
-    // What Beats What: Red > Blue > Green > Red
+    // Pitch Guess Resolution: Match (Same Color) = Batter claims Momentum; Mismatch = Pitcher claims Momentum
     function evaluateStanceRead(pColor, bColor) {
-      if (pColor === bColor) return 'tie';
-      const beats = { red: 'blue', blue: 'green', green: 'red' };
-      return beats[pColor] === bColor ? 'pitcher' : 'batter';
+      return pColor === bColor ? 'batter' : 'pitcher';
     }
 
     function toggleAbility(role) {
@@ -1570,13 +1563,21 @@
       document.getElementById('duel-b-color').textContent = colorNames[bColor];
       document.getElementById('duel-b-sub').textContent = `${bStance.label} (${bStance.a1}+${bStance.a2})`;
 
+      const vsSymbolEl = document.getElementById('duel-vs-symbol');
+      if (vsSymbolEl) {
+        vsSymbolEl.textContent = pColor === bColor ? '==' : '≠';
+        vsSymbolEl.style.color = pColor === bColor ? '#fde047' : '#93c5fd';
+      }
+
       const winnerBanner = document.getElementById('duel-winner-banner');
-      if (readWinner === 'pitcher') {
-        winnerBanner.textContent = `🏆 PITCHER WINS STANCE DUEL! (${colorNames[pColor]} beats ${colorNames[bColor]}) ➔ Claims ⚡ Momentum!`;
-      } else if (readWinner === 'batter') {
-        winnerBanner.textContent = `🏆 BATTER WINS STANCE DUEL! (${colorNames[bColor]} beats ${colorNames[pColor]}) ➔ Claims ⚡ Momentum!`;
+      if (readWinner === 'batter') {
+        winnerBanner.textContent = pColor === bColor
+          ? `🎯 PITCH READ! Both played ${colorNames[bColor]} ➔ BATTER claims ⚡ Momentum!`
+          : `🎯 ABILITY OVERRIDE! BATTER claims ⚡ Momentum!`;
       } else {
-        winnerBanner.textContent = `🤝 STANCE TIE! (Both played ${colorNames[pColor]}) ➔ ⚡ Momentum stays with ${state.momentumHolder.toUpperCase()}!`;
+        winnerBanner.textContent = pColor !== bColor
+          ? `🌀 CROSSED UP! (${colorNames[pColor]} ≠ ${colorNames[bColor]}) ➔ PITCHER claims ⚡ Momentum!`
+          : `🌀 ABILITY OVERRIDE! PITCHER claims ⚡ Momentum!`;
       }
 
       document.getElementById('duel-holder-tag').textContent =
@@ -1892,11 +1893,16 @@
 
       ['red', 'blue', 'green'].forEach(c => {
         const info = userIsBatting ? getBatterStanceDice(userPlayer, c) : getPitcherStanceDice(userPlayer, c);
+        const oppInfo = userIsBatting ? getPitcherStanceDice(p, c) : getBatterStanceDice(b, c);
         const r = calcRating(info.d1, info.d2);
+        const oppR = calcRating(oppInfo.d1, oppInfo.d2);
         const icon = c === 'red' ? '🔴 RED' : (c === 'blue' ? '🔵 BLUE' : '🟢 GREEN');
         document.getElementById(`btn-${c}-title`).textContent = `${icon} (${info.label})`;
+        document.getElementById(`btn-${c}-hint`).textContent = userIsBatting
+          ? `🎯 Match P (${oppR}) = ⚡`
+          : `🌀 Avoid B (${oppR}) = ⚡`;
         document.getElementById(`btn-${c}-dice`).textContent = `${info.a1} ${info.d1} + ${info.a2} ${info.d2}`;
-        document.getElementById(`btn-${c}-rating`).textContent = `Rating ${r} ${getStars(r)}`;
+        document.getElementById(`btn-${c}-rating`).textContent = `My Rating ${r} ${getStars(r)}`;
       });
 
       document.querySelectorAll('#outcome-ref-table tbody tr').forEach(tr => {
