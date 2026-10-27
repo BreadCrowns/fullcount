@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Full Count — Portrait Half-Size Cards (1.50" × 2.35") &amp; 8.5×11 Playmats</title>
+<title>Full Count — Portrait Half-Size Cards (1.50" × 2.38") &amp; Clean 8.5×11 Playmat</title>
 <style>
   @page {
     size: 8.5in 11.0in;
@@ -116,8 +116,8 @@
   }
 
   /* ====================================================================== */
-  /* PORTRAIT HALF-SIZE PLAYING CARDS (1.50" wide x 2.35" tall)             */
-  /* 5 columns x 4 rows = 20 Portrait Half-Cards per 8.5" x 11" sheet!      */
+  /* PORTRAIT HALF-SIZE PLAYING CARDS (1.50" wide x 2.38" tall)             */
+  /* 5 columns x 4 rows = 20 Portrait Half-Cards per 8.5" x 11" sheet       */
   /* ====================================================================== */
   .portrait-card-grid {
     display: grid;
@@ -170,10 +170,10 @@
     margin-bottom: 1px;
   }
   .card-role {
-    font-size: 5.8px;
+    font-size: 6px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.3px;
     color: #64748b;
   }
   .card-badge {
@@ -309,230 +309,105 @@
     text-transform: uppercase;
   }
 
-  /* ====================================================================== */
-  /* SINGLE-SHEET 8.5" x 11" MANAGER PLAYMAT (PORTRAIT CARD SLOTS)          */
-  /* ====================================================================== */
-  .playmat-sheet {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 10.48in;
-    width: 7.78in;
-  }
-
-  .playmat-top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0f172a;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    height: 0.44in;
-  }
-  .playmat-top-bar.titans-mat {
-    background: linear-gradient(90deg, #7f1d1d 0%, #991b1b 50%, #0f172a 100%);
-    border-bottom: 3px solid #ef4444;
-  }
-  .playmat-top-bar.serpents-mat {
-    background: linear-gradient(90deg, #064e3b 0%, #065f46 50%, #0f172a 100%);
-    border-bottom: 3px solid #10b981;
-  }
-  .playmat-team-title {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 15px;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
-  }
-  .playmat-team-sub {
-    font-size: 6.8px;
-    font-weight: 700;
-    color: #cbd5e1;
-  }
-  .playmat-rule-pills {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-  .playmat-pill {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 6.5px;
-    font-weight: 700;
-    line-height: 1.18;
-  }
-
-  /* Section Divider Label */
-  .mat-section-label {
-    background: #1e293b;
-    color: #f8fafc;
-    font-size: 6.8px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 3px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 0.17in;
-  }
-
-  /* Upper Row on Playmat: 3 Portrait Card Slots (Mound, Stance, Bullpen) + Outcome/Score Dashboard */
-  .mat-upper-row {
-    display: grid;
-    grid-template-columns: 1.52in 1.52in 1.52in 3.04in;
-    grid-template-rows: 2.40in;
-    gap: 0.06in;
-    width: 7.78in;
-  }
-
-  /* 5-Column Portrait Card Row for Batters (#1-#5 and #6-#9 + Diamond) */
-  .mat-portrait-row-5 {
-    display: grid;
-    grid-template-columns: repeat(5, 1.52in);
-    grid-template-rows: 2.40in;
-    gap: 0.045in;
-    width: 7.78in;
-  }
-
-  /* Portrait Card Slot (1.52" wide x 2.40" tall) */
-  .card-slot {
-    width: 1.52in;
-    height: 2.40in;
-    border: 2px dashed #64748b;
-    border-radius: 7px;
-    background: #f8fafc;
-    padding: 4px 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-  }
-  .card-slot.mound-slot {
-    border: 2px solid #0f172a;
-    background: #f1f5f9;
-  }
-  .card-slot.stance-slot {
-    border: 2px dashed #2563eb;
-    background: #eff6ff;
-  }
-  .card-slot.bullpen-slot {
-    border: 2px dashed #475569;
-    background: #f8fafc;
-  }
-  .card-slot.titans-slot {
-    border-color: #fca5a5;
-    background: #fffafa;
-  }
-  .card-slot.serpents-slot {
-    border-color: #6ee7b7;
-    background: #f6fef9;
-  }
-
-  .slot-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #cbd5e1;
-    padding-bottom: 2px;
-  }
-  .slot-num {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 10px;
-    color: #0f172a;
-    letter-spacing: 0.2px;
-  }
-  .slot-pos {
-    font-size: 5.8px;
-    font-weight: 800;
-    color: #475569;
-    background: #e2e8f0;
-    padding: 1px 3px;
-    border-radius: 3px;
-  }
-  .slot-center {
-    text-align: center;
-    margin: auto 0;
-  }
-  .slot-player-hint {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 10.5px;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    line-height: 1.1;
-  }
-  .slot-sub-hint {
-    font-size: 6px;
-    color: #64748b;
-    font-weight: 700;
-    margin-top: 3px;
-    line-height: 1.25;
-  }
-  .slot-footer {
-    font-size: 5.6px;
-    color: #64748b;
-    text-align: center;
-    border-top: 1px dashed #cbd5e1;
-    padding-top: 2px;
-    font-weight: 700;
-  }
-
-  /* Outcome & Scoreboard Panel in Upper Right of Playmat */
-  .dash-panel {
-    border: 1.5px solid #0f172a;
-    border-radius: 7px;
-    padding: 4px 6px;
-    background: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 2.40in;
-  }
-  .dash-panel-title {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 9.5px;
-    letter-spacing: 0.4px;
-    color: #0f172a;
-    border-bottom: 1.5px solid #cbd5e1;
-    padding-bottom: 1.5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .dash-panel-title span {
-    font-family: sans-serif;
-    font-size: 6px;
-    font-weight: 800;
-    color: #475569;
-  }
-
   .mat-outcome-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 6.3px;
+    font-size: 5.8px;
   }
   .mat-outcome-table td {
-    padding: 1.5px 2.5px;
+    padding: 1.5px 2px;
     border-bottom: 1px solid #e2e8f0;
   }
   .mat-outcome-table tr.p-win { background: #f0fdf4; font-weight: 700; }
   .mat-outcome-table tr.b-win { background: #fef2f2; font-weight: 700; }
 
-  /* Full-Width Inning Scoreboard & Basepath Strip on Playmat */
-  .mat-scoreboard-strip {
-    border: 1.5px solid #0f172a;
+  /* ====================================================================== */
+  /* CLEAN SINGLE-SHEET 8.5" x 11" PLAYMAT (ACTIVE PITCHER + SLOTS 1 TO 9)  */
+  /* ====================================================================== */
+  .clean-playmat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 10.4in;
+    width: 7.78in;
+    padding: 0.1in 0;
+  }
+
+  .clean-mat-title {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: #0f172a;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 2px solid #0f172a;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+
+  .clean-pitcher-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .clean-lineup-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.18in;
+    width: 100%;
+  }
+
+  .clean-row-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1.50in);
+    gap: 0.07in;
+    justify-content: center;
+  }
+
+  .clean-row-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1.50in);
+    gap: 0.07in;
+    justify-content: center;
+  }
+
+  .clean-slot {
+    width: 1.50in;
+    height: 2.38in;
+    border: 2px dashed #334155;
     border-radius: 7px;
     background: #f8fafc;
-    padding: 5px 8px;
-    display: grid;
-    grid-template-columns: 3.1in 2.6in 1.8in;
-    gap: 0.08in;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    height: 1.92in;
+    text-align: center;
+    padding: 8px;
+  }
+
+  .clean-slot.pitcher-slot {
+    border: 2.5px solid #0f172a;
+    background: #f1f5f9;
+  }
+
+  .clean-slot-number {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 28px;
+    color: #94a3b8;
+    line-height: 1;
+  }
+
+  .clean-slot-label {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 13px;
+    color: #475569;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-top: 4px;
   }
 </style>
 </head>
@@ -540,8 +415,8 @@
 
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT — PORTRAIT HALF-SIZE CARDS (1.50" × 2.38") &amp; 1-PAGE 8.5×11 PLAYMATS</h1>
-    <span style="font-size: 12px; color: #94a3b8;">Portrait Orientation for Ultra-Short Left-to-Right Lineups • Page 1: Metro Titans (20 Cards) • Page 2: Shadow Serpents (20 Cards) • Pages 3–4: 8.5×11 Playmats</span>
+    <h1>FULL COUNT — PORTRAIT HALF-SIZE CARDS (1.50" × 2.38") &amp; CLEAN 8.5×11 PLAYMAT</h1>
+    <span style="font-size: 12px; color: #94a3b8;">No Predetermined Lineup Order on Cards • Clean Playmat with Active Pitcher + Spots #1–#9 Only</span>
   </div>
   <div class="header-actions">
     <button class="print-btn" onclick="window.print()">🖨️ Print All Sheets (8.5" × 11")</button>
@@ -554,17 +429,17 @@
 <div class="page">
   <div class="sheet-banner titans-banner">
     <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Batters (#1–#9) + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Narrow Portrait Cards Line Up Left-to-Right in Minimal Space!</span>
+    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Manager Sets Any Batting Order (#1–#9)!</span>
   </div>
 
   <div class="portrait-card-grid">
 
-    <!-- ROW 1: TITANS BATTERS #1 TO #5 -->
+    <!-- ROW 1: TITANS POSITION PLAYERS (5) -->
     <!-- 1. FLASH MERCER -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#1 LEADOFF • CF</span>
+          <span class="card-role">TITANS • CF</span>
           <span class="card-badge spd-badge">SPD d12</span>
         </div>
         <div class="card-name">"FLASH" MERCER</div>
@@ -587,7 +462,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#2 MVP • RF</span>
+          <span class="card-role">TITANS • RF</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">AARON VANCE</div>
@@ -610,7 +485,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#3 ANCHOR • LF</span>
+          <span class="card-role">TITANS • LF</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">CORBIN REYES</div>
@@ -633,7 +508,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#4 CLEANUP • 1B</span>
+          <span class="card-role">TITANS • 1B</span>
           <span class="card-badge spd-badge">SPD d4</span>
         </div>
         <div class="card-name">"COLOSSUS" STONE</div>
@@ -656,7 +531,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#5 SLUGGER • 3B</span>
+          <span class="card-role">TITANS • 3B</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">MARCUS COLE</div>
@@ -675,12 +550,12 @@
       </div>
     </div>
 
-    <!-- ROW 2: TITANS BATTERS #6 TO #9 + SP #1 -->
+    <!-- ROW 2: TITANS POSITION PLAYERS (4) + SP -->
     <!-- 6. BLUE COLLAR DAN -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#6 CATCHER • C</span>
+          <span class="card-role">TITANS • C</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">"BLUE COLLAR" DAN</div>
@@ -703,7 +578,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#7 CONTACT • 2B</span>
+          <span class="card-role">TITANS • 2B</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">TOBY CHEN</div>
@@ -718,7 +593,7 @@
       </table>
       <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ SECOND LEADOFF:</span> Add +2 to your Batter total roll.</div>
+        <div><span class="ability-title">⚡ GAP SPARK:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
@@ -726,7 +601,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#8 DEFENSE • SS</span>
+          <span class="card-role">TITANS • SS</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">"GLOVE-MAN" PETE</div>
@@ -749,7 +624,7 @@
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#9 ROOKIE • DH</span>
+          <span class="card-role">TITANS • DH</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">ELI "THE KID"</div>
@@ -768,12 +643,12 @@
       </div>
     </div>
 
-    <!-- 10. SP1: APEX GARRISON -->
+    <!-- 10. SP: APEX GARRISON -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • SP #1</span>
-          <span class="card-badge mom-badge">ACE</span>
+          <span class="card-role">TITANS • SP</span>
+          <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">"APEX" GARRISON</div>
       </div>
@@ -791,13 +666,13 @@
       </div>
     </div>
 
-    <!-- ROW 3: TITANS PITCHERS (SP2, SP3, RP1, RP2, CL) -->
-    <!-- 11. SP2: BRICK KOWALSKI -->
+    <!-- ROW 3: TITANS PITCHERS -->
+    <!-- 11. SP: BRICK KOWALSKI -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • SP #2</span>
-          <span class="card-badge mom-badge">SINKER</span>
+          <span class="card-role">TITANS • SP</span>
+          <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">"BRICK" KOWALSKI</div>
       </div>
@@ -815,11 +690,11 @@
       </div>
     </div>
 
-    <!-- 12. SP3: DAKOTA RIDGE -->
+    <!-- 12. SP: DAKOTA RIDGE -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • SP #3</span>
+          <span class="card-role">TITANS • SP</span>
           <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">DAKOTA RIDGE</div>
@@ -838,12 +713,12 @@
       </div>
     </div>
 
-    <!-- 13. RP1: SPITFIRE RAMOS -->
+    <!-- 13. RP: SPITFIRE RAMOS -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • RP #1</span>
-          <span class="card-badge">SETUP</span>
+          <span class="card-role">TITANS • RP</span>
+          <span class="card-badge">RELIEVER</span>
         </div>
         <div class="card-name">"SPITFIRE" RAMOS</div>
       </div>
@@ -861,12 +736,12 @@
       </div>
     </div>
 
-    <!-- 14. RP2: LEFTY VANCE -->
+    <!-- 14. RP: LEFTY VANCE -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • RP #2</span>
-          <span class="card-badge">MIDDLE</span>
+          <span class="card-role">TITANS • RP</span>
+          <span class="card-badge">RELIEVER</span>
         </div>
         <div class="card-name">"LEFTY" VANCE</div>
       </div>
@@ -884,12 +759,12 @@
       </div>
     </div>
 
-    <!-- 15. CL: THE BEAST TANKER -->
+    <!-- 15. RP/CL: THE BEAST TANKER -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">TITANS • CLOSER</span>
-          <span class="card-badge" style="background:#b91c1c;">CLOSER</span>
+          <span class="card-role">TITANS • RP</span>
+          <span class="card-badge" style="background:#b91c1c;">RELIEVER</span>
         </div>
         <div class="card-name">"THE BEAST" TANKER</div>
       </div>
@@ -901,7 +776,7 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d12</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>CLOSER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum Token &amp; +2 Pitcher roll!</div>
       </div>
@@ -962,7 +837,7 @@
         <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
         <div class="card-name">OUTCOME TABLE</div>
       </div>
-      <table class="mat-outcome-table" style="font-size:5.8px;">
+      <table class="mat-outcome-table">
         <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
         <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
         <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
@@ -998,17 +873,17 @@
 <div class="page">
   <div class="sheet-banner serpents-banner">
     <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Batters (#1–#9) + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Narrow Portrait Cards Line Up Left-to-Right in Minimal Space!</span>
+    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Manager Sets Any Batting Order (#1–#9)!</span>
   </div>
 
   <div class="portrait-card-grid">
 
-    <!-- ROW 1: SERPENTS BATTERS #1 TO #5 -->
+    <!-- ROW 1: SERPENTS POSITION PLAYERS (5) -->
     <!-- 1. PROFESSOR SOTO -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#1 LEADOFF • LF</span>
+          <span class="card-role">SERPENTS • LF</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">"PROFESSOR" SOTO</div>
@@ -1031,7 +906,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#2 STAR • DH</span>
+          <span class="card-role">SERPENTS • DH</span>
           <span class="card-badge spd-badge">SPD d10</span>
         </div>
         <div class="card-name">SHOHEI "VIPER" CRUZ</div>
@@ -1054,7 +929,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#3 ANCHOR • SS</span>
+          <span class="card-role">SERPENTS • SS</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">GUNNAR HENDERSON</div>
@@ -1077,7 +952,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#4 CLEANUP • 1B</span>
+          <span class="card-role">SERPENTS • 1B</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">BRYCE HARPER</div>
@@ -1100,7 +975,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#5 THREAT • 3B</span>
+          <span class="card-role">SERPENTS • 3B</span>
           <span class="card-badge spd-badge">SPD d6</span>
         </div>
         <div class="card-name">MANNY MACHADO</div>
@@ -1119,12 +994,12 @@
       </div>
     </div>
 
-    <!-- ROW 2: SERPENTS BATTERS #6 TO #9 + SP #1 -->
+    <!-- ROW 2: SERPENTS POSITION PLAYERS (4) + SP -->
     <!-- 6. FRANCISCO LINDOR -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#6 SWITCH • CF</span>
+          <span class="card-role">SERPENTS • CF</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">FRANCISCO LINDOR</div>
@@ -1147,7 +1022,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#7 CONTACT • 2B</span>
+          <span class="card-role">SERPENTS • 2B</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">NICO HOERNER</div>
@@ -1170,7 +1045,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#8 DEFENSE • C</span>
+          <span class="card-role">SERPENTS • C</span>
           <span class="card-badge spd-badge">SPD d4</span>
         </div>
         <div class="card-name">AUSTIN HEDGES</div>
@@ -1193,7 +1068,7 @@
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">#9 ROOKIE • RF</span>
+          <span class="card-role">SERPENTS • RF</span>
           <span class="card-badge spd-badge">SPD d8</span>
         </div>
         <div class="card-name">LEO "THE SPARK"</div>
@@ -1208,16 +1083,16 @@
       </table>
       <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ NINE-HOLE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
+        <div><span class="ability-title">⚡ PURE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
-    <!-- 10. SP1: PROFESSOR WEBB -->
+    <!-- 10. SP: PROFESSOR WEBB -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • SP #1</span>
-          <span class="card-badge mom-badge">ACE</span>
+          <span class="card-role">SERPENTS • SP</span>
+          <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">"PROFESSOR" WEBB</div>
       </div>
@@ -1235,13 +1110,13 @@
       </div>
     </div>
 
-    <!-- ROW 3: SERPENTS PITCHERS (SP2, SP3, RP1, RP2, CL) -->
-    <!-- 11. SP2: GHOST STRIDER -->
+    <!-- ROW 3: SERPENTS PITCHERS -->
+    <!-- 11. SP: GHOST STRIDER -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • SP #2</span>
-          <span class="card-badge mom-badge">SPIN</span>
+          <span class="card-role">SERPENTS • SP</span>
+          <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">"GHOST" STRIDER</div>
       </div>
@@ -1259,11 +1134,11 @@
       </div>
     </div>
 
-    <!-- 12. SP3: COLD-EYE CARTER -->
+    <!-- 12. SP: COLD-EYE CARTER -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • SP #3</span>
+          <span class="card-role">SERPENTS • SP</span>
           <span class="card-badge mom-badge">STARTER</span>
         </div>
         <div class="card-name">"COLD-EYE" CARTER</div>
@@ -1282,12 +1157,12 @@
       </div>
     </div>
 
-    <!-- 13. RP1: SUBMARINE SKENES -->
+    <!-- 13. RP: SUBMARINE SKENES -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • RP #1</span>
-          <span class="card-badge">SETUP</span>
+          <span class="card-role">SERPENTS • RP</span>
+          <span class="card-badge">RELIEVER</span>
         </div>
         <div class="card-name">"SUBMARINE" SKENES</div>
       </div>
@@ -1305,12 +1180,12 @@
       </div>
     </div>
 
-    <!-- 14. RP2: ICEBOX KELLER -->
+    <!-- 14. RP: ICEBOX KELLER -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • RP #2</span>
-          <span class="card-badge">MIDDLE</span>
+          <span class="card-role">SERPENTS • RP</span>
+          <span class="card-badge">RELIEVER</span>
         </div>
         <div class="card-name">"ICEBOX" KELLER</div>
       </div>
@@ -1328,12 +1203,12 @@
       </div>
     </div>
 
-    <!-- 15. CL: VIPER CRUZ -->
+    <!-- 15. RP: VIPER CRUZ -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
-          <span class="card-role">SERPENTS • CLOSER</span>
-          <span class="card-badge" style="background:#047857;">CLOSER</span>
+          <span class="card-role">SERPENTS • RP</span>
+          <span class="card-badge" style="background:#047857;">RELIEVER</span>
         </div>
         <div class="card-name">"VIPER" CRUZ</div>
       </div>
@@ -1345,7 +1220,7 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d12+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
-      <div class="fatigue-bar"><span>CLOSER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ NASTY BITE:</span> Add +3 to your Pitcher total roll.</div>
       </div>
@@ -1406,7 +1281,7 @@
         <div class="card-top-meta"><span class="card-role">POCKET CHART</span><span class="card-badge">MARGIN</span></div>
         <div class="card-name">OUTCOME TABLE</div>
       </div>
-      <table class="mat-outcome-table" style="font-size:5.8px;">
+      <table class="mat-outcome-table">
         <tr class="p-win"><td>+6+</td><td><strong>STRIKEOUT (K)</strong></td></tr>
         <tr class="p-win"><td>+1..+5</td><td><strong>ROUTINE OUT</strong></td></tr>
         <tr class="p-win"><td>0..-2</td><td><strong>SAC / FIELD OUT</strong></td></tr>
@@ -1437,434 +1312,124 @@
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 3: METRO TITANS SINGLE-SHEET 8.5" x 11" MANAGER PLAYMAT           -->
+<!-- PAGE 3: PLAYER PLAYMAT (ACTIVE PITCHER + BATTING SLOTS #1 TO #9 ONLY)  -->
 <!-- ====================================================================== -->
 <div class="page">
-  <div class="playmat-sheet">
+  <div class="clean-playmat">
+    <div class="clean-mat-title">FULL COUNT — MANAGER PLAYMAT</div>
 
-    <!-- Top Banner -->
-    <div class="playmat-top-bar titans-mat">
-      <div>
-        <div class="playmat-team-title">⚡ THE METRO TITANS — SINGLE-SHEET MANAGER PLAYMAT (8.5" × 11")</div>
-        <div class="playmat-team-sub">Portrait Card Slots (1.50" × 2.38") • 5 Cards Fit Side-by-Side Across 8.5" (Or Line Up All 9 Left-to-Right in Only 13.5"!)</div>
-      </div>
-      <div class="playmat-rule-pills">
-        <div class="playmat-pill">🎯 <strong>MATCH:</strong> Batter ⚡</div>
-        <div class="playmat-pill">🌀 <strong>MISMATCH:</strong> Pitcher ⚡</div>
+    <!-- Active Pitcher Slot -->
+    <div class="clean-pitcher-zone">
+      <div class="clean-slot pitcher-slot">
+        <div class="clean-slot-label" style="color:#0f172a; font-size:15px;">ACTIVE PITCHER</div>
       </div>
     </div>
 
-    <!-- Section 1: Active Pitcher, Secret Stance, Bullpen + Outcome Lookup Table -->
-    <div class="mat-section-label" style="background:#991b1b;">
-      <span>⚾ PITCHING MOUND, SECRET STANCE, BULLPEN &amp; AT-BAT OUTCOME CHART</span>
-      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER WHEN #1 BATS OR AFTER SPECIAL</span>
-    </div>
-
-    <div class="mat-upper-row">
-      <div class="card-slot mound-slot">
-        <div class="slot-header"><span class="slot-num">⚾ MOUND</span><span class="slot-pos" style="background:#991b1b; color:white;">SP / RP</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">ACTIVE PITCHER</div>
-          <div class="slot-sub-hint">Garrison (SP1)<br>Kowalski (SP2)<br>Ridge (SP3)</div>
+    <!-- Batting Lineup Slots #1 to #9 -->
+    <div class="clean-lineup-zone">
+      <div class="clean-row-5">
+        <div class="clean-slot">
+          <div class="clean-slot-number">1</div>
+          <div class="clean-slot-label">BATTER #1</div>
         </div>
-        <div class="slot-footer">⚡ Tier: d8 ▸ d6 ▸ d4</div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">2</div>
+          <div class="clean-slot-label">BATTER #2</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">3</div>
+          <div class="clean-slot-label">BATTER #3</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">4</div>
+          <div class="clean-slot-label">BATTER #4</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">5</div>
+          <div class="clean-slot-label">BATTER #5</div>
+        </div>
       </div>
 
-      <div class="card-slot stance-slot">
-        <div class="slot-header"><span class="slot-num" style="color:#1d4ed8;">🎯 STANCE</span><span class="slot-pos" style="background:#2563eb; color:white;">🔴🔵🟢</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint" style="color:#3b82f6;">SECRET COLOR</div>
-          <div class="slot-sub-hint">Place 🔴, 🔵, or 🟢<br>Face-Down &amp; Reveal!</div>
+      <div class="clean-row-4">
+        <div class="clean-slot">
+          <div class="clean-slot-number">6</div>
+          <div class="clean-slot-label">BATTER #6</div>
         </div>
-        <div class="slot-footer">Match=Bat ⚡ | Diff=Pit ⚡</div>
-      </div>
-
-      <div class="card-slot bullpen-slot">
-        <div class="slot-header"><span class="slot-num">🔥 BULLPEN</span><span class="slot-pos">STACK</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">RELIEVERS</div>
-          <div class="slot-sub-hint">Ramos (d6)<br>Vance (d4)<br>Tanker (CL d8)</div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">7</div>
+          <div class="clean-slot-label">BATTER #7</div>
         </div>
-        <div class="slot-footer">-1 ⚡ tier / inn pitched</div>
-      </div>
-
-      <!-- Outcome Lookup Panel -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          AT-BAT OUTCOME CHART
-          <span>Margin = Pitcher − Batter</span>
+        <div class="clean-slot">
+          <div class="clean-slot-number">8</div>
+          <div class="clean-slot-label">BATTER #8</div>
         </div>
-        <table class="mat-outcome-table">
-          <tr class="p-win"><td><strong>+6 or more</strong></td><td><strong>STRIKEOUT (K)</strong></td><td>Batter out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>+1 to +5</strong></td><td><strong>ROUTINE OUT</strong></td><td>Fly/Pop out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; 3rd scores (&lt;2 out)!</td></tr>
-          <tr class="b-win"><td><strong>-3</strong></td><td><strong>WALK (BB)</strong></td><td>1st base; forces runners</td></tr>
-          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>+1 base (2nd: SPD 4+ Safe)</td></tr>
-          <tr class="b-win"><td><strong>-7 or less</strong></td><td><strong>EXTRA-BASE / HR</strong></td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
-        </table>
-        <div style="font-size:6px; font-weight:800; color:#475569; text-align:center; background:#e2e8f0; border-radius:3px; padding:2px;">
-          UNCONDITIONAL SPECIALS: Spend 1 ⚡ Tier on ANY At-Bat (Steps Down After Play)
+        <div class="clean-slot">
+          <div class="clean-slot-number">9</div>
+          <div class="clean-slot-label">BATTER #9</div>
         </div>
       </div>
     </div>
-
-    <!-- Section 2: Batting Order Row 1 (#1 to #5 Left-to-Right) -->
-    <div class="mat-section-label">
-      <span>🏏 BATTING ORDER #1 TO #5 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 1 OF 2)</span>
-      <span>ADVANCE AT-BAT MARKER LEFT ➔ RIGHT</span>
-    </div>
-
-    <div class="mat-portrait-row-5">
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">CF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"FLASH" MERCER</div>
-          <div class="slot-sub-hint">🟢 12 | 🔵 10 | 🔴 8<br>SPD d12 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">2nd+ AB: Opp SP -1 ⚡</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">RF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">AARON VANCE</div>
-          <div class="slot-sub-hint">🔴 11 | 🔵 10 | 🟢 10<br>SPD d8 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #2</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">LF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">CORBIN REYES</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 9<br>SPD d6 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #3</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"COLOSSUS" STONE</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 7 | 🟢 6<br>SPD d4 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #4</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">MARCUS COLE</div>
-          <div class="slot-sub-hint">🔴 9 | 🟢 8 | 🔵 7<br>SPD d6 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #5</div>
-      </div>
-    </div>
-
-    <!-- Section 3: Batting Order Row 2 (#6 to #9 Left-to-Right + On-Mat Diamond) -->
-    <div class="mat-section-label">
-      <span>🏏 BATTING ORDER #6 TO #9 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 2 OF 2) + ON-MAT DIAMOND</span>
-      <span>AFTER #9 BATS, LOOP BACK TO #1 LEADOFF</span>
-    </div>
-
-    <div class="mat-portrait-row-5">
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">C</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"BLUE COLLAR" DAN</div>
-          <div class="slot-sub-hint">🔴 8 | 🟢 8 | 🔵 7<br>SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #6</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">TOBY CHEN</div>
-          <div class="slot-sub-hint">🟢 9 | 🔴 7 | 🔵 6<br>SPD d8 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #7</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">SS</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"GLOVE-MAN" PETE</div>
-          <div class="slot-sub-hint">🟢 7 | 🔴 6 | 🔵 5<br>SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #8</div>
-      </div>
-
-      <div class="card-slot titans-slot">
-        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">DH</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">ELI "THE KID"</div>
-          <div class="slot-sub-hint">🟢 6 | 🔴 5 | 🔵 5<br>SPD d6 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Loops Back to #1</div>
-      </div>
-
-      <!-- 5th Slot: Integrated Mini Diamond & Momentum Dock -->
-      <div class="card-slot" style="border:2px solid #047857; background:#ecfdf5;">
-        <div class="slot-header"><span class="slot-num" style="color:#065f46;">⚾ DIAMOND</span><span class="slot-pos" style="background:#047857; color:white;">BASES</span></div>
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; margin:auto 0;">
-          <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 8px; font-size:6.5px; font-weight:900; color:#065f46;">◆ 2ND BASE</div>
-          <div style="display:flex; justify-content:space-between; width:100%; gap:3px;">
-            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">◆ 3RD</div>
-            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">1ST ◆</div>
-          </div>
-          <div style="border:1.5px solid #b91c1c; background:#fef2f2; border-radius:4px; padding:2px 6px; font-size:6px; font-weight:900; color:#991b1b;">⬖ HOME (SPD 4+)</div>
-        </div>
-        <div class="slot-footer" style="color:#065f46;">Send 2B on 1B: 4+ Safe</div>
-      </div>
-    </div>
-
-    <!-- Bottom Scoreboard, Outs & Momentum Strip -->
-    <div class="mat-scoreboard-strip">
-      <div>
-        <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; margin-bottom:3px;">📊 INNING-BY-INNING SCOREBOARD</div>
-        <table style="width:100%; border-collapse:collapse; font-size:6.8px; text-align:center; background:white;">
-          <tr style="background:#e2e8f0; font-weight:900;"><td>TEAM</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>R</td><td>H</td></tr>
-          <tr><td style="text-align:left; font-weight:900; color:#b91c1c; padding:2px;">TITANS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-          <tr><td style="text-align:left; font-weight:900; color:#047857; padding:2px;">SERPENTS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-        </table>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:4px; font-size:7px; font-weight:800; color:#1e293b;">
-        <div>OUTS THIS HALF-INNING:</div>
-        <div style="display:flex; gap:6px;">
-          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 1</span>
-          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 2</span>
-          <span style="border:1.5px solid #b91c1c; background:#fef2f2; padding:3px 8px; border-radius:4px; color:#991b1b;">❌ OUT 3</span>
-        </div>
-        <div style="font-size:6.2px; color:#475569;">3 Outs = Clear Bases &amp; Flip Top/Bottom</div>
-      </div>
-
-      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:6px; padding:6px; text-align:center;">
-        <div style="font-family:Impact, sans-serif; font-size:11px; color:#92400e;">⚡ MOMENTUM DOCK</div>
-        <div style="font-size:6.2px; font-weight:800; color:#78350f; margin-top:2px;">
-          Place ⚡ Token Here When You Win Pitch Guess!<br>
-          <strong>Roll 3rd Die (d8 / d6 / d4)</strong>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <!-- ====================================================================== -->
-<!-- PAGE 4: SHADOW SERPENTS SINGLE-SHEET 8.5" x 11" MANAGER PLAYMAT        -->
+<!-- PAGE 4: SECOND PLAYER PLAYMAT (ACTIVE PITCHER + SLOTS #1 TO #9 ONLY)   -->
 <!-- ====================================================================== -->
 <div class="page">
-  <div class="playmat-sheet">
+  <div class="clean-playmat">
+    <div class="clean-mat-title">FULL COUNT — MANAGER PLAYMAT</div>
 
-    <!-- Top Banner -->
-    <div class="playmat-top-bar serpents-mat">
-      <div>
-        <div class="playmat-team-title">🐍 THE SHADOW SERPENTS — SINGLE-SHEET MANAGER PLAYMAT (8.5" × 11")</div>
-        <div class="playmat-team-sub">Portrait Card Slots (1.50" × 2.38") • 5 Cards Fit Side-by-Side Across 8.5" (Or Line Up All 9 Left-to-Right in Only 13.5"!)</div>
-      </div>
-      <div class="playmat-rule-pills">
-        <div class="playmat-pill">🎯 <strong>MATCH:</strong> Batter ⚡</div>
-        <div class="playmat-pill">🌀 <strong>MISMATCH:</strong> Pitcher ⚡</div>
+    <!-- Active Pitcher Slot -->
+    <div class="clean-pitcher-zone">
+      <div class="clean-slot pitcher-slot">
+        <div class="clean-slot-label" style="color:#0f172a; font-size:15px;">ACTIVE PITCHER</div>
       </div>
     </div>
 
-    <!-- Section 1: Active Pitcher, Secret Stance, Bullpen + Outcome Lookup Table -->
-    <div class="mat-section-label" style="background:#065f46;">
-      <span>⚾ PITCHING MOUND, SECRET STANCE, BULLPEN &amp; AT-BAT OUTCOME CHART</span>
-      <span>SP FATIGUE: STEP ⚡ DOWN 1 TIER WHEN #1 BATS OR AFTER SPECIAL</span>
-    </div>
-
-    <div class="mat-upper-row">
-      <div class="card-slot mound-slot">
-        <div class="slot-header"><span class="slot-num">⚾ MOUND</span><span class="slot-pos" style="background:#065f46; color:white;">SP / RP</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">ACTIVE PITCHER</div>
-          <div class="slot-sub-hint">Webb (SP1)<br>Strider (SP2)<br>Carter (SP3)</div>
+    <!-- Batting Lineup Slots #1 to #9 -->
+    <div class="clean-lineup-zone">
+      <div class="clean-row-5">
+        <div class="clean-slot">
+          <div class="clean-slot-number">1</div>
+          <div class="clean-slot-label">BATTER #1</div>
         </div>
-        <div class="slot-footer">⚡ Tier: d8 ▸ d6 ▸ d4</div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">2</div>
+          <div class="clean-slot-label">BATTER #2</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">3</div>
+          <div class="clean-slot-label">BATTER #3</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">4</div>
+          <div class="clean-slot-label">BATTER #4</div>
+        </div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">5</div>
+          <div class="clean-slot-label">BATTER #5</div>
+        </div>
       </div>
 
-      <div class="card-slot stance-slot">
-        <div class="slot-header"><span class="slot-num" style="color:#1d4ed8;">🎯 STANCE</span><span class="slot-pos" style="background:#2563eb; color:white;">🔴🔵🟢</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint" style="color:#3b82f6;">SECRET COLOR</div>
-          <div class="slot-sub-hint">Place 🔴, 🔵, or 🟢<br>Face-Down &amp; Reveal!</div>
+      <div class="clean-row-4">
+        <div class="clean-slot">
+          <div class="clean-slot-number">6</div>
+          <div class="clean-slot-label">BATTER #6</div>
         </div>
-        <div class="slot-footer">Match=Bat ⚡ | Diff=Pit ⚡</div>
-      </div>
-
-      <div class="card-slot bullpen-slot">
-        <div class="slot-header"><span class="slot-num">🔥 BULLPEN</span><span class="slot-pos">STACK</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">RELIEVERS</div>
-          <div class="slot-sub-hint">Skenes (d6)<br>Keller (d4)<br>Viper Cruz (CL d8)</div>
+        <div class="clean-slot">
+          <div class="clean-slot-number">7</div>
+          <div class="clean-slot-label">BATTER #7</div>
         </div>
-        <div class="slot-footer">-1 ⚡ tier / inn pitched</div>
-      </div>
-
-      <!-- Outcome Lookup Panel -->
-      <div class="dash-panel">
-        <div class="dash-panel-title">
-          AT-BAT OUTCOME CHART
-          <span>Margin = Pitcher − Batter</span>
+        <div class="clean-slot">
+          <div class="clean-slot-number">8</div>
+          <div class="clean-slot-label">BATTER #8</div>
         </div>
-        <table class="mat-outcome-table">
-          <tr class="p-win"><td><strong>+6 or more</strong></td><td><strong>STRIKEOUT (K)</strong></td><td>Batter out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>+1 to +5</strong></td><td><strong>ROUTINE OUT</strong></td><td>Fly/Pop out; runners hold</td></tr>
-          <tr class="p-win"><td><strong>0 to -2</strong></td><td><strong>FIELDED / SAC</strong></td><td>Out; 3rd scores (&lt;2 out)!</td></tr>
-          <tr class="b-win"><td><strong>-3</strong></td><td><strong>WALK (BB)</strong></td><td>1st base; forces runners</td></tr>
-          <tr class="b-win"><td><strong>-4 to -6</strong></td><td><strong>CLEAN SINGLE</strong></td><td>+1 base (2nd: SPD 4+ Safe)</td></tr>
-          <tr class="b-win"><td><strong>-7 or less</strong></td><td><strong>EXTRA-BASE / HR</strong></td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
-        </table>
-        <div style="font-size:6px; font-weight:800; color:#475569; text-align:center; background:#e2e8f0; border-radius:3px; padding:2px;">
-          UNCONDITIONAL SPECIALS: Spend 1 ⚡ Tier on ANY At-Bat (Steps Down After Play)
+        <div class="clean-slot">
+          <div class="clean-slot-number">9</div>
+          <div class="clean-slot-label">BATTER #9</div>
         </div>
       </div>
     </div>
-
-    <!-- Section 2: Batting Order Row 1 (#1 to #5 Left-to-Right) -->
-    <div class="mat-section-label">
-      <span>🏏 BATTING ORDER #1 TO #5 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 1 OF 2)</span>
-      <span>ADVANCE AT-BAT MARKER LEFT ➔ RIGHT</span>
-    </div>
-
-    <div class="mat-portrait-row-5">
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#1 LEADOFF</span><span class="slot-pos">LF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">"PROFESSOR" SOTO</div>
-          <div class="slot-sub-hint">🔵 12 | 🟢 10 | 🔴 9<br>SPD d8 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">2nd+ AB: Opp SP -1 ⚡</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#2 TWO-HOLE</span><span class="slot-pos">DH</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">SHOHEI "VIPER" CRUZ</div>
-          <div class="slot-sub-hint">🔴 11 | 🟢 11 | 🔵 10<br>SPD d10 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #2</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#3 THREE-HOLE</span><span class="slot-pos">SS</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">GUNNAR HENDERSON</div>
-          <div class="slot-sub-hint">🔴 10 | 🟢 10 | 🔵 9<br>SPD d8 • ⚡ d8</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #3</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#4 CLEANUP</span><span class="slot-pos">1B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">BRYCE HARPER</div>
-          <div class="slot-sub-hint">🔴 10 | 🔵 9 | 🟢 8<br>SPD d6 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #4</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#5 FIVE-HOLE</span><span class="slot-pos">3B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">MANNY MACHADO</div>
-          <div class="slot-sub-hint">🔴 9 | 🔵 8 | 🟢 8<br>SPD d6 • ⚡ d6</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #5</div>
-      </div>
-    </div>
-
-    <!-- Section 3: Batting Order Row 2 (#6 to #9 Left-to-Right + On-Mat Diamond) -->
-    <div class="mat-section-label">
-      <span>🏏 BATTING ORDER #6 TO #9 (LEFT-TO-RIGHT PORTRAIT LINEUP • ROW 2 OF 2) + ON-MAT DIAMOND</span>
-      <span>AFTER #9 BATS, LOOP BACK TO #1 LEADOFF</span>
-    </div>
-
-    <div class="mat-portrait-row-5">
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#6 SIX-HOLE</span><span class="slot-pos">CF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">FRANCISCO LINDOR</div>
-          <div class="slot-sub-hint">🟢 9 | 🔴 8 | 🔵 7<br>SPD d8 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #6</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#7 SEVEN-HOLE</span><span class="slot-pos">2B</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">NICO HOERNER</div>
-          <div class="slot-sub-hint">🟢 10 | 🔴 8 | 🔵 6<br>SPD d8 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #7</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#8 EIGHT-HOLE</span><span class="slot-pos">C</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">AUSTIN HEDGES</div>
-          <div class="slot-sub-hint">🔵 7 | 🔴 6 | 🟢 6<br>SPD d4 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Lineup Slot #8</div>
-      </div>
-
-      <div class="card-slot serpents-slot">
-        <div class="slot-header"><span class="slot-num">#9 NINE-HOLE</span><span class="slot-pos">RF</span></div>
-        <div class="slot-center">
-          <div class="slot-player-hint">LEO "THE SPARK"</div>
-          <div class="slot-sub-hint">🟢 7 | 🔴 5 | 🔵 5<br>SPD d8 • ⚡ d4</div>
-        </div>
-        <div class="slot-footer">Loops Back to #1</div>
-      </div>
-
-      <!-- 5th Slot: Integrated Mini Diamond & Momentum Dock -->
-      <div class="card-slot" style="border:2px solid #047857; background:#ecfdf5;">
-        <div class="slot-header"><span class="slot-num" style="color:#065f46;">⚾ DIAMOND</span><span class="slot-pos" style="background:#047857; color:white;">BASES</span></div>
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; margin:auto 0;">
-          <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 8px; font-size:6.5px; font-weight:900; color:#065f46;">◆ 2ND BASE</div>
-          <div style="display:flex; justify-content:space-between; width:100%; gap:3px;">
-            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">◆ 3RD</div>
-            <div style="border:1.5px solid #047857; background:white; border-radius:4px; padding:2px 4px; font-size:6px; font-weight:900; color:#065f46; flex:1; text-align:center;">1ST ◆</div>
-          </div>
-          <div style="border:1.5px solid #b91c1c; background:#fef2f2; border-radius:4px; padding:2px 6px; font-size:6px; font-weight:900; color:#991b1b;">⬖ HOME (SPD 4+)</div>
-        </div>
-        <div class="slot-footer" style="color:#065f46;">Send 2B on 1B: 4+ Safe</div>
-      </div>
-    </div>
-
-    <!-- Bottom Scoreboard, Outs & Momentum Strip -->
-    <div class="mat-scoreboard-strip">
-      <div>
-        <div style="font-family:Impact, sans-serif; font-size:10px; color:#0f172a; margin-bottom:3px;">📊 INNING-BY-INNING SCOREBOARD</div>
-        <table style="width:100%; border-collapse:collapse; font-size:6.8px; text-align:center; background:white;">
-          <tr style="background:#e2e8f0; font-weight:900;"><td>TEAM</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>R</td><td>H</td></tr>
-          <tr><td style="text-align:left; font-weight:900; color:#b91c1c; padding:2px;">TITANS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-          <tr><td style="text-align:left; font-weight:900; color:#047857; padding:2px;">SERPENTS</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>_</td><td>__</td><td>__</td></tr>
-        </table>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:4px; font-size:7px; font-weight:800; color:#1e293b;">
-        <div>OUTS THIS HALF-INNING:</div>
-        <div style="display:flex; gap:6px;">
-          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 1</span>
-          <span style="border:1.5px solid #0f172a; background:white; padding:3px 8px; border-radius:4px;">⚪ OUT 2</span>
-          <span style="border:1.5px solid #b91c1c; background:#fef2f2; padding:3px 8px; border-radius:4px; color:#991b1b;">❌ OUT 3</span>
-        </div>
-        <div style="font-size:6.2px; color:#475569;">3 Outs = Clear Bases &amp; Flip Top/Bottom</div>
-      </div>
-
-      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:6px; padding:6px; text-align:center;">
-        <div style="font-family:Impact, sans-serif; font-size:11px; color:#92400e;">⚡ MOMENTUM DOCK</div>
-        <div style="font-size:6.2px; font-weight:800; color:#78350f; margin-top:2px;">
-          Place ⚡ Token Here When You Win Pitch Guess!<br>
-          <strong>Roll 3rd Die (d8 / d6 / d4)</strong>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
