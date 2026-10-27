@@ -1348,23 +1348,23 @@
         short: 'TIT',
         cardClass: 'titans-card',
         pitchers: [
-          { id: 't_sp1', role: 'SP #1 (Ace)', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll Velocity d12 & keep higher', abilityType: 'reroll_vel' },
-          { id: 't_sp2', role: 'SP #2 (Sinker)', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 to Pitcher roll on Green/Blue', abilityType: 'pitch_plus2' },
-          { id: 't_sp3', role: 'SP #3 (Workhorse)', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: '+2 to Blue Zone roll', abilityType: 'pitch_plus2' },
-          { id: 't_rp1', role: 'RP #1 (Setup)', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: '+2 to Red Heat roll', abilityType: 'pitch_plus2' },
-          { id: 't_rp2', role: 'RP #2 (Middle)', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Southpaw', abilityDesc: '+2 to Green Break roll', abilityType: 'pitch_plus2' },
-          { id: 't_cl',  role: 'Closer', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Steal Momentum Token & +2 roll', abilityType: 'steal_mom' }
+          { id: 't_sp1', role: 'SP #1 (Ace)', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll highest pitch die & +1 to roll', abilityType: 'reroll_pitch' },
+          { id: 't_sp2', role: 'SP #2 (Sinker)', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 't_sp3', role: 'SP #3 (Workhorse)', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 't_rp1', role: 'RP #1 (Setup)', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 't_rp2', role: 'RP #2 (Middle)', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Southpaw Sweep', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 't_cl',  role: 'Closer', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Claim ⚡ Momentum Token & +2 roll', abilityType: 'steal_mom' }
         ],
         batters: [
-          { order: 1, pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+1 extra base on any Single or +2 Green roll', abilityType: 'extra_base' },
+          { order: 1, pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+2 to Batter roll & +1 extra base on Single', abilityType: 'extra_base' },
           { order: 2, pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Pure Barrel', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 3, pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: '+3 to Batter roll with runners on', abilityType: 'clutch_plus3' },
-          { order: 4, pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 to Red Power roll; XBH is HR on 4-6', abilityType: 'moonshot' },
-          { order: 5, pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: '+2 to Red Power roll', abilityType: 'bat_plus2' },
+          { order: 3, pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: '+3 to Batter total roll', abilityType: 'clutch_plus3' },
+          { order: 4, pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 to Batter roll; XBH is HR on 4-6', abilityType: 'moonshot' },
+          { order: 5, pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
           { order: 6, pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd4', abilityName: 'Gritty AB', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 7, pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Second Leadoff', abilityDesc: '+2 to Green Timing roll', abilityType: 'bat_plus2' },
+          { order: 7, pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Second Leadoff', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
           { order: 8, pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Contact Poke', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 9, pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll extra +d6 if winning Stance Read', abilityType: 'underdog_d6' }
+          { order: 9, pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll an extra +d6 bonus die!', abilityType: 'underdog_d6' }
         ]
       },
       serpents: {
@@ -1373,22 +1373,22 @@
         cardClass: 'serpents-card',
         pitchers: [
           { id: 's_sp1', role: 'SP #1 (Ace)', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 to Pitcher roll (-3 Walk becomes Out)', abilityType: 'black_paint' },
-          { id: 's_sp2', role: 'SP #2 (Spin)', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll Deception d12 & keep higher', abilityType: 'reroll_dec' },
+          { id: 's_sp2', role: 'SP #2 (Spin)', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll highest pitch die & +1 to roll', abilityType: 'reroll_pitch' },
           { id: 's_sp3', role: 'SP #3 (Vet)', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 's_rp1', role: 'RP #1 (Setup)', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: '+2 to Green Break roll', abilityType: 'pitch_plus2' },
-          { id: 's_rp2', role: 'RP #2 (Middle)', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Fireman', abilityDesc: '+2 to Blue Zone roll', abilityType: 'pitch_plus2' },
-          { id: 's_cl',  role: 'Closer', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: '+3 when throwing Green Break', abilityType: 'pitch_plus2' }
+          { id: 's_rp1', role: 'RP #1 (Setup)', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 's_rp2', role: 'RP #2 (Middle)', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Fireman', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 's_cl',  role: 'Closer', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: '+3 to Pitcher total roll', abilityType: 'pitch_plus3' }
         ],
         batters: [
           { order: 1, pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: 'Draws Walk on Margin -2 or -3 (+2 roll)', abilityType: 'eagle_eye' },
-          { order: 2, pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Stance Read & claim Momentum!', abilityType: 'auto_read' },
+          { order: 2, pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Pitch Guess & claim ⚡ Momentum!', abilityType: 'auto_read' },
           { order: 3, pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: 'Upgrade Single to Double (+2 roll)', abilityType: 'upgrade_1b' },
-          { order: 4, pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: '+3 to Batter roll on Red Power', abilityType: 'clutch_plus3' },
+          { order: 4, pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: '+3 to Batter total roll', abilityType: 'clutch_plus3' },
           { order: 5, pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Line Drive', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 6, pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: '+2 to Green Timing roll', abilityType: 'bat_plus2' },
-          { order: 7, pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll Contact d10 & keep higher', abilityType: 'bat_plus2' },
-          { order: 8, pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: '+2 to Blue Eye roll', abilityType: 'bat_plus2' },
-          { order: 9, pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Nine-Hole Hustle', abilityDesc: 'Roll extra +d6 if winning Stance Read', abilityType: 'underdog_d6' }
+          { order: 6, pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 7, pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll highest batter die & +1 to roll', abilityType: 'reroll_bat' },
+          { order: 8, pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 9, pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Nine-Hole Hustle', abilityDesc: 'Roll an extra +d6 bonus die!', abilityType: 'underdog_d6' }
         ]
       }
     };
@@ -1516,15 +1516,23 @@
 
       let pRoll1 = rollDie(pStance.d1);
       let pRoll2 = rollDie(pStance.d2);
-      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_vel' && pColor === 'red') {
-        pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
-      }
-      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_dec' && pColor === 'green') {
-        pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
+      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_pitch') {
+        if (DIE_MAX[pStance.d1] >= DIE_MAX[pStance.d2]) {
+          pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
+        } else {
+          pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
+        }
       }
 
       let bRoll1 = rollDie(bStance.d1);
       let bRoll2 = rollDie(bStance.d2);
+      if (state.abilityArmed.batter && b.abilityType === 'reroll_bat') {
+        if (DIE_MAX[bStance.d1] >= DIE_MAX[bStance.d2]) {
+          bRoll1 = Math.max(bRoll1, rollDie(bStance.d1));
+        } else {
+          bRoll2 = Math.max(bRoll2, rollDie(bStance.d2));
+        }
+      }
 
       // Momentum Die Roll (uses current un-degraded Momentum Die!)
       const pMomDieUsed = (state.momentumHolder === 'pitcher' && p.mom !== 'None') ? p.mom : null;
@@ -1532,16 +1540,19 @@
       const pMomRoll = pMomDieUsed ? rollDie(pMomDieUsed) : 0;
       const bMomRoll = bMomDieUsed ? rollDie(bMomDieUsed) : 0;
 
-      // Special Ability Bonuses
+      // Special Ability Bonuses (Always active whenever ability is armed!)
       let pBonus = 0;
       let bBonus = 0;
       if (state.abilityArmed.pitcher) {
         if (['pitch_plus2', 'steal_mom', 'black_paint'].includes(p.abilityType)) pBonus += 2;
+        if (p.abilityType === 'pitch_plus3') pBonus += 3;
+        if (p.abilityType === 'reroll_pitch') pBonus += 1;
       }
       if (state.abilityArmed.batter) {
         if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base'].includes(b.abilityType)) bBonus += 2;
         if (['clutch_plus3', 'moonshot'].includes(b.abilityType)) bBonus += 3;
-        if (b.abilityType === 'underdog_d6' && readWinner === 'batter') bBonus += rollDie('d6');
+        if (b.abilityType === 'reroll_bat') bBonus += 1;
+        if (b.abilityType === 'underdog_d6') bBonus += rollDie('d6');
       }
 
       const pTotal = pRoll1 + pRoll2 + pMomRoll + pBonus;
