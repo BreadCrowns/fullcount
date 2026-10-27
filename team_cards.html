@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Full Count — Portrait Half-Cards &amp; 11×17 Landscape Playmat (Split Across Two 8.5×11 Pages)</title>
+<title>Full Count — Portrait Half-Cards (Cube Track) &amp; 11×17 Landscape Playmat</title>
 <style>
   @page {
     size: 8.5in 11.0in;
@@ -161,7 +161,7 @@
     height: 2.38in;
     border: 1.5px solid #0f172a;
     border-radius: 6px;
-    padding: 3.5px 4px;
+    padding: 3px 3.5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -180,8 +180,8 @@
   }
 
   /* Team & Stance Top Accents */
-  .card.titans { border-top: 4.5px solid #b91c1c; }
-  .card.serpents { border-top: 4.5px solid #047857; }
+  .card.titans { border-top: 4px solid #b91c1c; }
+  .card.serpents { border-top: 4px solid #047857; }
   .card.stance-red { border-top: 5px solid #dc2626; }
   .card.stance-blue { border-top: 5px solid #2563eb; }
   .card.stance-green { border-top: 5px solid #16a34a; }
@@ -189,29 +189,29 @@
 
   /* Portrait Card Header */
   .card-header {
-    border-bottom: 1.5px solid #e2e8f0;
-    padding-bottom: 2px;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 1.5px;
   }
   .card-top-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1px;
+    margin-bottom: 0.5px;
   }
   .card-role {
-    font-size: 6px;
+    font-size: 5.8px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.25px;
     color: #64748b;
   }
   .card-badge {
     background: #0f172a;
     color: white;
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 7.2px;
-    padding: 1px 3.5px;
-    border-radius: 3px;
+    font-size: 7px;
+    padding: 0.5px 3px;
+    border-radius: 2.5px;
     letter-spacing: 0.2px;
     white-space: nowrap;
   }
@@ -219,8 +219,8 @@
   .card-badge.mom-badge { background: #d97706; color: #0f172a; }
   .card-name {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
-    line-height: 1.02;
+    font-size: 10.5px;
+    line-height: 1.0;
     color: #0f172a;
     text-transform: uppercase;
     letter-spacing: 0.2px;
@@ -236,12 +236,12 @@
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 1.5px 1px;
+    padding: 1px 1px;
     text-align: center;
-    font-size: 5.5px;
+    font-size: 5.2px;
     font-weight: 800;
     color: #64748b;
-    line-height: 1.05;
+    line-height: 1.02;
   }
   .core-stats span {
     display: flex;
@@ -251,7 +251,7 @@
   .core-stats span strong {
     color: #0f172a;
     font-family: "Courier New", monospace;
-    font-size: 6.8px;
+    font-size: 6.4px;
     font-weight: 900;
   }
 
@@ -259,18 +259,18 @@
   .stances-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 6.6px;
+    font-size: 6.3px;
   }
   .stances-table tr {
     border-bottom: 1px solid #f1f5f9;
   }
   .stances-table td {
-    padding: 2px 1px;
+    padding: 1.2px 1px;
     vertical-align: middle;
   }
   .stance-tag {
     font-weight: 900;
-    font-size: 6.5px;
+    font-size: 6.1px;
     display: block;
     line-height: 1;
   }
@@ -280,42 +280,100 @@
   .stance-dice {
     font-family: "Courier New", Courier, monospace;
     font-weight: 800;
-    font-size: 6px;
+    font-size: 5.7px;
     color: #334155;
     display: block;
-    line-height: 1.05;
+    line-height: 1.02;
   }
   .stars {
     color: #d97706;
-    font-size: 5.8px;
+    font-size: 5.5px;
     text-align: right;
     white-space: nowrap;
   }
   .stance-rating {
     font-family: Impact, "Arial Black", sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     text-align: right;
     color: #0f172a;
-    width: 15px;
-    padding-left: 2px;
+    width: 14px;
+    padding-left: 1px;
   }
 
-  /* Momentum / Endurance Track Bar */
-  .fatigue-bar {
-    background: #0f172a;
-    color: #f8fafc;
-    border-radius: 3px;
-    padding: 1.5px 4px;
-    font-size: 5.8px;
-    font-weight: 800;
+  /* ====================================================================== */
+  /* PHYSICAL CUBE TRACK FOR MOMENTUM DEGRADATION (0.28" x 0.28" BOXES!)    */
+  /* Sized for 8mm Board Game Cubes or Mini Indicators                      */
+  /* ====================================================================== */
+  .mom-cube-track {
+    background: #f1f5f9;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    padding: 1.5px 2px 2px 2px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 1px;
   }
-  .fatigue-bar span.tiers {
-    font-family: "Courier New", monospace;
-    color: #fbbf24;
+  .mom-cube-label {
+    font-size: 4.8px;
     font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #475569;
+    text-align: center;
+    line-height: 1;
+  }
+  .mom-cube-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .cube-box {
+    width: 0.28in;
+    height: 0.27in;
+    border: 1.5px solid #334155;
+    border-radius: 3.5px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  }
+  .cube-box.start-box {
+    border: 2px solid #d97706;
+    background: #fffbeb;
+  }
+  .cube-box.out-box {
+    border: 1.5px dashed #94a3b8;
+    background: #f8fafc;
+  }
+  .cube-box-step {
+    font-size: 4.3px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #64748b;
+    line-height: 1;
+  }
+  .cube-box.start-box .cube-box-step {
+    color: #b45309;
+  }
+  .cube-box-die {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 8.5px;
+    color: #0f172a;
+    line-height: 1.05;
+  }
+  .cube-box.out-box .cube-box-die {
+    font-size: 6.5px;
+    color: #94a3b8;
+  }
+  .cube-arrow {
+    font-size: 6.5px;
+    font-weight: 900;
+    color: #64748b;
+    line-height: 1;
   }
 
   /* Portrait Special Ability Box */
@@ -323,11 +381,11 @@
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 3px;
-    padding: 2.5px 3.5px;
-    font-size: 5.9px;
-    line-height: 1.18;
+    padding: 2px 3px;
+    font-size: 5.5px;
+    line-height: 1.14;
     color: #1e293b;
-    min-height: 0.46in;
+    min-height: 0.37in;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -352,8 +410,6 @@
 
   /* ====================================================================== */
   /* 17" x 11" LANDSCAPE PLAYMAT SPLIT ACROSS TWO 8.5" x 11" PORTRAIT PAGES */
-  /* Left 8.5"x11" Page  = Active Pitcher + Batters #1, #2, #3, #4, #5      */
-  /* Right 8.5"x11" Page = Batters #6, #7, #8, #9 (Aligned in 1 Single Row!)*/
   /* ====================================================================== */
   .page.playmat-left-page {
     padding: 0.35in 0.14in 0.35in 0.42in !important;
@@ -489,8 +545,8 @@
 
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT — PORTRAIT HALF-CARDS (1.50" × 2.38") &amp; 11×17 TWO-PAGE PLAYMAT</h1>
-    <span style="font-size: 12px; color: #94a3b8;">Every Sheet Prints on Standard 8.5" × 11" Paper • Place Playmat Left Page &amp; Right Page Side-by-Side to Form a 17" × 11" Landscape Playmat with All 9 Batters in 1 Row!</span>
+    <h1>FULL COUNT — PORTRAIT HALF-CARDS (CUBE TRACK) &amp; 11×17 TWO-PAGE PLAYMAT</h1>
+    <span style="font-size: 12px; color: #94a3b8;">Each Card Features Physical 0.28" × 0.27" Cube Slots for Momentum Degradation • Playmat Splits Across Two Standard 8.5" × 11" Sheets</span>
   </div>
   <div class="header-actions">
     <button class="print-btn" onclick="window.print()">🖨️ Print All 8.5" × 11" Sheets</button>
@@ -503,12 +559,12 @@
 <div class="page">
   <div class="sheet-banner titans-banner">
     <span class="sheet-banner-title">⚡ PAGE 1: THE METRO TITANS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Prints on Standard 8.5" × 11" Paper</span>
+    <span class="sheet-banner-sub">Place a Small Cube on Each Player's "START" Momentum Box &amp; Slide Right as Their Momentum Degrades!</span>
   </div>
 
   <div class="portrait-card-grid">
 
-    <!-- 1. FLASH MERCER -->
+    <!-- 1. FLASH MERCER (d6) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -525,13 +581,22 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
-        <div><span class="ability-title">⚡ RABBIT JUMP:</span> +2 Batter roll; advance +1 extra base on any Clean Single.</div>
+        <div><span class="ability-title">⚡ RABBIT JUMP:</span> +2 Batter roll; advance +1 extra base on any Single.</div>
       </div>
     </div>
 
-    <!-- 2. AARON VANCE -->
+    <!-- 2. AARON VANCE (d8) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -548,13 +613,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ PURE BARREL:</span> +2 Batter roll; Strikeout (+6+) becomes Routine Out.</div>
       </div>
     </div>
 
-    <!-- 3. CORBIN REYES -->
+    <!-- 3. CORBIN REYES (d8) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -571,13 +647,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ CLUTCH DRIVE:</span> Add +3 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 4. COLOSSUS STONE -->
+    <!-- 4. COLOSSUS STONE (d8) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -594,13 +681,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ MOONSHOT:</span> +3 Batter roll; Extra-Base (-7) is HR on d6 roll of 4–6!</div>
       </div>
     </div>
 
-    <!-- 5. MARCUS COLE -->
+    <!-- 5. MARCUS COLE (d6) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -617,13 +715,22 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ HOT CORNER:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 6. BLUE COLLAR DAN -->
+    <!-- 6. BLUE COLLAR DAN (d4) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -640,13 +747,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ GRITTY AB:</span> +2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).</div>
       </div>
     </div>
 
-    <!-- 7. TOBY CHEN -->
+    <!-- 7. TOBY CHEN (d4) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -663,13 +777,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ GAP SPARK:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 8. GLOVE-MAN PETE -->
+    <!-- 8. GLOVE-MAN PETE (d4) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -686,13 +807,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ CONTACT POKE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 9. ELI THE KID -->
+    <!-- 9. ELI THE KID (d4) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -709,13 +837,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ UNDERDOG SPARK:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
-    <!-- 10. SP: APEX GARRISON -->
+    <!-- 10. SP: APEX GARRISON (d8) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -732,13 +867,24 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d10</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ SONIC BOOM:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
       </div>
     </div>
 
-    <!-- 11. SP: BRICK KOWALSKI -->
+    <!-- 11. SP: BRICK KOWALSKI (d6) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -755,13 +901,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ IRON SINK:</span> +2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.</div>
       </div>
     </div>
 
-    <!-- 12. SP: DAKOTA RIDGE -->
+    <!-- 12. SP: DAKOTA RIDGE (d6) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -778,13 +933,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ INNING EATER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
     </div>
 
-    <!-- 13. RP: SPITFIRE RAMOS -->
+    <!-- 13. RP: SPITFIRE RAMOS (d6) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -801,13 +965,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ FLAMETHROWER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
     </div>
 
-    <!-- 14. RP: LEFTY VANCE -->
+    <!-- 14. RP: LEFTY VANCE (d4) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -824,13 +997,20 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ SOUTHPAW SWEEP:</span> Add +2 to your Pitcher total roll.</div>
       </div>
     </div>
 
-    <!-- 15. RP: THE BEAST TANKER -->
+    <!-- 15. RP: THE BEAST TANKER (d8) -->
     <div class="card titans">
       <div class="card-header">
         <div class="card-top-meta">
@@ -847,7 +1027,18 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d4+Grt d12</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ LIGHTS OUT:</span> Auto-claim ⚡ Momentum Token &amp; +2 Pitcher roll!</div>
       </div>
@@ -943,12 +1134,12 @@
 <div class="page">
   <div class="sheet-banner serpents-banner">
     <span class="sheet-banner-title">🐍 PAGE 2: THE SHADOW SERPENTS — PORTRAIT HALF-SIZE ROSTER &amp; STANCE SHEET (1.50" × 2.38")</span>
-    <span class="sheet-banner-sub">9 Position Players + 6 Pitchers + 3 Stance Cards + 2 Reference/Token Cards • Prints on Standard 8.5" × 11" Paper</span>
+    <span class="sheet-banner-sub">Place a Small Cube on Each Player's "START" Momentum Box &amp; Slide Right as Their Momentum Degrades!</span>
   </div>
 
   <div class="portrait-card-grid">
 
-    <!-- 1. PROFESSOR SOTO -->
+    <!-- 1. PROFESSOR SOTO (d8) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -965,13 +1156,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d12+Foc d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ EAGLE EYE:</span> +2 Batter roll; draw a Walk on Margin -2 or -3!</div>
       </div>
     </div>
 
-    <!-- 2. SHOHEI VIPER CRUZ -->
+    <!-- 2. SHOHEI VIPER CRUZ (d8) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -988,13 +1190,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d10+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">10</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ FIVE-TOOL GENIUS:</span> Auto-win Pitch Guess &amp; claim ⚡ Momentum!</div>
       </div>
     </div>
 
-    <!-- 3. GUNNAR HENDERSON -->
+    <!-- 3. GUNNAR HENDERSON (d8) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1011,13 +1224,24 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ GAP HUNTER:</span> +2 Batter roll; upgrade any Single into a Double!</div>
       </div>
     </div>
 
-    <!-- 4. BRYCE HARPER -->
+    <!-- 4. BRYCE HARPER (d6) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1034,13 +1258,22 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d8+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ SHOWTIME:</span> Add +3 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 5. MANNY MACHADO -->
+    <!-- 5. MANNY MACHADO (d6) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1057,13 +1290,22 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ LINE DRIVE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 6. FRANCISCO LINDOR -->
+    <!-- 6. FRANCISCO LINDOR (d4) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1080,13 +1322,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d8+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ MR. SMILE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 7. NICO HOERNER -->
+    <!-- 7. NICO HOERNER (d4) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1103,13 +1352,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d10+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ BAT CONTROL:</span> Reroll highest batter die &amp; keep higher (+1 Bat).</div>
       </div>
     </div>
 
-    <!-- 8. AUSTIN HEDGES -->
+    <!-- 8. AUSTIN HEDGES (d4) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1126,13 +1382,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d6+Foc d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d6+Spd d4</span></td><td class="stars">⭐</td><td class="stance-rating">6</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ VETERAN EYE:</span> Add +2 to your Batter total roll.</div>
       </div>
     </div>
 
-    <!-- 9. LEO THE SPARK -->
+    <!-- 9. LEO THE SPARK (d4) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1149,13 +1412,20 @@
         <tr><td><span class="stance-tag blue">🔵 EYE</span><span class="stance-dice">Eye d4+Foc d4</span></td><td class="stars">⭐</td><td class="stance-rating">5</td></tr>
         <tr><td><span class="stance-tag green">🟢 TIMING</span><span class="stance-dice">Con d4+Spd d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>MOMENTUM:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ MOMENTUM CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ PURE HUSTLE:</span> Roll an extra +d6 bonus die &amp; add to Batter roll!</div>
       </div>
     </div>
 
-    <!-- 10. SP: PROFESSOR WEBB -->
+    <!-- 10. SP: PROFESSOR WEBB (d8) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1172,13 +1442,24 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d12+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ BLACK PAINT:</span> +2 Pitch; Margin -3 is Fielded Out (not BB).</div>
       </div>
     </div>
 
-    <!-- 11. SP: GHOST STRIDER -->
+    <!-- 11. SP: GHOST STRIDER (d6) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1195,13 +1476,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d6</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d8+Dec d12</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">11</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ TUNNELING:</span> Reroll highest pitch die &amp; keep higher (+1 Pitch).</div>
       </div>
     </div>
 
-    <!-- 12. SP: COLD-EYE CARTER -->
+    <!-- 12. SP: COLD-EYE CARTER (d6) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1218,13 +1508,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d6</span></td><td class="stars">⭐</td><td class="stance-rating">7</td></tr>
       </table>
-      <div class="fatigue-bar"><span>ENDURANCE:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ ENDURANCE / MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ VETERAN POISE:</span> +2 Pitch; downgrade Extra-Base Hit to Single.</div>
       </div>
     </div>
 
-    <!-- 13. RP: SUBMARINE SKENES -->
+    <!-- 13. RP: SUBMARINE SKENES (d6) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1241,13 +1540,22 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d6+Grt d8</span></td><td class="stars">⭐</td><td class="stance-rating">8</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d10+Dec d8</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">10</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d6 ▸ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ RISING SLIDER:</span> Add +2 to your Pitcher total roll.</div>
       </div>
     </div>
 
-    <!-- 14. RP: ICEBOX KELLER -->
+    <!-- 14. RP: ICEBOX KELLER (d4) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1264,13 +1572,20 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d10+Grt d6</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d6+Dec d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">8</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d4 ▸ —</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ FIREMAN:</span> Add +2 to your Pitcher total roll.</div>
       </div>
     </div>
 
-    <!-- 15. RP: VIPER CRUZ -->
+    <!-- 15. RP: VIPER CRUZ (d8) -->
     <div class="card serpents">
       <div class="card-header">
         <div class="card-top-meta">
@@ -1287,7 +1602,18 @@
         <tr><td><span class="stance-tag blue">🔵 ZONE</span><span class="stance-dice">Cmd d8+Grt d8</span></td><td class="stars">⭐⭐</td><td class="stance-rating">9</td></tr>
         <tr><td><span class="stance-tag green">🟢 BREAK</span><span class="stance-dice">Mov d12+Dec d10</span></td><td class="stars">⭐⭐⭐</td><td class="stance-rating">12</td></tr>
       </table>
-      <div class="fatigue-bar"><span>RELIEVER:</span><span class="tiers">⚡ d8 ▸ d6 ▸ d4</span></div>
+      <div class="mom-cube-track">
+        <div class="mom-cube-label">⚡ RELIEVER MOM. CUBE TRACK</div>
+        <div class="mom-cube-row">
+          <div class="cube-box start-box"><span class="cube-box-step">START</span><span class="cube-box-die">d8</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d6</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box"><span class="cube-box-step">STEP</span><span class="cube-box-die">d4</span></div>
+          <span class="cube-arrow">▸</span>
+          <div class="cube-box out-box"><span class="cube-box-step">OUT</span><span class="cube-box-die">✕</span></div>
+        </div>
+      </div>
       <div class="ability-box">
         <div><span class="ability-title">⚡ NASTY BITE:</span> Add +3 to your Pitcher total roll.</div>
       </div>
@@ -1379,7 +1705,6 @@
 
 <!-- ====================================================================== -->
 <!-- PAGES 3 & 4: 17" x 11" LANDSCAPE PLAYMAT (SPLIT ACROSS TWO 8.5" x 11") -->
-<!-- Print Pages 3 & 4 for Player 1, and print an extra copy for Player 2!  -->
 <!-- ====================================================================== -->
 <div class="screen-join-banner">
   🔗 <strong>17" × 11" LANDSCAPE PLAYMAT (2 × 8.5" × 11" PAGES SIDE-BY-SIDE):</strong> Page 3 (Left Half) + Page 4 (Right Half) join at the center seam so all 9 Batters (#1–#9) sit in a single unbroken row!
