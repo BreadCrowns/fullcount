@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Full Count - Modern Mobile Card Game UI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Full Count V4 — Digital Tabletop Prototype</title>
   <style>
-    /* ==========================================================================
-       FULL COUNT — HIGH-FIDELITY MOBILE CARD GAME UI (RESPONSIVE VIEWPORT)
-       ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -16,1776 +13,1502 @@
     }
 
     :root {
-      --bg-canvas: #090a16;
-      --bg-phone: #0e0f24;
-      --bg-header: #181938;
-      --bg-dock: #181938;
-      --felt-center: #1a6f3f;
-      --felt-mid: #145934;
-      --felt-dark: #0d3d22;
-      --royal-blue: #2563eb;
-      --royal-blue-hover: #1d4ed8;
-      --royal-blue-glow: rgba(37, 99, 235, 0.5);
+      --bg-dark: #0b1120;
+      --bg-panel: #111827;
+      --bg-card: #1e293b;
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.16);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59, 130, 246, 0.16);
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, 0.16);
       --gold: #f59e0b;
-      --gold-glow: rgba(245, 158, 11, 0.4);
-      --emerald: #10b981;
-      --emerald-glow: rgba(16, 185, 129, 0.4);
-      --card-white: #ffffff;
-      --card-border: #e2e8f0;
-      --text-dark: #0f172a;
-      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --font-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, monospace;
+      --gold-bg: rgba(245, 158, 11, 0.18);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
     html, body {
+      width: 100%;
       height: 100%;
       height: 100dvh;
-      width: 100%;
-      margin: 0;
-      padding: 0;
+      background: #060913;
+      color: var(--text-main);
+      font-family: var(--font-sans);
       overflow: hidden;
-      background-color: var(--bg-phone);
-      color: #f8fafc;
-      font-family: var(--font-stack);
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
-      position: fixed;
     }
 
-    /* ── FULL SCREEN MOBILE VIEWPORT ── */
-    .game-container {
+    .app-shell {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       height: 100%;
       height: 100dvh;
       margin: 0 auto;
-      background: var(--bg-phone);
+      background: var(--bg-dark);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      overflow: hidden;
       position: relative;
+      overflow: hidden;
+      border-left: 1px solid var(--border-subtle);
+      border-right: 1px solid var(--border-subtle);
     }
 
-    /* =========================================================================
-       1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP)
-       ========================================================================= */
-    .game-header {
-      background: var(--bg-header);
-      padding: max(8px, env(safe-area-inset-top, 0px)) 10px 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+    /* ── 1. TOP SCOREBOARD & DIAMOND BAR ── */
+    .top-bar {
+      background: #0f172a;
+      padding: max(6px, env(safe-area-inset-top, 6px)) 10px 6px;
+      border-bottom: 1px solid var(--border-subtle);
       flex-shrink: 0;
-      z-index: 20;
     }
 
-    .brand-row {
+    .score-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 6px;
     }
 
-    .brand-logo {
+    .brand-pill {
       display: flex;
       align-items: center;
       gap: 5px;
-    }
-    .brand-title {
-      font-size: 0.95rem;
       font-weight: 900;
-      letter-spacing: 1.2px;
-      color: #ffffff;
-      text-transform: uppercase;
+      font-size: 0.82rem;
+      letter-spacing: 0.6px;
     }
-    .brand-tag {
-      font-size: 0.55rem;
-      font-weight: 900;
-      color: var(--gold);
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1px 4px;
+    .v4-tag {
+      background: var(--gold-bg);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      font-size: 0.58rem;
+      padding: 1px 5px;
       border-radius: 4px;
-      letter-spacing: 0.4px;
+      font-weight: 800;
     }
 
-    /* Gold Score Pill */
-    .score-badge {
+    .scoreboard-center {
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 3px 8px;
-      border-radius: 9999px;
-    }
-    .score-led {
-      width: 5px;
-      height: 5px;
-      background: #fbbf24;
-      border-radius: 50%;
-      box-shadow: 0 0 5px #fbbf24;
-    }
-    .score-text {
-      font-size: 0.72rem;
-      font-weight: 900;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 9px;
+      border-radius: 999px;
       font-family: var(--font-mono);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 800;
     }
-    .score-sep { color: #64748b; font-weight: 700; }
-    .score-inn {
-      font-size: 0.65rem;
-      font-weight: 900;
-      color: #fde047;
-      letter-spacing: 0.4px;
-    }
-    .outs-group {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      margin-left: 2px;
-    }
-    .out-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #334155;
-    }
-    .out-dot.filled {
-      background: #ef4444;
-      box-shadow: 0 0 5px #ef4444;
-    }
-
-    .header-actions {
+    .team-score {
       display: flex;
       align-items: center;
       gap: 4px;
     }
-    .btn-icon-header {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #cbd5e1;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .btn-icon-header:hover {
-      background: rgba(255, 255, 255, 0.16);
-      color: #ffffff;
-    }
-
-    /* Opponent Bar */
-    .opponent-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 4px 8px;
-    }
-    .opp-profile {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .opp-avatar {
-      width: 26px;
-      height: 26px;
-      background: rgba(245, 158, 11, 0.2);
-      border: 1.5px solid rgba(245, 158, 11, 0.5);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-    }
-    .opp-details {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.15;
-    }
-    .opp-name-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .opp-name {
-      font-size: 0.74rem;
-      font-weight: 900;
-      color: #ffffff;
-    }
-    .opp-badge {
-      font-size: 0.55rem;
-      font-weight: 800;
-      color: #fb923c;
-      background: rgba(249, 115, 22, 0.18);
-      padding: 1px 4px;
-      border-radius: 3px;
-    }
-    .opp-sub {
-      font-size: 0.6rem;
-      color: #94a3b8;
-      font-weight: 700;
-    }
-
-    .opp-stats-right {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .opp-hand-counter {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 0.65rem;
-      font-weight: 900;
-      color: #e2e8f0;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 2px 6px;
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .opp-status-pill {
-      font-size: 0.6rem;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 9999px;
-      letter-spacing: 0.3px;
-      background: rgba(245, 158, 11, 0.18);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-    .opp-status-pill.ready {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border-color: rgba(16, 185, 129, 0.4);
-    }
-
-    /* =========================================================================
-       2. MIDDLE: ARENA / STADIUM FELT MAT (FITS TO VIEWPORT)
-       ========================================================================= */
-    .felt-arena {
-      flex: 1;
-      min-height: 0;
-      margin: 4px 8px;
-      padding: 8px;
-      background: radial-gradient(ellipse at 50% 40%, var(--felt-center) 0%, var(--felt-mid) 60%, var(--felt-dark) 100%);
-      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
-      border-radius: 16px;
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .felt-arena::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 14px 14px;
-      pointer-events: none;
-    }
-
-    /* ── BEAT 1: 3 MATCHUP LANES (OPPONENT ACROSS FROM USER) ── */
-    .b1-matchup-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-      z-index: 10;
-    }
-
-    .matchup-header-tag {
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .matchup-header-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 2px 10px;
-      border-radius: 9999px;
-      font-size: 0.62rem;
-      font-weight: 800;
-      color: #a7f3d0;
-      letter-spacing: 0.4px;
-    }
-
-    .matchup-columns-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      width: 100%;
-      flex: 1;
-      min-height: 0;
-      margin: 2px 0;
-    }
-
-    /* Individual Matchup Lane Column */
-    .matchup-lane {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.28);
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 5px 4px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      position: relative;
-    }
-
-    .matchup-lane:hover {
-      background: rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .matchup-lane.active {
-      background: rgba(37, 99, 235, 0.18);
-      border-color: var(--royal-blue);
-      box-shadow: 0 0 16px var(--royal-blue-glow);
-    }
-
-    /* Opponent Choice Card (Top of Lane) */
-    .opp-choice-card {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
-    .choice-role-tag {
-      font-size: 0.54rem;
-      font-weight: 900;
-      color: #fb923c;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-    }
-    .opp-card-mini {
-      width: 48px;
-      height: 58px;
-      border-radius: 7px;
-      border: 2px solid #ffffff;
-      background-color: #1e3a8a;
-      background-image: 
-        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px),
-        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px);
-      background-blend-mode: multiply;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      position: relative;
-    }
-    .opp-card-icon { font-size: 0.85rem; }
-    .opp-mod-badge {
-      font-size: 0.52rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      padding: 1px 4px;
-      border-radius: 4px;
-      background: rgba(239, 68, 68, 0.85);
-      color: #ffffff;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-    }
-    .opp-sub-calc {
-      font-size: 0.54rem;
-      font-weight: 800;
-      color: #cbd5e1;
-      text-align: center;
-    }
-
-    /* Center Lane Divider */
-    .lane-divider {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      margin: 3px 0;
-    }
-    .lane-name {
-      font-size: 0.62rem;
-      font-weight: 900;
-      letter-spacing: 0.4px;
+    .team-score.titans { color: #fca5a5; }
+    .team-score.serpents { color: #6ee7b7; }
+    .inn-badge {
       color: #fde047;
-      text-transform: uppercase;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 1px 6px;
-      border-radius: 9999px;
-      border: 1px solid rgba(253, 224, 71, 0.3);
-    }
-
-    /* User Choice Card (Bottom of Lane) */
-    .user-choice-card {
-      width: 100%;
-      background: var(--card-white);
-      color: var(--text-dark);
-      border-radius: 8px;
-      padding: 5px 3px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-      border: 2px solid transparent;
-      transition: all 0.15s ease;
-    }
-    .matchup-lane.active .user-choice-card {
-      border-color: var(--royal-blue);
-      box-shadow: 0 0 10px var(--royal-blue-glow);
-      transform: translateY(-2px);
-    }
-
-    .user-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 0 2px;
-    }
-    .uc-icon { font-size: 0.95rem; }
-    .uc-base {
-      font-size: 0.56rem;
-      font-weight: 800;
-      color: #64748b;
-    }
-
-    .uc-mod-row {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-    .tunnel-mod-pill {
-      font-size: 0.54rem;
+      font-size: 0.7rem;
       font-weight: 900;
-      color: #1e3a8a;
-      background: #dbeafe;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
     }
-
-    .uc-target-callout {
-      width: 100%;
-      background: #f1f5f9;
-      border-radius: 5px;
-      padding: 2px 3px;
+    .outs-dots {
       display: flex;
-      flex-direction: column;
+      gap: 3px;
       align-items: center;
-      line-height: 1.1;
-      margin: 1px 0;
     }
-    .tgt-label {
-      font-size: 0.48rem;
-      font-weight: 800;
-      color: #475569;
-      letter-spacing: 0.3px;
+    .out-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #334155;
+      border: 1px solid #475569;
     }
-    .tgt-val {
-      font-size: 0.9rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: #0f172a;
+    .out-dot.on {
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+      border-color: #fca5a5;
     }
 
-    .uc-action-btn {
-      font-size: 0.54rem;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 9999px;
-      background: #e2e8f0;
-      color: #475569;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-    }
-    .matchup-lane.active .uc-action-btn {
-      background: var(--royal-blue);
-      color: #ffffff;
-    }
-
-    .arena-hint-text {
-      text-align: center;
-      font-size: 0.58rem;
-      color: #a7f3d0;
-      font-style: italic;
-      opacity: 0.85;
-      margin-top: 3px;
-    }
-
-    /* =========================================================================
-       BEAT 2: CENTER SHOWCASE (PITCH CHOSEN + FOOLED RESULT + FINAL TARGET)
-       ========================================================================= */
-    .b2-play-container {
+    .top-actions {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-      z-index: 10;
+      gap: 4px;
     }
-
-    /* Center Play Area Showcase Card */
-    .b2-center-showcase {
-      background: rgba(14, 15, 36, 0.9);
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 14px;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(8px);
-    }
-
-    .b2-chosen-pitch-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 4px 8px;
-    }
-    .b2-badge-icon { font-size: 1.15rem; }
-    .b2-badge-title {
-      font-size: 0.8rem;
-      font-weight: 900;
-      color: #ffffff;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    /* Result: Fooled or Not Banner */
-    .b2-fooled-banner {
-      border-radius: 10px;
-      padding: 6px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      text-align: center;
-    }
-    .b2-fooled-banner.fooled-yes {
-      background: rgba(16, 185, 129, 0.18);
-      border: 1.5px solid rgba(16, 185, 129, 0.4);
-    }
-    .b2-fooled-banner.fooled-no {
-      background: rgba(245, 158, 11, 0.18);
-      border: 1.5px solid rgba(245, 158, 11, 0.4);
-    }
-
-    .fooled-status-tag {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.82rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-    .fooled-yes .fooled-status-tag { color: #34d399; }
-    .fooled-no .fooled-status-tag { color: #fbbf24; }
-
-    .fooled-subtext {
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #cbd5e1;
-    }
-
-    /* Final Target Number Display */
-    .b2-final-target-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 6px 10px;
-    }
-    .ft-left {
-      display: flex;
-      flex-direction: column;
-    }
-    .ft-label {
-      font-size: 0.6rem;
-      font-weight: 900;
-      color: #94a3b8;
-      letter-spacing: 0.4px;
-    }
-    .ft-formula {
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 3px 7px;
       font-size: 0.68rem;
       font-weight: 800;
-      color: #f1f5f9;
-      font-family: var(--font-mono);
+      cursor: pointer;
     }
-    .ft-target-circle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--gold);
-      color: #000000;
-      font-size: 1.35rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 12px var(--gold-glow);
-    }
+    .icon-btn:active { transform: scale(0.95); }
 
-    /* Vertical Duel Clash Stack (Opponent Top, Player Bottom) */
-    .clash-duel-stack {
+    /* Lineup Strip (#1 to #9 Left to Right) */
+    .lineup-strip {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 3px;
-      width: 100%;
-      margin: 2px 0;
+      margin-top: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .lineup-strip::-webkit-scrollbar { display: none; }
+    .lineup-chip {
+      flex: 0 0 auto;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .lineup-chip.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #fef08a;
+      font-weight: 900;
     }
 
-    .clash-slot-wrapper {
+    /* ── 2. CENTER ARENA: PITCHER ABOVE, FIELD/OUTCOME MIDDLE, BATTER BELOW ── */
+    .arena {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .slot-title {
-      font-size: 0.58rem;
-      font-weight: 800;
-      color: #a7f3d0;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+      justify-content: space-between;
+      padding: 6px 8px;
+      gap: 5px;
+      overflow-y: auto;
     }
 
-    .card-back {
-      width: 52px;
-      height: 70px;
-      border-radius: 8px;
-      border: 2px solid #ffffff;
-      background-color: #1d4ed8;
-      background-image: 
-        repeating-linear-gradient(45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px),
-        repeating-linear-gradient(-45deg, #1e40af 0, #1e40af 2.5px, #2563eb 2.5px, #2563eb 5px);
-      background-blend-mode: multiply;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    /* Player Card (Pitcher / Batter) */
+    .player-card {
+      background: var(--bg-card);
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 6px 8px;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
       position: relative;
     }
-    .card-back-stamp {
-      font-size: 0.5rem;
-      font-weight: 900;
-      color: #ffffff;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 1px 5px;
-      border-radius: 9999px;
-      backdrop-filter: blur(4px);
+    .player-card.titans-card { border-top: 4px solid #dc2626; }
+    .player-card.serpents-card { border-top: 4px solid #10b981; }
+    .player-card.has-momentum {
+      box-shadow: 0 0 0 1.5px #f59e0b, 0 0 14px rgba(245, 158, 11, 0.25);
     }
 
-    .drop-slot {
-      width: 52px;
-      height: 70px;
-      border-radius: 8px;
-      border: 2px dashed rgba(255, 255, 255, 0.5);
-      background: rgba(0, 0, 0, 0.25);
+    .pc-header {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s ease;
-    }
-    .drop-slot.filled {
-      border: 2px solid #ffffff;
-      background: #ffffff;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
-    }
-    .drop-slot-hint {
-      font-size: 0.56rem;
-      font-weight: 800;
-      color: rgba(255, 255, 255, 0.85);
-      text-align: center;
-      padding: 2px;
-    }
-
-    .clash-vs-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 1px 0;
-    }
-    .vs-tag {
-      font-size: 0.68rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: #fbbf24;
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(251, 191, 36, 0.4);
-      padding: 1px 6px;
-      border-radius: 9999px;
-    }
-
-    /* Clash Math Strip */
-    .clash-math-strip {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 4px 8px;
-      display: flex;
-      align-items: center;
       justify-content: space-between;
-      font-size: 0.64rem;
-      font-weight: 700;
-      color: #cbd5e1;
-    }
-    .math-highlight {
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: #fbbf24;
-    }
-
-    /* =========================================================================
-       3. BOTTOM: PRIMARY TOUCH / THUMB ZONE (USER ON BOTTOM)
-       ========================================================================= */
-    .game-dock {
-      background: var(--bg-dock);
-      padding: 6px 10px max(8px, env(safe-area-inset-bottom, 0px));
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      flex-shrink: 0;
-      z-index: 20;
-    }
-
-    /* Player Profile Line */
-    .player-line {
-      display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 2px;
+      gap: 4px;
     }
-    .my-info {
+    .pc-title-group {
       display: flex;
       align-items: center;
       gap: 6px;
+      min-width: 0;
     }
-    .my-avatar {
-      width: 24px;
-      height: 24px;
-      background: rgba(37, 99, 235, 0.25);
-      border: 1.5px solid rgba(37, 99, 235, 0.5);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-    }
-    .my-name {
-      font-size: 0.74rem;
+    .pc-role-tag {
+      font-size: 0.56rem;
       font-weight: 900;
-      color: #ffffff;
-    }
-    .my-sub {
-      font-size: 0.58rem;
-      font-weight: 700;
-      color: #60a5fa;
-    }
-    .role-badge {
-      font-size: 0.58rem;
-      font-weight: 900;
-      color: #93c5fd;
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.4);
       padding: 1px 5px;
-      border-radius: 9999px;
-      letter-spacing: 0.3px;
-    }
-
-    /* Status Context Pill */
-    .status-context-pill {
-      background: #0e0f24;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 9999px;
-      padding: 3px 10px;
-      font-size: 0.65rem;
-      font-weight: 800;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
       color: #cbd5e1;
-      text-align: center;
-      margin: 0 auto;
-      max-width: 95%;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .pc-name {
+      font-size: 0.84rem;
+      font-weight: 900;
+      color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      letter-spacing: 0.3px;
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
     }
-
-    /* Chunky Action Button */
-    .btn-action-lock {
-      width: 100%;
-      height: 40px;
-      background: var(--royal-blue);
-      background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-      border: none;
-      border-radius: 10px;
-      color: #ffffff;
-      font-size: 0.82rem;
-      font-weight: 900;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
+    .pc-badges {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px var(--royal-blue-glow);
-      transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+      gap: 4px;
+      flex-shrink: 0;
     }
-
-    .btn-action-lock:hover:not(:disabled) {
-      background: #1d4ed8;
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
-      transform: translateY(-1px);
-    }
-    .btn-action-lock:active:not(:disabled) {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
-    }
-
-    .btn-action-lock:disabled {
-      background: #1e293b;
-      color: #64748b;
-      box-shadow: none;
-      cursor: not-allowed;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      opacity: 0.7;
-    }
-
-    .locked-badge-active {
-      width: 100%;
-      height: 40px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1.5px solid rgba(16, 185, 129, 0.4);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      color: #34d399;
-      font-size: 0.8rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-
-    /* Hand Cards Row: Crisp White Number Cards (1–6) */
-    .hand-cards-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 5px;
-      width: 100%;
-    }
-
-    .number-card {
-      flex: 1;
-      max-width: 58px;
-      height: 68px;
-      background: var(--card-white);
-      color: var(--text-dark);
-      border-radius: 8px;
-      border: 1.5px solid var(--card-border);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 2px 3px;
-      cursor: pointer;
-      position: relative;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.15s;
-    }
-
-    .card-corner-val {
-      font-size: 0.62rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: #64748b;
-      line-height: 1;
-    }
-    .card-corner-val.top { align-self: flex-start; }
-    .card-corner-val.bottom { align-self: flex-end; transform: rotate(180deg); }
-
-    .card-center-num {
-      font-size: 1.55rem;
-      font-weight: 900;
-      font-family: var(--font-mono);
+    .mom-token-pill {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
       color: #0f172a;
-      line-height: 1;
+      font-size: 0.58rem;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+    .mom-die-pill {
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fde047;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .mom-die-pill.exhausted {
+      color: #ef4444;
+      border-color: rgba(239,68,68,0.4);
     }
 
-    .number-card.active:hover {
-      transform: translateY(-5px) scale(1.06);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-      border-color: rgba(37, 99, 235, 0.5);
-      z-index: 10;
+    /* 5 Core Attributes Strip */
+    .core-attr-strip {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .core-attr-strip strong {
+      color: #f8fafc;
+      font-family: var(--font-mono);
+      margin-left: 2px;
     }
 
-    .number-card.selected {
-      border-color: var(--royal-blue);
-      border-width: 2.5px;
-      box-shadow: 0 0 14px var(--royal-blue-glow), 0 8px 18px rgba(0, 0, 0, 0.6);
-      transform: translateY(-8px) scale(1.08);
-      z-index: 20;
+    /* 3 Color Stances Mini Grid on Card */
+    .card-stances-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
     }
-
-    .number-card.view-only {
-      opacity: 0.68;
-      cursor: default;
-    }
-    .number-card.view-only:hover {
-      transform: none;
-    }
-
-    /* Placed Card Inside Drop Slot */
-    .placed-card-view {
-      width: 100%;
-      height: 100%;
+    .stance-cell {
+      border-radius: 5px;
+      padding: 3px 5px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 1px;
+      border: 1px solid transparent;
+    }
+    .stance-cell.red { background: var(--red-bg); border-color: rgba(239, 68, 68, 0.35); }
+    .stance-cell.blue { background: var(--blue-bg); border-color: rgba(59, 130, 246, 0.35); }
+    .stance-cell.green { background: var(--green-bg); border-color: rgba(34, 197, 94, 0.35); }
+    .sc-top {
+      display: flex;
       justify-content: space-between;
-      padding: 2px;
-      position: relative;
-    }
-    .pcv-num {
-      font-size: 1.65rem;
+      align-items: center;
+      font-size: 0.6rem;
       font-weight: 900;
-      font-family: var(--font-mono);
-      color: #1e3a8a;
-      line-height: 1;
-      margin: auto 0;
     }
-    .pcv-remove {
-      font-size: 0.54rem;
-      font-weight: 800;
-      color: #ef4444;
-      cursor: pointer;
+    .sc-rating {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .sc-dice {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sc-stars {
+      font-size: 0.52rem;
+      color: #fbbf24;
+      letter-spacing: -1px;
     }
 
-    /* ── SCOUTING DOSSIER MODAL ── */
-    .modal-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 100;
+    /* Special Ability Row */
+    .ability-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 5px;
+      padding: 3px 6px;
+      font-size: 0.6rem;
+    }
+    .ability-text {
+      color: #cbd5e1;
+      line-height: 1.2;
+      flex: 1;
+    }
+    .ability-text strong {
+      color: #fde047;
+    }
+    .btn-ability {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid #f59e0b;
+      color: #fde047;
+      font-size: 0.58rem;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .btn-ability.active {
+      background: #f59e0b;
+      color: #0f172a;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+    }
+    .btn-ability:disabled {
+      opacity: 0.35;
+      border-color: #475569;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    /* ── CENTER PLAYMAT: DIAMOND, TRIANGLE & ROLL RESOLUTION ── */
+    .center-playmat {
+      background: radial-gradient(circle at center, #14532d 0%, #062e16 100%);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 10px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 92px;
+    }
+
+    /* Mini Diamond */
+    .diamond-box {
+      width: 74px;
+      height: 74px;
+      position: relative;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 14px;
-      transition: opacity 0.2s ease;
     }
-    .modal-overlay.hidden { display: none; }
+    .base-sq {
+      width: 14px;
+      height: 14px;
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      transform: rotate(45deg);
+      position: absolute;
+      transition: all 0.2s;
+    }
+    .base-sq.occupied {
+      background: #f59e0b;
+      border-color: #fff;
+      box-shadow: 0 0 8px #f59e0b;
+    }
+    .base-2b { top: 6px; left: 30px; }
+    .base-3b { top: 30px; left: 6px; }
+    .base-1b { top: 30px; right: 6px; }
+    .base-home {
+      bottom: 6px;
+      left: 30px;
+      background: rgba(255,255,255,0.35);
+      border-color: #fca5a5;
+    }
+    .diamond-center-label {
+      font-size: 0.52rem;
+      font-weight: 800;
+      color: #bbf7d0;
+      text-align: center;
+      line-height: 1.1;
+      z-index: 2;
+      pointer-events: none;
+    }
 
-    .modal-card {
-      width: 100%;
-      background: #181938;
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
+    /* Center Resolution Feed */
+    .resolution-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+    }
+    .res-headline {
+      font-size: 0.74rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.3px;
+    }
+    .res-sub {
+      font-size: 0.62rem;
+      color: #d1fae5;
+      line-height: 1.25;
+    }
+    .dice-clash-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    .roll-pill {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 0.63rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .margin-pill {
+      background: #f59e0b;
+      color: #0f172a;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Mini Triangle Reference on Right of Playmat */
+    .mini-triangle-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 4px 6px;
+      text-align: center;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .mt-title {
+      font-size: 0.5rem;
+      font-weight: 900;
+      color: #94a3b8;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+    }
+
+    /* ── 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE HAND ── */
+    .bottom-dock {
+      background: #0f172a;
+      border-top: 1px solid var(--border-subtle);
+      padding: 6px 10px max(8px, env(safe-area-inset-bottom, 8px));
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+    .role-indicator {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      color: #93c5fd;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: 0.6rem;
+      font-weight: 900;
+    }
+
+    .stance-hand {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stance-btn {
+      border-radius: 10px;
+      padding: 7px 6px;
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      color: #fff;
+      background: #1e293b;
+    }
+    .stance-btn:active {
+      transform: scale(0.96);
+    }
+    .stance-btn.red-card {
+      background: linear-gradient(180deg, rgba(220, 38, 38, 0.32) 0%, rgba(127, 29, 29, 0.45) 100%);
+      border-color: #ef4444;
+    }
+    .stance-btn.blue-card {
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.32) 0%, rgba(30, 58, 138, 0.45) 100%);
+      border-color: #3b82f6;
+    }
+    .stance-btn.green-card {
+      background: linear-gradient(180deg, rgba(22, 163, 74, 0.32) 0%, rgba(20, 83, 45, 0.45) 100%);
+      border-color: #22c55e;
+    }
+    .stance-btn:hover {
+      box-shadow: 0 4px 14px rgba(255,255,255,0.12);
+    }
+
+    .sb-color-title {
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+    }
+    .sb-beats {
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.45);
+      color: #e2e8f0;
+    }
+    .sb-dice-pair {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #fef08a;
+      margin-top: 1px;
+    }
+    .sb-rating-line {
+      font-size: 0.58rem;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+
+    /* ── MODALS (OUTCOME TABLE & BULLPEN/ROSTER) ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 14px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 440px;
+      max-height: 88dvh;
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 12px;
+      padding: 12px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-
-    .modal-header {
+    .modal-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
       padding-bottom: 6px;
     }
-    .modal-title {
-      font-size: 0.82rem;
+    .modal-top h3 {
+      font-size: 0.88rem;
       font-weight: 900;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      letter-spacing: 0.5px;
     }
-    .btn-close-modal {
-      background: transparent;
+    .close-btn {
+      background: rgba(255,255,255,0.1);
       border: none;
-      color: #94a3b8;
-      font-size: 1.1rem;
-      font-weight: 800;
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-weight: 900;
       cursor: pointer;
     }
 
-    .scout-box {
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 8px;
+    .outcome-ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+    }
+    .outcome-ref-table th, .outcome-ref-table td {
+      padding: 5px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      text-align: left;
+    }
+    .outcome-ref-table tr.out-row { background: rgba(34, 197, 94, 0.1); }
+    .outcome-ref-table tr.hit-row { background: rgba(239, 68, 68, 0.1); }
+    .outcome-ref-table tr.highlight-row {
+      outline: 2px solid #f59e0b;
+      background: rgba(245, 158, 11, 0.28) !important;
+    }
+
+    .bullpen-list {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
-    .sb-title-row {
+    .bp-item {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.7rem;
     }
-    .sb-name { font-size: 0.74rem; font-weight: 900; color: #fff; }
-    .sb-archetype { font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
-    .sb-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-      text-align: center;
-    }
-    .sb-cell {
-      background: rgba(255, 255, 255, 0.04);
-      padding: 3px 2px;
+    .bp-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
       border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      cursor: pointer;
     }
-    .sb-cell-label { font-size: 0.56rem; color: #94a3b8; font-weight: 700; display: block; }
-    .sb-cell-val { font-size: 0.65rem; color: #f8fafc; font-weight: 900; }
+    .bp-btn:disabled {
+      background: #334155;
+      color: #64748b;
+    }
   </style>
 </head>
 <body>
+  <div class="app-shell">
 
-  <!-- Game Container (Edge-to-Edge Mobile Viewport) -->
-  <div class="game-container">
-    
-    <!-- 1. TOP: STATUS & OPPONENT ZONE (OPPONENT ON TOP) -->
-    <header class="game-header">
-      
-      <!-- Brand & Gold Score Pill -->
-      <div class="brand-row">
-        <div class="brand-logo">
-          <span class="brand-title">FULL COUNT</span>
-          <span class="brand-tag">DUEL</span>
+    <!-- 1. TOP SCOREBOARD & BATTING LINEUP STRIP (#1 to #9 LEFT-TO-RIGHT) -->
+    <header class="top-bar">
+      <div class="score-row">
+        <div class="brand-pill">
+          <span>⚾ FULL COUNT</span>
+          <span class="v4-tag">V4 RULES</span>
         </div>
 
-        <div class="score-badge">
-          <span class="score-led"></span>
-          <div class="score-text">
-            <span>VIS</span> 2 <span class="score-sep">-</span> 1 <span>HOME</span>
-          </div>
-          <span class="score-sep">•</span>
-          <span class="score-inn">▲ INN 1</span>
-          <div class="outs-group">
-            <span class="out-dot filled"></span>
-            <span class="out-dot"></span>
+        <div class="scoreboard-center">
+          <span class="team-score titans" id="score-away">TIT 0</span>
+          <span style="color:#64748b;">-</span>
+          <span class="team-score serpents" id="score-home">SER 0</span>
+          <span class="inn-badge" id="inn-display">▲ 1ST</span>
+          <div class="outs-dots">
+            <span class="out-dot" id="out-1"></span>
+            <span class="out-dot" id="out-2"></span>
           </div>
         </div>
 
-        <div class="header-actions">
-          <button class="btn-icon-header" onclick="toggleModal(true)" title="Matchup Scouting Intel">ℹ️</button>
-          <button class="btn-icon-header" onclick="resetPrototype()" title="Reset Duel">↺</button>
+        <div class="top-actions">
+          <button class="icon-btn" onclick="openModal('modal-table')" title="Outcome Table & Triangle">📊 Chart</button>
+          <button class="icon-btn" onclick="openModal('modal-bullpen')" title="Bullpen & Lineups">🔄 Staff</button>
+          <button class="icon-btn" onclick="window.location.href='team_cards.html'" title="Printable Cards">🖨️</button>
         </div>
       </div>
 
-      <!-- Opponent Bar -->
-      <div class="opponent-bar">
-        <div class="opp-profile">
-          <div class="opp-avatar">🏏</div>
-          <div class="opp-details">
-            <div class="opp-name-row">
-              <span class="opp-name">Marcus Cole</span>
-              <span class="opp-badge">Slugger</span>
-            </div>
-            <span class="opp-sub">BATTER • Count: 0-0</span>
-          </div>
-        </div>
-
-        <div class="opp-stats-right">
-          <div class="opp-hand-counter">
-            <span>🎴</span>
-            <span>5</span>
-          </div>
-          <div class="opp-status-pill" id="opp-status-pill">
-            CHOOSING…
-          </div>
-        </div>
-      </div>
+      <!-- Batting Order Strip (#1 Leadoff on Left -> #9 on Right) -->
+      <div class="lineup-strip" id="lineup-strip"></div>
     </header>
 
-    <!-- 2. MIDDLE: STADIUM FELT MAT -->
-    <main class="felt-arena">
-      
-      <!-- ── BEAT 1: 3-COLUMN MATCHUP LANES (OPPONENT ACROSS FROM USER) ── -->
-      <div id="view-beat1" class="b1-matchup-container">
-        
-        <div class="matchup-header-tag">
-          <span class="matchup-header-pill">⚡ OPPONENT READ vs YOUR DELIVERY • SELECT PITCH LANE</span>
+    <!-- 2. CENTER ARENA: PITCHER ABOVE, FIELD/OUTCOME MIDDLE, BATTER BELOW -->
+    <main class="arena">
+
+      <!-- ACTIVE PITCHER CARD (ABOVE LINEUP) -->
+      <section class="player-card" id="pitcher-card">
+        <div class="pc-header">
+          <div class="pc-title-group">
+            <span class="pc-role-tag" id="p-role">SP #1</span>
+            <span class="pc-name" id="p-name">"Apex" Garrison</span>
+          </div>
+          <div class="pc-badges">
+            <span class="mom-token-pill" id="p-mom-token" style="display:none;">⚡ HOLDER</span>
+            <span class="mom-die-pill" id="p-mom-die">MOM: d8</span>
+          </div>
         </div>
 
-        <!-- 3 Matchup Lanes (Fastball | Breaking | Offspeed) -->
-        <div class="matchup-columns-grid">
-          
-          <!-- COLUMN 1: FASTBALL LANE -->
-          <div class="matchup-lane" id="lane-fastball" onclick="selectPitch('fastball')">
-            <!-- Opponent Choice Across (Top) -->
-            <div class="opp-choice-card">
-              <span class="choice-role-tag">BATTER READ</span>
-              <div class="opp-card-mini">
-                <span class="opp-card-icon">🔥</span>
-                <span class="opp-mod-badge">+2 READ</span>
-              </div>
-              <span class="opp-sub-calc">If Read: Tgt 7</span>
-            </div>
+        <div class="core-attr-strip" id="p-core-attrs"></div>
 
-            <!-- Center Lane Divider -->
-            <div class="lane-divider">
-              <span class="lane-name">FASTBALL</span>
-            </div>
+        <div class="card-stances-grid" id="p-stances-grid"></div>
 
-            <!-- User Choice (Bottom) -->
-            <div class="user-choice-card" id="pc-fastball">
-              <div class="user-card-header">
-                <span class="uc-icon">🔥</span>
-                <span class="uc-base">Base 5</span>
-              </div>
-              <div class="uc-mod-row">
-                <span class="tunnel-mod-pill">Tun -3</span>
-              </div>
-              <div class="uc-target-callout">
-                <span class="tgt-label">FOOLED TGT</span>
-                <span class="tgt-val">2</span>
-              </div>
-              <span class="uc-action-btn" id="badge-fastball">CALL</span>
-            </div>
-          </div>
+        <div class="ability-row">
+          <div class="ability-text" id="p-ability-text"></div>
+          <button class="btn-ability" id="p-ability-btn" onclick="toggleAbility('pitcher')">⚡ Use Ability</button>
+        </div>
+      </section>
 
-          <!-- COLUMN 2: BREAKING LANE -->
-          <div class="matchup-lane" id="lane-breaking" onclick="selectPitch('breaking')">
-            <!-- Opponent Choice Across (Top) -->
-            <div class="opp-choice-card">
-              <span class="choice-role-tag">BATTER READ</span>
-              <div class="opp-card-mini">
-                <span class="opp-card-icon">🌀</span>
-                <span class="opp-mod-badge">+1 READ</span>
-              </div>
-              <span class="opp-sub-calc">If Read: Tgt 6</span>
-            </div>
-
-            <!-- Center Lane Divider -->
-            <div class="lane-divider">
-              <span class="lane-name">BREAKING</span>
-            </div>
-
-            <!-- User Choice (Bottom) -->
-            <div class="user-choice-card" id="pc-breaking">
-              <div class="user-card-header">
-                <span class="uc-icon">🌀</span>
-                <span class="uc-base">Base 5</span>
-              </div>
-              <div class="uc-mod-row">
-                <span class="tunnel-mod-pill">Tun -2</span>
-              </div>
-              <div class="uc-target-callout">
-                <span class="tgt-label">FOOLED TGT</span>
-                <span class="tgt-val">3</span>
-              </div>
-              <span class="uc-action-btn" id="badge-breaking">CALL</span>
-            </div>
-          </div>
-
-          <!-- COLUMN 3: OFFSPEED LANE -->
-          <div class="matchup-lane" id="lane-offspeed" onclick="selectPitch('offspeed')">
-            <!-- Opponent Choice Across (Top) -->
-            <div class="opp-choice-card">
-              <span class="choice-role-tag">BATTER READ</span>
-              <div class="opp-card-mini">
-                <span class="opp-card-icon">⏱️</span>
-                <span class="opp-mod-badge">+3 READ</span>
-              </div>
-              <span class="opp-sub-calc">If Read: Tgt 8</span>
-            </div>
-
-            <!-- Center Lane Divider -->
-            <div class="lane-divider">
-              <span class="lane-name">OFFSPEED</span>
-            </div>
-
-            <!-- User Choice (Bottom) -->
-            <div class="user-choice-card" id="pc-offspeed">
-              <div class="user-card-header">
-                <span class="uc-icon">⏱️</span>
-                <span class="uc-base">Base 5</span>
-              </div>
-              <div class="uc-mod-row">
-                <span class="tunnel-mod-pill">Tun -1</span>
-              </div>
-              <div class="uc-target-callout">
-                <span class="tgt-label">FOOLED TGT</span>
-                <span class="tgt-val">4</span>
-              </div>
-              <span class="uc-action-btn" id="badge-offspeed">CALL</span>
-            </div>
-          </div>
-
+      <!-- CENTER PLAYMAT: DIAMOND, RESOLUTION FEED & WHAT BEATS WHAT TRIANGLE -->
+      <section class="center-playmat">
+        <div class="diamond-box" onclick="openModal('modal-table')">
+          <div class="base-sq base-2b" id="base-2"></div>
+          <div class="base-sq base-3b" id="base-3"></div>
+          <div class="base-sq base-1b" id="base-1"></div>
+          <div class="base-sq base-home"></div>
+          <div class="diamond-center-label" id="runners-label">BASES<br>EMPTY</div>
         </div>
 
-        <div class="arena-hint-text">
-          Opponent sits on a pitch. Choose your delivery to establish execution target.
-        </div>
-      </div>
-
-      <!-- ── BEAT 2: CENTER RESULTS & FINAL TARGET SHOWCASE + EXECUTION CLASH ── -->
-      <div id="view-beat2" class="b2-play-container" style="display: none;">
-        
-        <!-- CENTER OF PLAY AREA: CHOSEN PITCH + FOOLED RESULT + FINAL TARGET NUMBER -->
-        <div class="b2-center-showcase">
-          
-          <!-- Pitch Chosen Plaque -->
-          <div class="b2-chosen-pitch-badge" id="b2-chosen-pitch-badge">
-            <span class="b2-badge-icon" id="b2-pitch-icon">🔥</span>
-            <span class="b2-badge-title" id="b2-pitch-title">FASTBALL DELIVERY</span>
+        <div class="resolution-stage" id="resolution-stage">
+          <div class="res-headline" id="res-headline">CHOOSE 🔴 RED, 🔵 BLUE, OR 🟢 GREEN</div>
+          <div class="res-sub" id="res-sub">
+            🔴 Red beats 🔵 Blue • 🔵 Blue beats 🟢 Green • 🟢 Green beats 🔴 Red.<br>
+            Winner claims ⚡ Momentum &amp; rolls 3 dice (2 Base + Momentum Die)!
           </div>
-
-          <!-- Result: Fooled or Not Banner -->
-          <div class="b2-fooled-banner fooled-yes" id="b2-fooled-banner">
-            <div class="fooled-status-tag" id="fooled-status-tag">
-              <span id="fooled-icon">🎯</span>
-              <span id="fooled-text">BATTER FOOLED!</span>
-            </div>
-            <span class="fooled-subtext" id="fooled-subtext">Batter anticipated Breaking • Tunneling -3 applied</span>
-          </div>
-
-          <!-- Final Target Number Showcase -->
-          <div class="b2-final-target-card">
-            <div class="ft-left">
-              <span class="ft-label">FINAL TARGET NUMBER</span>
-              <span class="ft-formula" id="ft-formula">Base Target 5 - Tunneling 3</span>
-            </div>
-            <div class="ft-target-circle" id="ft-target-val">
-              2
-            </div>
-          </div>
-
+          <div class="dice-clash-row" id="dice-clash-row"></div>
         </div>
 
-        <!-- Vertical Head-to-Head Clash Stack (Opponent on TOP, User on BOTTOM) -->
-        <div class="clash-duel-stack">
-          
-          <!-- Opponent Side: Batter Swing (TOP) -->
-          <div class="clash-slot-wrapper">
-            <span class="slot-title">Batter Swing (Opponent)</span>
-            <div class="card-back">
-              <span class="card-back-stamp" id="b2-opp-card-stamp">SWINGING</span>
-            </div>
-          </div>
+        <!-- Mini What Beats What Triangle -->
+        <div class="mini-triangle-box" onclick="openModal('modal-table')" title="Tap for Outcome Chart & Triangle">
+          <div class="mt-title">WHAT BEATS WHAT</div>
+          <svg width="62" height="52" viewBox="0 0 80 68">
+            <line x1="48" y1="16" x2="64" y2="46" stroke="#ef4444" stroke-width="2.5" />
+            <line x1="56" y1="56" x2="24" y2="56" stroke="#3b82f6" stroke-width="2.5" />
+            <line x1="16" y1="46" x2="32" y2="16" stroke="#22c55e" stroke-width="2.5" />
+            <circle cx="40" cy="12" r="9" fill="#dc2626" />
+            <text x="40" y="15" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">RED</text>
+            <circle cx="66" cy="54" r="9" fill="#2563eb" />
+            <text x="66" y="57" font-size="6.5" font-weight="900" fill="#fff" text-anchor="middle">BLU</text>
+            <circle cx="14" cy="54" r="9" fill="#16a34a" />
+            <text x="14" y="57" font-size="6.5" font-weight="900" fill="#fff" text-anchor="middle">GRN</text>
+          </svg>
+        </div>
+      </section>
 
-          <!-- VS Badge -->
-          <div class="clash-vs-badge">
-            <span class="vs-tag">VS</span>
+      <!-- ACTIVE BATTER CARD (BELOW PLAYMAT) -->
+      <section class="player-card" id="batter-card">
+        <div class="pc-header">
+          <div class="pc-title-group">
+            <span class="pc-role-tag" id="b-role">#1 CF</span>
+            <span class="pc-name" id="b-name">"Flash" Mercer</span>
           </div>
-
-          <!-- Player Delivery Card Slot (BOTTOM) -->
-          <div class="clash-slot-wrapper">
-            <span class="slot-title">Your Delivery (Pitcher)</span>
-            <div class="drop-slot" id="drop-slot" onclick="removePlacedCard()">
-              <div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>
-            </div>
+          <div class="pc-badges">
+            <span class="mom-token-pill" id="b-mom-token" style="display:none;">⚡ HOLDER</span>
+            <span class="mom-die-pill" id="b-mom-die">MOM: d6</span>
           </div>
-
         </div>
 
-        <!-- Clash Threshold Math Strip -->
-        <div class="clash-math-strip">
-          <span id="clash-math-desc">Select 1 card from hand to throw.</span>
-          <span class="math-highlight" id="clash-math-val">CARD [?] vs TGT [2]</span>
+        <div class="core-attr-strip" id="b-core-attrs"></div>
+
+        <div class="card-stances-grid" id="b-stances-grid"></div>
+
+        <div class="ability-row">
+          <div class="ability-text" id="b-ability-text"></div>
+          <button class="btn-ability" id="b-ability-btn" onclick="toggleAbility('batter')">⚡ Use Ability</button>
         </div>
-      </div>
+      </section>
 
     </main>
 
-    <!-- 3. BOTTOM: PRIMARY TOUCH / THUMB ZONE (USER ON BOTTOM) -->
-    <footer class="game-dock">
-      
-      <!-- Player Profile Line -->
-      <div class="player-line">
-        <div class="my-info">
-          <div class="my-avatar">⚾</div>
-          <div>
-            <div class="my-name">Big Jake Harmon</div>
-            <div class="my-sub">PITCHER • Hand: 5/5</div>
-          </div>
-        </div>
-        <span class="role-badge">PITCHING</span>
+    <!-- 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE SELECTION -->
+    <footer class="bottom-dock">
+      <div class="dock-header">
+        <span id="dock-prompt">TAP YOUR STANCE CARD TO RESOLVE AT-BAT</span>
+        <span class="role-indicator" id="user-role-pill">YOU ARE BATTING (TITANS)</span>
       </div>
 
-      <!-- Centered Status Context Pill -->
-      <div class="status-context-pill" id="status-pill">
-        SELECT FASTBALL, BREAKING, OR OFFSPEED
-      </div>
-
-      <!-- Chunky Action Button -->
-      <div id="action-btn-area">
-        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
-          <span>🔒</span>
-          <span id="action-btn-label">CHOOSE PITCH</span>
+      <div class="stance-hand">
+        <button class="stance-btn red-card" onclick="playStance('red')">
+          <span class="sb-color-title" id="btn-red-title">🔴 RED</span>
+          <span class="sb-beats">BEATS 🔵 BLUE</span>
+          <span class="sb-dice-pair" id="btn-red-dice">d4 + d10</span>
+          <span class="sb-rating-line" id="btn-red-rating">Rating 8 ⭐</span>
         </button>
-      </div>
 
-      <!-- Player Hand: 5 Pure Number Cards -->
-      <div>
-        <div style="font-size: 0.6rem; font-weight: 800; color: #94a3b8; margin-bottom: 3px; display: flex; justify-content: space-between; padding: 0 2px;">
-          <span id="hand-heading">CARDS RESERVED FOR BEAT 2</span>
-          <span style="color: #64748b;">VALUES 1–6</span>
-        </div>
+        <button class="stance-btn blue-card" onclick="playStance('blue')">
+          <span class="sb-color-title" id="btn-blue-title">🔵 BLUE</span>
+          <span class="sb-beats">BEATS 🟢 GREEN</span>
+          <span class="sb-dice-pair" id="btn-blue-dice">d10 + d8</span>
+          <span class="sb-rating-line" id="btn-blue-rating">Rating 10 ⭐⭐</span>
+        </button>
 
-        <div class="hand-cards-container">
-          
-          <!-- Card 1 -->
-          <div class="number-card view-only" id="card-1" onclick="tapHandCard(1, 'card-1')">
-            <span class="card-corner-val top">1</span>
-            <span class="card-center-num">1</span>
-            <span class="card-corner-val bottom">1</span>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="number-card view-only" id="card-2" onclick="tapHandCard(2, 'card-2')">
-            <span class="card-corner-val top">2</span>
-            <span class="card-center-num">2</span>
-            <span class="card-corner-val bottom">2</span>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="number-card view-only" id="card-4" onclick="tapHandCard(4, 'card-4')">
-            <span class="card-corner-val top">4</span>
-            <span class="card-center-num">4</span>
-            <span class="card-corner-val bottom">4</span>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="number-card view-only" id="card-5" onclick="tapHandCard(5, 'card-5')">
-            <span class="card-corner-val top">5</span>
-            <span class="card-center-num">5</span>
-            <span class="card-corner-val bottom">5</span>
-          </div>
-
-          <!-- Card 5 -->
-          <div class="number-card view-only" id="card-6" onclick="tapHandCard(6, 'card-6')">
-            <span class="card-corner-val top">6</span>
-            <span class="card-center-num">6</span>
-            <span class="card-corner-val bottom">6</span>
-          </div>
-        </div>
+        <button class="stance-btn green-card" onclick="playStance('green')">
+          <span class="sb-color-title" id="btn-green-title">🟢 GREEN</span>
+          <span class="sb-beats">BEATS 🔴 RED</span>
+          <span class="sb-dice-pair" id="btn-green-dice">d10 + d12</span>
+          <span class="sb-rating-line" id="btn-green-rating">Rating 12 ⭐⭐⭐</span>
+        </button>
       </div>
     </footer>
 
-    <!-- ── SCOUTING DOSSIER MODAL ── -->
-    <div class="modal-overlay hidden" id="modal-scout">
-      <div class="modal-card">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>📊</span>
-            <span>MATCHUP SCOUTING DOSSIER</span>
-          </div>
-          <button class="btn-close-modal" onclick="toggleModal(false)">✕</button>
+    <!-- MODAL 1: AT-BAT OUTCOME TABLE & STANCE TRIANGLE -->
+    <div class="modal-backdrop" id="modal-table" onclick="closeModalOnBg(event, 'modal-table')">
+      <div class="modal-sheet">
+        <div class="modal-top">
+          <h3>📊 AT-BAT OUTCOME TABLE &amp; TRIANGLE</h3>
+          <button class="close-btn" onclick="closeModal('modal-table')">✕</button>
         </div>
 
-        <!-- Pitcher Dossier -->
-        <div class="scout-box" style="border-color: rgba(59, 130, 246, 0.4);">
-          <div class="sb-title-row">
-            <span class="sb-name">⚾ Big Jake Harmon (Pitcher)</span>
-            <span class="sb-archetype" style="background: rgba(59,130,246,0.2); color: #93c5fd;">Power Arm</span>
-          </div>
-          <div class="sb-grid">
-            <div class="sb-cell">
-              <span class="sb-cell-label">Fastball</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -3 (2)</span>
-            </div>
-            <div class="sb-cell">
-              <span class="sb-cell-label">Breaking</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -2 (3)</span>
-            </div>
-            <div class="sb-cell">
-              <span class="sb-cell-label">Offspeed</span>
-              <span class="sb-cell-val">Tgt 5 • Tun -1 (4)</span>
-            </div>
-          </div>
+        <div style="font-size:0.72rem; color:#cbd5e1;">
+          <strong>FORMULA:</strong> <code>Margin = Pitcher Score − Batter Score</code><br>
+          <strong>TIES ON STANCE READ:</strong> Token does NOT move; current holder keeps &amp; rolls their Momentum Die!
         </div>
 
-        <!-- Batter Dossier -->
-        <div class="scout-box" style="border-color: rgba(245, 158, 11, 0.4);">
-          <div class="sb-title-row">
-            <span class="sb-name">🏏 Marcus Cole (Batter)</span>
-            <span class="sb-archetype" style="background: rgba(245,158,11,0.2); color: #fde047;">Power Slugger</span>
-          </div>
-          <div class="sb-grid">
-            <div class="sb-cell">
-              <span class="sb-cell-label">Read Fastball</span>
-              <span class="sb-cell-val">+2 Read (Tgt 7)</span>
-            </div>
-            <div class="sb-cell">
-              <span class="sb-cell-label">Read Breaking</span>
-              <span class="sb-cell-val">+1 Read (Tgt 6)</span>
-            </div>
-            <div class="sb-cell">
-              <span class="sb-cell-label">Read Offspeed</span>
-              <span class="sb-cell-val">+3 Read (Tgt 8)</span>
-            </div>
-          </div>
+        <table class="outcome-ref-table" id="outcome-ref-table">
+          <thead>
+            <tr style="color:#94a3b8; font-size:0.64rem;">
+              <th>MARGIN</th>
+              <th>OUTCOME</th>
+              <th>EFFECT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="out-row" data-band="k">
+              <td><strong>+4 or more</strong></td>
+              <td><strong>STRIKEOUT (K)</strong></td>
+              <td>Batter out; runners hold</td>
+            </tr>
+            <tr class="out-row" data-band="out">
+              <td><strong>0 to +3</strong></td>
+              <td><strong>ROUTINE OUT</strong></td>
+              <td>Fly/Pop out; runners hold</td>
+            </tr>
+            <tr class="out-row" data-band="sac">
+              <td><strong>-1 to -3</strong></td>
+              <td><strong>FIELDED / SAC</strong></td>
+              <td>Out; Runner on 3rd scores!</td>
+            </tr>
+            <tr class="hit-row" data-band="bb">
+              <td><strong>-4 to -5</strong></td>
+              <td><strong>WALK (BB)</strong></td>
+              <td>1st base; forces runners</td>
+            </tr>
+            <tr class="hit-row" data-band="1b">
+              <td><strong>-6 to -8</strong></td>
+              <td><strong>CLEAN SINGLE</strong></td>
+              <td>Runners +1 (2nd scores 4-6)</td>
+            </tr>
+            <tr class="hit-row" data-band="xbh">
+              <td><strong>-9 or less</strong></td>
+              <td><strong>EXTRA-BASE / HR</strong></td>
+              <td>d6: 1-4 2B, 5 3B, 6 HR!</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="background:#1e293b; border-radius:8px; padding:8px; font-size:0.68rem; line-height:1.35; color:#e2e8f0;">
+          <strong>⚡ MOMENTUM DEGRADATION (V4 RULES):</strong><br>
+          • <strong>Never degrades on a loss!</strong><br>
+          • <strong>Pitcher Endurance:</strong> Steps down 1 tier each time #1 Leadoff starts a new loop through the order (or each new inning for Relievers).<br>
+          • <strong>Special Abilities:</strong> Using a Special Ability degrades that player's Momentum Die 1 tier (<code>d8 ➔ d6 ➔ d4 ➔ None</code>) <strong>after</strong> the ability is used.
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: BULLPEN & TEAM CONTROLS -->
+    <div class="modal-backdrop" id="modal-bullpen" onclick="closeModalOnBg(event, 'modal-bullpen')">
+      <div class="modal-sheet">
+        <div class="modal-top">
+          <h3>🔄 PITCHING STAFF &amp; GAME CONTROLS</h3>
+          <button class="close-btn" onclick="closeModal('modal-bullpen')">✕</button>
         </div>
 
-        <button onclick="toggleModal(false)" style="width: 100%; height: 38px; background: var(--royal-blue); border: none; border-radius: 8px; color: #fff; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
-          RETURN TO DUEL
-        </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+          <span style="font-size:0.72rem; color:#cbd5e1;">Your Team: <strong id="user-team-label" style="color:#fde047;">Metro Titans</strong></span>
+          <button class="bp-btn" onclick="swapUserTeam()">Switch Team</button>
+          <button class="bp-btn" style="background:#dc2626;" onclick="resetFullGame()">New Game</button>
+        </div>
+
+        <div style="font-size:0.72rem; font-weight:800; color:#93c5fd; margin-top:4px;">
+          ACTIVE DEFENSE PITCHING STAFF (Tap to Substitute):
+        </div>
+        <div class="bullpen-list" id="bullpen-list"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- JavaScript State & Tactile Audio Engine -->
   <script>
-    // Web Audio Synthesizer for tactile feedback
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playTactileSound(type) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
+    // =========================================================================
+    // FULL COUNT V4 — COMPLETE ROSTER DATA & GAME ENGINE
+    // =========================================================================
+    const DIE_MAX = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 };
+    const DIE_AVG = { d4: 2.5, d6: 3.5, d8: 4.5, d10: 5.5, d12: 6.5 };
+    const MOM_LADDER = ['d8', 'd6', 'd4', 'None'];
 
-      if (type === 'click') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(520, now);
-        osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.05);
-      } else if (type === 'thump') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.12);
-        osc.start(now);
-        osc.stop(now + 0.12);
-      } else if (type === 'lock') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.18);
-        osc.start(now);
-        osc.stop(now + 0.18);
-      } else if (type === 'fanfare') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(587.33, now); // D5
-        osc.frequency.setValueAtTime(880, now + 0.08); // A5
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      }
+    function stepDownDie(die) {
+      const idx = MOM_LADDER.indexOf(die);
+      if (idx === -1 || idx >= MOM_LADDER.length - 1) return 'None';
+      return MOM_LADDER[idx + 1];
     }
 
-    const pitchData = {
-      fastball: { name: 'Fastball', icon: '🔥', base: 5, tunnel: 3, fooledTgt: 2, readMod: 2, readTgt: 7 },
-      breaking: { name: 'Breaking', icon: '🌀', base: 5, tunnel: 2, fooledTgt: 3, readMod: 1, readTgt: 6 },
-      offspeed: { name: 'Offspeed', icon: '⏱️', base: 5, tunnel: 1, fooledTgt: 4, readMod: 3, readTgt: 8 }
+    function rollDie(dieStr) {
+      const faces = DIE_MAX[dieStr] || 0;
+      if (!faces) return 0;
+      return Math.floor(Math.random() * faces) + 1;
+    }
+
+    function calcRating(d1, d2) {
+      return Math.round((DIE_AVG[d1] + DIE_AVG[d2]) * 10) / 10;
+    }
+
+    function getStars(rating) {
+      if (rating >= 10) return '⭐⭐⭐';
+      if (rating >= 8) return '⭐⭐';
+      return '⭐';
+    }
+
+    const TEAMS_TEMPLATE = {
+      titans: {
+        name: 'Metro Titans',
+        short: 'TIT',
+        cardClass: 'titans-card',
+        pitchers: [
+          { id: 't_sp1', role: 'SP #1 (Ace)', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll Velocity d12 & keep higher', abilityType: 'reroll_vel' },
+          { id: 't_sp2', role: 'SP #2 (Sinker)', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 to Pitcher roll on Green/Blue', abilityType: 'pitch_plus2' },
+          { id: 't_sp3', role: 'SP #3 (Workhorse)', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: '+2 to Blue Zone roll', abilityType: 'pitch_plus2' },
+          { id: 't_rp1', role: 'RP #1 (Setup)', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: '+2 to Red Heat roll', abilityType: 'pitch_plus2' },
+          { id: 't_rp2', role: 'RP #2 (Middle)', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Southpaw', abilityDesc: '+2 to Green Break roll', abilityType: 'pitch_plus2' },
+          { id: 't_cl',  role: 'Closer', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Steal Momentum Token & +2 roll', abilityType: 'steal_mom' }
+        ],
+        batters: [
+          { order: 1, pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+1 extra base on any Single or +2 Green roll', abilityType: 'extra_base' },
+          { order: 2, pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Pure Barrel', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 3, pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: '+3 to Batter roll with runners on', abilityType: 'clutch_plus3' },
+          { order: 4, pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 to Red Power roll; XBH is HR on 4-6', abilityType: 'moonshot' },
+          { order: 5, pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: '+2 to Red Power roll', abilityType: 'bat_plus2' },
+          { order: 6, pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd4', abilityName: 'Gritty AB', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 7, pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Second Leadoff', abilityDesc: '+2 to Green Timing roll', abilityType: 'bat_plus2' },
+          { order: 8, pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Contact Poke', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 9, pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll extra +d6 if winning Stance Read', abilityType: 'underdog_d6' }
+        ]
+      },
+      serpents: {
+        name: 'Shadow Serpents',
+        short: 'SER',
+        cardClass: 'serpents-card',
+        pitchers: [
+          { id: 's_sp1', role: 'SP #1 (Ace)', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 to Pitcher roll (-4 Walk becomes Out)', abilityType: 'black_paint' },
+          { id: 's_sp2', role: 'SP #2 (Spin)', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll Deception d12 & keep higher', abilityType: 'reroll_dec' },
+          { id: 's_sp3', role: 'SP #3 (Vet)', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
+          { id: 's_rp1', role: 'RP #1 (Setup)', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: '+2 to Green Break roll', abilityType: 'pitch_plus2' },
+          { id: 's_rp2', role: 'RP #2 (Middle)', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Fireman', abilityDesc: '+2 to Blue Zone roll', abilityType: 'pitch_plus2' },
+          { id: 's_cl',  role: 'Closer', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: '+3 when throwing Green Break', abilityType: 'pitch_plus2' }
+        ],
+        batters: [
+          { order: 1, pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: 'Draws Walk on Margin -3, -4, or -5 (+2 roll)', abilityType: 'eagle_eye' },
+          { order: 2, pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Stance Read & claim Momentum!', abilityType: 'auto_read' },
+          { order: 3, pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: 'Upgrade Single to Double (+2 roll)', abilityType: 'upgrade_1b' },
+          { order: 4, pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: '+3 to Batter roll on Red Power', abilityType: 'clutch_plus3' },
+          { order: 5, pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Line Drive', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
+          { order: 6, pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: '+2 to Green Timing roll', abilityType: 'bat_plus2' },
+          { order: 7, pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll Contact d10 & keep higher', abilityType: 'bat_plus2' },
+          { order: 8, pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: '+2 to Blue Eye roll', abilityType: 'bat_plus2' },
+          { order: 9, pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Nine-Hole Hustle', abilityDesc: 'Roll extra +d6 if winning Stance Read', abilityType: 'underdog_d6' }
+        ]
+      }
     };
 
-    let activeBeat = 'beat1';
-    let selectedPitch = null;
-    let selectedHandCard = null;
-    let isBatterFooled = true;
-    let effectiveTarget = 2;
+    let state = null;
 
-    function selectPitch(pitchKey) {
-      if (activeBeat !== 'beat1') return;
-      playTactileSound('click');
-      selectedPitch = pitchKey;
-
-      ['fastball', 'breaking', 'offspeed'].forEach(p => {
-        const lane = document.getElementById(`lane-${p}`);
-        const badge = document.getElementById(`badge-${p}`);
-        if (p === pitchKey) {
-          lane.classList.add('active');
-          badge.textContent = '✓ CALLED';
-        } else {
-          lane.classList.remove('active');
-          badge.textContent = 'CALL';
-        }
-      });
-
-      updateBeat1ActionState();
+    function initGame(userTeamKey = 'titans') {
+      const clone = JSON.parse(JSON.stringify(TEAMS_TEMPLATE));
+      state = {
+        userTeam: userTeamKey, // 'titans' (Away) or 'serpents' (Home)
+        inning: 1,
+        half: 'top', // 'top' = Titans batting, Serpents pitching; 'bot' = Serpents batting, Titans pitching
+        outs: 0,
+        score: { titans: 0, serpents: 0 },
+        bases: [null, null, null], // [1B, 2B, 3B]
+        momentumHolder: 'pitcher', // 'pitcher' or 'batter'
+        teams: {
+          titans: {
+            ...clone.titans,
+            activePitcherIdx: 0,
+            batterIdx: 0,
+            lineupLoops: 0
+          },
+          serpents: {
+            ...clone.serpents,
+            activePitcherIdx: 0,
+            batterIdx: 0,
+            lineupLoops: 0
+          }
+        },
+        abilityArmed: { pitcher: false, batter: false },
+        lastBand: null
+      };
+      renderAll();
     }
 
-    function updateBeat1ActionState() {
-      const btn = document.getElementById('action-btn');
-      const label = document.getElementById('action-btn-label');
-      const pill = document.getElementById('status-pill');
+    function getOffenseTeamKey() {
+      return state.half === 'top' ? 'titans' : 'serpents';
+    }
+    function getDefenseTeamKey() {
+      return state.half === 'top' ? 'serpents' : 'titans';
+    }
+    function getActivePitcher() {
+      const def = state.teams[getDefenseTeamKey()];
+      return def.pitchers[def.activePitcherIdx];
+    }
+    function getActiveBatter() {
+      const off = state.teams[getOffenseTeamKey()];
+      return off.batters[off.batterIdx];
+    }
 
-      if (!selectedPitch) {
-        btn.disabled = true;
-        label.textContent = 'CHOOSE PITCH';
-        pill.textContent = 'SELECT FASTBALL, BREAKING, OR OFFSPEED';
+    function getPitcherStanceDice(p, color) {
+      if (color === 'red') return { label: 'HEAT', a1: 'Vel', d1: p.vel, a2: 'Grt', d2: p.grt };
+      if (color === 'blue') return { label: 'ZONE', a1: 'Cmd', d1: p.cmd, a2: 'Grt', d2: p.grt };
+      return { label: 'BREAK', a1: 'Mov', d1: p.mov, a2: 'Dec', d2: p.dec };
+    }
+
+    function getBatterStanceDice(b, color) {
+      if (color === 'red') return { label: 'POWER', a1: 'Pow', d1: b.pow, a2: 'Con', d2: b.con };
+      if (color === 'blue') return { label: 'EYE', a1: 'Eye', d1: b.eye, a2: 'Foc', d2: b.foc };
+      return { label: 'TIMING', a1: 'Con', d1: b.con, a2: 'Spd', d2: b.spd };
+    }
+
+    // What Beats What: Red > Blue > Green > Red
+    function evaluateStanceRead(pColor, bColor) {
+      if (pColor === bColor) return 'tie';
+      const beats = { red: 'blue', blue: 'green', green: 'red' };
+      return beats[pColor] === bColor ? 'pitcher' : 'batter';
+    }
+
+    function toggleAbility(role) {
+      const player = role === 'pitcher' ? getActivePitcher() : getActiveBatter();
+      if (player.mom === 'None') return;
+      state.abilityArmed[role] = !state.abilityArmed[role];
+      renderAll();
+    }
+
+    function chooseBotStance(botPlayer, isPitcher) {
+      const colors = ['red', 'blue', 'green'];
+      const weights = colors.map(c => {
+        const info = isPitcher ? getPitcherStanceDice(botPlayer, c) : getBatterStanceDice(botPlayer, c);
+        return calcRating(info.d1, info.d2);
+      });
+      // Weighted random choice favoring stronger stances
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total;
+      for (let i = 0; i < 3; i++) {
+        r -= weights[i];
+        if (r <= 0) return colors[i];
+      }
+      return 'red';
+    }
+
+    function playStance(userColor) {
+      const offKey = getOffenseTeamKey();
+      const userIsBatting = (offKey === state.userTeam);
+      const p = getActivePitcher();
+      const b = getActiveBatter();
+
+      const pColor = userIsBatting ? chooseBotStance(p, true) : userColor;
+      const bColor = userIsBatting ? userColor : chooseBotStance(b, false);
+
+      // 1. Stance Resolution (What Beats What)
+      let readWinner = evaluateStanceRead(pColor, bColor);
+      if (state.abilityArmed.batter && b.abilityType === 'auto_read') {
+        readWinner = 'batter';
+      }
+      if (state.abilityArmed.pitcher && p.abilityType === 'steal_mom') {
+        readWinner = 'pitcher';
+      }
+
+      if (readWinner === 'pitcher') state.momentumHolder = 'pitcher';
+      else if (readWinner === 'batter') state.momentumHolder = 'batter';
+      // On 'tie', state.momentumHolder does NOT move!
+
+      // 2. Roll Base Attribute Dice (2 dice each) + Momentum Die for Holder (3rd die)
+      const pStance = getPitcherStanceDice(p, pColor);
+      const bStance = getBatterStanceDice(b, bColor);
+
+      let pRoll1 = rollDie(pStance.d1);
+      let pRoll2 = rollDie(pStance.d2);
+      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_vel' && pColor === 'red') {
+        pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
+      }
+      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_dec' && pColor === 'green') {
+        pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
+      }
+
+      let bRoll1 = rollDie(bStance.d1);
+      let bRoll2 = rollDie(bStance.d2);
+
+      // Momentum Die Roll (uses current un-degraded Momentum Die!)
+      let pMomRoll = 0;
+      let bMomRoll = 0;
+      if (state.momentumHolder === 'pitcher' && p.mom !== 'None') {
+        pMomRoll = rollDie(p.mom);
+      } else if (state.momentumHolder === 'batter' && b.mom !== 'None') {
+        bMomRoll = rollDie(b.mom);
+      }
+
+      // Special Ability Bonuses
+      let pBonus = 0;
+      let bBonus = 0;
+      if (state.abilityArmed.pitcher) {
+        if (['pitch_plus2', 'steal_mom', 'black_paint'].includes(p.abilityType)) pBonus += 2;
+      }
+      if (state.abilityArmed.batter) {
+        if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base'].includes(b.abilityType)) bBonus += 2;
+        if (['clutch_plus3', 'moonshot'].includes(b.abilityType)) bBonus += 3;
+        if (b.abilityType === 'underdog_d6' && readWinner === 'batter') bBonus += rollDie('d6');
+      }
+
+      const pTotal = pRoll1 + pRoll2 + pMomRoll + pBonus;
+      const bTotal = bRoll1 + bRoll2 + bMomRoll + bBonus;
+      const margin = pTotal - bTotal;
+
+      // 3. Consult Single At-Bat Outcome Table
+      const outcomeInfo = resolveOutcomeTable(margin, p, b);
+
+      // 4. AFTER Ability Has Been Used -> Degrade Momentum Die 1 Tier!
+      let postAbilityNotes = [];
+      if (state.abilityArmed.pitcher) {
+        const oldDie = p.mom;
+        p.mom = stepDownDie(p.mom);
+        postAbilityNotes.push(`${p.name} used ${p.abilityName} (${oldDie} ➔ ${p.mom})`);
+        state.abilityArmed.pitcher = false;
+      }
+      if (state.abilityArmed.batter) {
+        const oldDie = b.mom;
+        b.mom = stepDownDie(b.mom);
+        postAbilityNotes.push(`${b.name} used ${b.abilityName} (${oldDie} ➔ ${b.mom})`);
+        state.abilityArmed.batter = false;
+      }
+
+      // 5. Update Center Feed UI
+      const colorIcon = { red: '🔴 RED', blue: '🔵 BLUE', green: '🟢 GREEN' };
+      const readMsg = readWinner === 'tie'
+        ? `TIE (${colorIcon[pColor]}) — ⚡ Token stays with ${state.momentumHolder.toUpperCase()}!`
+        : `${readWinner === 'pitcher' ? 'PITCHER' : 'BATTER'} wins Read (${colorIcon[pColor]} vs ${colorIcon[bColor]}) & claims ⚡ Momentum!`;
+
+      const pDiceFormula = `${pStance.a1} ${pStance.d1}(${pRoll1}) + ${pStance.a2} ${pStance.d2}(${pRoll2})` +
+        (pMomRoll ? ` + ⚡${p.mom}(${pMomRoll})` : '') + (pBonus ? ` +${pBonus}` : '') + ` = ${pTotal}`;
+      const bDiceFormula = `${bStance.a1} ${bStance.d1}(${bRoll1}) + ${bStance.a2} ${bStance.d2}(${bRoll2})` +
+        (bMomRoll ? ` + ⚡${b.mom}(${bMomRoll})` : '') + (bBonus ? ` +${bBonus}` : '') + ` = ${bTotal}`;
+
+      document.getElementById('res-headline').textContent = `${outcomeInfo.title} (Margin: ${margin >= 0 ? '+' + margin : margin})`;
+      document.getElementById('res-sub').innerHTML =
+        `${readMsg}<br>${outcomeInfo.detail}` +
+        (postAbilityNotes.length ? `<br><span style="color:#fde047;">⚡ Post-Use Degrade: ${postAbilityNotes.join(' • ')}</span>` : '');
+
+      document.getElementById('dice-clash-row').innerHTML = `
+        <span class="roll-pill">⚾ P: ${pDiceFormula}</span>
+        <span class="roll-pill">🏏 B: ${bDiceFormula}</span>
+        <span class="margin-pill">P−B: ${margin >= 0 ? '+' + margin : margin}</span>
+      `;
+
+      // 6. Advance to Next Batter in Left-to-Right Order & Check TTOP Pitcher Endurance
+      advanceLineupAndInning(outcomeInfo.outsAdded, outcomeInfo.runsAdded);
+      renderAll();
+    }
+
+    function resolveOutcomeTable(margin, p, b) {
+      const usedBlackPaint = state.abilityArmed.pitcher && p.abilityType === 'black_paint';
+      const usedEagleEye = state.abilityArmed.batter && b.abilityType === 'eagle_eye';
+      const usedUpgrade1B = state.abilityArmed.batter && b.abilityType === 'upgrade_1b';
+      const usedExtraBase = state.abilityArmed.batter && b.abilityType === 'extra_base';
+      const usedMoonshot = state.abilityArmed.batter && b.abilityType === 'moonshot';
+
+      let runs = 0;
+      let outs = 0;
+      let title = '';
+      let detail = '';
+
+      if (margin >= 4) {
+        state.lastBand = 'k';
+        outs = 1;
+        title = '🔥 STRIKEOUT (K)';
+        detail = 'Batter out; baserunners hold.';
+      } else if (margin >= 0) {
+        state.lastBand = 'out';
+        outs = 1;
+        title = '🧤 ROUTINE OUT';
+        detail = 'Fly/Pop out; baserunners hold.';
+      } else if (margin >= -3 && !(usedEagleEye && margin === -3)) {
+        state.lastBand = 'sac';
+        outs = 1;
+        title = '⚾ FIELDED / SAC OUT';
+        if (state.outs + outs < 3) {
+          if (state.bases[2]) {
+            runs += 1;
+            state.bases[2] = null;
+            detail = 'Batter out; Runner on 3rd scores!';
+          } else {
+            detail = 'Batter out at 1st.';
+          }
+          if (state.bases[1]) {
+            state.bases[2] = state.bases[1];
+            state.bases[1] = null;
+          }
+        } else {
+          detail = '3rd Out of the half-inning!';
+        }
+      } else if (margin >= -5 || (usedEagleEye && margin === -3)) {
+        if (usedBlackPaint && margin === -4) {
+          state.lastBand = 'sac';
+          outs = 1;
+          title = '🎨 BLACK PAINT OUT';
+          detail = 'Margin -4 converted from Walk into Fielded Out!';
+        } else {
+          state.lastBand = 'bb';
+          title = '👁️ WALK (BB)';
+          detail = 'Batter takes 1st base; forced runners advance.';
+          if (state.bases[0] && state.bases[1] && state.bases[2]) {
+            runs += 1;
+          }
+          if (state.bases[0] && state.bases[1]) state.bases[2] = state.bases[1];
+          if (state.bases[0]) state.bases[1] = state.bases[0];
+          state.bases[0] = b.name;
+        }
+      } else if (margin >= -8 && !usedUpgrade1B) {
+        state.lastBand = '1b';
+        title = '💥 CLEAN SINGLE';
+        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+        let r2Scores = false;
+        if (state.bases[1]) {
+          const d6 = rollDie('d6');
+          r2Scores = (d6 >= 4) || usedExtraBase;
+          if (r2Scores) { runs += 1; state.bases[1] = null; }
+          else { state.bases[2] = state.bases[1]; state.bases[1] = null; }
+        }
+        if (state.bases[0]) {
+          if (usedExtraBase && !state.bases[2]) state.bases[2] = state.bases[0];
+          else state.bases[1] = state.bases[0];
+        }
+        state.bases[0] = b.name;
+        detail = `Runners advance +1${r2Scores ? ' (Runner on 2nd scored!)' : ''}.`;
       } else {
-        const p = pitchData[selectedPitch];
-        btn.disabled = false;
-        label.textContent = `LOCK IN ${p.name.toUpperCase()} DELIVERY`;
-        pill.textContent = `${p.name.toUpperCase()} • FOOLED TARGET: ${p.fooledTgt} / READ TARGET: ${p.readTgt}`;
+        state.lastBand = 'xbh';
+        const d6 = rollDie('d6');
+        const isHR = (d6 === 6) || (usedMoonshot && d6 >= 4);
+        if (d6 === 5 && !isHR) {
+          title = '🚀 TRIPLE (3B)!';
+          runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+          state.bases = [null, null, b.name];
+          detail = `Rolled d6=${d6}: Bases cleared! Batter to 3rd base.`;
+        } else if (isHR) {
+          title = '💣 HOME RUN!';
+          runs += 1 + (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+          state.bases = [null, null, null];
+          detail = `Rolled d6=${d6}: Out of the park! ${runs} run(s) score!`;
+        } else {
+          title = '⚡ DOUBLE (2B)!';
+          if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+          if (state.bases[1]) { runs += 1; state.bases[1] = null; }
+          if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
+          state.bases[1] = b.name;
+          detail = `Rolled d6=${d6}: Runners on 2nd/3rd score; 1st to 3rd; batter to 2nd.`;
+        }
+      }
+
+      return { outsAdded: outs, runsAdded: runs, title, detail };
+    }
+
+    function advanceLineupAndInning(outsAdded, runsAdded) {
+      const offKey = getOffenseTeamKey();
+      const defKey = getDefenseTeamKey();
+      const offTeam = state.teams[offKey];
+      const defTeam = state.teams[defKey];
+
+      state.score[offKey] += runsAdded;
+      state.outs += outsAdded;
+
+      // Advance to next batter (#1 to #9 left-to-right)
+      offTeam.batterIdx = (offTeam.batterIdx + 1) % 9;
+
+      // Check Pitcher Endurance (Times Through the Order when #1 Leadoff steps up)
+      if (offTeam.batterIdx === 0) {
+        offTeam.lineupLoops += 1;
+        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
+        if (activeP.isStarter) {
+          activeP.mom = stepDownDie(activeP.mom);
+        }
+      }
+
+      // Check 3 Outs -> Flip Half-Inning
+      if (state.outs >= 3) {
+        state.outs = 0;
+        state.bases = [null, null, null];
+        // Reliever endurance: step down after inning pitched
+        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
+        if (!activeP.isStarter) {
+          activeP.mom = stepDownDie(activeP.mom);
+        }
+        if (state.half === 'top') {
+          state.half = 'bot';
+        } else {
+          state.half = 'top';
+          state.inning += 1;
+        }
       }
     }
 
-    function commitAction() {
-      playTactileSound('lock');
-      const area = document.getElementById('action-btn-area');
-      area.innerHTML = `
-        <div class="locked-badge-active">
-          <span>✅</span>
-          <span>LOCKED IN ✓ WAITING…</span>
+    function renderPlayerCard(prefix, player, isPitcher, teamClass, holdsMomentum, abilityArmed) {
+      const cardEl = document.getElementById(`${prefix === 'p' ? 'pitcher' : 'batter'}-card`);
+      cardEl.className = `player-card ${teamClass}${holdsMomentum ? ' has-momentum' : ''}`;
+
+      document.getElementById(`${prefix}-role`).textContent = isPitcher ? player.role : `#${player.order} ${player.pos}`;
+      document.getElementById(`${prefix}-name`).textContent = player.name;
+      document.getElementById(`${prefix}-mom-token`).style.display = holdsMomentum ? 'inline-flex' : 'none';
+
+      const momDieEl = document.getElementById(`${prefix}-mom-die`);
+      momDieEl.textContent = `MOM: ${player.mom}`;
+      momDieEl.className = `mom-die-pill${player.mom === 'None' ? ' exhausted' : ''}`;
+
+      // 5 Core Attributes
+      const attrsEl = document.getElementById(`${prefix}-core-attrs`);
+      if (isPitcher) {
+        attrsEl.innerHTML = `
+          <span>VEL<strong>${player.vel}</strong></span>
+          <span>CMD<strong>${player.cmd}</strong></span>
+          <span>MOV<strong>${player.mov}</strong></span>
+          <span>DEC<strong>${player.dec}</strong></span>
+          <span>GRT<strong>${player.grt}</strong></span>
+        `;
+      } else {
+        attrsEl.innerHTML = `
+          <span>POW<strong>${player.pow}</strong></span>
+          <span>CON<strong>${player.con}</strong></span>
+          <span>EYE<strong>${player.eye}</strong></span>
+          <span>FOC<strong>${player.foc}</strong></span>
+          <span>SPD<strong>${player.spd}</strong></span>
+        `;
+      }
+
+      // 3 Color Stances
+      const stancesEl = document.getElementById(`${prefix}-stances-grid`);
+      const colors = ['red', 'blue', 'green'];
+      const icons = { red: '🔴', blue: '🔵', green: '🟢' };
+      stancesEl.innerHTML = colors.map(c => {
+        const info = isPitcher ? getPitcherStanceDice(player, c) : getBatterStanceDice(player, c);
+        const r = calcRating(info.d1, info.d2);
+        return `
+          <div class="stance-cell ${c}">
+            <div class="sc-top">
+              <span>${icons[c]} ${info.label}</span>
+              <span class="sc-rating">${r}</span>
+            </div>
+            <div class="sc-dice">${info.a1} ${info.d1} + ${info.a2} ${info.d2}</div>
+            <div class="sc-stars">${getStars(r)}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Special Ability Row
+      document.getElementById(`${prefix}-ability-text`).innerHTML =
+        `<strong>${player.abilityName}:</strong> ${player.abilityDesc} <em>(Degrades Mom. Die after use)</em>`;
+      const btn = document.getElementById(`${prefix}-ability-btn`);
+      btn.disabled = (player.mom === 'None');
+      btn.className = `btn-ability${abilityArmed ? ' active' : ''}`;
+      btn.textContent = player.mom === 'None'
+        ? '🚫 Exhausted'
+        : (abilityArmed ? '⚡ Armed (Degrades After)' : '⚡ Use Ability');
+    }
+
+    function renderAll() {
+      const offKey = getOffenseTeamKey();
+      const defKey = getDefenseTeamKey();
+      const offTeam = state.teams[offKey];
+      const defTeam = state.teams[defKey];
+      const p = getActivePitcher();
+      const b = getActiveBatter();
+
+      // Scoreboard
+      document.getElementById('score-away').textContent = `TIT ${state.score.titans}`;
+      document.getElementById('score-home').textContent = `SER ${state.score.serpents}`;
+      document.getElementById('inn-display').textContent = `${state.half === 'top' ? '▲' : '▼'} INN ${state.inning}`;
+      document.getElementById('out-1').className = `out-dot${state.outs >= 1 ? ' on' : ''}`;
+      document.getElementById('out-2').className = `out-dot${state.outs >= 2 ? ' on' : ''}`;
+
+      // Lineup Strip (#1 to #9 Left to Right)
+      const stripEl = document.getElementById('lineup-strip');
+      stripEl.innerHTML = offTeam.batters.map((bat, idx) => `
+        <div class="lineup-chip${idx === offTeam.batterIdx ? ' active' : ''}">
+          #${bat.order} ${bat.name.split(' ').pop()} (${bat.mom})
         </div>
-      `;
+      `).join('');
 
-      const oppPill = document.getElementById('opp-status-pill');
-      oppPill.className = 'opp-status-pill ready';
-      oppPill.textContent = 'READY ✓';
+      // Pitcher & Batter Cards
+      renderPlayerCard('p', p, true, defTeam.cardClass, state.momentumHolder === 'pitcher', state.abilityArmed.pitcher);
+      renderPlayerCard('b', b, false, offTeam.cardClass, state.momentumHolder === 'batter', state.abilityArmed.batter);
 
-      if (activeBeat === 'beat1') {
-        // Opponent anticipation simulation:
-        // 70% of the time, the batter anticipates a different pitch -> BATTER FOOLED!
-        // 30% of the time, the batter sits on this pitch -> BATTER READ PITCH!
-        const rand = Math.random();
-        isBatterFooled = rand < 0.7;
+      // Diamond Bases
+      document.getElementById('base-1').className = `base-sq base-1b${state.bases[0] ? ' occupied' : ''}`;
+      document.getElementById('base-2').className = `base-sq base-2b${state.bases[1] ? ' occupied' : ''}`;
+      document.getElementById('base-3').className = `base-sq base-3b${state.bases[2] ? ' occupied' : ''}`;
+      const occCount = state.bases.filter(Boolean).length;
+      document.getElementById('runners-label').innerHTML = occCount === 0
+        ? 'BASES<br>EMPTY'
+        : `${occCount} ON<br>BASE`;
 
-        setTimeout(() => {
-          transitionToBeat2();
-        }, 650);
-      } else if (activeBeat === 'beat2') {
-        playTactileSound('fanfare');
-        const pill = document.getElementById('status-pill');
-        const isStrike = selectedHandCard >= effectiveTarget;
-        if (isStrike) {
-          pill.textContent = `STRIKE THREE! OUT PRODUCED 💥`;
-        } else {
-          pill.textContent = `BALL IN DIRT! COUNT ADVANCES 🔴`;
-        }
-      }
-    }
+      // Bottom Hand Buttons (Reflects User's Active Player)
+      const userIsBatting = (offKey === state.userTeam);
+      const userPlayer = userIsBatting ? b : p;
+      document.getElementById('user-role-pill').textContent =
+        userIsBatting ? `YOU ARE BATTING (${offTeam.short})` : `YOU ARE PITCHING (${defTeam.short})`;
 
-    function transitionToBeat2() {
-      activeBeat = 'beat2';
-      playTactileSound('fanfare');
-
-      document.getElementById('view-beat1').style.display = 'none';
-      document.getElementById('view-beat2').style.display = 'flex';
-
-      const p = pitchData[selectedPitch];
-
-      // Update Center Pitch Plaque
-      document.getElementById('b2-pitch-icon').textContent = p.icon;
-      document.getElementById('b2-pitch-title').textContent = `${p.name.toUpperCase()} DELIVERY`;
-
-      // Update Fooled or Not Result & Final Target
-      const banner = document.getElementById('b2-fooled-banner');
-      const icon = document.getElementById('fooled-icon');
-      const text = document.getElementById('fooled-text');
-      const sub = document.getElementById('fooled-subtext');
-      const formula = document.getElementById('ft-formula');
-      const targetCircle = document.getElementById('ft-target-val');
-
-      if (isBatterFooled) {
-        effectiveTarget = p.fooledTgt;
-        banner.className = 'b2-fooled-banner fooled-yes';
-        icon.textContent = '🎯';
-        text.textContent = 'BATTER FOOLED!';
-        
-        // Find other pitch the batter sat on
-        const otherPitches = ['fastball', 'breaking', 'offspeed'].filter(x => x !== selectedPitch);
-        const guessedPitch = pitchData[otherPitches[Math.floor(Math.random() * otherPitches.length)]].name;
-        sub.textContent = `Batter sat on ${guessedPitch} • Tunneling -${p.tunnel} active`;
-        formula.textContent = `Base ${p.base} - Tunnel ${p.tunnel} = Target ${effectiveTarget}`;
-        targetCircle.style.background = 'var(--gold)';
-        targetCircle.textContent = effectiveTarget;
-      } else {
-        effectiveTarget = p.readTgt;
-        banner.className = 'b2-fooled-banner fooled-no';
-        icon.textContent = '⚠️';
-        text.textContent = 'BATTER READ THE PITCH!';
-        sub.textContent = `Batter anticipated ${p.name} • Batter Advantage +${p.readMod} active`;
-        formula.textContent = `Base ${p.base} + Read ${p.readMod} = Target ${effectiveTarget}`;
-        targetCircle.style.background = '#ef4444';
-        targetCircle.style.color = '#ffffff';
-        targetCircle.textContent = effectiveTarget;
-      }
-
-      // Unlock hand cards
-      const handHeading = document.getElementById('hand-heading');
-      handHeading.textContent = 'TAP 1 CARD TO THROW PITCH';
-      document.querySelectorAll('.number-card').forEach(c => {
-        c.classList.remove('view-only');
-        c.classList.add('active');
+      ['red', 'blue', 'green'].forEach(c => {
+        const info = userIsBatting ? getBatterStanceDice(userPlayer, c) : getPitcherStanceDice(userPlayer, c);
+        const r = calcRating(info.d1, info.d2);
+        const icon = c === 'red' ? '🔴 RED' : (c === 'blue' ? '🔵 BLUE' : '🟢 GREEN');
+        document.getElementById(`btn-${c}-title`).textContent = `${icon} (${info.label})`;
+        document.getElementById(`btn-${c}-dice`).textContent = `${info.a1} ${info.d1} + ${info.a2} ${info.d2}`;
+        document.getElementById(`btn-${c}-rating`).textContent = `Rating ${r} ${getStars(r)}`;
       });
 
-      // Update Action Area
-      const area = document.getElementById('action-btn-area');
-      area.innerHTML = `
-        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
-          <span>🔒</span>
-          <span id="action-btn-label">CHOOSE EXECUTION CARD</span>
-        </button>
-      `;
+      // Highlight last outcome row in modal table
+      document.querySelectorAll('#outcome-ref-table tbody tr').forEach(tr => {
+        tr.classList.toggle('highlight-row', tr.dataset.band === state.lastBand);
+      });
 
-      updateBeat2ActionState();
-    }
-
-    function tapHandCard(val, elId) {
-      if (activeBeat !== 'beat2') return;
-
-      if (selectedHandCard === val) {
-        removePlacedCard();
-        return;
-      }
-
-      playTactileSound('thump');
-      selectedHandCard = val;
-
-      document.querySelectorAll('.number-card').forEach(c => c.classList.remove('selected'));
-      document.getElementById(elId).classList.add('selected');
-
-      const slot = document.getElementById('drop-slot');
-      slot.classList.add('filled');
-      slot.innerHTML = `
-        <div class="placed-card-view">
-          <span style="font-size:0.56rem; font-weight:900; align-self:flex-start; color:#64748b;">${val}</span>
-          <span class="pcv-num">${val}</span>
-          <span class="pcv-remove">✕ Remove</span>
+      // Bullpen modal list
+      document.getElementById('user-team-label').textContent = state.teams[state.userTeam].name;
+      const bpList = document.getElementById('bullpen-list');
+      bpList.innerHTML = defTeam.pitchers.map((arm, idx) => `
+        <div class="bp-item">
+          <div>
+            <strong>${arm.role}: ${arm.name}</strong> (MOM: ${arm.mom})<br>
+            <span style="color:#94a3b8; font-size:0.62rem;">🔴 ${calcRating(arm.vel, arm.grt)} • 🔵 ${calcRating(arm.cmd, arm.grt)} • 🟢 ${calcRating(arm.mov, arm.dec)} | ${arm.abilityName}</span>
+          </div>
+          <button class="bp-btn" ${idx === defTeam.activePitcherIdx ? 'disabled' : ''} onclick="subPitcher(${idx})">
+            ${idx === defTeam.activePitcherIdx ? 'On Mound' : 'Call In'}
+          </button>
         </div>
-      `;
-
-      updateBeat2ActionState();
+      `).join('');
     }
 
-    function removePlacedCard() {
-      playTactileSound('click');
-      selectedHandCard = null;
-      document.querySelectorAll('.number-card').forEach(c => c.classList.remove('selected'));
-      
-      const slot = document.getElementById('drop-slot');
-      slot.classList.remove('filled');
-      slot.innerHTML = `<div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>`;
-
-      updateBeat2ActionState();
+    function subPitcher(idx) {
+      const defTeam = state.teams[getDefenseTeamKey()];
+      defTeam.activePitcherIdx = idx;
+      state.abilityArmed.pitcher = false;
+      closeModal('modal-bullpen');
+      renderAll();
     }
 
-    function updateBeat2ActionState() {
-      const btn = document.getElementById('action-btn');
-      const label = document.getElementById('action-btn-label');
-      const pill = document.getElementById('status-pill');
-      const mathDesc = document.getElementById('clash-math-desc');
-      const mathVal = document.getElementById('clash-math-val');
-
-      if (selectedHandCard === null) {
-        btn.disabled = true;
-        label.textContent = 'CHOOSE EXECUTION CARD';
-        pill.textContent = `TARGET: ${effectiveTarget} • PICK 1 CARD TO THROW`;
-        mathDesc.textContent = 'Select 1 card from hand to execute pitch.';
-        mathVal.textContent = `CARD [?] vs TGT [${effectiveTarget}]`;
-      } else {
-        btn.disabled = false;
-        label.textContent = 'LOCK IN PITCH EXECUTION';
-        
-        const isStrike = selectedHandCard >= effectiveTarget;
-        if (isStrike) {
-          pill.textContent = `CARD [${selectedHandCard}] ≥ TARGET [${effectiveTarget}] • STRIKE IN ZONE 🟢`;
-          mathDesc.textContent = 'Execution succeeds: Strike in the zone!';
-          mathVal.textContent = `[${selectedHandCard}] ≥ [${effectiveTarget}] STRIKE`;
-        } else {
-          pill.textContent = `CARD [${selectedHandCard}] < TARGET [${effectiveTarget}] • BALL IN DIRT 🔴`;
-          mathDesc.textContent = 'Missed target: Ball outside zone.';
-          mathVal.textContent = `[${selectedHandCard}] < [${effectiveTarget}] BALL`;
-        }
-      }
+    function swapUserTeam() {
+      state.userTeam = state.userTeam === 'titans' ? 'serpents' : 'titans';
+      renderAll();
     }
 
-    function resetPrototype() {
-      playTactileSound('click');
-      activeBeat = 'beat1';
-      selectedPitch = null;
-      selectedHandCard = null;
-
-      document.getElementById('view-beat1').style.display = 'flex';
-      document.getElementById('view-beat2').style.display = 'none';
-
-      ['fastball', 'breaking', 'offspeed'].forEach(p => {
-        document.getElementById(`lane-${p}`).classList.remove('active');
-        document.getElementById(`badge-${p}`).textContent = 'CALL';
-      });
-
-      const oppPill = document.getElementById('opp-status-pill');
-      oppPill.className = 'opp-status-pill';
-      oppPill.textContent = 'CHOOSING…';
-
-      const handHeading = document.getElementById('hand-heading');
-      handHeading.textContent = 'CARDS RESERVED FOR BEAT 2';
-
-      document.querySelectorAll('.number-card').forEach(c => {
-        c.classList.add('view-only');
-        c.classList.remove('active', 'selected');
-      });
-
-      const slot = document.getElementById('drop-slot');
-      if (slot) {
-        slot.classList.remove('filled');
-        slot.innerHTML = `<div class="drop-slot-hint" id="drop-slot-hint">+ Tap Card<br>From Hand</div>`;
-      }
-
-      const area = document.getElementById('action-btn-area');
-      area.innerHTML = `
-        <button class="btn-action-lock" id="action-btn" onclick="commitAction()" disabled>
-          <span>🔒</span>
-          <span id="action-btn-label">CHOOSE PITCH</span>
-        </button>
-      `;
-
-      updateBeat1ActionState();
+    function resetFullGame() {
+      closeModal('modal-bullpen');
+      initGame(state.userTeam);
     }
 
-    function toggleModal(open) {
-      playTactileSound('click');
-      const modal = document.getElementById('modal-scout');
-      if (open) modal.classList.remove('hidden');
-      else modal.classList.add('hidden');
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
     }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    function closeModalOnBg(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    initGame('titans');
   </script>
 </body>
 </html>
