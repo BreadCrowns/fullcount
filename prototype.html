@@ -1010,9 +1010,28 @@
       border: 2px solid #334155;
       border-radius: 6px;
       padding: 3px 7px;
-      min-width: 48px;
+      min-width: 52px;
       text-align: center;
       box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .die-cube.unrolled {
+      background: #1e293b;
+      color: #fde047;
+      border: 2px dashed #f59e0b;
+      cursor: pointer;
+    }
+    .die-cube.unrolled .dc-meta { color: #cbd5e1; }
+    .die-cube.unrolled .dc-val { color: #fde047; }
+    .die-cube.rolling {
+      animation: dieShake 0.14s infinite alternate ease-in-out;
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+    @keyframes dieShake {
+      0%   { transform: translate(-2px, -2px) rotate(-6deg) scale(1.05); }
+      50%  { transform: translate(2px, 2px) rotate(6deg) scale(1.08); }
+      100% { transform: translate(-1px, 2px) rotate(-4deg) scale(1.04); }
     }
     .die-cube.mom-cube {
       background: #fef3c7;
@@ -1021,6 +1040,29 @@
     .die-cube.pow-cube {
       background: #ffe4e6;
       border-color: #e11d48;
+    }
+    .btn-roll-dice {
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+      color: #ffffff;
+      border: 2px solid #86efac;
+      border-radius: 8px;
+      padding: 11px;
+      font-family: var(--font-impact);
+      font-size: 1.05rem;
+      letter-spacing: 0.7px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+    .btn-roll-dice:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+    .btn-roll-dice:disabled {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
     }
     .dc-meta {
       display: block;
@@ -1374,10 +1416,10 @@
         <div class="duel-winner-banner" id="duel-winner-banner"></div>
       </div>
 
-      <!-- STEP 2: ATTRIBUTE DICE + MOMENTUM DIE ROLL -->
+      <!-- STEP 2: INTERACTIVE VIRTUAL DICE TRAY -->
       <div class="step-box">
         <div class="step-header">
-          <span>2. TABLETOP DICE ROLL (2 STANCE DICE + HOLDER'S ⚡ MOMENTUM DIE)</span>
+          <span>2. VIRTUAL DICE TRAY (2 STANCE DICE + HOLDER'S ⚡ MOMENTUM DIE)</span>
           <span id="duel-holder-tag" style="color:#fde047;"></span>
         </div>
 
@@ -1388,7 +1430,7 @@
           </div>
           <div class="ds-total-box">
             <div class="dst-label">PITCHER</div>
-            <div class="dst-num" id="duel-p-total">0</div>
+            <div class="dst-num" id="duel-p-total">?</div>
           </div>
         </div>
 
@@ -1399,24 +1441,39 @@
           </div>
           <div class="ds-total-box">
             <div class="dst-label">BATTER</div>
-            <div class="dst-num" id="duel-b-total">0</div>
+            <div class="dst-num" id="duel-b-total">?</div>
           </div>
         </div>
 
-        <div class="margin-calc-bar">
+        <!-- Roll Dice Pool Button (Shown before rolling!) -->
+        <button class="btn-roll-dice" id="btn-roll-main-pool" onclick="rollMainDicePool()">
+          🎲 SHAKE &amp; ROLL DICE POOL!
+        </button>
+
+        <!-- Calculated Margin Bar (Hidden until dice pool is rolled!) -->
+        <div class="margin-calc-bar" id="duel-margin-bar" style="display:none;">
           <span id="duel-margin-formula">Pitcher (0) − Batter (0)</span>
           <span class="mc-badge" id="duel-margin-badge">MARGIN: 0</span>
         </div>
       </div>
 
-      <!-- STEP 3: AT-BAT OUTCOME, EXTRA-BASE POW DIE & 3RD-BASE COACH -->
-      <div class="step-box">
+      <!-- STEP 3: AT-BAT OUTCOME, EXTRA-BASE POW DIE & 3RD-BASE COACH (Hidden until main dice are rolled!) -->
+      <div class="step-box" id="duel-step3-box" style="display:none;">
         <div class="step-header">
           <span>3. PLAYMAT OUTCOME &amp; CUBE TRACK UPDATE</span>
           <span id="duel-score-status">TIT 0 - SER 0</span>
         </div>
 
-        <div class="outcome-hero" id="duel-outcome-hero">
+        <!-- Pending Extra-Base POW Die Roll Box (When Margin <= -7) -->
+        <div id="xbh-pending-roll-box" style="display:none; background:rgba(225,29,72,0.16); border:1.5px solid #f43f5e; border-radius:8px; padding:10px; text-align:center;">
+          <div id="xbh-pending-prompt" style="font-size:0.78rem; font-weight:900; color:#fecdd3; margin-bottom:8px;"></div>
+          <div id="xbh-pending-die-mount" style="display:flex; justify-content:center; margin-bottom:8px;"></div>
+          <button class="btn-roll-dice" id="btn-roll-xbh-pow" style="background:linear-gradient(135deg,#e11d48 0%,#be123c 100%); border-color:#fda4af;" onclick="rollExtraBasePowDie()">
+            🎲 ROLL BATTER'S POW DIE FOR EXTRA-BASE HIT!
+          </button>
+        </div>
+
+        <div class="outcome-hero" id="duel-outcome-hero" style="display:none;">
           <div class="oh-title" id="duel-outcome-title"></div>
           <div class="oh-desc" id="duel-outcome-desc"></div>
           <div id="duel-xbh-pow-box" style="display:none; margin-top:6px;"></div>
@@ -1426,15 +1483,16 @@
         <!-- Interactive 3rd-Base Coach Decision on Clean Single with Runner on 2nd -->
         <div id="send-runner-box" style="display:none; background:rgba(245,158,11,0.16); border:1.5px solid #f59e0b; border-radius:8px; padding:8px 10px; text-align:center;">
           <div id="send-runner-prompt" style="font-size:0.74rem; font-weight:900; color:#fef08a; margin-bottom:6px;"></div>
+          <div id="send-runner-die-mount" style="display:flex; justify-content:center; margin-bottom:6px;"></div>
           <div id="send-runner-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <button class="tt-btn" style="padding:7px;" onclick="holdRunnerAt3rd()">🛑 HOLD AT 3RD (Safe)</button>
-            <button class="tt-btn gold" id="btn-send-home" style="padding:7px;" onclick="sendRunnerHome()">🏃 SEND HOME! (Roll SPD Die)</button>
+            <button class="tt-btn gold" id="btn-send-home" style="padding:7px;" onclick="sendRunnerHome()">🏃 ROLL SPD DIE TO SEND HOME!</button>
           </div>
           <div id="send-runner-result" style="display:none; font-size:0.75rem; font-weight:900; margin-top:5px;"></div>
         </div>
       </div>
 
-      <button class="btn-next-ab" onclick="closeDuelOverlay()">
+      <button class="btn-next-ab" id="btn-continue-ab" style="display:none;" onclick="closeDuelOverlay()">
         CONTINUE TO NEXT AT-BAT ▶
       </button>
     </div>
@@ -1798,18 +1856,21 @@
       return 'red';
     }
 
-    function makeCubeHTML(meta, val, extraClass = '') {
+    function makeCubeHTML(meta, val, extraClass = '', idAttr = '', onClickAttr = '') {
       return `
-        <div class="die-cube ${extraClass}">
+        <div class="die-cube ${extraClass}" ${idAttr ? `id="${idAttr}"` : ''} ${onClickAttr ? `onclick="${onClickAttr}"` : ''}>
           <span class="dc-meta">${meta}</span>
           <span class="dc-val">${val}</span>
         </div>
       `;
     }
 
+    // Stores the current At-Bat's unrolled/rolled dice pool state
+    let currentDuelContext = null;
+
+    // STAGE 1: Reveal Cards, Determine Momentum Holder, and Assemble the Unrolled Dice Pool!
     function playStance(userColor) {
       const offKey = getOffenseTeamKey();
-      const defKey = getDefenseTeamKey();
       const userIsBatting = (offKey === state.userTeam);
       const p = getActivePitcher();
       const b = getActiveBatter();
@@ -1831,66 +1892,35 @@
       if (state.abilityArmed.pitcher && p.abilityType === 'steal_mom') readWinner = 'pitcher';
       state.momentumHolder = readWinner;
 
-      // 2. Roll 2 Chosen Stance Dice + Holder's Momentum Die
       const pStance = getPitcherStanceDice(p, pColor);
       const bStance = getBatterStanceDice(b, bColor);
-
-      let pRoll1 = rollDie(pStance.d1);
-      let pRoll2 = rollDie(pStance.d2);
-      if (state.abilityArmed.pitcher && p.abilityType === 'reroll_pitch') {
-        if (DIE_MAX[pStance.d1] >= DIE_MAX[pStance.d2]) pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
-        else pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
-      }
-
-      let bRoll1 = rollDie(bStance.d1);
-      let bRoll2 = rollDie(bStance.d2);
-      if (state.abilityArmed.batter && b.abilityType === 'reroll_bat') {
-        if (DIE_MAX[bStance.d1] >= DIE_MAX[bStance.d2]) bRoll1 = Math.max(bRoll1, rollDie(bStance.d1));
-        else bRoll2 = Math.max(bStance.d2 ? bRoll2 : 0, rollDie(bStance.d2));
-      }
-
       const pMomDieUsed = (state.momentumHolder === 'pitcher' && p.mom !== 'None') ? p.mom : null;
       const bMomDieUsed = (state.momentumHolder === 'batter' && b.mom !== 'None') ? b.mom : null;
-      const pMomRoll = pMomDieUsed ? rollDie(pMomDieUsed) : 0;
-      const bMomRoll = bMomDieUsed ? rollDie(bMomDieUsed) : 0;
+      const hasUnderdogDie = state.abilityArmed.batter && b.abilityType === 'underdog_d6';
 
-      let pBonus = 0;
-      let bBonus = 0;
+      let pFlatBonus = 0;
+      let bFlatBonus = 0;
       if (state.abilityArmed.pitcher) {
-        if (['pitch_plus2', 'steal_mom', 'black_paint', 'iron_sink', 'vet_poise'].includes(p.abilityType)) pBonus += 2;
-        if (p.abilityType === 'pitch_plus3') pBonus += 3;
-        if (p.abilityType === 'reroll_pitch') pBonus += 1;
+        if (['pitch_plus2', 'steal_mom', 'black_paint', 'iron_sink', 'vet_poise'].includes(p.abilityType)) pFlatBonus += 2;
+        if (p.abilityType === 'pitch_plus3') pFlatBonus += 3;
+        if (p.abilityType === 'reroll_pitch') pFlatBonus += 1;
       }
       if (state.abilityArmed.batter) {
-        if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base', 'pure_barrel', 'gritty_ab'].includes(b.abilityType)) bBonus += 2;
-        if (['clutch_plus3', 'moonshot'].includes(b.abilityType)) bBonus += 3;
-        if (b.abilityType === 'reroll_bat') bBonus += 1;
-        if (b.abilityType === 'underdog_d6') bBonus += rollDie('d6');
+        if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base', 'pure_barrel', 'gritty_ab'].includes(b.abilityType)) bFlatBonus += 2;
+        if (['clutch_plus3', 'moonshot'].includes(b.abilityType)) bFlatBonus += 3;
+        if (b.abilityType === 'reroll_bat') bFlatBonus += 1;
       }
 
-      const pTotal = pRoll1 + pRoll2 + pMomRoll + pBonus;
-      const bTotal = bRoll1 + bRoll2 + bMomRoll + bBonus;
-      const margin = pTotal - bTotal;
+      currentDuelContext = {
+        p, b, pColor, bColor, readWinner,
+        pStance, bStance, pMomDieUsed, bMomDieUsed,
+        hasUnderdogDie, pFlatBonus, bFlatBonus,
+        pArmed: state.abilityArmed.pitcher,
+        bArmed: state.abilityArmed.batter,
+        rolled: false
+      };
 
-      // 3. Resolve Outcome Table (including Option B Batter POW Die on Extra-Base Hits!)
-      const outcomeInfo = resolveOutcomeTable(margin, p, b);
-
-      // 4. Slide Physical Momentum Cube 1 Box Right After Ability Use!
-      let postAbilityNotes = [];
-      if (state.abilityArmed.pitcher) {
-        const oldDie = p.mom;
-        p.mom = stepDownDie(p.mom);
-        postAbilityNotes.push(`${p.name} used ${p.abilityName} (Cube slid right: ${oldDie} ▸ ${p.mom === 'None' ? 'OUT ✕' : p.mom})`);
-        state.abilityArmed.pitcher = false;
-      }
-      if (state.abilityArmed.batter) {
-        const oldDie = b.mom;
-        b.mom = stepDownDie(b.mom);
-        postAbilityNotes.push(`${b.name} used ${b.abilityName} (Cube slid right: ${oldDie} ▸ ${b.mom === 'None' ? 'OUT ✕' : b.mom})`);
-        state.abilityArmed.batter = false;
-      }
-
-      // 5. Populate Duel Overlay
+      // Populate Step 1 (Simultaneous Card Reveal)
       const colorNames = { red: '🔴 RED', blue: '🔵 BLUE', green: '🟢 GREEN' };
       document.getElementById('duel-p-card').className = `played-stance-pill ${pColor} ${readWinner === 'pitcher' ? 'winner' : ''}`;
       document.getElementById('duel-b-card').className = `played-stance-pill ${bColor} ${readWinner === 'batter' ? 'winner' : ''}`;
@@ -1918,42 +1948,253 @@
       document.getElementById('duel-holder-tag').textContent =
         `⚡ Momentum Holder: ${state.momentumHolder === 'pitcher' ? p.name : b.name}`;
 
-      // Build Visual Dice Cubes
+      // Populate Step 2 with UNROLLED Virtual Dice Pool (? faces) waiting for player roll!
       document.getElementById('duel-p-dice-label').innerHTML =
-        `⚾ <strong>${p.name}</strong> ${state.momentumHolder === 'pitcher' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice)</span>' : '<span style="color:#94a3b8;">(2 Dice)</span>'}`;
-      let pCubes =
-        makeCubeHTML(`${pStance.a1} (${pStance.d1})`, pRoll1) +
+        `⚾ <strong>${p.name}</strong> ${state.momentumHolder === 'pitcher' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice Pool)</span>' : '<span style="color:#94a3b8;">(2 Base Dice Pool)</span>'}`;
+      let pPoolHTML =
+        makeCubeHTML(`${pStance.a1} (${pStance.d1})`, `🎲 ${pStance.d1}`, 'unrolled', 'p-die-1', 'rollMainDicePool()') +
         `<span>+</span>` +
-        makeCubeHTML(`${pStance.a2} (${pStance.d2})`, pRoll2);
-      if (pMomDieUsed) pCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, pMomRoll, 'mom-cube');
-      if (pBonus) pCubes += `<span>+</span>` + makeCubeHTML(`ABILITY`, `+${pBonus}`, 'mom-cube');
-      document.getElementById('duel-p-cubes').innerHTML = pCubes;
-      document.getElementById('duel-p-total').textContent = pTotal;
+        makeCubeHTML(`${pStance.a2} (${pStance.d2})`, `🎲 ${pStance.d2}`, 'unrolled', 'p-die-2', 'rollMainDicePool()');
+      if (pMomDieUsed) {
+        pPoolHTML += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, `🎲 ${pMomDieUsed}`, 'unrolled mom-cube', 'p-die-mom', 'rollMainDicePool()');
+      }
+      if (pFlatBonus) {
+        pPoolHTML += `<span>+</span>` + makeCubeHTML(`⚡ ABILITY`, `+${pFlatBonus}`, 'mom-cube');
+      }
+      document.getElementById('duel-p-cubes').innerHTML = pPoolHTML;
+      document.getElementById('duel-p-total').textContent = '?';
 
       document.getElementById('duel-b-dice-label').innerHTML =
-        `🏏 <strong>${b.name}</strong> ${state.momentumHolder === 'batter' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice)</span>' : '<span style="color:#94a3b8;">(2 Dice)</span>'}`;
-      let bCubes =
-        makeCubeHTML(`${bStance.a1} (${bStance.d1})`, bRoll1) +
+        `🏏 <strong>${b.name}</strong> ${state.momentumHolder === 'batter' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice Pool)</span>' : '<span style="color:#94a3b8;">(2 Base Dice Pool)</span>'}`;
+      let bPoolHTML =
+        makeCubeHTML(`${bStance.a1} (${bStance.d1})`, `🎲 ${bStance.d1}`, 'unrolled', 'b-die-1', 'rollMainDicePool()') +
         `<span>+</span>` +
-        makeCubeHTML(`${bStance.a2} (${bStance.d2})`, bRoll2);
-      if (bMomDieUsed) bCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, bMomRoll, 'mom-cube');
-      if (bBonus) bCubes += `<span>+</span>` + makeCubeHTML(`ABILITY`, `+${bBonus}`, 'mom-cube');
-      document.getElementById('duel-b-cubes').innerHTML = bCubes;
-      document.getElementById('duel-b-total').textContent = bTotal;
+        makeCubeHTML(`${bStance.a2} (${bStance.d2})`, `🎲 ${bStance.d2}`, 'unrolled', 'b-die-2', 'rollMainDicePool()');
+      if (bMomDieUsed) {
+        bPoolHTML += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, `🎲 ${bMomDieUsed}`, 'unrolled mom-cube', 'b-die-mom', 'rollMainDicePool()');
+      }
+      if (hasUnderdogDie) {
+        bPoolHTML += `<span>+</span>` + makeCubeHTML(`⚡ SPARK (d6)`, `🎲 d6`, 'unrolled mom-cube', 'b-die-underdog', 'rollMainDicePool()');
+      }
+      if (bFlatBonus) {
+        bPoolHTML += `<span>+</span>` + makeCubeHTML(`⚡ ABILITY`, `+${bFlatBonus}`, 'mom-cube');
+      }
+      document.getElementById('duel-b-cubes').innerHTML = bPoolHTML;
+      document.getElementById('duel-b-total').textContent = '?';
 
-      const marginStr = margin >= 0 ? `+${margin}` : `${margin}`;
-      document.getElementById('duel-margin-formula').textContent = `Pitcher (${pTotal}) − Batter (${bTotal})`;
-      document.getElementById('duel-margin-badge').textContent = `MARGIN: ${marginStr}`;
+      // Show Roll Button, Hide Margin & Step 3 Outcome until the player rolls the dice pool!
+      const rollBtn = document.getElementById('btn-roll-main-pool');
+      rollBtn.style.display = 'block';
+      rollBtn.disabled = false;
+      rollBtn.textContent = '🎲 SHAKE & ROLL DICE POOL!';
 
-      // Advance Lineup & Inning
+      document.getElementById('duel-margin-bar').style.display = 'none';
+      document.getElementById('duel-step3-box').style.display = 'none';
+      document.getElementById('btn-continue-ab').style.display = 'none';
+
+      renderAll();
+      openDuelOverlay();
+    }
+
+    // STAGE 2: Physically Shake & Roll the Virtual Dice Pool, Then Calculate Margin!
+    function rollMainDicePool() {
+      const ctx = currentDuelContext;
+      if (!ctx || ctx.rolled) return;
+      ctx.rolled = true;
+
+      const rollBtn = document.getElementById('btn-roll-main-pool');
+      rollBtn.disabled = true;
+      rollBtn.textContent = '🎲 ROLLING DICE...';
+
+      // Start shaking all unrolled dice in the tray
+      const dieIds = ['p-die-1', 'p-die-2', 'p-die-mom', 'b-die-1', 'b-die-2', 'b-die-mom', 'b-die-underdog'];
+      const dieFaces = {
+        'p-die-1': ctx.pStance.d1,
+        'p-die-2': ctx.pStance.d2,
+        'p-die-mom': ctx.pMomDieUsed,
+        'b-die-1': ctx.bStance.d1,
+        'b-die-2': ctx.bStance.d2,
+        'b-die-mom': ctx.bMomDieUsed,
+        'b-die-underdog': ctx.hasUnderdogDie ? 'd6' : null
+      };
+
+      dieIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.remove('unrolled');
+          el.classList.add('rolling');
+        }
+      });
+
+      const cycleTimer = setInterval(() => {
+        dieIds.forEach(id => {
+          const el = document.getElementById(id);
+          const dieStr = dieFaces[id];
+          if (el && dieStr) {
+            el.querySelector('.dc-val').textContent = rollDie(dieStr);
+          }
+        });
+      }, 65);
+
+      setTimeout(() => {
+        clearInterval(cycleTimer);
+        rollBtn.style.display = 'none';
+
+        const { p, b, pStance, bStance, pMomDieUsed, bMomDieUsed, hasUnderdogDie, pFlatBonus, bFlatBonus } = ctx;
+
+        let pRoll1 = rollDie(pStance.d1);
+        let pRoll2 = rollDie(pStance.d2);
+        let pRerollNote = '';
+        if (ctx.pArmed && p.abilityType === 'reroll_pitch') {
+          if (DIE_MAX[pStance.d1] >= DIE_MAX[pStance.d2]) {
+            const r2 = rollDie(pStance.d1);
+            pRerollNote = ` (Rerolled ${pRoll1}➔${Math.max(pRoll1, r2)})`;
+            pRoll1 = Math.max(pRoll1, r2);
+          } else {
+            const r2 = rollDie(pStance.d2);
+            pRerollNote = ` (Rerolled ${pRoll2}➔${Math.max(pRoll2, r2)})`;
+            pRoll2 = Math.max(pRoll2, r2);
+          }
+        }
+
+        let bRoll1 = rollDie(bStance.d1);
+        let bRoll2 = rollDie(bStance.d2);
+        let bRerollNote = '';
+        if (ctx.bArmed && b.abilityType === 'reroll_bat') {
+          if (DIE_MAX[bStance.d1] >= DIE_MAX[bStance.d2]) {
+            const r2 = rollDie(bStance.d1);
+            bRerollNote = ` (Rerolled ${bRoll1}➔${Math.max(bRoll1, r2)})`;
+            bRoll1 = Math.max(bRoll1, r2);
+          } else {
+            const r2 = rollDie(bStance.d2);
+            bRerollNote = ` (Rerolled ${bRoll2}➔${Math.max(bRoll2, r2)})`;
+            bRoll2 = Math.max(bRoll2, r2);
+          }
+        }
+
+        const pMomRoll = pMomDieUsed ? rollDie(pMomDieUsed) : 0;
+        const bMomRoll = bMomDieUsed ? rollDie(bMomDieUsed) : 0;
+        const bUnderdogRoll = hasUnderdogDie ? rollDie('d6') : 0;
+
+        const pTotal = pRoll1 + pRoll2 + pMomRoll + pFlatBonus;
+        const bTotal = bRoll1 + bRoll2 + bMomRoll + bUnderdogRoll + bFlatBonus;
+        const margin = pTotal - bTotal;
+
+        // Render final landed dice cubes
+        let pCubes =
+          makeCubeHTML(`${pStance.a1} (${pStance.d1})`, pRoll1) +
+          `<span>+</span>` +
+          makeCubeHTML(`${pStance.a2} (${pStance.d2})`, pRoll2);
+        if (pMomDieUsed) pCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, pMomRoll, 'mom-cube');
+        if (pFlatBonus) pCubes += `<span>+</span>` + makeCubeHTML(`⚡ ABILITY${pRerollNote}`, `+${pFlatBonus}`, 'mom-cube');
+        document.getElementById('duel-p-cubes').innerHTML = pCubes;
+        document.getElementById('duel-p-total').textContent = pTotal;
+
+        let bCubes =
+          makeCubeHTML(`${bStance.a1} (${bStance.d1})`, bRoll1) +
+          `<span>+</span>` +
+          makeCubeHTML(`${bStance.a2} (${bStance.d2})`, bRoll2);
+        if (bMomDieUsed) bCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, bMomRoll, 'mom-cube');
+        if (hasUnderdogDie) bCubes += `<span>+</span>` + makeCubeHTML(`⚡ SPARK (d6)`, `+${bUnderdogRoll}`, 'mom-cube');
+        if (bFlatBonus) bCubes += `<span>+</span>` + makeCubeHTML(`⚡ ABILITY${bRerollNote}`, `+${bFlatBonus}`, 'mom-cube');
+        document.getElementById('duel-b-cubes').innerHTML = bCubes;
+        document.getElementById('duel-b-total').textContent = bTotal;
+
+        const marginStr = margin >= 0 ? `+${margin}` : `${margin}`;
+        document.getElementById('duel-margin-bar').style.display = 'flex';
+        document.getElementById('duel-margin-formula').textContent = `Pitcher (${pTotal}) − Batter (${bTotal})`;
+        document.getElementById('duel-margin-badge').textContent = `MARGIN: ${marginStr}`;
+
+        ctx.margin = margin;
+        ctx.marginStr = marginStr;
+
+        // Now reveal Step 3 (Outcome or Pending Extra-Base POW Die Roll!)
+        document.getElementById('duel-step3-box').style.display = 'flex';
+        const usedVetPoise = ctx.pArmed && p.abilityType === 'vet_poise';
+
+        if (margin <= -7 && !usedVetPoise) {
+          // Wait for player to roll the Batter's POW Die for Extra-Base Hit!
+          document.getElementById('xbh-pending-roll-box').style.display = 'block';
+          document.getElementById('duel-outcome-hero').style.display = 'none';
+          document.getElementById('send-runner-box').style.display = 'none';
+          document.getElementById('btn-continue-ab').style.display = 'none';
+
+          const moonshotNote = (ctx.bArmed && b.abilityType === 'moonshot')
+            ? ' [⚡ MOONSHOT: 5+ = HR!]'
+            : ' (1–5 = 2B | 6 = 3B | 7+ = HR)';
+          document.getElementById('xbh-pending-prompt').innerHTML =
+            `🚀 <strong>EXTRA-BASE HIT! (Margin ${marginStr})</strong><br>Roll <strong>${b.name}'s Power (<code>POW ${b.pow}</code>) Die</strong>${moonshotNote}:`;
+          document.getElementById('xbh-pending-die-mount').innerHTML =
+            makeCubeHTML(`🏏 POW (${b.pow})`, `🎲 ${b.pow}`, 'unrolled pow-cube', 'xbh-pow-die-cube', 'rollExtraBasePowDie()');
+          const powBtn = document.getElementById('btn-roll-xbh-pow');
+          powBtn.disabled = false;
+          powBtn.textContent = `🎲 ROLL ${b.name.toUpperCase()}'S POW DIE (${b.pow})!`;
+        } else {
+          // Resolve non-XBH outcome immediately
+          document.getElementById('xbh-pending-roll-box').style.display = 'none';
+          finalizeAtBatResolution(null);
+        }
+      }, 620);
+    }
+
+    // STAGE 2B: Roll the Batter's POW Die when Margin is -7 or less!
+    function rollExtraBasePowDie() {
+      const ctx = currentDuelContext;
+      if (!ctx || ctx.powRolled) return;
+      ctx.powRolled = true;
+
+      const powBtn = document.getElementById('btn-roll-xbh-pow');
+      powBtn.disabled = true;
+      powBtn.textContent = `🎲 ROLLING ${ctx.b.pow}...`;
+
+      const cubeEl = document.getElementById('xbh-pow-die-cube');
+      if (cubeEl) {
+        cubeEl.classList.remove('unrolled');
+        cubeEl.classList.add('rolling');
+      }
+
+      const timer = setInterval(() => {
+        if (cubeEl) cubeEl.querySelector('.dc-val').textContent = rollDie(ctx.b.pow);
+      }, 65);
+
+      setTimeout(() => {
+        clearInterval(timer);
+        const finalPowRoll = rollDie(ctx.b.pow);
+        document.getElementById('xbh-pending-roll-box').style.display = 'none';
+        finalizeAtBatResolution(finalPowRoll);
+      }, 580);
+    }
+
+    // STAGE 3: Finalize At-Bat Outcome, Update Cube Tracks & Baserunners!
+    function finalizeAtBatResolution(manualPowRoll) {
+      const ctx = currentDuelContext;
+      const { p, b, margin, marginStr } = ctx;
+
+      const outcomeInfo = resolveOutcomeTable(margin, p, b, manualPowRoll);
+
+      // Slide Physical Momentum Cube 1 Box Right After Ability Use!
+      let postAbilityNotes = [];
+      if (state.abilityArmed.pitcher) {
+        const oldDie = p.mom;
+        p.mom = stepDownDie(p.mom);
+        postAbilityNotes.push(`${p.name} used ${p.abilityName} (Cube slid right: ${oldDie} ▸ ${p.mom === 'None' ? 'OUT ✕' : p.mom})`);
+        state.abilityArmed.pitcher = false;
+      }
+      if (state.abilityArmed.batter) {
+        const oldDie = b.mom;
+        b.mom = stepDownDie(b.mom);
+        postAbilityNotes.push(`${b.name} used ${b.abilityName} (Cube slid right: ${oldDie} ▸ ${b.mom === 'None' ? 'OUT ✕' : b.mom})`);
+        state.abilityArmed.batter = false;
+      }
+
       advanceLineupAndInning(outcomeInfo.outsAdded, outcomeInfo.runsAdded, postAbilityNotes);
 
       const heroEl = document.getElementById('duel-outcome-hero');
+      heroEl.style.display = 'block';
       heroEl.className = `outcome-hero ${outcomeInfo.outsAdded > 0 ? 'pitcher-win' : 'batter-win'}`;
       document.getElementById('duel-outcome-title').textContent = `${outcomeInfo.title} (Margin ${marginStr})`;
       document.getElementById('duel-outcome-desc').textContent = outcomeInfo.detail;
 
-      // Show Batter's POW Die cube when Extra-Base Hit (-7 or less) occurs!
       const xbhBox = document.getElementById('duel-xbh-pow-box');
       if (outcomeInfo.powRollInfo) {
         xbhBox.style.display = 'flex';
@@ -1985,11 +2226,16 @@
         sendActions.style.display = 'grid';
         sendResult.style.display = 'none';
         document.getElementById('send-runner-prompt').innerHTML =
-          `👋 <strong>3RD-BASE COACH:</strong> <strong>${r2.name}</strong> (SPD: <code>${r2.spd}</code>) is rounding 3rd! Send home?`;
+          `👋 <strong>3RD-BASE COACH:</strong> <strong>${r2.name}</strong> (SPD: <code>${r2.spd}</code>) is rounding 3rd! Hold or roll <code>SPD ${r2.spd}</code> to send home?`;
+        document.getElementById('send-runner-die-mount').innerHTML =
+          makeCubeHTML(`🏃 SPD (${r2.spd})`, `🎲 ${r2.spd}`, 'unrolled', 'send-spd-die-cube', 'sendRunnerHome()');
+        document.getElementById('btn-send-home').disabled = false;
         document.getElementById('btn-send-home').textContent =
-          `🏃 SEND HOME! (Roll ${r2.spd}: 4+ Safe / 1-3 Out)`;
+          `🏃 ROLL ${r2.spd} TO SEND HOME! (4+ Safe)`;
+        document.getElementById('btn-continue-ab').style.display = 'none';
       } else {
         sendBox.style.display = 'none';
+        document.getElementById('btn-continue-ab').style.display = 'block';
       }
 
       document.getElementById('duel-score-status').textContent =
@@ -1999,10 +2245,9 @@
       document.getElementById('btn-reopen-duel').style.display = 'inline-block';
 
       renderAll();
-      openDuelOverlay();
     }
 
-    function resolveOutcomeTable(margin, p, b) {
+    function resolveOutcomeTable(margin, p, b, manualPowRoll = null) {
       const usedBlackPaint = state.abilityArmed.pitcher && p.abilityType === 'black_paint';
       const usedIronSink   = state.abilityArmed.pitcher && p.abilityType === 'iron_sink';
       const usedVetPoise   = state.abilityArmed.pitcher && p.abilityType === 'vet_poise';
@@ -2098,7 +2343,6 @@
           ? `${b.name} singles! ${pendingSendRunner.name} (${pendingSendRunner.spd}) reaches 3rd — 3rd-Base Coach decision!`
           : `${b.name} singles to 1st! Runners advance 1 base.`;
       } else if (effectiveMargin >= -6 && usedUpgrade1B) {
-        // Gunnar Henderson Gap Hunter: Upgrade Single to Double
         state.lastBand = 'xbh';
         title = '⚡ GAP HUNTER DOUBLE (2B)!';
         if (state.bases[2]) { runs += 1; state.bases[2] = null; }
@@ -2109,7 +2353,7 @@
       } else {
         // EXTRA-BASE HIT (-7 OR LESS) -> OPTION B: ROLL BATTER'S POW DIE (1-5 = 2B, 6 = 3B, 7+ = HR)
         state.lastBand = 'xbh';
-        const powRoll = rollDie(b.pow);
+        const powRoll = manualPowRoll !== null ? manualPowRoll : rollDie(b.pow);
         const isHR = (powRoll >= 7) || (usedMoonshot && powRoll >= 5);
         const is3B = (powRoll === 6) && !isHR;
 
@@ -2182,10 +2426,12 @@
       if (!r2) return;
       state.pendingSendRunner = null;
       document.getElementById('send-runner-actions').style.display = 'none';
+      document.getElementById('send-runner-die-mount').style.display = 'none';
       const resEl = document.getElementById('send-runner-result');
       resEl.style.display = 'block';
       resEl.style.color = '#93c5fd';
       resEl.textContent = `🛑 Held ${r2.name} safely at 3rd base.`;
+      document.getElementById('btn-continue-ab').style.display = 'block';
       renderAll();
     }
 
@@ -2193,32 +2439,53 @@
       const r2 = state.pendingSendRunner;
       if (!r2) return;
       state.pendingSendRunner = null;
-      const spdRoll = rollDie(r2.spd);
-      const offKey = r2.offKey;
+
       document.getElementById('send-runner-actions').style.display = 'none';
-      const resEl = document.getElementById('send-runner-result');
-      resEl.style.display = 'block';
-
-      state.bases[2] = null;
-
-      if (spdRoll >= 4) {
-        state.score[offKey] += 1;
-        resEl.style.color = '#86efac';
-        resEl.innerHTML = `🎉 <strong>SAFE AT HOME!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (4+ Safe) ➔ <strong>+1 RUN!</strong>`;
-      } else {
-        state.outs += 1;
-        resEl.style.color = '#fca5a5';
-        resEl.innerHTML = `🚨 <strong>THROWN OUT AT THE PLATE!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (1–3 Out) ➔ <strong>+1 OUT!</strong>`;
-        if (state.outs >= 3) {
-          state.outs = 0;
-          state.bases = [null, null, null];
-          if (state.half === 'top') state.half = 'bot';
-          else { state.half = 'top'; state.inning += 1; }
-        }
+      const dieMount = document.getElementById('send-runner-die-mount');
+      dieMount.style.display = 'flex';
+      const spdCube = document.getElementById('send-spd-die-cube');
+      if (spdCube) {
+        spdCube.classList.remove('unrolled');
+        spdCube.classList.add('rolling');
       }
-      document.getElementById('duel-score-status').textContent =
-        `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
-      renderAll();
+
+      const timer = setInterval(() => {
+        if (spdCube) spdCube.querySelector('.dc-val').textContent = rollDie(r2.spd);
+      }, 65);
+
+      setTimeout(() => {
+        clearInterval(timer);
+        const spdRoll = rollDie(r2.spd);
+        if (spdCube) {
+          spdCube.classList.remove('rolling');
+          spdCube.querySelector('.dc-val').textContent = spdRoll;
+        }
+        const offKey = r2.offKey;
+        const resEl = document.getElementById('send-runner-result');
+        resEl.style.display = 'block';
+
+        state.bases[2] = null;
+
+        if (spdRoll >= 4) {
+          state.score[offKey] += 1;
+          resEl.style.color = '#86efac';
+          resEl.innerHTML = `🎉 <strong>SAFE AT HOME!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (4+ Safe) ➔ <strong>+1 RUN!</strong>`;
+        } else {
+          state.outs += 1;
+          resEl.style.color = '#fca5a5';
+          resEl.innerHTML = `🚨 <strong>THROWN OUT AT THE PLATE!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (1–3 Out) ➔ <strong>+1 OUT!</strong>`;
+          if (state.outs >= 3) {
+            state.outs = 0;
+            state.bases = [null, null, null];
+            if (state.half === 'top') state.half = 'bot';
+            else { state.half = 'top'; state.inning += 1; }
+          }
+        }
+        document.getElementById('duel-score-status').textContent =
+          `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
+        document.getElementById('btn-continue-ab').style.display = 'block';
+        renderAll();
+      }, 580);
     }
 
     // =========================================================================
