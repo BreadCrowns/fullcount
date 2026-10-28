@@ -1567,14 +1567,14 @@
         <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
           <strong style="color:#fde047;">2. ROLL DICE &amp; EXTRA-BASE POW DIE</strong><br>
           • Each player rolls the <strong>2 Attribute Dice</strong> for the color they chose.<br>
-          • The <strong>⚡ Momentum Holder</strong> also rolls their current <strong>Momentum Die</strong> (<code>d8</code>, <code>d6</code>, or <code>d4</code> where their cube sits).<br>
+          • The <strong>⚡ Momentum Holder</strong> also rolls their current <strong>Momentum Die</strong> (<code>d12</code>, <code>d8</code>, or <code>d6</code> where their cube sits).<br>
           • <strong><code>Margin = Pitcher Total − Batter Total</code></strong>.<br>
           • On an <strong>Extra-Base Hit (−7 or less)</strong>, roll the <strong>Batter's <code>POW</code> Die</strong>: <strong><code>1–5</code> = Double (2B)</strong>, <strong><code>6</code> = Triple (3B)</strong>, <strong><code>7+</code> = Home Run (HR)!</strong>
         </div>
         <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
           <strong style="color:#fde047;">3. MOMENTUM CUBE TRACK &amp; SPECIAL ABILITIES</strong><br>
-          • Place a cube on each player's <strong><code>START</code></strong> box (<code>d8</code>, <code>d6</code>, or <code>d4</code>).<br>
-          • Tap any active card's <strong>⚡ Special Ability box</strong> before pitching/swinging to arm it. Using an ability slides that player's cube <strong>1 box right</strong> (<code>d8 ▸ d6 ▸ d4 ▸ OUT ✕</code>) <em>after</em> the at-bat resolves.
+          • Place a cube on each player's <strong><code>START</code></strong> box (<code>d12</code>, <code>d8</code>, or <code>d6</code>).<br>
+          • Tap any active card's <strong>⚡ Special Ability box</strong> before pitching/swinging to arm it. Using an ability slides that player's cube <strong>1 box right</strong> (<code>d12 ▸ d8 ▸ d6 ▸ OUT ✕</code>) <em>after</em> the at-bat resolves.
         </div>
         <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
           <strong style="color:#fde047;">4. PITCHER ENDURANCE &amp; SENDING RUNNERS</strong><br>
@@ -1592,7 +1592,7 @@
     // =========================================================================
     const DIE_MAX = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 };
     const DIE_AVG = { d4: 2.5, d6: 3.5, d8: 4.5, d10: 5.5, d12: 6.5 };
-    const MOM_LADDER = ['d8', 'd6', 'd4', 'None'];
+    const MOM_LADDER = ['d12', 'd8', 'd6', 'None'];
 
     function stepDownDie(die) {
       const idx = MOM_LADDER.indexOf(die);
@@ -1623,23 +1623,23 @@
         short: 'TIT',
         themeClass: 'titans',
         pitchers: [
-          { id: 't_sp1', pos: 'SP', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', startMom: 'd8', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
-          { id: 't_sp2', pos: 'SP', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.', abilityType: 'iron_sink' },
-          { id: 't_sp3', pos: 'SP', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
-          { id: 't_rp1', pos: 'RP', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
-          { id: 't_rp2', pos: 'RP', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Southpaw Sweep', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
-          { id: 't_cl',  pos: 'RP', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', startMom: 'd8', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Auto-claim ⚡ Momentum Token & +2 Pitcher roll!', abilityType: 'steal_mom' }
+          { id: 't_sp1', pos: 'SP', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', startMom: 'd12', mom: 'd12', abilityName: 'Sonic Boom', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
+          { id: 't_sp2', pos: 'SP', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Iron Sink', abilityDesc: '+2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.', abilityType: 'iron_sink' },
+          { id: 't_sp3', pos: 'SP', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Inning Eater', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_rp1', pos: 'RP', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Flamethrower', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_rp2', pos: 'RP', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Southpaw Sweep', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_cl',  pos: 'RP', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd8', dec: 'd6', grt: 'd12', startMom: 'd12', mom: 'd12', abilityName: 'Lights Out', abilityDesc: 'Auto-claim ⚡ Momentum Token & +2 Pitcher roll!', abilityType: 'steal_mom' }
         ],
         batters: [
-          { id: 't_b1', pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', startMom: 'd6', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+2 Batter roll; advance +1 extra base on a Single.', abilityType: 'extra_base' },
-          { id: 't_b2', pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Pure Barrel', abilityDesc: '+2 Batter roll; any Strikeout becomes Routine Out.', abilityType: 'pure_barrel' },
-          { id: 't_b3', pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
-          { id: 't_b4', pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', startMom: 'd8', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 Batter roll; Extra-Base (-7) is HR on POW 5+!', abilityType: 'moonshot' },
-          { id: 't_b5', pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 't_b6', pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Gritty AB', abilityDesc: '+2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).', abilityType: 'gritty_ab' },
-          { id: 't_b7', pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Gap Spark', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 't_b8', pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Contact Poke', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 't_b9', pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
+          { id: 't_b1', pos: 'CF', name: '"Flash" Mercer', pow: 'd6', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', startMom: 'd8', mom: 'd8', abilityName: 'Rabbit Jump', abilityDesc: '+2 Batter roll; advance +1 extra base on a Single.', abilityType: 'extra_base' },
+          { id: 't_b2', pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', startMom: 'd12', mom: 'd12', abilityName: 'Pure Barrel', abilityDesc: '+2 Batter roll; any Strikeout becomes Routine Out.', abilityType: 'pure_barrel' },
+          { id: 't_b3', pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd12', mom: 'd12', abilityName: 'Clutch Drive', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
+          { id: 't_b4', pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', startMom: 'd12', mom: 'd12', abilityName: 'Moonshot', abilityDesc: '+3 Batter roll; Extra-Base (-7) is HR on POW 5+!', abilityType: 'moonshot' },
+          { id: 't_b5', pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Hot Corner', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b6', pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Gritty AB', abilityDesc: '+2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).', abilityType: 'gritty_ab' },
+          { id: 't_b7', pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Gap Spark', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b8', pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Contact Poke', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b9', pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Underdog Spark', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
         ]
       },
       serpents: {
@@ -1647,23 +1647,23 @@
         short: 'SER',
         themeClass: 'serpents',
         pitchers: [
-          { id: 's_sp1', pos: 'SP', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 Pitch; Margin -3 Walk becomes 0 Fielded Out.', abilityType: 'black_paint' },
-          { id: 's_sp2', pos: 'SP', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
-          { id: 's_sp3', pos: 'SP', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 Pitch; downgrade any Extra-Base (-7) to Single.', abilityType: 'vet_poise' },
-          { id: 's_rp1', pos: 'RP', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
-          { id: 's_rp2', pos: 'RP', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Fireman', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
-          { id: 's_cl',  pos: 'RP', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: 'Add +3 to your Pitcher total roll.', abilityType: 'pitch_plus3' }
+          { id: 's_sp1', pos: 'SP', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', startMom: 'd12', mom: 'd12', abilityName: 'Black Paint', abilityDesc: '+2 Pitch; Margin -3 Walk becomes 0 Fielded Out.', abilityType: 'black_paint' },
+          { id: 's_sp2', pos: 'SP', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Tunneling', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
+          { id: 's_sp3', pos: 'SP', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Veteran Poise', abilityDesc: '+2 Pitch; downgrade any Extra-Base (-7) to Single.', abilityType: 'vet_poise' },
+          { id: 's_rp1', pos: 'RP', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Rising Slider', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 's_rp2', pos: 'RP', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Fireman', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 's_cl',  pos: 'RP', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', startMom: 'd12', mom: 'd12', abilityName: 'Nasty Bite', abilityDesc: 'Add +3 to your Pitcher total roll.', abilityType: 'pitch_plus3' }
         ],
         batters: [
-          { id: 's_b1', pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: '+2 Batter roll; draw a Walk on Margin -2 or -3.', abilityType: 'eagle_eye' },
-          { id: 's_b2', pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', startMom: 'd8', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Pitch Guess & claim ⚡ Momentum Token!', abilityType: 'auto_read' },
-          { id: 's_b3', pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: '+2 Batter roll; upgrade any Single (-4..-6) to 2B.', abilityType: 'upgrade_1b' },
-          { id: 's_b4', pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
-          { id: 's_b5', pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Line Drive', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 's_b6', pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 's_b7', pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll highest batter die & keep higher (+1 Bat).', abilityType: 'reroll_bat' },
-          { id: 's_b8', pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', startMom: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
-          { id: 's_b9', pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Pure Hustle', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
+          { id: 's_b1', pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', startMom: 'd12', mom: 'd12', abilityName: 'Eagle Eye', abilityDesc: '+2 Batter roll; draw a Walk on Margin -2 or -3.', abilityType: 'eagle_eye' },
+          { id: 's_b2', pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', startMom: 'd12', mom: 'd12', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Pitch Guess & claim ⚡ Momentum Token!', abilityType: 'auto_read' },
+          { id: 's_b3', pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', startMom: 'd12', mom: 'd12', abilityName: 'Gap Hunter', abilityDesc: '+2 Batter roll; upgrade any Single (-4..-6) to 2B.', abilityType: 'upgrade_1b' },
+          { id: 's_b4', pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Showtime', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
+          { id: 's_b5', pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Line Drive', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b6', pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Mr. Smile', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b7', pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd6', spd: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Bat Control', abilityDesc: 'Reroll highest batter die & keep higher (+1 Bat).', abilityType: 'reroll_bat' },
+          { id: 's_b8', pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', startMom: 'd6', mom: 'd6', abilityName: 'Veteran Eye', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b9', pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Pure Hustle', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
         ]
       }
     };
@@ -1719,9 +1719,9 @@
     // Build the physical Momentum Cube Track HTML (with a 3D glowing cube on the active box!)
     function buildCubeTrackHTML(startMom, currentMom, isPitcher) {
       const steps = [];
-      if (startMom === 'd8') steps.push('d8', 'd6', 'd4');
-      else if (startMom === 'd6') steps.push('d6', 'd4');
-      else steps.push('d4');
+      if (startMom === 'd12') steps.push('d12', 'd8', 'd6');
+      else if (startMom === 'd8') steps.push('d8', 'd6');
+      else steps.push('d6');
 
       let boxesHTML = '';
       steps.forEach((tier, idx) => {
