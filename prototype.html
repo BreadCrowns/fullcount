@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Full Count V4 — Digital Tabletop Prototype</title>
+  <title>Full Count — Tabletop Simulator &amp; Playmat Prototype</title>
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -13,1308 +13,1524 @@
     }
 
     :root {
-      --bg-dark: #0b1120;
-      --bg-panel: #111827;
-      --bg-card: #1e293b;
-      --border-subtle: rgba(255, 255, 255, 0.12);
-      --red: #ef4444;
-      --red-bg: rgba(239, 68, 68, 0.18);
-      --blue: #3b82f6;
-      --blue-bg: rgba(59, 130, 246, 0.18);
-      --green: #22c55e;
-      --green-bg: rgba(34, 197, 94, 0.18);
+      --felt-dark: #07111e;
+      --felt-mid: #0f1f33;
+      --mat-paper: #f8fafc;
+      --mat-border: #0f172a;
+      --titans-red: #b91c1c;
+      --serpents-green: #047857;
+      --stance-red: #dc2626;
+      --stance-blue: #2563eb;
+      --stance-green: #16a34a;
       --gold: #f59e0b;
-      --gold-bg: rgba(245, 158, 11, 0.2);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-impact: Impact, "Arial Black", sans-serif;
+      --font-mono: "Courier New", Courier, monospace;
     }
 
     html, body {
       width: 100%;
-      height: 100%;
-      height: 100dvh;
-      background: #060913;
-      color: var(--text-main);
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 30%, #132842 0%, #07101c 100%);
+      color: #f8fafc;
       font-family: var(--font-sans);
-      overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
+      overflow-x: hidden;
     }
 
-    .app-shell {
-      width: 100%;
-      max-width: 480px;
-      height: 100%;
-      height: 100dvh;
-      margin: 0 auto;
-      background: var(--bg-dark);
+    /* ====================================================================== */
+    /* TOP TABLETOP SCOREBOARD & MANAGER BAR                                  */
+    /* ====================================================================== */
+    .table-topbar {
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+      padding: 8px 14px;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      border-left: 1px solid var(--border-subtle);
-      border-right: 1px solid var(--border-subtle);
-    }
-
-    /* ── 1. TOP SCOREBOARD & BATTING ORDER BAR ── */
-    .top-bar {
-      background: #0f172a;
-      padding: max(6px, env(safe-area-inset-top, 6px)) 10px 6px;
-      border-bottom: 1px solid var(--border-subtle);
-      flex-shrink: 0;
-    }
-
-    .score-row {
-      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(8px);
     }
 
-    .brand-pill {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 900;
-      font-size: 0.82rem;
-      letter-spacing: 0.6px;
-    }
-    .v4-tag {
-      background: var(--gold-bg);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      font-size: 0.58rem;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-weight: 800;
-    }
-
-    .scoreboard-center {
+    .brand-cluster {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid var(--border-subtle);
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 800;
     }
-    .team-score.titans { color: #fca5a5; }
-    .team-score.serpents { color: #6ee7b7; }
-    .inn-badge {
-      color: #fde047;
-      font-size: 0.7rem;
-      font-weight: 900;
+    .brand-title {
+      font-family: var(--font-impact);
+      font-size: 1.15rem;
+      letter-spacing: 0.8px;
+      color: #ffffff;
     }
-    .outs-dots {
-      display: flex;
-      gap: 3px;
-      align-items: center;
-    }
-    .out-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #334155;
-      border: 1px solid #475569;
-    }
-    .out-dot.on {
-      background: #ef4444;
-      box-shadow: 0 0 6px #ef4444;
-      border-color: #fca5a5;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 4px;
-    }
-    .icon-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-subtle);
-      color: #e2e8f0;
-      border-radius: 6px;
-      padding: 3px 7px;
-      font-size: 0.68rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .icon-btn:active { transform: scale(0.95); }
-
-    /* Lineup Strip (#1 to #9 Left to Right) */
-    .lineup-strip {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      margin-top: 5px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 2px;
-    }
-    .lineup-strip::-webkit-scrollbar { display: none; }
-    .lineup-chip {
-      flex: 0 0 auto;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 2px 5px;
-      font-size: 0.58rem;
-      color: var(--text-muted);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .lineup-chip.active {
-      background: rgba(245, 158, 11, 0.22);
-      border-color: #f59e0b;
-      color: #fef08a;
-      font-weight: 900;
-    }
-
-    /* ── 2. CENTER ARENA ── */
-    .arena {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 5px 8px;
-      gap: 5px;
-      overflow-y: auto;
-    }
-
-    /* Player Card (Pitcher / Batter) */
-    .player-card {
-      background: var(--bg-card);
-      border: 1.5px solid rgba(255,255,255,0.14);
-      border-radius: 10px;
-      padding: 5px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      position: relative;
-    }
-    .player-card.titans-card { border-top: 4px solid #dc2626; }
-    .player-card.serpents-card { border-top: 4px solid #10b981; }
-    .player-card.has-momentum {
-      box-shadow: 0 0 0 1.5px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.25);
-    }
-
-    .pc-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 4px;
-    }
-    .pc-title-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-    }
-    .pc-role-tag {
-      font-size: 0.56rem;
-      font-weight: 900;
-      padding: 1px 5px;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.1);
-      color: #cbd5e1;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .pc-name {
-      font-size: 0.82rem;
-      font-weight: 900;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .pc-badges {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-    .mom-token-pill {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #0f172a;
-      font-size: 0.58rem;
-      font-weight: 900;
-      padding: 1px 5px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-    }
-    .mom-die-pill {
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fde047;
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-    .mom-die-pill.exhausted {
-      color: #ef4444;
-      border-color: rgba(239,68,68,0.4);
-    }
-
-    /* 5 Core Attributes Strip */
-    .core-attr-strip {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 5px;
-      padding: 2px 6px;
-      font-size: 0.58rem;
-      color: #94a3b8;
-      font-weight: 700;
-    }
-    .core-attr-strip strong {
-      color: #f8fafc;
-      font-family: var(--font-mono);
-      margin-left: 2px;
-    }
-
-    /* 3 Color Stances Mini Grid on Card */
-    .card-stances-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-    }
-    .stance-cell {
-      border-radius: 5px;
-      padding: 2px 5px;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      border: 1px solid transparent;
-    }
-    .stance-cell.red { background: var(--red-bg); border-color: rgba(239, 68, 68, 0.35); }
-    .stance-cell.blue { background: var(--blue-bg); border-color: rgba(59, 130, 246, 0.35); }
-    .stance-cell.green { background: var(--green-bg); border-color: rgba(34, 197, 94, 0.35); }
-    .sc-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.58rem;
-      font-weight: 900;
-    }
-    .sc-rating {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 900;
-      color: #fff;
-    }
-    .sc-dice {
-      font-family: var(--font-mono);
-      font-size: 0.55rem;
-      color: #cbd5e1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .sc-stars {
-      font-size: 0.5rem;
-      color: #fbbf24;
-      letter-spacing: -1px;
-    }
-
-    /* Special Ability Row */
-    .ability-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 5px;
-      padding: 3px 6px;
-      font-size: 0.58rem;
-    }
-    .ability-text {
-      color: #cbd5e1;
-      line-height: 1.15;
-      flex: 1;
-    }
-    .ability-text strong {
-      color: #fde047;
-    }
-    .btn-ability {
-      background: rgba(245, 158, 11, 0.15);
+    .tabletop-badge {
+      background: #fef3c7;
+      color: #92400e;
       border: 1px solid #f59e0b;
-      color: #fde047;
-      font-size: 0.58rem;
-      font-weight: 800;
-      padding: 3px 7px;
-      border-radius: 5px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .btn-ability.active {
-      background: #f59e0b;
-      color: #0f172a;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-    }
-    .btn-ability:disabled {
-      opacity: 0.35;
-      border-color: #475569;
-      color: #64748b;
-      cursor: not-allowed;
-    }
-
-    /* ── CENTER PLAYMAT: DIAMOND, LAST PLAY SUMMARY & TRIANGLE ── */
-    .center-playmat {
-      background: radial-gradient(circle at center, #14532d 0%, #062e16 100%);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      border-radius: 10px;
-      padding: 6px 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 82px;
-    }
-
-    /* Mini Diamond */
-    .diamond-box {
-      width: 68px;
-      height: 68px;
-      position: relative;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .base-sq {
-      width: 13px;
-      height: 13px;
-      background: rgba(255,255,255,0.18);
-      border: 1.5px solid rgba(255,255,255,0.5);
-      transform: rotate(45deg);
-      position: absolute;
-    }
-    .base-sq.occupied {
-      background: #f59e0b;
-      border-color: #fff;
-      box-shadow: 0 0 8px #f59e0b;
-    }
-    .base-2b { top: 5px; left: 27px; }
-    .base-3b { top: 27px; left: 5px; }
-    .base-1b { top: 27px; right: 5px; }
-    .base-home {
-      bottom: 5px;
-      left: 27px;
-      background: rgba(255,255,255,0.35);
-      border-color: #fca5a5;
-    }
-    .diamond-center-label {
-      font-size: 0.5rem;
-      font-weight: 800;
-      color: #bbf7d0;
-      text-align: center;
-      line-height: 1.1;
-      z-index: 2;
-    }
-
-    .center-status-box {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 3px;
-      min-width: 0;
-    }
-    .cs-title {
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       font-weight: 900;
-      color: #fff;
-    }
-    .cs-sub {
-      font-size: 0.6rem;
-      color: #d1fae5;
-      line-height: 1.25;
-    }
-    .btn-reopen-last {
-      align-self: flex-start;
-      margin-top: 2px;
-      background: rgba(245, 158, 11, 0.25);
-      border: 1px solid #fbbf24;
-      color: #fef08a;
-      font-size: 0.58rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    /* Mini Triangle Reference */
-    .mini-triangle-box {
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      padding: 3px 5px;
-      text-align: center;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-    .mt-title {
-      font-size: 0.48rem;
-      font-weight: 900;
-      color: #94a3b8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
       letter-spacing: 0.4px;
-      margin-bottom: 1px;
     }
 
-    /* ── 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE HAND ── */
-    .bottom-dock {
-      background: #0f172a;
-      border-top: 1px solid var(--border-subtle);
-      padding: 6px 10px max(8px, env(safe-area-inset-bottom, 8px));
+    .scoreboard-strip {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .dock-header {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.64rem;
-      font-weight: 800;
-      color: #cbd5e1;
+      gap: 10px;
+      background: #020617;
+      border: 1.5px solid #334155;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 0.85rem;
     }
-    .role-indicator {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid #3b82f6;
-      color: #93c5fd;
+    .sb-team.titans { color: #fca5a5; }
+    .sb-team.serpents { color: #6ee7b7; }
+    .sb-inning {
+      color: #fde047;
+      background: rgba(253, 224, 71, 0.12);
       padding: 1px 7px;
       border-radius: 999px;
-      font-size: 0.58rem;
-      font-weight: 900;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+    }
+    .outs-cluster {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+    .out-pip {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1.5px solid #94a3b8;
+      background: transparent;
+    }
+    .out-pip.filled {
+      background: #ef4444;
+      border-color: #fca5a5;
+      box-shadow: 0 0 6px #ef4444;
     }
 
-    .stance-hand {
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tt-btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tt-btn:hover { background: #334155; }
+    .tt-btn.gold {
+      background: #f59e0b;
+      color: #0f172a;
+      border-color: #fbbf24;
+    }
+    .tt-btn.gold:hover { background: #fbbf24; }
+
+    /* ====================================================================== */
+    /* MAIN TABLETOP WORKSPACE                                                */
+    /* ====================================================================== */
+    .tabletop-surface {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 12px 14px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ====================================================================== */
+    /* UPPER TABLETOP ZONE: ACTIVE DUEL ARENA + DIAMOND + PLAYMAT CHARTS      */
+    /* ====================================================================== */
+    .table-upper-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.95fr 1.15fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1080px) {
+      .table-upper-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* DUEL MAT: ACTIVE PITCHER VS ACTIVE BATTER PHYSICAL CARDS */
+    .duel-mat-panel {
+      background: rgba(15, 23, 42, 0.82);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .panel-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 6px;
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #cbd5e1;
+    }
+
+    .active-cards-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 4px 0;
+    }
+
+    .card-slot-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slot-placard {
+      font-family: var(--font-impact);
+      font-size: 0.72rem;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ====================================================================== */
+    /* AUTHENTIC PORTRAIT HALF-SIZE PHYSICAL PLAYER CARD (1.50 : 2.38 RATIO)  */
+    /* ====================================================================== */
+    .phys-card {
+      width: 196px;
+      height: 310px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      border-radius: 8px;
+      padding: 5px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .phys-card::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border: 1px dashed rgba(15, 23, 42, 0.16);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+    .phys-card.titans { border-top: 6px solid var(--titans-red); }
+    .phys-card.serpents { border-top: 6px solid var(--serpents-green); }
+
+    /* Mini version for the 9-Batter Lineup Row on the 11x17 Playmat */
+    .phys-card.lineup-mini {
+      width: 138px;
+      height: 218px;
+      padding: 3.5px 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    }
+    .phys-card.lineup-mini:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Card Header */
+    .pc-header {
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 2px;
+    }
+    .pc-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1px;
+    }
+    .pc-role {
+      font-size: 8px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #64748b;
+    }
+    .lineup-mini .pc-role { font-size: 6.2px; }
+
+    .pc-badge {
+      background: #0f172a;
+      color: #ffffff;
+      font-family: var(--font-impact);
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+    }
+    .pc-badge.spd-badge { background: #0369a1; }
+    .pc-badge.mom-badge { background: #d97706; color: #0f172a; }
+    .lineup-mini .pc-badge { font-size: 7px; padding: 0.5px 3px; }
+
+    .pc-name {
+      font-family: var(--font-impact);
+      font-size: 14px;
+      line-height: 1.05;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.25px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lineup-mini .pc-name { font-size: 10.2px; }
+
+    /* 5-Column Core Attribute Strip */
+    .pc-core-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 2px 1px;
+      text-align: center;
+      font-size: 7.2px;
+      font-weight: 800;
+      color: #64748b;
+      line-height: 1.05;
+    }
+    .lineup-mini .pc-core-stats { font-size: 5.5px; padding: 1px; }
+    .pc-core-stats span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pc-core-stats span strong {
+      color: #0f172a;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 900;
+    }
+    .lineup-mini .pc-core-stats span strong { font-size: 6.8px; }
+
+    /* 3 Color Stances Table */
+    .pc-stances-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5px;
+    }
+    .lineup-mini .pc-stances-table { font-size: 6.4px; }
+    .pc-stances-table tr {
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .pc-stances-table td {
+      padding: 2px 1px;
+      vertical-align: middle;
+    }
+    .lineup-mini .pc-stances-table td { padding: 1px 0.5px; }
+
+    .pc-stance-tag {
+      font-weight: 900;
+      font-size: 8.2px;
+      display: block;
+      line-height: 1;
+    }
+    .lineup-mini .pc-stance-tag { font-size: 6.2px; }
+    .pc-stance-tag.red { color: var(--stance-red); }
+    .pc-stance-tag.blue { color: var(--stance-blue); }
+    .pc-stance-tag.green { color: var(--stance-green); }
+
+    .pc-stance-dice {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 7.8px;
+      color: #334155;
+      display: block;
+      line-height: 1.05;
+    }
+    .lineup-mini .pc-stance-dice { font-size: 5.8px; }
+
+    .pc-stars {
+      color: #d97706;
+      font-size: 7.5px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .lineup-mini .pc-stars { font-size: 5.5px; }
+
+    .pc-rating {
+      font-family: var(--font-impact);
+      font-size: 13px;
+      text-align: right;
+      color: #0f172a;
+      width: 18px;
+    }
+    .lineup-mini .pc-rating { font-size: 9.8px; width: 13px; }
+
+    /* ====================================================================== */
+    /* PHYSICAL MOMENTUM CUBE TRACK WITH 3D WOODEN/ACRYLIC GAME CUBE!         */
+    /* ====================================================================== */
+    .pc-cube-track {
+      background: #f1f5f9;
+      border: 1px solid #94a3b8;
+      border-radius: 5px;
+      padding: 2.5px 3px 3px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .lineup-mini .pc-cube-track { padding: 1.5px 2px 2px; gap: 1px; }
+
+    .pc-cube-label {
+      font-size: 6.4px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #475569;
+      text-align: center;
+      line-height: 1;
+    }
+    .lineup-mini .pc-cube-label { font-size: 4.8px; }
+
+    .pc-cube-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .lineup-mini .pc-cube-row { gap: 2px; }
+
+    .pc-cube-box {
+      width: 35px;
+      height: 33px;
+      border: 1.5px solid #334155;
+      border-radius: 4px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .lineup-mini .pc-cube-box {
+      width: 25px;
+      height: 24px;
+      border-radius: 3px;
+    }
+    .pc-cube-box.start-box {
+      border: 1.5px solid #d97706;
+      background: #fffbeb;
+    }
+    .pc-cube-box.out-box {
+      border: 1.5px dashed #94a3b8;
+      background: #f8fafc;
+    }
+
+    .pc-cube-step {
+      font-size: 5.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #64748b;
+      line-height: 1;
+    }
+    .lineup-mini .pc-cube-step { font-size: 4.2px; }
+    .pc-cube-box.start-box .pc-cube-step { color: #b45309; }
+
+    .pc-cube-die {
+      font-family: var(--font-impact);
+      font-size: 11px;
+      color: #0f172a;
+      line-height: 1.05;
+    }
+    .lineup-mini .pc-cube-die { font-size: 8px; }
+    .pc-cube-box.out-box .pc-cube-die {
+      font-size: 8.5px;
+      color: #94a3b8;
+    }
+    .lineup-mini .pc-cube-box.out-box .pc-cube-die { font-size: 6.5px; }
+
+    .pc-cube-arrow {
+      font-size: 8px;
+      font-weight: 900;
+      color: #64748b;
+      line-height: 1;
+    }
+    .lineup-mini .pc-cube-arrow { font-size: 6px; }
+
+    /* THE PHYSICAL 3D CUBE PLACED ON THE CURRENT MOMENTUM STEP */
+    .pc-cube-box.has-cube {
+      background: #fef3c7;
+      border: 2px solid #d97706;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+    }
+    .pc-cube-box.out-box.has-cube {
+      background: #fee2e2;
+      border: 2px solid #dc2626;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.28);
+    }
+    .physical-cube-marker {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 13px;
+      height: 13px;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      border: 1.5px solid #0f172a;
+      border-radius: 3px;
+      box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.45);
+      z-index: 3;
+    }
+    .pc-cube-box.out-box .physical-cube-marker {
+      background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+    }
+    .lineup-mini .physical-cube-marker {
+      width: 10px;
+      height: 10px;
+      top: -4px;
+      right: -4px;
+    }
+
+    /* Special Ability Box on Card */
+    .pc-ability-box {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 3px 4px;
+      font-size: 7.4px;
+      line-height: 1.15;
+      color: #1e293b;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lineup-mini .pc-ability-box {
+      font-size: 5.5px;
+      min-height: 32px;
+      padding: 2px 3px;
+    }
+    .pc-ability-box.armed {
+      background: #fef3c7;
+      border-color: #d97706;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.55);
+    }
+    .pc-ability-box.exhausted {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .pc-ability-title {
+      font-weight: 900;
+      color: #0f172a;
+      text-transform: uppercase;
+    }
+
+    /* Physical Momentum Token Badge on Active Card */
+    .phys-mom-token {
+      background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%);
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ====================================================================== */
+    /* CENTER PANEL: BASEBALL DIAMOND + PHYSICAL BASERUNNER TOKENS + STANCES  */
+    /* ====================================================================== */
+    .diamond-stance-panel {
+      background: rgba(15, 23, 42, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .diamond-box {
+      position: relative;
+      height: 175px;
+      background: radial-gradient(circle at 50% 60%, #14532d 0%, #062e16 75%, #091526 100%);
+      border: 2px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .infield-dirt {
+      width: 96px;
+      height: 96px;
+      border: 2px solid rgba(217, 119, 6, 0.65);
+      background: rgba(180, 83, 9, 0.18);
+      transform: rotate(45deg);
+      position: relative;
+    }
+
+    .base-bag {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #f8fafc;
+      border: 2px solid #334155;
+      transform: rotate(45deg);
+      transition: all 0.2s;
+    }
+    .base-bag.occupied {
+      background: #fde047;
+      border-color: #b45309;
+      box-shadow: 0 0 14px #f59e0b;
+    }
+    .base-bag.b2 { top: 20px; left: calc(50% - 11px); }
+    .base-bag.b3 { top: calc(50% - 11px); left: calc(50% - 68px); }
+    .base-bag.b1 { top: calc(50% - 11px); right: calc(50% - 68px); }
+    .base-bag.home {
+      bottom: 18px;
+      left: calc(50% - 9px);
+      width: 18px;
+      height: 18px;
+      background: #ffffff;
+    }
+
+    /* Physical Cutout Baserunner Token on Diamond */
+    .runner-token-tag {
+      position: absolute;
+      background: #fef3c7;
+      color: #0f172a;
+      border: 1.5px solid #0f172a;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.65rem;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+    .runner-token-tag.r2 { top: 2px; left: 50%; transform: translateX(-50%); }
+    .runner-token-tag.r3 { top: 50%; left: 8px; transform: translateY(-50%); }
+    .runner-token-tag.r1 { top: 50%; right: 8px; transform: translateY(-50%); }
+
+    /* Physical 3-Stance Hand (Portrait Half-Size Stance Cards!) */
+    .stance-hand-title {
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fde047;
+      text-align: center;
+    }
+
+    .stance-cards-hand {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    .stance-btn {
-      border-radius: 10px;
+    .phys-stance-card {
+      background: #ffffff;
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      border-radius: 8px;
       padding: 7px 6px;
-      border: 2px solid transparent;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
-      cursor: pointer;
-      transition: transform 0.12s, box-shadow 0.12s;
-      color: #fff;
-      background: #1e293b;
+      justify-content: space-between;
+      gap: 4px;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
-    .stance-btn:active {
-      transform: scale(0.95);
+    .phys-stance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 22px rgba(0, 0, 0, 0.6);
     }
-    .stance-btn.red-card {
-      background: linear-gradient(180deg, rgba(220, 38, 38, 0.35) 0%, rgba(127, 29, 29, 0.5) 100%);
-      border-color: #ef4444;
+    .phys-stance-card:active {
+      transform: translateY(-1px);
     }
-    .stance-btn.blue-card {
-      background: linear-gradient(180deg, rgba(37, 99, 235, 0.35) 0%, rgba(30, 58, 138, 0.5) 100%);
-      border-color: #3b82f6;
+    .phys-stance-card.red-card { border-top: 6px solid var(--stance-red); }
+    .phys-stance-card.blue-card { border-top: 6px solid var(--stance-blue); }
+    .phys-stance-card.green-card { border-top: 6px solid var(--stance-green); }
+
+    .psc-header {
+      font-family: var(--font-impact);
+      font-size: 0.85rem;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
     }
-    .stance-btn.green-card {
-      background: linear-gradient(180deg, rgba(22, 163, 74, 0.35) 0%, rgba(20, 83, 45, 0.5) 100%);
-      border-color: #22c55e;
+    .red-card .psc-header { color: var(--stance-red); }
+    .blue-card .psc-header { color: var(--stance-blue); }
+    .green-card .psc-header { color: var(--stance-green); }
+
+    .psc-dice-box {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 3px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+    .psc-rating {
+      font-size: 0.66rem;
+      font-weight: 900;
+      color: #475569;
     }
 
-    .sb-color-title {
-      font-size: 0.76rem;
-      font-weight: 900;
-      letter-spacing: 0.3px;
+    /* ====================================================================== */
+    /* RIGHT PANEL: PRINTED PLAYMAT OUTCOME & EXTRA-BASE (POW DIE) CHART      */
+    /* ====================================================================== */
+    .playmat-chart-panel {
+      background: #ffffff;
+      color: #0f172a;
+      border: 3px solid #0f172a;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
     }
-    .sb-beats {
-      font-size: 0.54rem;
-      font-weight: 800;
+
+    .pm-chart-header {
+      background: #0f172a;
+      color: #ffffff;
+      font-family: var(--font-impact);
+      font-size: 0.85rem;
+      letter-spacing: 0.6px;
+      padding: 5px 9px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+    .pm-table th {
+      background: #1e293b;
+      color: #ffffff;
+      text-align: left;
+      padding: 4px 6px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+    .pm-table td {
+      padding: 4.5px 6px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .pm-table tr.p-row { background: #f0fdf4; }
+    .pm-table tr.b-row { background: #fef2f2; }
+    .pm-table tr.active-row {
+      outline: 2.5px solid #f59e0b;
+      background: #fef3c7 !important;
+      font-weight: 900;
+    }
+
+    .pm-subboxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .pm-subbox {
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 5px 7px;
+      font-size: 0.66rem;
+      line-height: 1.3;
+    }
+    .pm-subbox h5 {
+      font-family: var(--font-impact);
+      font-size: 0.72rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    /* ====================================================================== */
+    /* LOWER PLAYMAT ZONE: THE 11" x 17" SINGLE UNBROKEN 9-CARD LINEUP ROW!   */
+    /* ====================================================================== */
+    .playmat-11x17-sheet {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 3px solid #0f172a;
+      border-radius: 12px;
+      padding: 10px 12px 12px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+      position: relative;
+    }
+
+    .playmat-sheet-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2.5px solid #0f172a;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .playmat-sheet-title {
+      font-family: var(--font-impact);
+      font-size: 1.05rem;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lineup-row-scroll {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(138px, 1fr));
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .lineup-slot-cell {
+      border: 2px dashed #64748b;
+      border-radius: 8px;
+      background: #f1f5f9;
+      padding: 5px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      transition: all 0.18s;
+    }
+    /* Visual Center Seam between Slot #5 (Page 1) and Slot #6 (Page 2) */
+    .lineup-slot-cell.seam-right {
+      border-right: 3px dashed #0f172a;
+    }
+
+    .lineup-slot-cell.at-bat-now {
+      background: #fef3c7;
+      border: 2.5px solid #d97706;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.45);
+    }
+
+    .slot-header-tag {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 3px;
+      font-family: var(--font-impact);
+      font-size: 0.72rem;
+      color: #334155;
+      letter-spacing: 0.4px;
+    }
+    .at-bat-token-pill {
+      background: #b91c1c;
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 0.56rem;
+      font-weight: 900;
       padding: 1px 5px;
       border-radius: 999px;
-      background: rgba(0,0,0,0.45);
-      color: #e2e8f0;
-    }
-    .sb-dice-pair {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      font-weight: 800;
-      color: #fef08a;
-      margin-top: 1px;
-    }
-    .sb-rating-line {
-      font-size: 0.56rem;
-      color: #cbd5e1;
-      font-weight: 700;
+      text-transform: uppercase;
     }
 
-    /* =========================================================================
-       AT-BAT DUEL RESOLUTION OVERLAY (3 CLEAR STEPS: DUEL -> DICE -> OUTCOME)
-       ========================================================================= */
+    /* ====================================================================== */
+    /* TABLETOP DUEL RESOLUTION & DICE ROLL MODAL OVERLAY                     */
+    /* ====================================================================== */
     .duel-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.88);
-      backdrop-filter: blur(4px);
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(5px);
       z-index: 90;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 14px;
     }
     .duel-overlay.open {
       display: flex;
     }
-    .duel-card {
+
+    .duel-modal-card {
       width: 100%;
-      max-width: 450px;
-      max-height: 94dvh;
+      max-width: 580px;
+      max-height: 92dvh;
+      overflow-y: auto;
       background: #0f172a;
-      border: 2px solid rgba(255, 255, 255, 0.18);
+      border: 2px solid #475569;
       border-radius: 14px;
-      padding: 10px 12px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+      gap: 10px;
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.75);
     }
 
     .step-box {
       background: #1e293b;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      padding: 8px 10px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
     .step-header {
-      font-size: 0.62rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      color: #94a3b8;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 4px;
     }
 
-    /* Step 1: Stance Duel Cards */
     .stance-clash-row {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
       align-items: center;
-      gap: 8px;
     }
     .played-stance-pill {
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 7px 8px;
       text-align: center;
-      border: 2px solid transparent;
-    }
-    .played-stance-pill.red { background: rgba(220, 38, 38, 0.25); border-color: #ef4444; }
-    .played-stance-pill.blue { background: rgba(37, 99, 235, 0.25); border-color: #3b82f6; }
-    .played-stance-pill.green { background: rgba(22, 163, 74, 0.25); border-color: #22c55e; }
-    .played-stance-pill.winner {
-      box-shadow: 0 0 0 2px #f59e0b, 0 0 14px rgba(245, 158, 11, 0.45);
-    }
-    .psp-who {
-      font-size: 0.56rem;
-      font-weight: 800;
-      color: #cbd5e1;
-      text-transform: uppercase;
-    }
-    .psp-color {
-      font-size: 0.82rem;
-      font-weight: 900;
-      color: #fff;
-      margin-top: 1px;
-    }
-    .psp-sub {
-      font-size: 0.58rem;
-      color: #fde047;
-      font-weight: 800;
-      margin-top: 2px;
-    }
-    .vs-circle {
-      font-size: 0.68rem;
-      font-weight: 900;
-      color: #64748b;
+      border: 2px solid rgba(255, 255, 255, 0.15);
       background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .played-stance-pill.red { border-color: #ef4444; background: rgba(239, 68, 68, 0.16); }
+    .played-stance-pill.blue { border-color: #3b82f6; background: rgba(59, 130, 246, 0.16); }
+    .played-stance-pill.green { border-color: #22c55e; background: rgba(34, 197, 94, 0.16); }
+    .played-stance-pill.winner {
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
+      outline: 2px solid #fde047;
+    }
+    .psp-who { font-size: 0.65rem; font-weight: 800; color: #cbd5e1; }
+    .psp-color { font-family: var(--font-impact); font-size: 1rem; margin: 2px 0; }
+    .psp-sub { font-size: 0.65rem; font-family: var(--font-mono); color: #e2e8f0; }
+
+    .vs-circle {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      width: 26px;
-      height: 26px;
+      background: #020617;
+      border: 1.5px solid #475569;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 900;
+      font-size: 0.9rem;
     }
 
     .duel-winner-banner {
-      background: rgba(245, 158, 11, 0.16);
+      background: rgba(245, 158, 11, 0.15);
       border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fde047;
       border-radius: 6px;
       padding: 5px 8px;
       text-align: center;
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 900;
-      color: #fef08a;
     }
 
-    /* Step 2: Visual Dice Rolled */
     .dice-side-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 6px;
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 6px 8px;
-    }
-    .ds-left {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1;
-    }
-    .ds-player-label {
-      font-size: 0.65rem;
-      font-weight: 900;
-      color: #e2e8f0;
-      display: flex;
       align-items: center;
-      gap: 5px;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 7px 9px;
+      gap: 8px;
     }
     .dice-cubes-wrap {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       flex-wrap: wrap;
+      margin-top: 4px;
     }
     .die-cube {
-      background: #1e293b;
-      border: 1.5px solid #64748b;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 2px solid #334155;
       border-radius: 6px;
-      padding: 3px 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 52px;
+      padding: 3px 7px;
+      min-width: 48px;
+      text-align: center;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
     }
     .die-cube.mom-cube {
-      background: rgba(245, 158, 11, 0.2);
-      border-color: #f59e0b;
+      background: #fef3c7;
+      border-color: #d97706;
     }
-    .die-cube.bonus-cube {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: #3b82f6;
+    .die-cube.pow-cube {
+      background: #ffe4e6;
+      border-color: #e11d48;
     }
     .dc-meta {
-      font-size: 0.52rem;
-      font-weight: 800;
-      color: #94a3b8;
-      text-transform: uppercase;
+      display: block;
+      font-size: 0.56rem;
+      font-weight: 900;
+      color: #475569;
     }
-    .die-cube.mom-cube .dc-meta { color: #fde047; }
     .dc-val {
-      font-family: var(--font-mono);
-      font-size: 0.92rem;
-      font-weight: 900;
-      color: #ffffff;
-      line-height: 1.1;
-    }
-    .plus-sign {
-      font-weight: 900;
-      color: #64748b;
-      font-size: 0.8rem;
+      display: block;
+      font-family: var(--font-impact);
+      font-size: 1.05rem;
+      color: #0f172a;
     }
     .ds-total-box {
-      background: #0f172a;
-      border: 1.5px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      padding: 4px 8px;
-      text-align: center;
-      min-width: 52px;
+      text-align: right;
+      min-width: 54px;
     }
-    .dst-label {
-      font-size: 0.5rem;
-      font-weight: 800;
-      color: #94a3b8;
-    }
-    .dst-num {
-      font-family: var(--font-mono);
-      font-size: 1.1rem;
-      font-weight: 900;
-      color: #fff;
-    }
+    .dst-label { font-size: 0.56rem; font-weight: 900; color: #94a3b8; }
+    .dst-num { font-family: var(--font-impact); font-size: 1.4rem; color: #ffffff; }
 
     .margin-calc-bar {
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 6px;
-      padding: 5px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #020617;
+      padding: 6px 10px;
+      border-radius: 6px;
       font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 900;
+      font-size: 0.76rem;
+      font-weight: 800;
     }
     .mc-badge {
       background: #f59e0b;
       color: #0f172a;
       padding: 2px 8px;
       border-radius: 4px;
-      font-size: 0.78rem;
       font-weight: 900;
     }
 
-    /* Step 3: Outcome Banner & Mini Table */
     .outcome-hero {
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 9px 10px;
       text-align: center;
-      border: 2px solid transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
     }
     .outcome-hero.pitcher-win {
-      background: rgba(34, 197, 94, 0.18);
+      background: rgba(22, 163, 74, 0.18);
       border-color: #22c55e;
     }
     .outcome-hero.batter-win {
-      background: rgba(239, 68, 68, 0.22);
+      background: rgba(239, 68, 68, 0.2);
       border-color: #ef4444;
     }
     .oh-title {
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: #fff;
+      font-family: var(--font-impact);
+      font-size: 1.15rem;
       letter-spacing: 0.5px;
+      margin-bottom: 3px;
     }
     .oh-desc {
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       color: #e2e8f0;
-      margin-top: 2px;
-      font-weight: 700;
     }
     .oh-degrade {
-      margin-top: 4px;
-      font-size: 0.64rem;
-      color: #fde047;
+      margin-top: 6px;
+      font-size: 0.7rem;
       font-weight: 800;
-    }
-
-    .mini-outcome-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.62rem;
-      margin-top: 2px;
-    }
-    .mini-outcome-table td {
-      padding: 3px 5px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      color: #94a3b8;
-    }
-    .mini-outcome-table tr.active-band {
-      background: rgba(245, 158, 11, 0.28);
-      outline: 1.5px solid #f59e0b;
-    }
-    .mini-outcome-table tr.active-band td {
-      color: #fff;
-      font-weight: 900;
+      color: #fde047;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 6px;
+      border-radius: 4px;
     }
 
     .btn-next-ab {
       width: 100%;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #fff;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0f172a;
       border: none;
-      border-radius: 10px;
-      padding: 11px;
-      font-size: 0.85rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
-    }
-    .btn-next-ab:active {
-      transform: scale(0.98);
-    }
-
-    /* ── MODALS (OUTCOME TABLE & BULLPEN/ROSTER) ── */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.78);
-      z-index: 100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-    }
-    .modal-backdrop.open {
-      display: flex;
-    }
-    .modal-sheet {
-      width: 100%;
-      max-width: 440px;
-      max-height: 88dvh;
-      background: #111827;
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 12px;
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .modal-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 6px;
-    }
-    .modal-top h3 {
-      font-size: 0.88rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-    .close-btn {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: #fff;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .outcome-ref-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.7rem;
-    }
-    .outcome-ref-table th, .outcome-ref-table td {
-      padding: 5px 6px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      text-align: left;
-    }
-    .outcome-ref-table tr.out-row { background: rgba(34, 197, 94, 0.1); }
-    .outcome-ref-table tr.hit-row { background: rgba(239, 68, 68, 0.1); }
-    .outcome-ref-table tr.highlight-row {
-      outline: 2px solid #f59e0b;
-      background: rgba(245, 158, 11, 0.28) !important;
-    }
-
-    .bullpen-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .bp-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 8px;
-      padding: 6px 8px;
-      font-size: 0.7rem;
-    }
-    .bp-btn {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 0.65rem;
-      font-weight: 800;
+      padding: 11px;
+      font-family: var(--font-impact);
+      font-size: 1rem;
+      letter-spacing: 0.6px;
       cursor: pointer;
     }
-    .bp-btn:disabled {
-      background: #334155;
-      color: #64748b;
+
+    /* ====================================================================== */
+    /* MANAGER LINEUP & STARTING PITCHER SETUP MODAL                          */
+    /* ====================================================================== */
+    .setup-modal-card {
+      width: 100%;
+      max-width: 780px;
+      max-height: 92dvh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 2px solid #f59e0b;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+    }
+
+    .setup-Order-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 680px) {
+      .setup-Order-list { grid-template-columns: 1fr; }
+    }
+    .setup-batter-item {
+      background: #1e293b;
+      border: 1.5px solid #475569;
+      border-radius: 8px;
+      padding: 7px 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .setup-batter-item.selected-swap {
+      border-color: #fde047;
+      background: rgba(245, 158, 11, 0.22);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
 
-    <!-- 1. TOP SCOREBOARD & BATTING LINEUP STRIP (#1 to #9 LEFT-TO-RIGHT) -->
-    <header class="top-bar">
-      <div class="score-row">
-        <div class="brand-pill">
-          <span>⚾ FULL COUNT</span>
-          <span class="v4-tag">V4 RULES</span>
-        </div>
+  <!-- TOP TABLETOP BAR -->
+  <header class="table-topbar">
+    <div class="brand-cluster">
+      <span class="brand-title">⚾ FULL COUNT</span>
+      <span class="tabletop-badge">11×17 Tabletop Simulator</span>
+    </div>
 
-        <div class="scoreboard-center">
-          <span class="team-score titans" id="score-away">TIT 0</span>
-          <span style="color:#64748b;">-</span>
-          <span class="team-score serpents" id="score-home">SER 0</span>
-          <span class="inn-badge" id="inn-display">▲ 1ST</span>
-          <div class="outs-dots">
-            <span class="out-dot" id="out-1"></span>
-            <span class="out-dot" id="out-2"></span>
-          </div>
-        </div>
-
-        <div class="top-actions">
-          <button class="icon-btn" onclick="openModal('modal-table')" title="Outcome Table & Triangle">📊 Chart</button>
-          <button class="icon-btn" onclick="openModal('modal-bullpen')" title="Bullpen & Lineups">🔄 Staff</button>
-          <button class="icon-btn" onclick="window.location.href='team_cards.html'" title="Printable Cards">🖨️</button>
-        </div>
-      </div>
-
-      <!-- Batting Order Strip (#1 Leadoff on Left -> #9 on Right) -->
-      <div class="lineup-strip" id="lineup-strip"></div>
-    </header>
-
-    <!-- 2. CENTER ARENA: PITCHER ABOVE, FIELD/OUTCOME MIDDLE, BATTER BELOW -->
-    <main class="arena">
-
-      <!-- ACTIVE PITCHER CARD (ABOVE LINEUP) -->
-      <section class="player-card" id="pitcher-card">
-        <div class="pc-header">
-          <div class="pc-title-group">
-            <span class="pc-role-tag" id="p-role">SP #1</span>
-            <span class="pc-name" id="p-name">"Apex" Garrison</span>
-          </div>
-          <div class="pc-badges">
-            <span class="mom-token-pill" id="p-mom-token" style="display:none;">⚡ HOLDER</span>
-            <span class="mom-die-pill" id="p-mom-die">MOM: d8</span>
-          </div>
-        </div>
-
-        <div class="core-attr-strip" id="p-core-attrs"></div>
-
-        <div class="card-stances-grid" id="p-stances-grid"></div>
-
-        <div class="ability-row">
-          <div class="ability-text" id="p-ability-text"></div>
-          <button class="btn-ability" id="p-ability-btn" onclick="toggleAbility('pitcher')">⚡ Use Ability</button>
-        </div>
-      </section>
-
-      <!-- CENTER PLAYMAT: DIAMOND, LAST PLAY SUMMARY & WHAT BEATS WHAT TRIANGLE -->
-      <section class="center-playmat">
-        <div class="diamond-box" onclick="openModal('modal-table')">
-          <div class="base-sq base-2b" id="base-2"></div>
-          <div class="base-sq base-3b" id="base-3"></div>
-          <div class="base-sq base-1b" id="base-1"></div>
-          <div class="base-sq base-home"></div>
-          <div class="diamond-center-label" id="runners-label">BASES<br>EMPTY</div>
-        </div>
-
-        <div class="center-status-box">
-          <div class="cs-title" id="res-headline">READY FOR PITCH — PICK YOUR COLOR BELOW</div>
-          <div class="cs-sub" id="res-sub">
-            🎯 <strong>MATCH</strong> (Same Color) = <strong>Batter</strong> reads the pitch &amp; claims ⚡ Momentum!<br>
-            🌀 <strong>MISMATCH</strong> (Different Color) = <strong>Pitcher</strong> fools batter &amp; claims ⚡ Momentum!
-          </div>
-          <button class="btn-reopen-last" id="btn-reopen-last" style="display:none;" onclick="openDuelOverlay()">
-            🔍 View Last Duel &amp; Dice Breakdown
-          </button>
-        </div>
-
-        <!-- Mini Pitch Guess Reference -->
-        <div class="mini-triangle-box" onclick="openModal('modal-table')" title="Tap for Outcome Chart & Rules">
-          <div class="mt-title">PITCH GUESS</div>
-          <div style="font-size:0.55rem; font-weight:900; color:#fde047; line-height:1.35; padding:2px 2px;">
-            🎯 MATCH<br><span style="color:#fca5a5;">Batter ⚡</span><br>
-            <span style="color:#64748b;">───</span><br>
-            🌀 DIFF<br><span style="color:#86efac;">Pitcher ⚡</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ACTIVE BATTER CARD (BELOW PLAYMAT) -->
-      <section class="player-card" id="batter-card">
-        <div class="pc-header">
-          <div class="pc-title-group">
-            <span class="pc-role-tag" id="b-role">#1 CF</span>
-            <span class="pc-name" id="b-name">"Flash" Mercer</span>
-          </div>
-          <div class="pc-badges">
-            <span class="mom-token-pill" id="b-mom-token" style="display:none;">⚡ HOLDER</span>
-            <span class="mom-die-pill" id="b-mom-die">MOM: d6</span>
-          </div>
-        </div>
-
-        <div class="core-attr-strip" id="b-core-attrs"></div>
-
-        <div class="card-stances-grid" id="b-stances-grid"></div>
-
-        <div class="ability-row">
-          <div class="ability-text" id="b-ability-text"></div>
-          <button class="btn-ability" id="b-ability-btn" onclick="toggleAbility('batter')">⚡ Use Ability</button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- 3. BOTTOM THUMB ZONE: RED / BLUE / GREEN STANCE SELECTION -->
-    <footer class="bottom-dock">
-      <div class="dock-header">
-        <span id="dock-prompt">🎯 MATCH PITCHER = BATTER ⚡ | 🌀 MISMATCH = PITCHER ⚡</span>
-        <span class="role-indicator" id="user-role-pill">YOU ARE BATTING (TITANS)</span>
-      </div>
-
-      <div class="stance-hand">
-        <button class="stance-btn red-card" onclick="playStance('red')">
-          <span class="sb-color-title" id="btn-red-title">🔴 RED</span>
-          <span class="sb-beats" id="btn-red-hint">🎯 Match = Batter ⚡</span>
-          <span class="sb-dice-pair" id="btn-red-dice">d4 + d10</span>
-          <span class="sb-rating-line" id="btn-red-rating">Rating 8 ⭐</span>
-        </button>
-
-        <button class="stance-btn blue-card" onclick="playStance('blue')">
-          <span class="sb-color-title" id="btn-blue-title">🔵 BLUE</span>
-          <span class="sb-beats" id="btn-blue-hint">🎯 Match = Batter ⚡</span>
-          <span class="sb-dice-pair" id="btn-blue-dice">d10 + d8</span>
-          <span class="sb-rating-line" id="btn-blue-rating">Rating 10 ⭐⭐</span>
-        </button>
-
-        <button class="stance-btn green-card" onclick="playStance('green')">
-          <span class="sb-color-title" id="btn-green-title">🟢 GREEN</span>
-          <span class="sb-beats" id="btn-green-hint">🎯 Match = Batter ⚡</span>
-          <span class="sb-dice-pair" id="btn-green-dice">d10 + d12</span>
-          <span class="sb-rating-line" id="btn-green-rating">Rating 12 ⭐⭐⭐</span>
-        </button>
-      </div>
-    </footer>
-
-    <!-- =======================================================================
-         FULL 3-STEP AT-BAT DUEL RESOLUTION BREAKDOWN OVERLAY
-         ======================================================================= -->
-    <div class="duel-overlay" id="duel-overlay">
-      <div class="duel-card">
-
-        <!-- STEP 1: WHO WON THE PITCH GUESS -->
-        <div class="step-box">
-          <div class="step-header">
-            <span>1. PITCH GUESS (MATCH vs. MISMATCH)</span>
-            <span>🎯 Match = Batter ⚡ | 🌀 Diff = Pitcher ⚡</span>
-          </div>
-
-          <div class="stance-clash-row">
-            <div class="played-stance-pill" id="duel-p-card">
-              <div class="psp-who" id="duel-p-who">⚾ PITCHER</div>
-              <div class="psp-color" id="duel-p-color">🔴 RED</div>
-              <div class="psp-sub" id="duel-p-sub">HEAT</div>
-            </div>
-
-            <div class="vs-circle" id="duel-vs-symbol">≠</div>
-
-            <div class="played-stance-pill" id="duel-b-card">
-              <div class="psp-who" id="duel-b-who">🏏 BATTER</div>
-              <div class="psp-color" id="duel-b-color">🔵 BLUE</div>
-              <div class="psp-sub" id="duel-b-sub">EYE</div>
-            </div>
-          </div>
-
-          <div class="duel-winner-banner" id="duel-winner-banner">
-            🌀 CROSSED UP! Pitcher claims ⚡ Momentum Die!
-          </div>
-        </div>
-
-        <!-- STEP 2: WHICH DICE WERE ROLLED -->
-        <div class="step-box">
-          <div class="step-header">
-            <span>2. DICE ROLLED (HOLDER ROLLS 3 DICE vs. 2 DICE)</span>
-            <span id="duel-holder-tag" style="color:#fde047;">⚡ Holder: Pitcher</span>
-          </div>
-
-          <!-- Pitcher Dice Row -->
-          <div class="dice-side-row">
-            <div class="ds-left">
-              <div class="ds-player-label" id="duel-p-dice-label">⚾ Pitcher</div>
-              <div class="dice-cubes-wrap" id="duel-p-cubes"></div>
-            </div>
-            <div class="ds-total-box">
-              <div class="dst-label">PITCHER</div>
-              <div class="dst-num" id="duel-p-total">0</div>
-            </div>
-          </div>
-
-          <!-- Batter Dice Row -->
-          <div class="dice-side-row">
-            <div class="ds-left">
-              <div class="ds-player-label" id="duel-b-dice-label">🏏 Batter</div>
-              <div class="dice-cubes-wrap" id="duel-b-cubes"></div>
-            </div>
-            <div class="ds-total-box">
-              <div class="dst-label">BATTER</div>
-              <div class="dst-num" id="duel-b-total">0</div>
-            </div>
-          </div>
-
-          <!-- Margin Calculation Bar -->
-          <div class="margin-calc-bar">
-            <span id="duel-margin-formula">Pitcher (15) − Batter (10)</span>
-            <span class="mc-badge" id="duel-margin-badge">MARGIN: +5</span>
-          </div>
-        </div>
-
-        <!-- STEP 3: AT-BAT OUTCOME & HIGHLIGHTED CHART -->
-        <div class="step-box">
-          <div class="step-header">
-            <span>3. AT-BAT OUTCOME (SINGLE LOOKUP TABLE)</span>
-            <span id="duel-score-status">TIT 0 - SER 0</span>
-          </div>
-
-          <div class="outcome-hero" id="duel-outcome-hero">
-            <div class="oh-title" id="duel-outcome-title">🔥 STRIKEOUT (K)</div>
-            <div class="oh-desc" id="duel-outcome-desc">Batter out; baserunners hold.</div>
-            <div class="oh-degrade" id="duel-outcome-degrade" style="display:none;"></div>
-          </div>
-
-          <!-- Interactive 3rd-Base Coach Decision: Send Runner from 2nd on a Single -->
-          <div id="send-runner-box" style="display:none; background:rgba(245,158,11,0.16); border:1.5px solid #f59e0b; border-radius:8px; padding:7px 9px; text-align:center;">
-            <div id="send-runner-prompt" style="font-size:0.7rem; font-weight:900; color:#fef08a; margin-bottom:5px;">
-              👋 3RD BASE COACH: Send runner from 2nd home?
-            </div>
-            <div id="send-runner-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-              <button class="bp-btn" style="background:#334155; padding:6px;" onclick="holdRunnerAt3rd()">
-                🛑 HOLD AT 3RD (Safe)
-              </button>
-              <button class="bp-btn" id="btn-send-home" style="background:#d97706; color:#0f172a; font-weight:900; padding:6px;" onclick="sendRunnerHome()">
-                🏃 SEND HOME! (SPD 4+)
-              </button>
-            </div>
-            <div id="send-runner-result" style="display:none; font-size:0.72rem; font-weight:900; margin-top:4px;"></div>
-          </div>
-
-          <table class="mini-outcome-table" id="duel-mini-table">
-            <tbody>
-              <tr data-band="k"><td>+6 or more</td><td>STRIKEOUT (K)</td><td>Batter out; runners hold</td></tr>
-              <tr data-band="out"><td>+1 to +5</td><td>ROUTINE OUT</td><td>Fly/Pop out; runners hold</td></tr>
-              <tr data-band="sac"><td>0 to -2</td><td>FIELDED / SAC</td><td>Out; Runner on 3rd scores!</td></tr>
-              <tr data-band="bb"><td>-3</td><td>WALK (BB)</td><td>1st base; forces runners</td></tr>
-              <tr data-band="1b"><td>-4 to -6</td><td>CLEAN SINGLE</td><td>Runners +1 (Send 2nd: SPD 4+)</td></tr>
-              <tr data-band="xbh"><td>-7 or less</td><td>EXTRA-BASE / HR</td><td>d6: 1-4 2B, 5 3B, 6 HR!</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <button class="btn-next-ab" onclick="closeDuelOverlay()">
-          CONTINUE TO NEXT AT-BAT ▶
-        </button>
-
+    <div class="scoreboard-strip">
+      <span class="sb-team titans" id="sb-titans">TIT 0</span>
+      <span style="color:#475569;">•</span>
+      <span class="sb-team serpents" id="sb-serpents">SER 0</span>
+      <span class="sb-inning" id="sb-inning">▲ 1ST</span>
+      <div class="outs-cluster">
+        <span>OUTS</span>
+        <span class="out-pip" id="out-pip-1"></span>
+        <span class="out-pip" id="out-pip-2"></span>
       </div>
     </div>
 
-    <!-- MODAL 1: AT-BAT OUTCOME TABLE & STANCE TRIANGLE -->
-    <div class="modal-backdrop" id="modal-table" onclick="closeModalOnBg(event, 'modal-table')">
-      <div class="modal-sheet">
-        <div class="modal-top">
-          <h3>📊 AT-BAT OUTCOME TABLE &amp; PITCH GUESS</h3>
-          <button class="close-btn" onclick="closeModal('modal-table')">✕</button>
+    <div class="topbar-actions">
+      <button class="tt-btn gold" onclick="openLineupSetupModal()">📋 Manager Lineup &amp; Pitcher Setup</button>
+      <button class="tt-btn" onclick="openRulesModal()">📖 Quick Rules</button>
+      <button class="tt-btn" id="btn-reopen-duel" style="display:none;" onclick="openDuelOverlay()">🎲 Last Roll</button>
+      <a href="team_cards.html" target="_blank" class="tt-btn" style="text-decoration:none;">🖨️ Print 11×17 Sheets</a>
+    </div>
+  </header>
+
+  <!-- MAIN TABLETOP SURFACE -->
+  <main class="tabletop-surface">
+
+    <!-- UPPER TABLETOP ROW: ACTIVE DUEL CARDS | DIAMOND & STANCE HAND | PLAYMAT RESULTS CHART -->
+    <section class="table-upper-grid">
+
+      <!-- 1. ACTIVE PITCHER VS. ACTIVE BATTER PHYSICAL PORTRAIT CARDS -->
+      <div class="duel-mat-panel">
+        <div class="panel-banner">
+          <span>🎴 ACTIVE TABLETOP MATCHUP (CLICK ABILITY BOX TO ARM ⚡)</span>
+          <span id="matchup-team-indicator" style="color:#fde047;">You Manage: Metro Titans</span>
         </div>
 
-        <div style="font-size:0.72rem; color:#cbd5e1; line-height:1.4;">
-          <strong>FORMULA:</strong> <code>Margin = Pitcher Score − Batter Score</code><br>
-          <strong>🎯 MATCH (Same Color):</strong> Batter reads the pitch &amp; claims ⚡ Momentum!<br>
-          <strong>🌀 MISMATCH (Different Color):</strong> Pitcher fools the batter &amp; claims ⚡ Momentum!<br>
-          <strong>🏃 SEND RUNNER ON SINGLE:</strong> Manager may Hold runner on 2nd at 3rd (safe) OR Send Home (roll runner's <code>SPD</code> die: <strong>4+ Safe</strong> / <strong>1-3 Out at Home</strong>)!
+        <div class="active-cards-stage">
+          <!-- ACTIVE PITCHER SLOT -->
+          <div class="card-slot-wrapper">
+            <div class="slot-placard">
+              <span>⚾ ACTIVE PITCHER</span>
+              <span id="p-mom-holder-badge" class="phys-mom-token">⚡ MOMENTUM</span>
+            </div>
+            <div id="active-pitcher-card-mount"></div>
+          </div>
+
+          <!-- ACTIVE BATTER SLOT -->
+          <div class="card-slot-wrapper">
+            <div class="slot-placard">
+              <span id="active-batter-slot-label">🏏 BATTER #1</span>
+              <span id="b-mom-holder-badge" class="phys-mom-token" style="display:none;">⚡ MOMENTUM</span>
+            </div>
+            <div id="active-batter-card-mount"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. BASEBALL DIAMOND (WITH BASERUNNER TOKENS) & 3-COLOR STANCE CARDS -->
+      <div class="diamond-stance-panel">
+        <div class="panel-banner">
+          <span>🏟️ BASEBALL DIAMOND &amp; BASERUNNERS</span>
+          <span id="last-play-banner" style="color:#93c5fd;">Select a Stance Card below!</span>
         </div>
 
-        <table class="outcome-ref-table" id="outcome-ref-table">
+        <div class="diamond-box">
+          <div class="infield-dirt"></div>
+          <div class="base-bag b2" id="bag-2b"></div>
+          <div class="base-bag b3" id="bag-3b"></div>
+          <div class="base-bag b1" id="bag-1b"></div>
+          <div class="base-bag home"></div>
+
+          <div class="runner-token-tag r2" id="runner-tag-2b" style="display:none;"></div>
+          <div class="runner-token-tag r3" id="runner-tag-3b" style="display:none;"></div>
+          <div class="runner-token-tag r1" id="runner-tag-1b" style="display:none;"></div>
+        </div>
+
+        <div class="stance-hand-title" id="stance-hand-prompt">
+          👇 YOUR 3 STANCE CARDS (TAP ONE TO REVEAL SIMULTANEOUSLY)
+        </div>
+
+        <div class="stance-cards-hand">
+          <button class="phys-stance-card red-card" onclick="playStance('red')">
+            <div class="psc-header" id="sc-red-title">🔴 POWER</div>
+            <div class="psc-dice-box" id="sc-red-dice">POW + CON</div>
+            <div class="psc-rating" id="sc-red-rating">Rating 10 ⭐⭐⭐</div>
+          </button>
+
+          <button class="phys-stance-card blue-card" onclick="playStance('blue')">
+            <div class="psc-header" id="sc-blue-title">🔵 EYE</div>
+            <div class="psc-dice-box" id="sc-blue-dice">EYE + FOC</div>
+            <div class="psc-rating" id="sc-blue-rating">Rating 9 ⭐⭐</div>
+          </button>
+
+          <button class="phys-stance-card green-card" onclick="playStance('green')">
+            <div class="psc-header" id="sc-green-title">🟢 TIMING</div>
+            <div class="psc-dice-box" id="sc-green-dice">CON + SPD</div>
+            <div class="psc-rating" id="sc-green-rating">Rating 9 ⭐⭐</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. PLAYMAT RESULTS CHART (PRINTED RIGHT ON THE PLAYMAT) -->
+      <div class="playmat-chart-panel">
+        <div class="pm-chart-header">
+          <span>📊 PLAYMAT RESULTS CHART</span>
+          <span style="font-size:0.68rem; font-family:var(--font-sans); color:#fde68a;">Margin = Pitcher − Batter</span>
+        </div>
+
+        <table class="pm-table" id="playmat-live-table">
           <thead>
-            <tr style="color:#94a3b8; font-size:0.64rem;">
-              <th>MARGIN</th>
-              <th>OUTCOME</th>
-              <th>EFFECT</th>
+            <tr>
+              <th style="width:20%;">Margin</th>
+              <th style="width:28%;">Outcome</th>
+              <th>Tabletop Effect</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="out-row" data-band="k">
+            <tr class="p-row" data-band="k">
               <td><strong>+6 or more</strong></td>
-              <td><strong>STRIKEOUT (K)</strong></td>
-              <td>Batter out; runners hold</td>
+              <td><strong>🔥 STRIKEOUT (K)</strong></td>
+              <td>Batter out; baserunners hold.</td>
             </tr>
-            <tr class="out-row" data-band="out">
+            <tr class="p-row" data-band="out">
               <td><strong>+1 to +5</strong></td>
-              <td><strong>ROUTINE OUT</strong></td>
-              <td>Fly/Pop out; runners hold</td>
+              <td><strong>🧤 ROUTINE OUT</strong></td>
+              <td>Fly/Pop out; baserunners hold.</td>
             </tr>
-            <tr class="out-row" data-band="sac">
-              <td><strong>0 to -2</strong></td>
-              <td><strong>FIELDED / SAC</strong></td>
-              <td>Out; Runner on 3rd scores!</td>
+            <tr class="p-row" data-band="sac">
+              <td><strong>0 to −2</strong></td>
+              <td><strong>⚾ FIELDED / SAC</strong></td>
+              <td>Out; Runner on 3rd scores! (2nd ➔ 3rd)</td>
             </tr>
-            <tr class="hit-row" data-band="bb">
-              <td><strong>-3</strong></td>
-              <td><strong>WALK (BB)</strong></td>
-              <td>1st base; forces runners</td>
+            <tr class="b-row" data-band="bb">
+              <td><strong>−3</strong></td>
+              <td><strong>👁️ WALK (BB)</strong></td>
+              <td>1st base; forces baserunners.</td>
             </tr>
-            <tr class="hit-row" data-band="1b">
-              <td><strong>-4 to -6</strong></td>
-              <td><strong>CLEAN SINGLE</strong></td>
-              <td>Runners +1 (Send 2nd: SPD 4+)</td>
+            <tr class="b-row" data-band="1b">
+              <td><strong>−4 to −6</strong></td>
+              <td><strong>💥 CLEAN SINGLE</strong></td>
+              <td>Runners +1 <em>(Send 2nd: <code>SPD</code> 4+ Safe)</em></td>
             </tr>
-            <tr class="hit-row" data-band="xbh">
-              <td><strong>-7 or less</strong></td>
-              <td><strong>EXTRA-BASE / HR</strong></td>
-              <td>d6: 1-4 2B, 5 3B, 6 HR!</td>
+            <tr class="b-row" data-band="xbh">
+              <td><strong>−7 or less</strong></td>
+              <td><strong>🚀 EXTRA-BASE HIT</strong></td>
+              <td><strong>Roll Batter <code>POW</code> Die:</strong> 1–5 2B, 6 3B, 7+ HR!</td>
             </tr>
           </tbody>
         </table>
 
-        <div style="background:#1e293b; border-radius:8px; padding:8px; font-size:0.68rem; line-height:1.35; color:#e2e8f0;">
-          <strong>⚡ MOMENTUM DEGRADATION (V4 RULES):</strong><br>
-          • <strong>Never degrades on a loss!</strong><br>
-          • <strong>Pitcher Endurance:</strong> Steps down 1 tier each time #1 Leadoff starts a new loop through the order (or each new inning for Relievers).<br>
-          • <strong>Special Abilities:</strong> Using a Special Ability degrades that player's Momentum Die 1 tier (<code>d8 ➔ d6 ➔ d4 ➔ None</code>) <strong>after</strong> the ability is used.
+        <div class="pm-subboxes">
+          <div class="pm-subbox" style="background:#fff1f2; border-color:#fecdd3;">
+            <h5 style="color:#9f1239;">🚀 EXTRA-BASE (−7): BATTER POW DIE</h5>
+            • <strong>1–5:</strong> <strong>Double (2B)</strong> (R2/R3 score; R1➔3rd)<br>
+            • <strong>6:</strong> <strong>Triple (3B)</strong> (All score; Batter➔3rd)<br>
+            • <strong>7+:</strong> <strong>Home Run (HR)!</strong> (All score!)
+          </div>
+          <div class="pm-subbox" style="background:#f0f9ff; border-color:#bae6fd;">
+            <h5 style="color:#075985;">🏃 SEND 2ND ON SINGLE: SPD DIE</h5>
+            • <strong>Hold at 3rd:</strong> Advances 1 base safely.<br>
+            • <strong>Send Home:</strong> Roll runner's <strong><code>SPD</code> die</strong>:<br>
+            &nbsp;&nbsp;<strong>4+ Safe (+1 Run)</strong> | <strong>1–3 Out at Home</strong>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- LOWER TABLETOP ROW: THE 11" x 17" LANDSCAPE PLAYMAT WITH ALL 9 BATTERS IN 1 ROW! -->
+    <section class="playmat-11x17-sheet">
+      <div class="playmat-sheet-header">
+        <div class="playmat-sheet-title">
+          <span id="playmat-team-title">📋 11" × 17" MANAGER PLAYMAT — BATTING LINEUP (#1 – #9 IN A SINGLE ROW)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.72rem; font-weight:800; color:#475569;">
+          <span>Each Card Has Its Own Physical Momentum Cube Track (<code>START ▸ STEP ▸ OUT ✕</code>)</span>
+          <button class="tt-btn" style="padding:3px 8px; font-size:0.68rem;" onclick="toggleInspectedLineupTeam()">👁️ View Opponent Lineup</button>
+        </div>
+      </div>
+
+      <div class="lineup-row-scroll" id="playmat-9-row"></div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- 3-STEP AT-BAT DUEL & PHYSICAL DICE RESOLUTION OVERLAY                  -->
+  <!-- ====================================================================== -->
+  <div class="duel-overlay" id="duel-overlay">
+    <div class="duel-modal-card">
+
+      <!-- STEP 1: SIMULTANEOUS 3-COLOR PITCH GUESS -->
+      <div class="step-box">
+        <div class="step-header">
+          <span>1. SIMULTANEOUS PITCH GUESS</span>
+          <span>🎯 Match = Batter ⚡ | 🌀 Mismatch = Pitcher ⚡</span>
+        </div>
+
+        <div class="stance-clash-row">
+          <div class="played-stance-pill" id="duel-p-card">
+            <div class="psp-who" id="duel-p-who">⚾ PITCHER</div>
+            <div class="psp-color" id="duel-p-color">🔴 RED</div>
+            <div class="psp-sub" id="duel-p-sub">HEAT</div>
+          </div>
+
+          <div class="vs-circle" id="duel-vs-symbol">≠</div>
+
+          <div class="played-stance-pill" id="duel-b-card">
+            <div class="psp-who" id="duel-b-who">🏏 BATTER</div>
+            <div class="psp-color" id="duel-b-color">🔵 BLUE</div>
+            <div class="psp-sub" id="duel-b-sub">EYE</div>
+          </div>
+        </div>
+
+        <div class="duel-winner-banner" id="duel-winner-banner"></div>
+      </div>
+
+      <!-- STEP 2: ATTRIBUTE DICE + MOMENTUM DIE ROLL -->
+      <div class="step-box">
+        <div class="step-header">
+          <span>2. TABLETOP DICE ROLL (2 STANCE DICE + HOLDER'S ⚡ MOMENTUM DIE)</span>
+          <span id="duel-holder-tag" style="color:#fde047;"></span>
+        </div>
+
+        <div class="dice-side-row">
+          <div>
+            <div id="duel-p-dice-label" style="font-size:0.74rem;">⚾ Pitcher</div>
+            <div class="dice-cubes-wrap" id="duel-p-cubes"></div>
+          </div>
+          <div class="ds-total-box">
+            <div class="dst-label">PITCHER</div>
+            <div class="dst-num" id="duel-p-total">0</div>
+          </div>
+        </div>
+
+        <div class="dice-side-row">
+          <div>
+            <div id="duel-b-dice-label" style="font-size:0.74rem;">🏏 Batter</div>
+            <div class="dice-cubes-wrap" id="duel-b-cubes"></div>
+          </div>
+          <div class="ds-total-box">
+            <div class="dst-label">BATTER</div>
+            <div class="dst-num" id="duel-b-total">0</div>
+          </div>
+        </div>
+
+        <div class="margin-calc-bar">
+          <span id="duel-margin-formula">Pitcher (0) − Batter (0)</span>
+          <span class="mc-badge" id="duel-margin-badge">MARGIN: 0</span>
+        </div>
+      </div>
+
+      <!-- STEP 3: AT-BAT OUTCOME, EXTRA-BASE POW DIE & 3RD-BASE COACH -->
+      <div class="step-box">
+        <div class="step-header">
+          <span>3. PLAYMAT OUTCOME &amp; CUBE TRACK UPDATE</span>
+          <span id="duel-score-status">TIT 0 - SER 0</span>
+        </div>
+
+        <div class="outcome-hero" id="duel-outcome-hero">
+          <div class="oh-title" id="duel-outcome-title"></div>
+          <div class="oh-desc" id="duel-outcome-desc"></div>
+          <div id="duel-xbh-pow-box" style="display:none; margin-top:6px;"></div>
+          <div class="oh-degrade" id="duel-outcome-degrade" style="display:none;"></div>
+        </div>
+
+        <!-- Interactive 3rd-Base Coach Decision on Clean Single with Runner on 2nd -->
+        <div id="send-runner-box" style="display:none; background:rgba(245,158,11,0.16); border:1.5px solid #f59e0b; border-radius:8px; padding:8px 10px; text-align:center;">
+          <div id="send-runner-prompt" style="font-size:0.74rem; font-weight:900; color:#fef08a; margin-bottom:6px;"></div>
+          <div id="send-runner-actions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button class="tt-btn" style="padding:7px;" onclick="holdRunnerAt3rd()">🛑 HOLD AT 3RD (Safe)</button>
+            <button class="tt-btn gold" id="btn-send-home" style="padding:7px;" onclick="sendRunnerHome()">🏃 SEND HOME! (Roll SPD Die)</button>
+          </div>
+          <div id="send-runner-result" style="display:none; font-size:0.75rem; font-weight:900; margin-top:5px;"></div>
+        </div>
+      </div>
+
+      <button class="btn-next-ab" onclick="closeDuelOverlay()">
+        CONTINUE TO NEXT AT-BAT ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MANAGER LINEUP (#1-#9) & PITCHING STAFF SETUP MODAL                    -->
+  <!-- ====================================================================== -->
+  <div class="duel-overlay" id="setup-modal">
+    <div class="setup-modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:8px;">
+        <div>
+          <h3 style="font-family:var(--font-impact); font-size:1.15rem; letter-spacing:0.6px; color:#fde047;">
+            📋 MANAGER PLAYMAT SETUP — SET YOUR BATTING ORDER (#1–#9) &amp; PITCHER
+          </h3>
+          <p style="font-size:0.72rem; color:#94a3b8;">
+            No player has a predetermined lineup spot! Tap any two batters below to swap their slots (#1–#9), or choose your active pitcher.
+          </p>
+        </div>
+        <button class="tt-btn" onclick="closeLineupSetupModal()">✕ Close</button>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; background:#1e293b; padding:8px 10px; border-radius:8px;">
+        <div style="font-size:0.78rem; font-weight:800;">
+          Managing Team: <strong id="setup-team-name" style="color:#fde047;">Metro Titans</strong>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="tt-btn" onclick="switchUserTeam()">🔄 Switch Managed Team</button>
+          <button class="tt-btn" style="background:#dc2626; border-color:#ef4444;" onclick="resetNewGame()">♻️ Reset New Game</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:0.75rem; font-weight:900; color:#93c5fd; margin-bottom:6px; text-transform:uppercase;">
+          1. Your Batting Lineup Slots (#1 to #9) — Tap Two Players to Swap Order:
+        </div>
+        <div class="setup-Order-list" id="setup-lineup-grid"></div>
+      </div>
+
+      <div>
+        <div style="font-size:0.75rem; font-weight:900; color:#86efac; margin-bottom:6px; text-transform:uppercase;">
+          2. Active Pitcher Slot (Starters &amp; Bullpen Relievers — Tap to Put on the Mound):
+        </div>
+        <div class="setup-Order-list" id="setup-pitcher-grid"></div>
+      </div>
+
+      <button class="btn-next-ab" onclick="closeLineupSetupModal()">
+        ✅ LOCK IN PLAYMAT LINEUP &amp; PLAY BALL!
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- QUICK RULES MODAL (MATCHING PLAYMAT LEFT SHEET)                        -->
+  <!-- ====================================================================== -->
+  <div class="duel-overlay" id="rules-modal">
+    <div class="setup-modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:8px;">
+        <h3 style="font-family:var(--font-impact); font-size:1.1rem; color:#fde047;">⚾ FULL COUNT — PLAYMAT QUICK RULES REFERENCE</h3>
+        <button class="tt-btn" onclick="closeRulesModal()">✕ Close</button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.76rem; line-height:1.45; color:#e2e8f0;">
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+          <strong style="color:#fde047;">1. SIMULTANEOUS PITCH GUESS (🔴 / 🔵 / 🟢)</strong><br>
+          • Both managers secretly select and reveal one Color Stance card:<br>
+          &nbsp;&nbsp;— <strong>🔴 Red:</strong> Pitcher <code>VEL+GRT</code> vs. Batter <code>POW+CON</code><br>
+          &nbsp;&nbsp;— <strong>🔵 Blue:</strong> Pitcher <code>CMD+GRT</code> vs. Batter <code>EYE+FOC</code><br>
+          &nbsp;&nbsp;— <strong>🟢 Green:</strong> Pitcher <code>MOV+DEC</code> vs. Batter <code>CON+SPD</code><br>
+          • <strong>🎯 MATCH (Same Color):</strong> Batter claims the <strong>⚡ Momentum Token</strong>!<br>
+          • <strong>🌀 MISMATCH (Different Colors):</strong> Pitcher claims the <strong>⚡ Momentum Token</strong>!
+        </div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+          <strong style="color:#fde047;">2. ROLL DICE &amp; EXTRA-BASE POW DIE</strong><br>
+          • Each player rolls the <strong>2 Attribute Dice</strong> for the color they chose.<br>
+          • The <strong>⚡ Momentum Holder</strong> also rolls their current <strong>Momentum Die</strong> (<code>d8</code>, <code>d6</code>, or <code>d4</code> where their cube sits).<br>
+          • <strong><code>Margin = Pitcher Total − Batter Total</code></strong>.<br>
+          • On an <strong>Extra-Base Hit (−7 or less)</strong>, roll the <strong>Batter's <code>POW</code> Die</strong>: <strong><code>1–5</code> = Double (2B)</strong>, <strong><code>6</code> = Triple (3B)</strong>, <strong><code>7+</code> = Home Run (HR)!</strong>
+        </div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+          <strong style="color:#fde047;">3. MOMENTUM CUBE TRACK &amp; SPECIAL ABILITIES</strong><br>
+          • Place a cube on each player's <strong><code>START</code></strong> box (<code>d8</code>, <code>d6</code>, or <code>d4</code>).<br>
+          • Tap any active card's <strong>⚡ Special Ability box</strong> before pitching/swinging to arm it. Using an ability slides that player's cube <strong>1 box right</strong> (<code>d8 ▸ d6 ▸ d4 ▸ OUT ✕</code>) <em>after</em> the at-bat resolves.
+        </div>
+        <div style="background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+          <strong style="color:#fde047;">4. PITCHER ENDURANCE &amp; SENDING RUNNERS</strong><br>
+          • <strong>Starters (SP):</strong> Slide cube 1 box right each time <code>BATTER #1</code> starts a new loop through the batting order.<br>
+          • <strong>Relievers (RP):</strong> Slide cube 1 box right at the start of each new inning they remain on the mound.<br>
+          • <strong>Single with Runner on 2nd:</strong> Hold at 3rd (safe) OR Send Home (roll runner's <code>SPD</code> die: <strong>4+ Safe</strong> / <strong>1–3 Out</strong>).
         </div>
       </div>
     </div>
-
-    <!-- MODAL 2: BULLPEN & TEAM CONTROLS -->
-    <div class="modal-backdrop" id="modal-bullpen" onclick="closeModalOnBg(event, 'modal-bullpen')">
-      <div class="modal-sheet">
-        <div class="modal-top">
-          <h3>🔄 PITCHING STAFF &amp; GAME CONTROLS</h3>
-          <button class="close-btn" onclick="closeModal('modal-bullpen')">✕</button>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-          <span style="font-size:0.72rem; color:#cbd5e1;">Your Team: <strong id="user-team-label" style="color:#fde047;">Metro Titans</strong></span>
-          <button class="bp-btn" onclick="swapUserTeam()">Switch Team</button>
-          <button class="bp-btn" style="background:#dc2626;" onclick="resetFullGame()">New Game</button>
-        </div>
-
-        <div style="font-size:0.72rem; font-weight:800; color:#93c5fd; margin-top:4px;">
-          ACTIVE DEFENSE PITCHING STAFF (Tap to Substitute):
-        </div>
-        <div class="bullpen-list" id="bullpen-list"></div>
-      </div>
-    </div>
-
   </div>
 
   <script>
     // =========================================================================
-    // FULL COUNT V4 — COMPLETE ROSTER DATA & GAME ENGINE
+    // FULL COUNT V4 — TABLETOP SIMULATOR ENGINE & ROSTERS
     // =========================================================================
     const DIE_MAX = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 };
     const DIE_AVG = { d4: 2.5, d6: 3.5, d8: 4.5, d10: 5.5, d12: 6.5 };
@@ -1342,63 +1558,66 @@
       return '⭐';
     }
 
+    // Complete 30-Player Rosters (Matching team_cards.html 100% — No predetermined lineup titles!)
     const TEAMS_TEMPLATE = {
       titans: {
         name: 'Metro Titans',
         short: 'TIT',
-        cardClass: 'titans-card',
+        themeClass: 'titans',
         pitchers: [
-          { id: 't_sp1', role: 'SP #1 (Ace)', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll highest pitch die & +1 to roll', abilityType: 'reroll_pitch' },
-          { id: 't_sp2', role: 'SP #2 (Sinker)', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 't_sp3', role: 'SP #3 (Workhorse)', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 't_rp1', role: 'RP #1 (Setup)', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 't_rp2', role: 'RP #2 (Middle)', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Southpaw Sweep', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 't_cl',  role: 'Closer', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Claim ⚡ Momentum Token & +2 roll', abilityType: 'steal_mom' }
+          { id: 't_sp1', pos: 'SP', name: '"Apex" Garrison', isStarter: true, vel: 'd12', cmd: 'd6', mov: 'd8', dec: 'd6', grt: 'd10', startMom: 'd8', mom: 'd8', abilityName: 'Sonic Boom', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
+          { id: 't_sp2', pos: 'SP', name: '"Brick" Kowalski', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd10', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Iron Sink', abilityDesc: '+2 Pitch; Fielded/Sac Outs (0..-2) hold all runners.', abilityType: 'iron_sink' },
+          { id: 't_sp3', pos: 'SP', name: 'Dakota Ridge', isStarter: true, vel: 'd6', cmd: 'd8', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Inning Eater', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_rp1', pos: 'RP', name: '"Spitfire" Ramos', isStarter: false, vel: 'd10', cmd: 'd4', mov: 'd8', dec: 'd4', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Flamethrower', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_rp2', pos: 'RP', name: '"Lefty" Vance', isStarter: false, vel: 'd6', cmd: 'd8', mov: 'd8', dec: 'd8', grt: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Southpaw Sweep', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 't_cl',  pos: 'RP', name: '"The Beast" Tanker', isStarter: false, vel: 'd12', cmd: 'd4', mov: 'd6', dec: 'd4', grt: 'd12', startMom: 'd8', mom: 'd8', abilityName: 'Lights Out', abilityDesc: 'Auto-claim ⚡ Momentum Token & +2 Pitcher roll!', abilityType: 'steal_mom' }
         ],
         batters: [
-          { order: 1, pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+2 to Batter roll & +1 extra base on Single', abilityType: 'extra_base' },
-          { order: 2, pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Pure Barrel', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 3, pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: '+3 to Batter total roll', abilityType: 'clutch_plus3' },
-          { order: 4, pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 to Batter roll; XBH is HR on 4-6', abilityType: 'moonshot' },
-          { order: 5, pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 6, pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', mom: 'd4', abilityName: 'Gritty AB', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 7, pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Second Leadoff', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 8, pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Contact Poke', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 9, pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll an extra +d6 bonus die!', abilityType: 'underdog_d6' }
+          { id: 't_b1', pos: 'CF', name: '"Flash" Mercer', pow: 'd4', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd12', startMom: 'd6', mom: 'd6', abilityName: 'Rabbit Jump', abilityDesc: '+2 Batter roll; advance +1 extra base on a Single.', abilityType: 'extra_base' },
+          { id: 't_b2', pos: 'RF', name: 'Aaron Vance', pow: 'd10', con: 'd10', eye: 'd8', foc: 'd10', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Pure Barrel', abilityDesc: '+2 Batter roll; any Strikeout becomes Routine Out.', abilityType: 'pure_barrel' },
+          { id: 't_b3', pos: 'LF', name: 'Corbin Reyes', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd8', mom: 'd8', abilityName: 'Clutch Drive', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
+          { id: 't_b4', pos: '1B', name: '"Colossus" Stone', pow: 'd12', con: 'd6', eye: 'd4', foc: 'd8', spd: 'd4', startMom: 'd8', mom: 'd8', abilityName: 'Moonshot', abilityDesc: '+3 Batter roll; Extra-Base (-7) is HR on POW 5+!', abilityType: 'moonshot' },
+          { id: 't_b5', pos: '3B', name: 'Marcus Cole', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Hot Corner', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b6', pos: 'C',  name: '"Blue Collar" Dan', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Gritty AB', abilityDesc: '+2 Batter roll; Margin +1 becomes 0 (Fielded/Sac).', abilityType: 'gritty_ab' },
+          { id: 't_b7', pos: '2B', name: 'Toby Chen', pow: 'd4', con: 'd8', eye: 'd6', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Gap Spark', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b8', pos: 'SS', name: '"Glove-Man" Pete', pow: 'd4', con: 'd6', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Contact Poke', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 't_b9', pos: 'DH', name: 'Eli "The Kid"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Underdog Spark', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
         ]
       },
       serpents: {
         name: 'Shadow Serpents',
         short: 'SER',
-        cardClass: 'serpents-card',
+        themeClass: 'serpents',
         pitchers: [
-          { id: 's_sp1', role: 'SP #1 (Ace)', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 to Pitcher roll (-3 Walk becomes Out)', abilityType: 'black_paint' },
-          { id: 's_sp2', role: 'SP #2 (Spin)', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll highest pitch die & +1 to roll', abilityType: 'reroll_pitch' },
-          { id: 's_sp3', role: 'SP #3 (Vet)', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 's_rp1', role: 'RP #1 (Setup)', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 's_rp2', role: 'RP #2 (Middle)', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', mom: 'd4', abilityName: 'Fireman', abilityDesc: '+2 to Pitcher total roll', abilityType: 'pitch_plus2' },
-          { id: 's_cl',  role: 'Closer', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: '+3 to Pitcher total roll', abilityType: 'pitch_plus3' }
+          { id: 's_sp1', pos: 'SP', name: '"Professor" Webb', isStarter: true, vel: 'd6', cmd: 'd12', mov: 'd10', dec: 'd10', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Black Paint', abilityDesc: '+2 Pitch; Margin -3 Walk becomes 0 Fielded Out.', abilityType: 'black_paint' },
+          { id: 's_sp2', pos: 'SP', name: '"Ghost" Strider', isStarter: true, vel: 'd8', cmd: 'd8', mov: 'd8', dec: 'd12', grt: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Tunneling', abilityDesc: 'Reroll highest pitch die & keep higher (+1 Pitch).', abilityType: 'reroll_pitch' },
+          { id: 's_sp3', pos: 'SP', name: '"Cold-Eye" Carter', isStarter: true, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd6', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Veteran Poise', abilityDesc: '+2 Pitch; downgrade any Extra-Base (-7) to Single.', abilityType: 'vet_poise' },
+          { id: 's_rp1', pos: 'RP', name: '"Submarine" Skenes', isStarter: false, vel: 'd8', cmd: 'd6', mov: 'd10', dec: 'd8', grt: 'd8', startMom: 'd6', mom: 'd6', abilityName: 'Rising Slider', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 's_rp2', pos: 'RP', name: '"Icebox" Keller', isStarter: false, vel: 'd6', cmd: 'd10', mov: 'd6', dec: 'd8', grt: 'd6', startMom: 'd4', mom: 'd4', abilityName: 'Fireman', abilityDesc: 'Add +2 to your Pitcher total roll.', abilityType: 'pitch_plus2' },
+          { id: 's_cl',  pos: 'RP', name: '"Viper" Cruz', isStarter: false, vel: 'd8', cmd: 'd8', mov: 'd12', dec: 'd10', grt: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Nasty Bite', abilityDesc: 'Add +3 to your Pitcher total roll.', abilityType: 'pitch_plus3' }
         ],
         batters: [
-          { order: 1, pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: 'Draws Walk on Margin -2 or -3 (+2 roll)', abilityType: 'eagle_eye' },
-          { order: 2, pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Pitch Guess & claim ⚡ Momentum!', abilityType: 'auto_read' },
-          { order: 3, pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: 'Upgrade Single to Double (+2 roll)', abilityType: 'upgrade_1b' },
-          { order: 4, pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: '+3 to Batter total roll', abilityType: 'clutch_plus3' },
-          { order: 5, pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', mom: 'd6', abilityName: 'Line Drive', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 6, pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 7, pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll highest batter die & +1 to roll', abilityType: 'reroll_bat' },
-          { order: 8, pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: '+2 to Batter total roll', abilityType: 'bat_plus2' },
-          { order: 9, pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', mom: 'd4', abilityName: 'Nine-Hole Hustle', abilityDesc: 'Roll an extra +d6 bonus die!', abilityType: 'underdog_d6' }
+          { id: 's_b1', pos: 'LF', name: '"Professor" Soto', pow: 'd6', con: 'd10', eye: 'd12', foc: 'd10', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Eagle Eye', abilityDesc: '+2 Batter roll; draw a Walk on Margin -2 or -3.', abilityType: 'eagle_eye' },
+          { id: 's_b2', pos: 'DH', name: 'Shohei "Viper" Cruz', pow: 'd10', con: 'd10', eye: 'd10', foc: 'd8', spd: 'd10', startMom: 'd8', mom: 'd8', abilityName: '5-Tool Genius', abilityDesc: 'Auto-win Pitch Guess & claim ⚡ Momentum Token!', abilityType: 'auto_read' },
+          { id: 's_b3', pos: 'SS', name: 'Gunnar Henderson', pow: 'd8', con: 'd10', eye: 'd8', foc: 'd8', spd: 'd8', startMom: 'd8', mom: 'd8', abilityName: 'Gap Hunter', abilityDesc: '+2 Batter roll; upgrade any Single (-4..-6) to 2B.', abilityType: 'upgrade_1b' },
+          { id: 's_b4', pos: '1B', name: 'Bryce Harper', pow: 'd10', con: 'd8', eye: 'd8', foc: 'd8', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Showtime', abilityDesc: 'Add +3 to your Batter total roll.', abilityType: 'clutch_plus3' },
+          { id: 's_b5', pos: '3B', name: 'Manny Machado', pow: 'd8', con: 'd8', eye: 'd6', foc: 'd8', spd: 'd6', startMom: 'd6', mom: 'd6', abilityName: 'Line Drive', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b6', pos: 'CF', name: 'Francisco Lindor', pow: 'd6', con: 'd8', eye: 'd6', foc: 'd6', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Mr. Smile', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b7', pos: '2B', name: 'Nico Hoerner', pow: 'd4', con: 'd10', eye: 'd6', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Bat Control', abilityDesc: 'Reroll highest batter die & keep higher (+1 Bat).', abilityType: 'reroll_bat' },
+          { id: 's_b8', pos: 'C',  name: 'Austin Hedges', pow: 'd4', con: 'd6', eye: 'd6', foc: 'd6', spd: 'd4', startMom: 'd4', mom: 'd4', abilityName: 'Veteran Eye', abilityDesc: 'Add +2 to your Batter total roll.', abilityType: 'bat_plus2' },
+          { id: 's_b9', pos: 'RF', name: 'Leo "The Spark"', pow: 'd4', con: 'd4', eye: 'd4', foc: 'd4', spd: 'd8', startMom: 'd4', mom: 'd4', abilityName: 'Pure Hustle', abilityDesc: 'Roll an extra +d6 bonus die & add to Batter roll!', abilityType: 'underdog_d6' }
         ]
       }
     };
 
     let state = null;
+    let swapSlotIdx = null;
 
     function initGame(userTeamKey = 'titans') {
       const clone = JSON.parse(JSON.stringify(TEAMS_TEMPLATE));
       state = {
         userTeam: userTeamKey,
+        inspectedLineupTeam: userTeamKey,
         inning: 1,
         half: 'top',
         outs: 0,
@@ -1406,31 +1625,18 @@
         bases: [null, null, null],
         momentumHolder: 'pitcher',
         teams: {
-          titans: {
-            ...clone.titans,
-            activePitcherIdx: 0,
-            batterIdx: 0,
-            lineupLoops: 0
-          },
-          serpents: {
-            ...clone.serpents,
-            activePitcherIdx: 0,
-            batterIdx: 0,
-            lineupLoops: 0
-          }
+          titans: { ...clone.titans, activePitcherIdx: 0, batterIdx: 0, lineupLoops: 0 },
+          serpents: { ...clone.serpents, activePitcherIdx: 0, batterIdx: 0, lineupLoops: 0 }
         },
         abilityArmed: { pitcher: false, batter: false },
-        lastBand: null
+        lastBand: null,
+        pendingSendRunner: null
       };
       renderAll();
     }
 
-    function getOffenseTeamKey() {
-      return state.half === 'top' ? 'titans' : 'serpents';
-    }
-    function getDefenseTeamKey() {
-      return state.half === 'top' ? 'serpents' : 'titans';
-    }
+    function getOffenseTeamKey() { return state.half === 'top' ? 'titans' : 'serpents'; }
+    function getDefenseTeamKey() { return state.half === 'top' ? 'serpents' : 'titans'; }
     function getActivePitcher() {
       const def = state.teams[getDefenseTeamKey()];
       return def.pitchers[def.activePitcherIdx];
@@ -1452,9 +1658,122 @@
       return { label: 'TIMING', a1: 'Con', d1: b.con, a2: 'Spd', d2: b.spd };
     }
 
-    // Pitch Guess Resolution: Match (Same Color) = Batter claims Momentum; Mismatch = Pitcher claims Momentum
-    function evaluateStanceRead(pColor, bColor) {
-      return pColor === bColor ? 'batter' : 'pitcher';
+    // Build the physical Momentum Cube Track HTML (with a 3D glowing cube on the active box!)
+    function buildCubeTrackHTML(startMom, currentMom, isPitcher) {
+      const steps = [];
+      if (startMom === 'd8') steps.push('d8', 'd6', 'd4');
+      else if (startMom === 'd6') steps.push('d6', 'd4');
+      else steps.push('d4');
+
+      let boxesHTML = '';
+      steps.forEach((tier, idx) => {
+        const isStart = (idx === 0);
+        const hasCube = (currentMom === tier);
+        boxesHTML += `
+          <div class="pc-cube-box ${isStart ? 'start-box' : ''} ${hasCube ? 'has-cube' : ''}">
+            ${hasCube ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+            <span class="pc-cube-step">${isStart ? 'START' : 'STEP'}</span>
+            <span class="pc-cube-die">${tier}</span>
+          </div>
+          <span class="pc-cube-arrow">▸</span>
+        `;
+      });
+
+      const isOut = (currentMom === 'None');
+      boxesHTML += `
+        <div class="pc-cube-box out-box ${isOut ? 'has-cube' : ''}">
+          ${isOut ? '<span class="physical-cube-marker" title="Momentum Exhausted"></span>' : ''}
+          <span class="pc-cube-step">OUT</span>
+          <span class="pc-cube-die">✕</span>
+        </div>
+      `;
+
+      return `
+        <div class="pc-cube-track">
+          <div class="pc-cube-label">⚡ ${isPitcher ? 'ENDURANCE / MOM. CUBE TRACK' : 'MOMENTUM CUBE TRACK'}</div>
+          <div class="pc-cube-row">${boxesHTML}</div>
+        </div>
+      `;
+    }
+
+    // Build an authentic Portrait Half-Size Physical Card HTML (matching team_cards.html)
+    function buildPhysicalCardHTML(player, teamKey, isPitcher, options = {}) {
+      const team = state.teams[teamKey];
+      const miniClass = options.isMini ? 'lineup-mini' : '';
+      const isArmed = options.isArmed || false;
+      const onClickAbility = options.onClickAbility || '';
+
+      const redInfo = isPitcher ? getPitcherStanceDice(player, 'red') : getBatterStanceDice(player, 'red');
+      const blueInfo = isPitcher ? getPitcherStanceDice(player, 'blue') : getBatterStanceDice(player, 'blue');
+      const greenInfo = isPitcher ? getPitcherStanceDice(player, 'green') : getBatterStanceDice(player, 'green');
+
+      const rRed = Math.round(calcRating(redInfo.d1, redInfo.d2));
+      const rBlue = Math.round(calcRating(blueInfo.d1, blueInfo.d2));
+      const rGreen = Math.round(calcRating(greenInfo.d1, greenInfo.d2));
+
+      const badgeHTML = isPitcher
+        ? `<span class="pc-badge ${player.isStarter ? 'mom-badge' : ''}">${player.isStarter ? 'STARTER' : 'RELIEVER'}</span>`
+        : `<span class="pc-badge spd-badge">SPD ${player.spd}</span>`;
+
+      const coreStatsHTML = isPitcher
+        ? `<div class="pc-core-stats">
+             <span>VEL<strong>${player.vel}</strong></span>
+             <span>CMD<strong>${player.cmd}</strong></span>
+             <span>MOV<strong>${player.mov}</strong></span>
+             <span>DEC<strong>${player.dec}</strong></span>
+             <span>GRT<strong>${player.grt}</strong></span>
+           </div>`
+        : `<div class="pc-core-stats">
+             <span>POW<strong>${player.pow}</strong></span>
+             <span>CON<strong>${player.con}</strong></span>
+             <span>EYE<strong>${player.eye}</strong></span>
+             <span>FOC<strong>${player.foc}</strong></span>
+             <span>SPD<strong>${player.spd}</strong></span>
+           </div>`;
+
+      const exhaustedClass = player.mom === 'None' ? 'exhausted' : '';
+      const armedClass = isArmed ? 'armed' : '';
+
+      return `
+        <div class="phys-card ${team.themeClass} ${miniClass}">
+          <div class="pc-header">
+            <div class="pc-top-meta">
+              <span class="pc-role">${team.short} • ${player.pos}</span>
+              ${badgeHTML}
+            </div>
+            <div class="pc-name">${player.name}</div>
+          </div>
+
+          ${coreStatsHTML}
+
+          <table class="pc-stances-table">
+            <tr>
+              <td><span class="pc-stance-tag red">🔴 ${redInfo.label}</span><span class="pc-stance-dice">${redInfo.a1} ${redInfo.d1}+${redInfo.a2} ${redInfo.d2}</span></td>
+              <td class="pc-stars">${getStars(rRed)}</td>
+              <td class="pc-rating">${rRed}</td>
+            </tr>
+            <tr>
+              <td><span class="pc-stance-tag blue">🔵 ${blueInfo.label}</span><span class="pc-stance-dice">${blueInfo.a1} ${blueInfo.d1}+${blueInfo.a2} ${blueInfo.d2}</span></td>
+              <td class="pc-stars">${getStars(rBlue)}</td>
+              <td class="pc-rating">${rBlue}</td>
+            </tr>
+            <tr>
+              <td><span class="pc-stance-tag green">🟢 ${greenInfo.label}</span><span class="pc-stance-dice">${greenInfo.a1} ${greenInfo.d1}+${greenInfo.a2} ${greenInfo.d2}</span></td>
+              <td class="pc-stars">${getStars(rGreen)}</td>
+              <td class="pc-rating">${rGreen}</td>
+            </tr>
+          </table>
+
+          ${buildCubeTrackHTML(player.startMom, player.mom, isPitcher)}
+
+          <div class="pc-ability-box ${armedClass} ${exhaustedClass}" ${onClickAbility ? `onclick="${onClickAbility}"` : ''} title="Click to toggle Special Ability for this At-Bat">
+            <div>
+              <span class="pc-ability-title">⚡ ${player.abilityName}${isArmed ? ' [ARMED!]' : ''}:</span>
+              ${player.abilityDesc}
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function toggleAbility(role) {
@@ -1490,66 +1809,60 @@
 
     function playStance(userColor) {
       const offKey = getOffenseTeamKey();
+      const defKey = getDefenseTeamKey();
       const userIsBatting = (offKey === state.userTeam);
       const p = getActivePitcher();
       const b = getActiveBatter();
 
+      // Bot occasionally arms its Special Ability in high-leverage moments
+      const runnersOn = !!(state.bases[0] || state.bases[1] || state.bases[2]);
+      if (userIsBatting && p.mom !== 'None' && runnersOn && Math.random() < 0.25) {
+        state.abilityArmed.pitcher = true;
+      } else if (!userIsBatting && b.mom !== 'None' && (runnersOn || state.inning >= 7) && Math.random() < 0.25) {
+        state.abilityArmed.batter = true;
+      }
+
       const pColor = userIsBatting ? chooseBotStance(p, true) : userColor;
       const bColor = userIsBatting ? userColor : chooseBotStance(b, false);
 
-      // 1. Stance Resolution (What Beats What)
-      let readWinner = evaluateStanceRead(pColor, bColor);
-      if (state.abilityArmed.batter && b.abilityType === 'auto_read') {
-        readWinner = 'batter';
-      }
-      if (state.abilityArmed.pitcher && p.abilityType === 'steal_mom') {
-        readWinner = 'pitcher';
-      }
+      // 1. Pitch Guess Resolution: Match = Batter claims Momentum; Mismatch = Pitcher claims Momentum
+      let readWinner = (pColor === bColor) ? 'batter' : 'pitcher';
+      if (state.abilityArmed.batter && b.abilityType === 'auto_read') readWinner = 'batter';
+      if (state.abilityArmed.pitcher && p.abilityType === 'steal_mom') readWinner = 'pitcher';
+      state.momentumHolder = readWinner;
 
-      if (readWinner === 'pitcher') state.momentumHolder = 'pitcher';
-      else if (readWinner === 'batter') state.momentumHolder = 'batter';
-      // On 'tie', state.momentumHolder does NOT move!
-
-      // 2. Roll Base Attribute Dice (2 dice each) + Momentum Die for Holder (3rd die)
+      // 2. Roll 2 Chosen Stance Dice + Holder's Momentum Die
       const pStance = getPitcherStanceDice(p, pColor);
       const bStance = getBatterStanceDice(b, bColor);
 
       let pRoll1 = rollDie(pStance.d1);
       let pRoll2 = rollDie(pStance.d2);
       if (state.abilityArmed.pitcher && p.abilityType === 'reroll_pitch') {
-        if (DIE_MAX[pStance.d1] >= DIE_MAX[pStance.d2]) {
-          pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
-        } else {
-          pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
-        }
+        if (DIE_MAX[pStance.d1] >= DIE_MAX[pStance.d2]) pRoll1 = Math.max(pRoll1, rollDie(pStance.d1));
+        else pRoll2 = Math.max(pRoll2, rollDie(pStance.d2));
       }
 
       let bRoll1 = rollDie(bStance.d1);
       let bRoll2 = rollDie(bStance.d2);
       if (state.abilityArmed.batter && b.abilityType === 'reroll_bat') {
-        if (DIE_MAX[bStance.d1] >= DIE_MAX[bStance.d2]) {
-          bRoll1 = Math.max(bRoll1, rollDie(bStance.d1));
-        } else {
-          bRoll2 = Math.max(bRoll2, rollDie(bStance.d2));
-        }
+        if (DIE_MAX[bStance.d1] >= DIE_MAX[bStance.d2]) bRoll1 = Math.max(bRoll1, rollDie(bStance.d1));
+        else bRoll2 = Math.max(bStance.d2 ? bRoll2 : 0, rollDie(bStance.d2));
       }
 
-      // Momentum Die Roll (uses current un-degraded Momentum Die!)
       const pMomDieUsed = (state.momentumHolder === 'pitcher' && p.mom !== 'None') ? p.mom : null;
       const bMomDieUsed = (state.momentumHolder === 'batter' && b.mom !== 'None') ? b.mom : null;
       const pMomRoll = pMomDieUsed ? rollDie(pMomDieUsed) : 0;
       const bMomRoll = bMomDieUsed ? rollDie(bMomDieUsed) : 0;
 
-      // Special Ability Bonuses (Always active whenever ability is armed!)
       let pBonus = 0;
       let bBonus = 0;
       if (state.abilityArmed.pitcher) {
-        if (['pitch_plus2', 'steal_mom', 'black_paint'].includes(p.abilityType)) pBonus += 2;
+        if (['pitch_plus2', 'steal_mom', 'black_paint', 'iron_sink', 'vet_poise'].includes(p.abilityType)) pBonus += 2;
         if (p.abilityType === 'pitch_plus3') pBonus += 3;
         if (p.abilityType === 'reroll_pitch') pBonus += 1;
       }
       if (state.abilityArmed.batter) {
-        if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base'].includes(b.abilityType)) bBonus += 2;
+        if (['bat_plus2', 'eagle_eye', 'upgrade_1b', 'extra_base', 'pure_barrel', 'gritty_ab'].includes(b.abilityType)) bBonus += 2;
         if (['clutch_plus3', 'moonshot'].includes(b.abilityType)) bBonus += 3;
         if (b.abilityType === 'reroll_bat') bBonus += 1;
         if (b.abilityType === 'underdog_d6') bBonus += rollDie('d6');
@@ -1559,30 +1872,28 @@
       const bTotal = bRoll1 + bRoll2 + bMomRoll + bBonus;
       const margin = pTotal - bTotal;
 
-      // 3. Consult Single At-Bat Outcome Table
+      // 3. Resolve Outcome Table (including Option B Batter POW Die on Extra-Base Hits!)
       const outcomeInfo = resolveOutcomeTable(margin, p, b);
 
-      // 4. AFTER Ability Has Been Used -> Degrade Momentum Die 1 Tier!
+      // 4. Slide Physical Momentum Cube 1 Box Right After Ability Use!
       let postAbilityNotes = [];
       if (state.abilityArmed.pitcher) {
         const oldDie = p.mom;
         p.mom = stepDownDie(p.mom);
-        postAbilityNotes.push(`${p.name} used ${p.abilityName} (Mom. Die degraded after use: ${oldDie} ➔ ${p.mom})`);
+        postAbilityNotes.push(`${p.name} used ${p.abilityName} (Cube slid right: ${oldDie} ▸ ${p.mom === 'None' ? 'OUT ✕' : p.mom})`);
         state.abilityArmed.pitcher = false;
       }
       if (state.abilityArmed.batter) {
         const oldDie = b.mom;
         b.mom = stepDownDie(b.mom);
-        postAbilityNotes.push(`${b.name} used ${b.abilityName} (Mom. Die degraded after use: ${oldDie} ➔ ${b.mom})`);
+        postAbilityNotes.push(`${b.name} used ${b.abilityName} (Cube slid right: ${oldDie} ▸ ${b.mom === 'None' ? 'OUT ✕' : b.mom})`);
         state.abilityArmed.batter = false;
       }
 
-      // 5. Populate the 3-Step Duel Breakdown Overlay
+      // 5. Populate Duel Overlay
       const colorNames = { red: '🔴 RED', blue: '🔵 BLUE', green: '🟢 GREEN' };
-      const pCardEl = document.getElementById('duel-p-card');
-      const bCardEl = document.getElementById('duel-b-card');
-      pCardEl.className = `played-stance-pill ${pColor}${readWinner === 'pitcher' ? ' winner' : ''}`;
-      bCardEl.className = `played-stance-pill ${bColor}${readWinner === 'batter' ? ' winner' : ''}`;
+      document.getElementById('duel-p-card').className = `played-stance-pill ${pColor} ${readWinner === 'pitcher' ? 'winner' : ''}`;
+      document.getElementById('duel-b-card').className = `played-stance-pill ${bColor} ${readWinner === 'batter' ? 'winner' : ''}`;
       document.getElementById('duel-p-who').textContent = `⚾ ${p.name}`;
       document.getElementById('duel-p-color').textContent = colorNames[pColor];
       document.getElementById('duel-p-sub').textContent = `${pStance.label} (${pStance.a1}+${pStance.a2})`;
@@ -1591,68 +1902,70 @@
       document.getElementById('duel-b-color').textContent = colorNames[bColor];
       document.getElementById('duel-b-sub').textContent = `${bStance.label} (${bStance.a1}+${bStance.a2})`;
 
-      const vsSymbolEl = document.getElementById('duel-vs-symbol');
-      if (vsSymbolEl) {
-        vsSymbolEl.textContent = pColor === bColor ? '==' : '≠';
-        vsSymbolEl.style.color = pColor === bColor ? '#fde047' : '#93c5fd';
-      }
+      const vsEl = document.getElementById('duel-vs-symbol');
+      vsEl.textContent = pColor === bColor ? '==' : '≠';
+      vsEl.style.color = pColor === bColor ? '#fde047' : '#93c5fd';
 
       const winnerBanner = document.getElementById('duel-winner-banner');
-      if (readWinner === 'batter') {
-        winnerBanner.textContent = pColor === bColor
-          ? `🎯 PITCH READ! Both played ${colorNames[bColor]} ➔ BATTER claims ⚡ Momentum!`
-          : `🎯 ABILITY OVERRIDE! BATTER claims ⚡ Momentum!`;
-      } else {
-        winnerBanner.textContent = pColor !== bColor
-          ? `🌀 CROSSED UP! (${colorNames[pColor]} ≠ ${colorNames[bColor]}) ➔ PITCHER claims ⚡ Momentum!`
-          : `🌀 ABILITY OVERRIDE! PITCHER claims ⚡ Momentum!`;
-      }
+      winnerBanner.textContent = readWinner === 'batter'
+        ? (pColor === bColor
+            ? `🎯 PITCH READ! Both played ${colorNames[bColor]} ➔ BATTER claims ⚡ Momentum Token!`
+            : `🎯 ABILITY OVERRIDE! BATTER claims ⚡ Momentum Token!`)
+        : (pColor !== bColor
+            ? `🌀 CROSSED UP! (${colorNames[pColor]} ≠ ${colorNames[bColor]}) ➔ PITCHER claims ⚡ Momentum Token!`
+            : `🌀 ABILITY OVERRIDE! PITCHER claims ⚡ Momentum Token!`);
 
       document.getElementById('duel-holder-tag').textContent =
-        `⚡ Holder: ${state.momentumHolder === 'pitcher' ? p.name : b.name}`;
+        `⚡ Momentum Holder: ${state.momentumHolder === 'pitcher' ? p.name : b.name}`;
 
-      // Step 2: Build Visual Dice Cubes
+      // Build Visual Dice Cubes
       document.getElementById('duel-p-dice-label').innerHTML =
-        `⚾ <strong>${p.name}</strong> ${state.momentumHolder === 'pitcher' ? '<span class="mom-token-pill">⚡ 3 DICE</span>' : '<span style="color:#94a3b8;font-size:0.58rem;">(2 Base Dice)</span>'}`;
-      let pCubesHTML =
+        `⚾ <strong>${p.name}</strong> ${state.momentumHolder === 'pitcher' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice)</span>' : '<span style="color:#94a3b8;">(2 Dice)</span>'}`;
+      let pCubes =
         makeCubeHTML(`${pStance.a1} (${pStance.d1})`, pRoll1) +
-        `<span class="plus-sign">+</span>` +
+        `<span>+</span>` +
         makeCubeHTML(`${pStance.a2} (${pStance.d2})`, pRoll2);
-      if (pMomDieUsed) {
-        pCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, pMomRoll, 'mom-cube');
-      }
-      if (pBonus) {
-        pCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`ABILITY`, `+${pBonus}`, 'bonus-cube');
-      }
-      document.getElementById('duel-p-cubes').innerHTML = pCubesHTML;
+      if (pMomDieUsed) pCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${pMomDieUsed})`, pMomRoll, 'mom-cube');
+      if (pBonus) pCubes += `<span>+</span>` + makeCubeHTML(`ABILITY`, `+${pBonus}`, 'mom-cube');
+      document.getElementById('duel-p-cubes').innerHTML = pCubes;
       document.getElementById('duel-p-total').textContent = pTotal;
 
       document.getElementById('duel-b-dice-label').innerHTML =
-        `🏏 <strong>${b.name}</strong> ${state.momentumHolder === 'batter' ? '<span class="mom-token-pill">⚡ 3 DICE</span>' : '<span style="color:#94a3b8;font-size:0.58rem;">(2 Base Dice)</span>'}`;
-      let bCubesHTML =
+        `🏏 <strong>${b.name}</strong> ${state.momentumHolder === 'batter' ? '<span style="color:#fde047;font-weight:900;">(⚡ 3 Dice)</span>' : '<span style="color:#94a3b8;">(2 Dice)</span>'}`;
+      let bCubes =
         makeCubeHTML(`${bStance.a1} (${bStance.d1})`, bRoll1) +
-        `<span class="plus-sign">+</span>` +
+        `<span>+</span>` +
         makeCubeHTML(`${bStance.a2} (${bStance.d2})`, bRoll2);
-      if (bMomDieUsed) {
-        bCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, bMomRoll, 'mom-cube');
-      }
-      if (bBonus) {
-        bCubesHTML += `<span class="plus-sign">+</span>` + makeCubeHTML(`ABILITY`, `+${bBonus}`, 'bonus-cube');
-      }
-      document.getElementById('duel-b-cubes').innerHTML = bCubesHTML;
+      if (bMomDieUsed) bCubes += `<span>+</span>` + makeCubeHTML(`⚡ MOM (${bMomDieUsed})`, bMomRoll, 'mom-cube');
+      if (bBonus) bCubes += `<span>+</span>` + makeCubeHTML(`ABILITY`, `+${bBonus}`, 'mom-cube');
+      document.getElementById('duel-b-cubes').innerHTML = bCubes;
       document.getElementById('duel-b-total').textContent = bTotal;
 
       const marginStr = margin >= 0 ? `+${margin}` : `${margin}`;
       document.getElementById('duel-margin-formula').textContent = `Pitcher (${pTotal}) − Batter (${bTotal})`;
       document.getElementById('duel-margin-badge').textContent = `MARGIN: ${marginStr}`;
 
-      // Step 3: Advance state and show Outcome Hero + Highlighted Row
-      advanceLineupAndInning(outcomeInfo.outsAdded, outcomeInfo.runsAdded);
+      // Advance Lineup & Inning
+      advanceLineupAndInning(outcomeInfo.outsAdded, outcomeInfo.runsAdded, postAbilityNotes);
 
       const heroEl = document.getElementById('duel-outcome-hero');
       heroEl.className = `outcome-hero ${outcomeInfo.outsAdded > 0 ? 'pitcher-win' : 'batter-win'}`;
       document.getElementById('duel-outcome-title').textContent = `${outcomeInfo.title} (Margin ${marginStr})`;
       document.getElementById('duel-outcome-desc').textContent = outcomeInfo.detail;
+
+      // Show Batter's POW Die cube when Extra-Base Hit (-7 or less) occurs!
+      const xbhBox = document.getElementById('duel-xbh-pow-box');
+      if (outcomeInfo.powRollInfo) {
+        xbhBox.style.display = 'flex';
+        xbhBox.style.justifyContent = 'center';
+        xbhBox.style.alignItems = 'center';
+        xbhBox.style.gap = '8px';
+        xbhBox.innerHTML =
+          makeCubeHTML(`🏏 BATTER POW (${outcomeInfo.powRollInfo.die})`, outcomeInfo.powRollInfo.roll, 'pow-cube') +
+          `<span style="font-size:0.75rem; font-weight:900; color:#fecdd3;">➔ ${outcomeInfo.powRollInfo.bandText}</span>`;
+      } else {
+        xbhBox.style.display = 'none';
+      }
 
       const degEl = document.getElementById('duel-outcome-degrade');
       if (postAbilityNotes.length) {
@@ -1662,7 +1975,7 @@
         degEl.style.display = 'none';
       }
 
-      // Interactive Send Runner from 2nd on a Single box
+      // 3rd-Base Coach Prompt on Single with Runner on 2nd
       const sendBox = document.getElementById('send-runner-box');
       const sendActions = document.getElementById('send-runner-actions');
       const sendResult = document.getElementById('send-runner-result');
@@ -1681,19 +1994,187 @@
 
       document.getElementById('duel-score-status').textContent =
         `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
-
-      document.querySelectorAll('#duel-mini-table tbody tr').forEach(tr => {
-        tr.classList.toggle('active-band', tr.dataset.band === state.lastBand);
-      });
-
-      // Also update compact center playmat summary
-      document.getElementById('res-headline').textContent = `LAST PLAY: ${outcomeInfo.title} (Margin ${marginStr})`;
-      document.getElementById('res-sub').innerHTML =
-        `P ${colorNames[pColor]} (${pTotal}) vs B ${colorNames[bColor]} (${bTotal}) • ${outcomeInfo.detail}`;
-      document.getElementById('btn-reopen-last').style.display = 'inline-block';
+      document.getElementById('last-play-banner').textContent =
+        `Last: ${outcomeInfo.title} (Margin ${marginStr})`;
+      document.getElementById('btn-reopen-duel').style.display = 'inline-block';
 
       renderAll();
       openDuelOverlay();
+    }
+
+    function resolveOutcomeTable(margin, p, b) {
+      const usedBlackPaint = state.abilityArmed.pitcher && p.abilityType === 'black_paint';
+      const usedIronSink   = state.abilityArmed.pitcher && p.abilityType === 'iron_sink';
+      const usedVetPoise   = state.abilityArmed.pitcher && p.abilityType === 'vet_poise';
+
+      const usedEagleEye   = state.abilityArmed.batter && b.abilityType === 'eagle_eye';
+      const usedUpgrade1B  = state.abilityArmed.batter && b.abilityType === 'upgrade_1b';
+      const usedExtraBase  = state.abilityArmed.batter && b.abilityType === 'extra_base';
+      const usedMoonshot   = state.abilityArmed.batter && b.abilityType === 'moonshot';
+      const usedPureBarrel = state.abilityArmed.batter && b.abilityType === 'pure_barrel';
+      const usedGrittyAB   = state.abilityArmed.batter && b.abilityType === 'gritty_ab';
+
+      let effectiveMargin = margin;
+      if (usedGrittyAB && effectiveMargin === 1) effectiveMargin = 0;
+
+      state.pendingSendRunner = null;
+      const runnerObj = { name: b.name, spd: b.spd, offKey: getOffenseTeamKey() };
+
+      let runs = 0;
+      let outs = 0;
+      let title = '';
+      let detail = '';
+      let pendingSendRunner = null;
+      let powRollInfo = null;
+
+      if (effectiveMargin >= 6 && !usedPureBarrel) {
+        state.lastBand = 'k';
+        outs = 1;
+        title = '🔥 STRIKEOUT (K)';
+        detail = `${b.name} strikes out swinging! Baserunners hold.`;
+      } else if (effectiveMargin >= 1) {
+        state.lastBand = 'out';
+        outs = 1;
+        title = '🧤 ROUTINE OUT';
+        detail = `${b.name} flies/pops out. Baserunners hold.`;
+      } else if (effectiveMargin >= -2 && !(usedEagleEye && effectiveMargin === -2)) {
+        state.lastBand = 'sac';
+        outs = 1;
+        title = '⚾ FIELDED / SAC OUT';
+        if (usedIronSink) {
+          detail = `${p.name}'s Iron Sink holds all baserunners! ${b.name} out at 1st.`;
+        } else if (state.outs + outs < 3) {
+          if (state.bases[2]) {
+            runs += 1;
+            state.bases[2] = null;
+            detail = `${b.name} grounded/sac out; Runner on 3rd SCORES!`;
+          } else {
+            detail = `${b.name} thrown out at 1st.`;
+          }
+          if (state.bases[1]) {
+            state.bases[2] = state.bases[1];
+            state.bases[1] = null;
+          }
+        } else {
+          detail = `${b.name} out at 1st (3rd Out of the inning).`;
+        }
+      } else if (effectiveMargin >= -3 || (usedEagleEye && effectiveMargin === -2)) {
+        if (usedBlackPaint && effectiveMargin === -3) {
+          state.lastBand = 'sac';
+          outs = 1;
+          title = '🎨 BLACK PAINT OUT';
+          detail = `${p.name} paints the corner! Margin -3 Walk becomes a Fielded Out.`;
+        } else {
+          state.lastBand = 'bb';
+          title = '👁️ WALK (BB)';
+          detail = `${b.name} draws a walk to 1st base; forced runners advance.`;
+          if (state.bases[0] && state.bases[1] && state.bases[2]) runs += 1;
+          if (state.bases[0] && state.bases[1]) state.bases[2] = state.bases[1];
+          if (state.bases[0]) state.bases[1] = state.bases[0];
+          state.bases[0] = runnerObj;
+        }
+      } else if ((effectiveMargin >= -6 && !usedUpgrade1B) || (effectiveMargin <= -7 && usedVetPoise)) {
+        state.lastBand = '1b';
+        title = usedVetPoise && effectiveMargin <= -7 ? '🛡️ VETERAN POISE SINGLE' : '💥 CLEAN SINGLE (1B)';
+        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+        const r2 = state.bases[1];
+        if (r2) {
+          if (usedExtraBase) {
+            runs += 1;
+            state.bases[1] = null;
+          } else {
+            state.bases[2] = r2;
+            state.bases[1] = null;
+            pendingSendRunner = r2;
+            state.pendingSendRunner = r2;
+          }
+        }
+        if (state.bases[0]) {
+          if (usedExtraBase && !state.bases[2]) state.bases[2] = state.bases[0];
+          else state.bases[1] = state.bases[0];
+        }
+        state.bases[0] = runnerObj;
+        detail = pendingSendRunner
+          ? `${b.name} singles! ${pendingSendRunner.name} (${pendingSendRunner.spd}) reaches 3rd — 3rd-Base Coach decision!`
+          : `${b.name} singles to 1st! Runners advance 1 base.`;
+      } else if (effectiveMargin >= -6 && usedUpgrade1B) {
+        // Gunnar Henderson Gap Hunter: Upgrade Single to Double
+        state.lastBand = 'xbh';
+        title = '⚡ GAP HUNTER DOUBLE (2B)!';
+        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+        if (state.bases[1]) { runs += 1; state.bases[1] = null; }
+        if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
+        state.bases[1] = runnerObj;
+        detail = `${b.name} upgrades a Single into a Double to 2nd base!`;
+      } else {
+        // EXTRA-BASE HIT (-7 OR LESS) -> OPTION B: ROLL BATTER'S POW DIE (1-5 = 2B, 6 = 3B, 7+ = HR)
+        state.lastBand = 'xbh';
+        const powRoll = rollDie(b.pow);
+        const isHR = (powRoll >= 7) || (usedMoonshot && powRoll >= 5);
+        const is3B = (powRoll === 6) && !isHR;
+
+        if (is3B) {
+          title = '🚀 TRIPLE (3B)!';
+          runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+          state.bases = [null, null, runnerObj];
+          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) ➔ TRIPLE! All baserunners score!`;
+          powRollInfo = { die: b.pow, roll: powRoll, bandText: 'Roll 6 = TRIPLE (3B)!' };
+        } else if (isHR) {
+          title = '💣 HOME RUN (HR)!';
+          runs += 1 + (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+          state.bases = [null, null, null];
+          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) ➔ HOME RUN! ${runs} run(s) score!`;
+          powRollInfo = { die: b.pow, roll: powRoll, bandText: usedMoonshot ? 'Moonshot 5+ = HOME RUN!' : 'Roll 7+ = HOME RUN!' };
+        } else {
+          title = '⚡ DOUBLE (2B)!';
+          if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+          if (state.bases[1]) { runs += 1; state.bases[1] = null; }
+          if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
+          state.bases[1] = runnerObj;
+          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) (1–5) ➔ DOUBLE to 2nd base!`;
+          powRollInfo = { die: b.pow, roll: powRoll, bandText: 'Roll 1–5 = DOUBLE (2B)' };
+        }
+      }
+
+      return { outsAdded: outs, runsAdded: runs, title, detail, pendingSendRunner, powRollInfo };
+    }
+
+    function advanceLineupAndInning(outsAdded, runsAdded, postAbilityNotes) {
+      const offKey = getOffenseTeamKey();
+      const defKey = getDefenseTeamKey();
+      const offTeam = state.teams[offKey];
+      const defTeam = state.teams[defKey];
+
+      state.score[offKey] += runsAdded;
+      state.outs += outsAdded;
+
+      offTeam.batterIdx = (offTeam.batterIdx + 1) % 9;
+
+      // Starting Pitcher Endurance: Slide cube 1 box right each time Batter #1 steps up after 1st loop
+      if (offTeam.batterIdx === 0) {
+        offTeam.lineupLoops += 1;
+        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
+        if (activeP.isStarter) {
+          const oldDie = activeP.mom;
+          activeP.mom = stepDownDie(activeP.mom);
+          postAbilityNotes.push(`New Lineup Loop: ${activeP.name} Endurance cube slid right (${oldDie} ▸ ${activeP.mom === 'None' ? 'OUT ✕' : activeP.mom})`);
+        }
+      }
+
+      if (state.outs >= 3) {
+        state.outs = 0;
+        state.bases = [null, null, null];
+        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
+        if (!activeP.isStarter) {
+          activeP.mom = stepDownDie(activeP.mom);
+        }
+        if (state.half === 'top') {
+          state.half = 'bot';
+        } else {
+          state.half = 'top';
+          state.inning += 1;
+        }
+      }
     }
 
     function holdRunnerAt3rd() {
@@ -1718,346 +2199,220 @@
       const resEl = document.getElementById('send-runner-result');
       resEl.style.display = 'block';
 
-      // Clear runner from 3rd base (either scores or is out at home!)
       state.bases[2] = null;
 
       if (spdRoll >= 4) {
         state.score[offKey] += 1;
         resEl.style.color = '#86efac';
-        resEl.innerHTML = `🎉 <strong>SAFE AT THE PLATE!</strong> ${r2.name} rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (4+ Safe) ➔ <strong>+1 RUN!</strong>`;
+        resEl.innerHTML = `🎉 <strong>SAFE AT HOME!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (4+ Safe) ➔ <strong>+1 RUN!</strong>`;
       } else {
         state.outs += 1;
         resEl.style.color = '#fca5a5';
-        resEl.innerHTML = `🚨 <strong>THROWN OUT AT HOME!</strong> ${r2.name} rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (1-3 Out) ➔ <strong>+1 OUT!</strong>`;
+        resEl.innerHTML = `🚨 <strong>THROWN OUT AT THE PLATE!</strong> Rolled <strong>${spdRoll}</strong> on <code>${r2.spd}</code> (1–3 Out) ➔ <strong>+1 OUT!</strong>`;
         if (state.outs >= 3) {
           state.outs = 0;
           state.bases = [null, null, null];
-          const defKey = getDefenseTeamKey();
-          const defTeam = state.teams[defKey];
-          const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
-          if (!activeP.isStarter) activeP.mom = stepDownDie(activeP.mom);
           if (state.half === 'top') state.half = 'bot';
           else { state.half = 'top'; state.inning += 1; }
         }
       }
-
       document.getElementById('duel-score-status').textContent =
         `TIT ${state.score.titans} - SER ${state.score.serpents} • ${state.outs} Out(s)`;
       renderAll();
     }
 
-    function openDuelOverlay() {
-      document.getElementById('duel-overlay').classList.add('open');
-    }
-    function closeDuelOverlay() {
-      document.getElementById('duel-overlay').classList.remove('open');
-    }
-
-    function resolveOutcomeTable(margin, p, b) {
-      const usedBlackPaint = state.abilityArmed.pitcher && p.abilityType === 'black_paint';
-      const usedEagleEye = state.abilityArmed.batter && b.abilityType === 'eagle_eye';
-      const usedUpgrade1B = state.abilityArmed.batter && b.abilityType === 'upgrade_1b';
-      const usedExtraBase = state.abilityArmed.batter && b.abilityType === 'extra_base';
-      const usedMoonshot = state.abilityArmed.batter && b.abilityType === 'moonshot';
-
-      state.pendingSendRunner = null;
-      const runnerObj = { name: b.name, spd: b.spd, offKey: getOffenseTeamKey() };
-
-      let runs = 0;
-      let outs = 0;
-      let title = '';
-      let detail = '';
-      let pendingSendRunner = null;
-
-      if (margin >= 6) {
-        state.lastBand = 'k';
-        outs = 1;
-        title = '🔥 STRIKEOUT (K)';
-        detail = `${b.name} strikes out! Baserunners hold.`;
-      } else if (margin >= 1) {
-        state.lastBand = 'out';
-        outs = 1;
-        title = '🧤 ROUTINE OUT';
-        detail = `${b.name} flies/pops out. Baserunners hold.`;
-      } else if (margin >= -2 && !(usedEagleEye && margin === -2)) {
-        state.lastBand = 'sac';
-        outs = 1;
-        title = '⚾ FIELDED / SAC OUT';
-        if (state.outs + outs < 3) {
-          if (state.bases[2]) {
-            runs += 1;
-            state.bases[2] = null;
-            detail = `${b.name} grounded/sac out; Runner on 3rd scores!`;
-          } else {
-            detail = `${b.name} thrown out at 1st.`;
-          }
-          if (state.bases[1]) {
-            state.bases[2] = state.bases[1];
-            state.bases[1] = null;
-          }
-        } else {
-          detail = `${b.name} out at 1st (3rd Out of the half-inning!).`;
-        }
-      } else if (margin >= -3 || (usedEagleEye && margin === -2)) {
-        if (usedBlackPaint && margin === -3) {
-          state.lastBand = 'sac';
-          outs = 1;
-          title = '🎨 BLACK PAINT OUT';
-          detail = `Margin -3 converted from Walk into Fielded Out!`;
-        } else {
-          state.lastBand = 'bb';
-          title = '👁️ WALK (BB)';
-          detail = `${b.name} takes 1st base; forced runners advance.`;
-          if (state.bases[0] && state.bases[1] && state.bases[2]) {
-            runs += 1;
-          }
-          if (state.bases[0] && state.bases[1]) state.bases[2] = state.bases[1];
-          if (state.bases[0]) state.bases[1] = state.bases[0];
-          state.bases[0] = runnerObj;
-        }
-      } else if (margin >= -6 && !usedUpgrade1B) {
-        state.lastBand = '1b';
-        title = '💥 CLEAN SINGLE';
-        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-        const r2 = state.bases[1];
-        if (r2) {
-          if (usedExtraBase) {
-            runs += 1;
-            state.bases[1] = null;
-          } else {
-            state.bases[2] = r2;
-            state.bases[1] = null;
-            pendingSendRunner = r2;
-            state.pendingSendRunner = r2;
-          }
-        }
-        if (state.bases[0]) {
-          if (usedExtraBase && !state.bases[2]) state.bases[2] = state.bases[0];
-          else state.bases[1] = state.bases[0];
-        }
-        state.bases[0] = runnerObj;
-        detail = pendingSendRunner
-          ? `${b.name} singles! ${pendingSendRunner.name} (${pendingSendRunner.spd}) reaches 3rd — decide whether to send home!`
-          : `${b.name} singles to 1st! Runners advance +1 base.`;
-      } else {
-        state.lastBand = 'xbh';
-        const d6 = rollDie('d6');
-        const isHR = (d6 === 6) || (usedMoonshot && d6 >= 4);
-        if (d6 === 5 && !isHR) {
-          title = '🚀 TRIPLE (3B)!';
-          runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
-          state.bases = [null, null, runnerObj];
-          detail = `Extra-Base d6 rolled ${d6}: Bases cleared! ${b.name} to 3rd base.`;
-        } else if (isHR) {
-          title = '💣 HOME RUN!';
-          runs += 1 + (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
-          state.bases = [null, null, null];
-          detail = `Extra-Base d6 rolled ${d6}: HOME RUN! ${runs} run(s) score!`;
-        } else {
-          title = '⚡ DOUBLE (2B)!';
-          if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-          if (state.bases[1]) { runs += 1; state.bases[1] = null; }
-          if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
-          state.bases[1] = runnerObj;
-          detail = `Extra-Base d6 rolled ${d6}: ${b.name} doubles to 2nd!`;
-        }
-      }
-
-      return { outsAdded: outs, runsAdded: runs, title, detail, pendingSendRunner };
-    }
-
-    function advanceLineupAndInning(outsAdded, runsAdded) {
-      const offKey = getOffenseTeamKey();
-      const defKey = getDefenseTeamKey();
-      const offTeam = state.teams[offKey];
-      const defTeam = state.teams[defKey];
-
-      state.score[offKey] += runsAdded;
-      state.outs += outsAdded;
-
-      offTeam.batterIdx = (offTeam.batterIdx + 1) % 9;
-
-      if (offTeam.batterIdx === 0) {
-        offTeam.lineupLoops += 1;
-        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
-        if (activeP.isStarter) {
-          activeP.mom = stepDownDie(activeP.mom);
-        }
-      }
-
-      if (state.outs >= 3) {
-        state.outs = 0;
-        state.bases = [null, null, null];
-        const activeP = defTeam.pitchers[defTeam.activePitcherIdx];
-        if (!activeP.isStarter) {
-          activeP.mom = stepDownDie(activeP.mom);
-        }
-        if (state.half === 'top') {
-          state.half = 'bot';
-        } else {
-          state.half = 'top';
-          state.inning += 1;
-        }
-      }
-    }
-
-    function renderPlayerCard(prefix, player, isPitcher, teamClass, holdsMomentum, abilityArmed) {
-      const cardEl = document.getElementById(`${prefix === 'p' ? 'pitcher' : 'batter'}-card`);
-      cardEl.className = `player-card ${teamClass}${holdsMomentum ? ' has-momentum' : ''}`;
-
-      document.getElementById(`${prefix}-role`).textContent = isPitcher ? player.role : `#${player.order} ${player.pos}`;
-      document.getElementById(`${prefix}-name`).textContent = player.name;
-      document.getElementById(`${prefix}-mom-token`).style.display = holdsMomentum ? 'inline-flex' : 'none';
-
-      const momDieEl = document.getElementById(`${prefix}-mom-die`);
-      momDieEl.textContent = `MOM: ${player.mom}`;
-      momDieEl.className = `mom-die-pill${player.mom === 'None' ? ' exhausted' : ''}`;
-
-      const attrsEl = document.getElementById(`${prefix}-core-attrs`);
-      if (isPitcher) {
-        attrsEl.innerHTML = `
-          <span>VEL<strong>${player.vel}</strong></span>
-          <span>CMD<strong>${player.cmd}</strong></span>
-          <span>MOV<strong>${player.mov}</strong></span>
-          <span>DEC<strong>${player.dec}</strong></span>
-          <span>GRT<strong>${player.grt}</strong></span>
-        `;
-      } else {
-        attrsEl.innerHTML = `
-          <span>POW<strong>${player.pow}</strong></span>
-          <span>CON<strong>${player.con}</strong></span>
-          <span>EYE<strong>${player.eye}</strong></span>
-          <span>FOC<strong>${player.foc}</strong></span>
-          <span>SPD<strong>${player.spd}</strong></span>
-        `;
-      }
-
-      const stancesEl = document.getElementById(`${prefix}-stances-grid`);
-      const colors = ['red', 'blue', 'green'];
-      const icons = { red: '🔴', blue: '🔵', green: '🟢' };
-      stancesEl.innerHTML = colors.map(c => {
-        const info = isPitcher ? getPitcherStanceDice(player, c) : getBatterStanceDice(player, c);
-        const r = calcRating(info.d1, info.d2);
-        return `
-          <div class="stance-cell ${c}">
-            <div class="sc-top">
-              <span>${icons[c]} ${info.label}</span>
-              <span class="sc-rating">${r}</span>
-            </div>
-            <div class="sc-dice">${info.a1} ${info.d1} + ${info.a2} ${info.d2}</div>
-            <div class="sc-stars">${getStars(r)}</div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById(`${prefix}-ability-text`).innerHTML =
-        `<strong>${player.abilityName}:</strong> ${player.abilityDesc} <em>(Degrades after use)</em>`;
-      const btn = document.getElementById(`${prefix}-ability-btn`);
-      btn.disabled = (player.mom === 'None');
-      btn.className = `btn-ability${abilityArmed ? ' active' : ''}`;
-      btn.textContent = player.mom === 'None'
-        ? '🚫 Exhausted'
-        : (abilityArmed ? '⚡ Armed (Degrades After)' : '⚡ Use Ability');
-    }
-
+    // =========================================================================
+    // RENDER ALL TABLETOP ELEMENTS (CARDS, CUBE TRACKS, PLAYMAT 9-ROW, DIAMOND)
+    // =========================================================================
     function renderAll() {
       const offKey = getOffenseTeamKey();
       const defKey = getDefenseTeamKey();
-      const offTeam = state.teams[offKey];
-      const defTeam = state.teams[defKey];
+      const userIsBatting = (offKey === state.userTeam);
       const p = getActivePitcher();
       const b = getActiveBatter();
+      const offTeam = state.teams[offKey];
 
-      document.getElementById('score-away').textContent = `TIT ${state.score.titans}`;
-      document.getElementById('score-home').textContent = `SER ${state.score.serpents}`;
-      document.getElementById('inn-display').textContent = `${state.half === 'top' ? '▲' : '▼'} INN ${state.inning}`;
-      document.getElementById('out-1').className = `out-dot${state.outs >= 1 ? ' on' : ''}`;
-      document.getElementById('out-2').className = `out-dot${state.outs >= 2 ? ' on' : ''}`;
+      // 1. Scoreboard
+      document.getElementById('sb-titans').textContent = `TIT ${state.score.titans}`;
+      document.getElementById('sb-serpents').textContent = `SER ${state.score.serpents}`;
+      document.getElementById('sb-inning').textContent = `${state.half === 'top' ? '▲' : '▼'} INNING ${state.inning}`;
+      document.getElementById('out-pip-1').classList.toggle('filled', state.outs >= 1);
+      document.getElementById('out-pip-2').classList.toggle('filled', state.outs >= 2);
 
-      const stripEl = document.getElementById('lineup-strip');
-      stripEl.innerHTML = offTeam.batters.map((bat, idx) => `
-        <div class="lineup-chip${idx === offTeam.batterIdx ? ' active' : ''}">
-          #${bat.order} ${bat.name.split(' ').pop()} (${bat.mom})
-        </div>
-      `).join('');
+      document.getElementById('matchup-team-indicator').textContent =
+        `You Manage: ${state.teams[state.userTeam].name} (${userIsBatting ? '🏏 BATTING NOW' : '⚾ PITCHING NOW'})`;
 
-      renderPlayerCard('p', p, true, defTeam.cardClass, state.momentumHolder === 'pitcher', state.abilityArmed.pitcher);
-      renderPlayerCard('b', b, false, offTeam.cardClass, state.momentumHolder === 'batter', state.abilityArmed.batter);
+      // 2. Active Pitcher & Active Batter Physical Portrait Cards
+      document.getElementById('p-mom-holder-badge').style.display = state.momentumHolder === 'pitcher' ? 'inline-flex' : 'none';
+      document.getElementById('b-mom-holder-badge').style.display = state.momentumHolder === 'batter' ? 'inline-flex' : 'none';
+      document.getElementById('active-batter-slot-label').textContent = `🏏 BATTER #${offTeam.batterIdx + 1}`;
 
-      document.getElementById('base-1').className = `base-sq base-1b${state.bases[0] ? ' occupied' : ''}`;
-      document.getElementById('base-2').className = `base-sq base-2b${state.bases[1] ? ' occupied' : ''}`;
-      document.getElementById('base-3').className = `base-sq base-3b${state.bases[2] ? ' occupied' : ''}`;
-      const occCount = state.bases.filter(Boolean).length;
-      document.getElementById('runners-label').innerHTML = occCount === 0
-        ? 'BASES<br>EMPTY'
-        : `${occCount} ON<br>BASE`;
+      document.getElementById('active-pitcher-card-mount').innerHTML = buildPhysicalCardHTML(p, defKey, true, {
+        isArmed: state.abilityArmed.pitcher,
+        onClickAbility: `toggleAbility('pitcher')`
+      });
+      document.getElementById('active-batter-card-mount').innerHTML = buildPhysicalCardHTML(b, offKey, false, {
+        isArmed: state.abilityArmed.batter,
+        onClickAbility: `toggleAbility('batter')`
+      });
 
-      const userIsBatting = (offKey === state.userTeam);
+      // 3. Baseball Diamond & Physical Baserunner Tokens
+      ['1b', '2b', '3b'].forEach((bag, idx) => {
+        const runner = state.bases[idx];
+        document.getElementById(`bag-${bag}`).classList.toggle('occupied', !!runner);
+        const tagEl = document.getElementById(`runner-tag-${bag}`);
+        if (runner) {
+          tagEl.style.display = 'block';
+          tagEl.textContent = `🏃 ${runner.name} (SPD ${runner.spd})`;
+        } else {
+          tagEl.style.display = 'none';
+        }
+      });
+
+      // 4. Stance Hand Cards (Shows YOUR active player's 3 Color Stances!)
       const userPlayer = userIsBatting ? b : p;
-      document.getElementById('user-role-pill').textContent =
-        userIsBatting ? `YOU ARE BATTING (${offTeam.short})` : `YOU ARE PITCHING (${defTeam.short})`;
+      const userIsPitcher = !userIsBatting;
+      document.getElementById('stance-hand-prompt').textContent =
+        `👇 YOUR 3 STANCE CARDS FOR ${userPlayer.name.toUpperCase()} (${userIsBatting ? '🏏 PICK SWING COLOR' : '⚾ PICK PITCH COLOR'})`;
 
-      ['red', 'blue', 'green'].forEach(c => {
-        const info = userIsBatting ? getBatterStanceDice(userPlayer, c) : getPitcherStanceDice(userPlayer, c);
-        const oppInfo = userIsBatting ? getPitcherStanceDice(p, c) : getBatterStanceDice(b, c);
-        const r = calcRating(info.d1, info.d2);
-        const oppR = calcRating(oppInfo.d1, oppInfo.d2);
-        const icon = c === 'red' ? '🔴 RED' : (c === 'blue' ? '🔵 BLUE' : '🟢 GREEN');
-        document.getElementById(`btn-${c}-title`).textContent = `${icon} (${info.label})`;
-        document.getElementById(`btn-${c}-hint`).textContent = userIsBatting
-          ? `🎯 Match P (${oppR}) = ⚡`
-          : `🌀 Avoid B (${oppR}) = ⚡`;
-        document.getElementById(`btn-${c}-dice`).textContent = `${info.a1} ${info.d1} + ${info.a2} ${info.d2}`;
-        document.getElementById(`btn-${c}-rating`).textContent = `My Rating ${r} ${getStars(r)}`;
+      ['red', 'blue', 'green'].forEach(col => {
+        const info = userIsPitcher ? getPitcherStanceDice(userPlayer, col) : getBatterStanceDice(userPlayer, col);
+        const r = Math.round(calcRating(info.d1, info.d2));
+        const icon = col === 'red' ? '🔴' : col === 'blue' ? '🔵' : '🟢';
+        document.getElementById(`sc-${col}-title`).textContent = `${icon} ${info.label}`;
+        document.getElementById(`sc-${col}-dice`).textContent = `${info.a1} ${info.d1} + ${info.a2} ${info.d2}`;
+        document.getElementById(`sc-${col}-rating`).textContent = `Rating ${r} ${getStars(r)}`;
       });
 
-      document.querySelectorAll('#outcome-ref-table tbody tr').forEach(tr => {
-        tr.classList.toggle('highlight-row', tr.dataset.band === state.lastBand);
+      // 5. Highlight last outcome row on Playmat Chart
+      document.querySelectorAll('#playmat-live-table tbody tr').forEach(tr => {
+        tr.classList.toggle('active-row', tr.dataset.band === state.lastBand);
       });
 
-      document.getElementById('user-team-label').textContent = state.teams[state.userTeam].name;
-      const bpList = document.getElementById('bullpen-list');
-      bpList.innerHTML = defTeam.pitchers.map((arm, idx) => `
-        <div class="bp-item">
-          <div>
-            <strong>${arm.role}: ${arm.name}</strong> (MOM: ${arm.mom})<br>
-            <span style="color:#94a3b8; font-size:0.62rem;">🔴 ${calcRating(arm.vel, arm.grt)} • 🔵 ${calcRating(arm.cmd, arm.grt)} • 🟢 ${calcRating(arm.mov, arm.dec)} | ${arm.abilityName}</span>
+      // 6. Render the 11" x 17" Single-Row 9-Batter Lineup Playmat!
+      const lineupTeamKey = state.inspectedLineupTeam || state.userTeam;
+      const lineupTeam = state.teams[lineupTeamKey];
+      document.getElementById('playmat-team-title').textContent =
+        `📋 11" × 17" MANAGER PLAYMAT — ${lineupTeam.name.toUpperCase()} LINEUP (#1 – #9 IN ONE ROW)`;
+
+      let rowHTML = '';
+      lineupTeam.batters.forEach((batter, idx) => {
+        const isAtBatNow = (offKey === lineupTeamKey && offTeam.batterIdx === idx);
+        const seamClass = (idx === 4) ? 'seam-right' : ''; // Center seam between #5 and #6!
+        rowHTML += `
+          <div class="lineup-slot-cell ${seamClass} ${isAtBatNow ? 'at-bat-now' : ''}">
+            <div class="slot-header-tag">
+              <span>BATTER #${idx + 1}</span>
+              ${isAtBatNow ? '<span class="at-bat-token-pill">🏏 AT BAT</span>' : ''}
+            </div>
+            ${buildPhysicalCardHTML(batter, lineupTeamKey, false, { isMini: true })}
           </div>
-          <button class="bp-btn" ${idx === defTeam.activePitcherIdx ? 'disabled' : ''} onclick="subPitcher(${idx})">
-            ${idx === defTeam.activePitcherIdx ? 'On Mound' : 'Call In'}
-          </button>
-        </div>
-      `).join('');
+        `;
+      });
+      document.getElementById('playmat-9-row').innerHTML = rowHTML;
     }
 
-    function subPitcher(idx) {
-      const defTeam = state.teams[getDefenseTeamKey()];
-      defTeam.activePitcherIdx = idx;
-      state.abilityArmed.pitcher = false;
-      closeModal('modal-bullpen');
+    function toggleInspectedLineupTeam() {
+      state.inspectedLineupTeam = (state.inspectedLineupTeam === 'titans') ? 'serpents' : 'titans';
       renderAll();
     }
 
-    function swapUserTeam() {
-      state.userTeam = state.userTeam === 'titans' ? 'serpents' : 'titans';
+    // =========================================================================
+    // MANAGER LINEUP (#1-#9) & PITCHER SETUP MODAL FUNCTIONS
+    // =========================================================================
+    function openLineupSetupModal() {
+      swapSlotIdx = null;
+      renderSetupModal();
+      document.getElementById('setup-modal').classList.add('open');
+    }
+    function closeLineupSetupModal() {
+      document.getElementById('setup-modal').classList.remove('open');
       renderAll();
     }
 
-    function resetFullGame() {
-      closeModal('modal-bullpen');
+    function renderSetupModal() {
+      const team = state.teams[state.userTeam];
+      document.getElementById('setup-team-name').textContent = team.name;
+
+      // Render 9 Batting Order Slots
+      let bHTML = '';
+      team.batters.forEach((b, idx) => {
+        const isSelected = (swapSlotIdx === idx);
+        bHTML += `
+          <div class="setup-batter-item ${isSelected ? 'selected-swap' : ''}" onclick="handleLineupSwapClick(${idx})">
+            <div>
+              <div style="font-size:0.65rem; font-weight:900; color:#fde047;">SLOT #${idx + 1} • ${b.pos}</div>
+              <div style="font-family:var(--font-impact); font-size:0.95rem;">${b.name}</div>
+              <div style="font-size:0.65rem; color:#94a3b8; font-family:var(--font-mono);">POW ${b.pow} | CON ${b.con} | EYE ${b.eye} | SPD ${b.spd} | Mom ${b.mom}</div>
+            </div>
+            <span style="font-size:0.7rem; background:#334155; padding:3px 7px; border-radius:4px; font-weight:800;">
+              ${isSelected ? 'SWAP ➔' : '⇅ Swap'}
+            </span>
+          </div>
+        `;
+      });
+      document.getElementById('setup-lineup-grid').innerHTML = bHTML;
+
+      // Render 6 Pitchers
+      let pHTML = '';
+      team.pitchers.forEach((p, idx) => {
+        const isActive = (team.activePitcherIdx === idx);
+        pHTML += `
+          <div class="setup-batter-item ${isActive ? 'selected-swap' : ''}" onclick="selectActivePitcher(${idx})">
+            <div>
+              <div style="font-size:0.65rem; font-weight:900; color:#86efac;">${p.isStarter ? 'STARTER (SP)' : 'RELIEVER (RP)'} • Mom: ${p.mom}</div>
+              <div style="font-family:var(--font-impact); font-size:0.95rem;">${p.name}</div>
+              <div style="font-size:0.65rem; color:#94a3b8; font-family:var(--font-mono);">VEL ${p.vel} | CMD ${p.cmd} | MOV ${p.mov} | GRT ${p.grt}</div>
+            </div>
+            <span style="font-size:0.7rem; background:${isActive ? '#16a34a' : '#334155'}; padding:3px 7px; border-radius:4px; font-weight:800;">
+              ${isActive ? '⚾ ON MOUND' : 'Select'}
+            </span>
+          </div>
+        `;
+      });
+      document.getElementById('setup-pitcher-grid').innerHTML = pHTML;
+    }
+
+    function handleLineupSwapClick(idx) {
+      const team = state.teams[state.userTeam];
+      if (swapSlotIdx === null) {
+        swapSlotIdx = idx;
+      } else if (swapSlotIdx === idx) {
+        swapSlotIdx = null;
+      } else {
+        const temp = team.batters[swapSlotIdx];
+        team.batters[swapSlotIdx] = team.batters[idx];
+        team.batters[idx] = temp;
+        swapSlotIdx = null;
+      }
+      renderSetupModal();
+    }
+
+    function selectActivePitcher(idx) {
+      const team = state.teams[state.userTeam];
+      team.activePitcherIdx = idx;
+      renderSetupModal();
+    }
+
+    function switchUserTeam() {
+      state.userTeam = (state.userTeam === 'titans') ? 'serpents' : 'titans';
+      state.inspectedLineupTeam = state.userTeam;
+      swapSlotIdx = null;
+      renderSetupModal();
+      renderAll();
+    }
+
+    function resetNewGame() {
       initGame(state.userTeam);
+      renderSetupModal();
     }
 
-    function openModal(id) {
-      document.getElementById(id).classList.add('open');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('open');
-    }
-    function closeModalOnBg(e, id) {
-      if (e.target.id === id) closeModal(id);
-    }
+    function openDuelOverlay() { document.getElementById('duel-overlay').classList.add('open'); }
+    function closeDuelOverlay() { document.getElementById('duel-overlay').classList.remove('open'); }
+    function openRulesModal() { document.getElementById('rules-modal').classList.add('open'); }
+    function closeRulesModal() { document.getElementById('rules-modal').classList.remove('open'); }
 
+    // Initialize Tabletop Simulator on Load
     initGame('titans');
   </script>
 </body>
