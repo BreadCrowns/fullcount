@@ -166,68 +166,124 @@ Pitchers face realistic baseball fatigue governed by **Times Through the Order (
 
 ---
 
+### The Economy of Amplified Abilities
+Because spending 1 Momentum level drops a player down the ladder (`L3 → L2` loses 2 momentum bonus; `L1 → EXH` loses 2 momentum bonus), **Special Abilities are high-impact and game-changing**. 
+
+Rather than weak `+2` nudges, abilities deliver **massive leverage**:
+1. **Commanding Roll Swings (+4 to +5):** Net gain of +3 to +4 even after paying fuel.
+2. **Explosive Bonus Dice (+d10, +d8, or Double Dice Sums):** Creates unpredictable, clutch surges.
+3. **Outcome Bending:** Complete strikeout immunity, guaranteed double plays, automatic intentional walks, or instant Home Runs!
+
+---
+
 ## 7. Official Team Rosters
 
 ### Team 1: The Metro Titans
 * **SP "Apex" Garrison (Ace • 4-Box Ladder • Starts L2):** 🔴 VEL d12 • 🔵 CMD d6 • 🟢 MOV d8
   * `⚡ SURGE:` On Strikeout with Margin $\ge +3$.
   * `🔥 LOCKED IN:` Opponents rolling Red Power against his fastball roll with Disadvantage (roll 2 dice, take lower).
-  * `★ ABILITY (1 Lvl):` *Sonic Boom* — Reroll pitch die and keep higher result.
+  * `★ ABILITY (1 Lvl):` *102 MPH Heat* — Pitch die automatically counts as Maximum (12 on d12) + Batter rolls with Disadvantage!
 * **SP "Brick" Kowalski (Sinker SP • 3-Box Ladder • Starts L2):** 🔴 VEL d8 • 🔵 CMD d8 • 🟢 MOV d10
   * `⚡ SURGE:` When inducing a Sac/Fielded Groundout.
-  * `★ ABILITY (1 Lvl):` *Iron Sink* — +2 to roll; Sac outs advance zero runners.
+  * `★ ABILITY (1 Lvl):` *Twin-Killer Sinker* — Margin 0 or higher immediately triggers an instant 6-4-3 DOUBLE PLAY (records 2 outs) and holds all baserunners!
 * **SP Dakota Ridge (Workhorse SP • 2-Box Ladder • Starts L1):** 🔴 VEL d6 • 🔵 CMD d8 • 🟢 MOV d6
-  * `★ ABILITY (1 Lvl):` *Inning Eater* — +2 to pitch roll.
-* **RP "Spitfire" Ramos (Setup RP • 3-Box Ladder • Starts L2):** 🔴 VEL d10 • 🔵 CMD d4 • 🟢 MOV d8
-  * `⚡ SURGE:` On any Strikeout.
-  * `★ ABILITY (1 Lvl):` *Flamethrower* — +2 to pitch roll.
-* **RP "Lefty" Vance (Middle RP • 2-Box Ladder • Starts L1):** 🔴 VEL d6 • 🔵 CMD d8 • 🟢 MOV d8
-  * `★ ABILITY (1 Lvl):` *Southpaw Sweep* — +2 to pitch roll.
-* **CL "The Beast" Tanker (Closer • 4-Box Ladder • Starts L2):** 🔴 VEL d12 • 🔵 CMD d4 • 🟢 MOV d8
-  * `⚡ SURGE:` On any Strikeout.
-  * `🔥 LOCKED IN:` Opponents cannot use Batter Special Abilities while Tanker is Locked In.
-  * `★ ABILITY (1 Lvl):` *Lights Out* — Automatically claim the Momentum advantage for this at-bat.
-* **CF "Flash" Mercer (4-Box Ladder • Starts L2):** 🔴 POW d6 • 🔵 EYE d10 • 🟢 CON d10 • 🏃 SPD d12
-  * `⚡ SURGE:` Scores a run or advances 2 bases on a Single.
-  * `🔥 LOCKED IN:` Takes 2 extra bases on any hit without a roll.
-  * `★ ABILITY (1 Lvl):` *Rabbit Jump* — +2 to roll.
-* **RF Aaron Vance (4-Box Ladder • Starts L2):** 🔴 POW d10 • 🔵 EYE d8 • 🟢 CON d10 • 🏃 SPD d8
-  * `⚡ SURGE:` Hits a Clean Single or Extra-Base Hit (Margin $\le -3$).
-  * `🔥 LOCKED IN:` Upgrades any Single into a Double.
-  * `★ ABILITY (1 Lvl):` *Pure Barrel* — +2 to roll; immune to Strikeouts.
-* **LF Corbin Reyes (4-Box Ladder • Starts L2):** 🔴 POW d8 • 🔵 EYE d8 • 🟢 CON d10 • 🏃 SPD d6
-  * `⚡ SURGE:` Drives in an RBI with 2 outs.
-  * `🔥 LOCKED IN:` Adds +4 to all Contact and Power rolls.
-  * `★ ABILITY (1 Lvl):` *Clutch Drive* — +3 to roll.
-* **1B "Colossus" Stone (4-Box Ladder • Starts L2):** 🔴 POW d12 • 🔵 EYE d4 • 🟢 CON d6 • 🏃 SPD d4
-  * `⚡ SURGE:` Hits a Home Run (Margin $\le -5$, `POW 7+`).
-  * `🔥 LOCKED IN:` Moonshot Frenzy — Extra-Base Hits become HRs on `POW 5+`.
-  * `★ ABILITY (1 Lvl):` *Moonshot* — +3 to roll.
-* **3B Marcus Cole (3-Box Ladder • Starts L1):** 🔴 POW d8 • 🔵 EYE d6 • 🟢 CON d8 • 🏃 SPD d6
-  * `⚡ SURGE:` Drives in an RBI with RISP.
-  * `★ ABILITY (1 Lvl):` *Hot Corner* — +2 to roll.
-* **C "Blue Collar" Dan (2-Box Ladder • Starts L1):** 🔴 POW d6 • 🔵 EYE d6 • 🟢 CON d8 • 🏃 SPD d6
-  * `★ ABILITY (1 Lvl):` *Gritty AB* — +2 to roll; Margin +1 out becomes a Sac Out.
-* **2B Toby Chen (2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 EYE d6 • 🟢 CON d8 • 🏃 SPD d8
-  * `★ ABILITY (1 Lvl):` *Gap Spark* — +2 to roll.
-* **SS "Glove-Man" Pete (2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 EYE d4 • 🟢 CON d6 • 🏃 SPD d6
-  * `★ ABILITY (1 Lvl):` *Contact Poke* — +2 to roll.
-* **DH Eli "The Kid" (2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 EYE d4 • 🟢 CON d4 • 🏃 SPD d6
-  * `★ ABILITY (1 Lvl):` *Underdog Spark* — Roll an extra +d6 bonus die to your roll.
+  * `★ ABILITY (1 Lvl):` *Inning Eater* — Add +5 to pitch roll; wipes batter's Momentum bonus to +0 this at-bat!
+* **RP Tyler Miller (Fireman RP • 2-Box Ladder • Starts L1):** 🔴 VEL d10 • 🔵 CMD d4 • 🟢 MOV d8
+  * `⚡ SURGE:` On any Strikeout (K).
+  * `★ ABILITY (1 Lvl):` *Flamethrower Smoke* — Add +5 to pitch roll; if batter chose Red Power, they automatically strike out swinging!
+* **RP Alexis Diaz (Electric RP • 2-Box Ladder • Starts L1):** 🔴 VEL d6 • 🔵 CMD d8 • 🟢 MOV d8
+  * `⚡ SURGE:` On inducing a soft popout.
+  * `★ ABILITY (1 Lvl):` *Wicked Wipeout* — Pitch die counts as Maximum (8 on d8) and completely strips the batter of their Momentum bonus!
+* **CL Josh Hader (Shutdown Closer • 4-Box Ladder • Starts L2):** 🔴 VEL d12 • 🔵 CMD d4 • 🟢 MOV d8
+  * `⚡ SURGE:` On Game-Ending Out or Strikeout.
+  * `🔥 LOCKED IN:` Flamethrower heat: Adds +3 to pitch roll on every pitch.
+  * `★ ABILITY (1 Lvl):` *Lights Out* — Auto-claim Momentum (+5) AND add +4 to pitch roll; any out recorded is a Strikeout!
+* **CF Axel Mercer (Speed Demon • 2-Box Ladder • Starts L1):** 🔴 POW d6 • 🔵 CON d10 • 🟢 EYE d10 • 🏃 SPD 5
+  * `⚡ SURGE:` On Single + Stolen Base.
+  * `★ ABILITY (1 Lvl):` *Lightning Leap* — Add +4 to roll; on any ball in play (hit or fielder's choice), advances +2 extra bases and automatically steals next base!
+* **2B Lucas Vance (Pure Barrel • 4-Box Ladder • Starts L2):** 🔴 POW d10 • 🔵 CON d10 • 🟢 EYE d8 • 🏃 SPD 3
+  * `⚡ SURGE:` On Clean Barrel Single (Margin -4 to -6).
+  * `🔥 LOCKED IN:` Any Strikeout becomes a Routine Out.
+  * `★ ABILITY (1 Lvl):` *Strikeout Shield* — Zero Strikeouts: Cannot strike out this at-bat! Margin > 0 becomes a Sac (0); any hit is an automatic Double (2B)!
+* **3B Marcus Reyes (Clutch Drive • 4-Box Ladder • Starts L2):** 🔴 POW d8 • 🔵 CON d10 • 🟢 EYE d8 • 🏃 SPD 3
+  * `⚡ SURGE:` On Extra-Base Hit or RBI.
+  * `🔥 LOCKED IN:` Adds +2 to Batter total roll on all at-bats.
+  * `★ ABILITY (1 Lvl):` *Grand Slammer* — Add +5 to roll with runners in scoring position; all baserunners score!
+* **1B Rex Stone (Colossus Power • 4-Box Ladder • Starts L2):** 🔴 POW d12 • 🔵 CON d6 • 🟢 EYE d4 • 🏃 SPD 2
+  * `⚡ SURGE:` On any Home Run (HR).
+  * `🔥 LOCKED IN:` Crush — Roll 2 dice on POW, choose higher.
+  * `★ ABILITY (1 Lvl):` *Grand Sledgehammer* — Add +5 to roll; on ANY hit (Margin -4 or less), it is an automatic 450-foot HOME RUN!
+* **RF Duke Cole (Hot Corner • 3-Box Ladder • Starts L2):** 🔴 POW d8 • 🔵 CON d8 • 🟢 EYE d6 • 🏃 SPD 3
+  * `⚡ SURGE:` On RBI or Line Drive.
+  * `★ ABILITY (1 Lvl):` *Scorching Liner* — Add +4 to roll; any hit clears the bases!
+* **DH Silas Dan (Gritty Veteran • 2-Box Ladder • Starts L1):** 🔴 POW d6 • 🔵 CON d8 • 🟢 EYE d6 • 🏃 SPD 3
+  * `⚡ SURGE:` On Gritty 2-Strike Contact.
+  * `★ ABILITY (1 Lvl):` *Count Battle* — Add +4 to roll; any Margin +1 to +3 is fouled off, letting you redraw and re-roll with fresh momentum!
+* **SS Bryan Chen (Gap Spark • 2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d8 • 🟢 EYE d6 • 🏃 SPD 4
+  * `⚡ SURGE:` On Infield Single or Bunt.
+  * `★ ABILITY (1 Lvl):` *Suicide Squeeze* — Add +4 to roll; bunts to score runner from 3rd base guaranteed!
+* **C "Iron" Pete (Defensive Anchor • 2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d6 • 🟢 EYE d4 • 🏃 SPD 2
+  * `⚡ SURGE:` On Sac/Fielded Groundout (0).
+  * `★ ABILITY (1 Lvl):` *Iron Wall Framing* — While catching, adds +3 to all pitch rolls. At bat: guaranteed Sacrifice Fly driving in runner on 3rd!
+* **LF Eli Vance (Underdog • 2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d4 • 🟢 EYE d4 • 🏃 SPD 3
+  * `⚡ SURGE:` On any Walk (BB) or Hit.
+  * `★ ABILITY (1 Lvl):` *Miracle Spark* — Roll an explosive +d10 bonus die added directly to your roll!
 
 ---
 
-### Team 2: The Shadow Serpents
+### Team 2: The Crimson Serpents
 * **SP "Professor" Webb (Ace • 4-Box Ladder • Starts L2):** 🔴 VEL d6 • 🔵 CMD d12 • 🟢 MOV d10
-  * `⚡ SURGE:` Margin +2 called Strikeout.
-  * `🔥 LOCKED IN:` Eliminates opponent's walk window; all Walks become Groundouts.
-  * `★ ABILITY (1 Lvl):` *Black Paint* — +2 to roll; Margin -3 Walk becomes a Fielded Out.
-* **SP "Ghost" Strider (Strikeout SP • 3-Box Ladder • Starts L1):** 🔴 VEL d8 • 🔵 CMD d8 • 🟢 MOV d8
-  * `⚡ SURGE:` On any Strikeout.
-  * `★ ABILITY (1 Lvl):` *Tunneling* — Reroll pitch die and keep higher result.
-* **SP "Cold-Eye" Carter (Poise SP • 3-Box Ladder • Starts L2):** 🔴 VEL d6 • 🔵 CMD d10 • 🟢 MOV d6
-  * `⚡ SURGE:` Induces a weak Routine Out with runner on 3rd.
-  * `★ ABILITY (1 Lvl):` *Veteran Poise* — +2 to roll; downgrades Extra-Base Hits to Singles.
+  * `⚡ SURGE:` On Inducing Groundout on Green.
+  * `🔥 LOCKED IN:` Sinkers drop: Margin 0 becomes Strikeout Looking.
+  * `★ ABILITY (1 Lvl):` *The Painted Abyss* — Completely wipes batter's Momentum to +0; Margin 0 and -1 become Strikeout Looking!
+* **SP "Ghost" Strider (Power SP • 4-Box Ladder • Starts L2):** 🔴 VEL d8 • 🔵 CMD d8 • 🟢 MOV d8
+  * `⚡ SURGE:` On any Strikeout (K).
+  * `🔥 LOCKED IN:` Tunneling: Pitcher adds +2 to roll on stance match.
+  * `★ ABILITY (1 Lvl):` *Quad-Drive Heat* — Roll pitch die + bonus +d8; if total roll $\ge 14$, instant swinging Strikeout!
+* **SP Logan Webb (Groundball SP • 2-Box Ladder • Starts L1):** 🔴 VEL d6 • 🔵 CMD d10 • 🟢 MOV d6
+  * `⚡ SURGE:` When inducing a Double Play.
+  * `★ ABILITY (1 Lvl):` *Veteran Trap* — Add +4 to pitch roll; downgrade ANY hit (even a Home Run) to a soft Single!
+* **RP Spencer Strider (Rising RP • 2-Box Ladder • Starts L1):** 🔴 VEL d8 • 🔵 CMD d6 • 🟢 MOV d10
+  * `⚡ SURGE:` On Strikeout with Margin $\ge +3$.
+  * `★ ABILITY (1 Lvl):` *High Strike Fog* — Add +5 to pitch roll; batter rolls with Disadvantage!
+* **RP Felix Bautista (Mountain RP • 2-Box Ladder • Starts L1):** 🔴 VEL d6 • 🔵 CMD d10 • 🟢 MOV d6
+  * `⚡ SURGE:` On 1-2-3 Relief Inning.
+  * `★ ABILITY (1 Lvl):` *The Mountain* — Red Power swings are totally negated; add +5 to pitch roll!
+* **CL Emmanuel Clase (Cutter CL • 4-Box Ladder • Starts L2):** 🔴 VEL d8 • 🔵 CMD d8 • 🟢 MOV d12
+  * `⚡ SURGE:` On 3-Pitch Strikeout or Save.
+  * `🔥 LOCKED IN:` Cutter bite: Opponents roll Contact with Disadvantage.
+  * `★ ABILITY (1 Lvl):` *101 MPH Cutter* — Batter subtracts -3 from their roll; on any ball in play, forces a routine groundout!
+* **LF Juan Soto (Eagle Eye • 4-Box Ladder • Starts L2):** 🔴 POW d6 • 🔵 CON d10 • 🟢 EYE d12 • 🏃 SPD 4
+  * `⚡ SURGE:` On any Walk (BB) on Eye.
+  * `🔥 LOCKED IN:` Opponents cannot use Command to reduce walks.
+  * `★ ABILITY (1 Lvl):` *The Soto Shuffle* — Zone mastery: Draw an automatic Walk (BB) on any Margin between -1 and +2 (steals pitcher's weak outs)!
+* **DH Elly Cruz (5-Tool Phenomenon • 4-Box Ladder • Starts L2):** 🔴 POW d10 • 🔵 CON d10 • 🟢 EYE d10 • 🏃 SPD 5
+  * `⚡ SURGE:` On any Stolen Base or HR.
+  * `🔥 LOCKED IN:` Auto-wins approach guess on 1st pitch.
+  * `★ ABILITY (1 Lvl):` *Apex Predator* — Auto-win stance guess, claim Momentum (+5), and automatically steal Home on any ball in play!
+* **SS Gunnar Henderson (Gap Hunter • 4-Box Ladder • Starts L2):** 🔴 POW d8 • 🔵 CON d10 • 🟢 EYE d8 • 🏃 SPD 4
+  * `⚡ SURGE:` On Clean Single or Double.
+  * `🔥 LOCKED IN:` Adds +2 to Batter total roll on all at-bats.
+  * `★ ABILITY (1 Lvl):` *Gap Executioner* — Add +4 to roll; ANY hit is upgraded to a bases-clearing Stand-up Double!
+* **1B Bryce Harper (Showtime • 4-Box Ladder • Starts L2):** 🔴 POW d10 • 🔵 CON d8 • 🟢 EYE d8 • 🏃 SPD 3
+  * `⚡ SURGE:` On Extra-Base Hit or HR.
+  * `🔥 LOCKED IN:` Rolls 2 dice on Power, takes higher.
+  * `★ ABILITY (1 Lvl):` *Showtime Blast* — Roll 2 Power dice and ADD them together; on Margin $\le -4$, instant upper-deck Home Run!
+* **3B Manny Machado (Line Drive • 3-Box Ladder • Starts L2):** 🔴 POW d8 • 🔵 CON d8 • 🟢 EYE d6 • 🏃 SPD 3
+  * `⚡ SURGE:` On Hard Line Drive Single.
+  * `★ ABILITY (1 Lvl):` *Laser Beam* — Add +4 to roll; line drive scores runner from 1st base!
+* **2B Francisco Lindor (Mr. Smile • 3-Box Ladder • Starts L1):** 🔴 POW d6 • 🔵 CON d8 • 🟢 EYE d6 • 🏃 SPD 4
+  * `⚡ SURGE:` On inducing 2-Strike Foul/Hit.
+  * `★ ABILITY (1 Lvl):` *Switch-Hit Maestro* — Pitch peeking: Peek at pitcher's chosen stance BEFORE picking your own stance!
+* **CF Nico Hoerner (Bat Control • 3-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d10 • 🟢 EYE d6 • 🏃 SPD 4
+  * `⚡ SURGE:` On 2-Strike Contact Single.
+  * `★ ABILITY (1 Lvl):` *Contact Machine* — Strikeouts impossible: Add +4 to roll & reroll die to guarantee putting ball in play!
+* **C Austin Hedges (Elite Framing • 2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d6 • 🟢 EYE d6 • 🏃 SPD 2
+  * `⚡ SURGE:` On Catcher Framing / Strikeout.
+  * `★ ABILITY (1 Lvl):` *Laser Back-Pick* — Back-pick any lead runner for an immediate OUT, or add +4 to Pitcher's Command roll!
+* **RF Leo "The Spark" (Pure Hustle • 2-Box Ladder • Starts L1):** 🔴 POW d4 • 🔵 CON d4 • 🟢 EYE d4 • 🏃 SPD 4
+  * `⚡ SURGE:` On reaching base via Walk or Hit.
+  * `★ ABILITY (1 Lvl):` *Chaos on the Paths* — Roll an explosive +d10 bonus die; on contact, defense must roll d6 $\ge 4$ or commit a 2-base throwing error!
 * **RP "Submarine" Skenes (Setup RP • 3-Box Ladder • Starts L2):** 🔴 VEL d8 • 🔵 CMD d6 • 🟢 MOV d10
   * `⚡ SURGE:` Induces a Fielded/Sac Out.
   * `★ ABILITY (1 Lvl):` *Rising Slider* — +2 to roll.
