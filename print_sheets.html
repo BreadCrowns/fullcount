@@ -2,23 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Full Count (V5) — Official Print Sheets</title>
+<title>Full Count (V5) — Official 5-Page Print Sheets</title>
 <style>
   @page { size: 8.5in 11.0in; margin: 0; }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { background: #e2e8f0; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  .screen-header { background: #0f172a; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-  .screen-header h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 20px; letter-spacing: 0.8px; color: #f8fafc; }
-  .print-btn { background: #2563eb; color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+  body { background: #cbd5e1; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .screen-header { background: #0f172a; color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .screen-header h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 22px; letter-spacing: 0.8px; color: #f8fafc; }
+  .screen-header p { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .print-btn { background: #2563eb; color: white; border: none; padding: 10px 22px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 15px; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
   .print-btn:hover { background: #1d4ed8; }
-  .page { width: 8.5in; height: 11.0in; margin: 15px auto; background: white; padding: 0.35in 0.45in; box-shadow: 0 3px 12px rgba(0,0,0,0.15); page-break-after: always; break-after: page; overflow: hidden; }
+  .page { width: 8.5in; height: 11.0in; margin: 20px auto; background: white; padding: 0.35in 0.45in; box-shadow: 0 4px 16px rgba(0,0,0,0.2); page-break-after: always; break-after: page; overflow: hidden; }
   @media print { body { background: white; } .screen-header { display: none !important; } .page { margin: 0 !important; box-shadow: none !important; page-break-after: always; break-after: page; } }
   .card-grid { display: grid; grid-template-columns: 2.5in 2.5in 2.5in; grid-template-rows: 3.35in 3.35in 3.35in; gap: 0.08in 0.08in; width: 7.6in; height: 10.3in; }
   .card { width: 2.5in; height: 3.35in; border: 1.5px solid #0f172a; border-radius: 8px; padding: 6px 7px; display: flex; flex-direction: column; justify-content: space-between; background: white; position: relative; overflow: hidden; }
-  .card.titans { border-top: 4px solid #b91c1c; }
-  .card.serpents { border-top: 4px solid #047857; }
+  .card.titans { border-top: 4.5px solid #b91c1c; }
+  .card.serpents { border-top: 4.5px solid #047857; }
   .card.stance-card { border: 2px solid #0f172a; }
   .card.table-card { border: 2px solid #1e293b; background: #f8fafc; }
+  .card.playmat-card { border: 2px solid #334155; background: #f8fafc; }
   .card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; }
   .card-role { font-size: 7.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; }
   .titans .card-role { color: #991b1b; }
@@ -27,7 +29,7 @@
   .card-badge { font-size: 7px; font-weight: 900; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e293b; white-space: nowrap; }
   .badge-ace { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
   .badge-mvp { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
-  .dice-strip { display: flex; gap: 3px; margin: 4px 0; }
+  .dice-strip { display: flex; gap: 3px; margin: 3px 0; }
   .dice-box { flex: 1; padding: 3px 2px; border-radius: 4px; text-align: center; border: 1px solid transparent; }
   .dice-box.red { background: #fef2f2; border-color: #fca5a5; }
   .dice-box.blue { background: #eff6ff; border-color: #93c5fd; }
@@ -38,8 +40,8 @@
   .dice-box.blue .dice-label { color: #1d4ed8; }
   .dice-box.green .dice-label { color: #15803d; }
   .dice-box.spd .dice-label { color: #7e22ce; }
-  .dice-val { font-family: Impact, sans-serif; font-size: 11px; color: #0f172a; line-height: 1.1; }
-  .ladder-container { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px; margin: 3px 0; }
+  .dice-val { font-family: Impact, sans-serif; font-size: 11.5px; color: #0f172a; line-height: 1.1; }
+  .ladder-container { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px; margin: 2px 0; }
   .ladder-title { font-size: 6px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 2px; display: flex; justify-content: space-between; }
   .ladder-slots { display: flex; gap: 2px; justify-content: space-between; }
   .ladder-box { flex: 1; border: 1px dashed #94a3b8; background: white; border-radius: 3px; padding: 2px 1px; text-align: center; font-size: 6.5px; font-weight: 800; color: #475569; line-height: 1; }
@@ -66,65 +68,65 @@
 <body>
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT (V5) — OFFICIAL 4-PAGE PRINT SHEETS</h1>
-    <span style="font-size: 11px; color: #94a3b8;">Standard 8.5" x 11" Letter • 36 Cards (2.5" x 3.35") • Option 1 Engine • Printed Surges & Ladder</span>
+    <h1>FULL COUNT (V5) — OFFICIAL 5-PAGE TABLETOP PRINT SHEETS</h1>
+    <p>5 Letter Pages (8.5" x 11") • 45 Cards (2.5" x 3.35") • Full Rosters (#1–#9 Batters & 6 Pitchers each) • Option 1 Engine</p>
   </div>
-  <button class="print-btn" onclick="window.print()">🖨️ Print Sheets</button>
+  <button class="print-btn" onclick="window.print()">&#128424; Print 5 Sheets</button>
 </div>
-<!-- PAGE 1: STANCE CARDS & MASTER AT-BAT OUTCOME TABLES -->
+<!-- PAGE 1: STANCES & PLAYMAT REFERENCE TABLES -->
 <div class="page"><div class="card-grid">
   <div class="card stance-card" style="border-top:4px solid #dc2626;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#dc2626;">🔴 HEAT (VELOCITY)</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">⚡</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR VEL DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Challenges batter with raw speed and fastball overpower.</div></div>
-    <div class="ability-box"><strong>READ:</strong> Match vs 🔴 = Batter wins! Mismatch vs 🟢/🔵 = Pitcher claims +Bonus!</div>
+    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#dc2626;">&#128308; HEAT (VELOCITY)</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">PITCH</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#9889;</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR VEL DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Overpowers hitters with raw triple-digit fastball velocity.</div></div>
+    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128308; = Batter wins read! Mismatch vs &#128994;/&#128309; = Pitcher claims +Bonus!</div>
   </div>
   <div class="card stance-card" style="border-top:4px solid #2563eb;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#2563eb;">🔵 ZONE (COMMAND)</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">🎯</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR CMD DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Paints corners, works counts, and induces called strikes.</div></div>
-    <div class="ability-box"><strong>READ:</strong> Match vs 🔵 = Batter wins! Mismatch vs 🔴/🟢 = Pitcher claims +Bonus!</div>
+    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#2563eb;">&#128309; ZONE (COMMAND)</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">PITCH</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#127919;</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR CMD DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Paints black edges, hits the catcher's mitt, limits walks.</div></div>
+    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128309; = Batter wins read! Mismatch vs &#128308;/&#128994; = Pitcher claims +Bonus!</div>
   </div>
   <div class="card stance-card" style="border-top:4px solid #16a34a;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#16a34a;">🟢 BREAK (MOVEMENT)</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">🌪️</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR MOV DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Nasty sliders, sinkers, and deceptive off-speed bite.</div></div>
-    <div class="ability-box"><strong>READ:</strong> Match vs 🟢 = Batter wins! Mismatch vs 🔴/🔵 = Pitcher claims +Bonus!</div>
+    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#16a34a;">&#128994; BREAK (MOVEMENT)</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">PITCH</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#127786;</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR MOV DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Nasty sliders, sinkers, and devastating late horizontal break.</div></div>
+    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128994; = Batter wins read! Mismatch vs &#128308;/&#128309; = Pitcher claims +Bonus!</div>
   </div>
   <div class="card stance-card" style="border-top:4px solid #dc2626;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#dc2626;">🔴 POWER SWING</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">💥</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR POW DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Sell out for damage! Uncapped HR ceiling, but vulnerable to Strikeouts.</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Margin ≤ -5 triggers Extra-Base roll!</div>
+    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#dc2626;">&#128308; POWER SWING</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">SWING</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128165;</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR POW DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Sell out for damage! Uncapped HR ceiling; vulnerable to Ks (&#8805; +2).</div></div>
+    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Margin &#8804; -5 triggers Extra-Base roll!</div>
   </div>
   <div class="card stance-card" style="border-top:4px solid #2563eb;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#2563eb;">🔵 EYE / TAKE</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">👁️</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR EYE DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Discipline and plate awareness. Expanded walk window (-1 to -3).</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Margin -1 to -3 draws a Walk!</div>
+    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#2563eb;">&#128309; EYE / TAKE</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">SWING</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128065;</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR EYE DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Plate discipline! Expanded walk window on margins -1 to -3.</div></div>
+    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Working the count draws easy walks.</div>
   </div>
   <div class="card stance-card" style="border-top:4px solid #16a34a;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#16a34a;">🟢 CONTACT SWING</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:24px;">🛡️</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR CON DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Shorten up! Protected from strikeouts; high floor, capped at 1B.</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Immune to strikeouts (Margin ≥0 = Out).</div>
+    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#16a34a;">&#128994; CONTACT SWING</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">SWING</div></div>
+    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128737;</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR CON DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Shorten up! Protected from strikeouts; high floor, capped at 1B.</div></div>
+    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Any margin &#8805; 0 is a Routine Out (No K!).</div>
   </div>
   <div class="card table-card">
     <div class="card-header"><div><div class="card-role">TABLEPLAY MASTER</div><div class="card-name">UNIVERSAL OUTCOME CHART</div></div><div class="card-badge">MARGIN</div></div>
-    <div style="font-size:6.5px; font-weight:800; text-align:center; color:#64748b; margin-top:2px;">MARGIN = Pitcher Total Roll − Batter Total Roll</div>
+    <div style="font-size:6.5px; font-weight:800; text-align:center; color:#64748b; margin-top:1px;">MARGIN = Pitcher Total Roll − Batter Total Roll</div>
     <table class="outcome-table">
-      <tr><th>MARGIN</th><th>🔴 RED (POW)</th><th>🟢 GRN (CON)</th><th>🔵 BLU (EYE)</th></tr>
-      <tr class="row-k"><td>≥ +2</td><td>STRIKEOUT (K)</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td></tr>
+      <tr><th>MARGIN</th><th>&#128308; RED (POW)</th><th>&#128994; GRN (CON)</th><th>&#128309; BLU (EYE)</th></tr>
+      <tr class="row-k"><td>&#8805; +2</td><td>STRIKEOUT (K)</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td></tr>
       <tr class="row-out"><td>+1 .. 0</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td></tr>
       <tr class="row-sac"><td>-1</td><td>SAC (R3 Scores)</td><td>SAC (R3 Scores)</td><td>WALK (BB)</td></tr>
       <tr class="row-bb"><td>-2</td><td>WALK (BB)</td><td>WALK (BB)</td><td>WALK (BB)</td></tr>
       <tr class="row-hit"><td>-3 .. -4</td><td>CLEAN SINGLE</td><td>CLEAN SINGLE</td><td>WALK / 1B</td></tr>
-      <tr class="row-hr"><td>≤ -5</td><td>EXTRA-BASE/HR</td><td>CLEAN SINGLE</td><td>CLEAN SINGLE</td></tr>
+      <tr class="row-hr"><td>&#8804; -5</td><td>EXTRA-BASE/HR</td><td>CLEAN SINGLE</td><td>CLEAN SINGLE</td></tr>
     </table>
-    <div class="ability-box"><strong>EXTRA-BASE HIT:</strong> Roll POW die: 1-5 Double (2B), 6 Triple (3B), 7+ HOME RUN!</div>
+    <div class="ability-box"><strong>EXTRA-BASE HIT (&#8804; -5):</strong> Roll POW die: 1-5 Double (2B), 6 Triple (3B), 7+ HOME RUN!</div>
   </div>
   <div class="card table-card">
     <div class="card-header"><div><div class="card-role">CORE MECHANICS</div><div class="card-name">LADDER & FATIGUE</div></div><div class="card-badge" style="background:#fef08a;">RULES</div></div>
     <div style="font-size:6.8px; line-height:1.25; margin:auto 0;">
       <strong>MOMENTUM LADDER LEVELS:</strong><br>
-      • <strong>L3 🔥 (LOCKED IN):</strong> +5 Bonus & Superpower Unlocked!<br>
-      • <strong>L2 (PRIME ★):</strong> +3 Bonus (Stars start here).<br>
+      • <strong>L3 &#128293; (LOCKED IN):</strong> +5 Bonus & Superpower Unlocked!<br>
+      • <strong>L2 (PRIME &#9733;):</strong> +3 Bonus (Stars start here).<br>
       • <strong>L1 (READY):</strong> +2 Bonus (Role players start here).<br>
-      • <strong>✕ EXH:</strong> +0 Bonus (Abilities locked; cannot spend).<br><br>
+      • <strong>&#10005; EXH:</strong> +0 Bonus (Abilities locked; cannot spend).<br><br>
       <strong>PITCHER FATIGUE (TIMES THROUGH ORDER):</strong><br>
       • 2nd time facing #1 Leadoff: Slide cube 1 step down.<br>
       • 3rd time facing #1 Leadoff: Slide cube 1 step down.<br>
@@ -143,10 +145,10 @@
       • Triple: All runners on base score; batter stops at 3rd base.<br><br>
       <strong>WALKS:</strong> Only force-advance runners on base.
     </div>
-    <div class="ability-box"><strong>SURGES:</strong> When you trigger your card's ⚡ SURGE, slide cube 1 step right!</div>
+    <div class="ability-box"><strong>SURGES:</strong> When you trigger your card's &#9889; SURGE, slide cube 1 step right!</div>
   </div>
 </div></div>
-<!-- PAGE 2: METRO TITANS (PITCHING & TOP LINEUP) -->
+<!-- PAGE 2: METRO TITANS PITCHING & TOP LINEUP -->
 <div class="page"><div class="card-grid">
     <div class="card titans">
       <div class="card-header">
@@ -154,28 +156,28 @@
           <div class="card-role">TITANS • SP #1 (ACE)</div>
           <div class="card-name">"APEX" GARRISON</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d12</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> On Strikeout with Margin +3 or more</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Opponents rolling Red Power against his fastball roll with Disadvantage</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> On Strikeout with Margin +3 or more</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Opponents rolling Red Power against his fastball roll with Disadvantage</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Sonic Boom — Reroll pitch die</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Sonic Boom — Reroll pitch die</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -184,28 +186,28 @@
           <div class="card-role">TITANS • SP #2 (SINKER)</div>
           <div class="card-name">"BRICK" KOWALSKI</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d10</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> When inducing a Sac/Fielded Groundout</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Sac outs advance zero baserunners</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> When inducing a Sac/Fielded Groundout</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Sac outs advance zero baserunners</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Iron Sink — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Iron Sink — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -217,20 +219,20 @@
         <div class="card-badge">MID/RP (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Inning Eater — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Inning Eater — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -239,28 +241,28 @@
           <div class="card-role">TITANS • RP #1 (SETUP)</div>
           <div class="card-name">"SPITFIRE" RAMOS</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d10</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Flamethrower heat: Adds +3 to pitch roll</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Flamethrower heat: Adds +3 to pitch roll</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Flamethrower — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Flamethrower — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -272,20 +274,20 @@
         <div class="card-badge">MID/RP (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Southpaw Sweep — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Southpaw Sweep — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -294,28 +296,28 @@
           <div class="card-role">TITANS • CL #1 (CLOSER)</div>
           <div class="card-name">"THE BEAST" TANKER</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d12</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Opponents cannot activate Batter Abilities while Tanker is Locked In</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Opponents cannot activate Batter Abilities while Tanker is Locked In</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Lights Out — Auto-claim Momentum read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Lights Out — Auto-claim Momentum read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -324,29 +326,29 @@
           <div class="card-role">TITANS • CF #1 (LEADOFF)</div>
           <div class="card-name">"FLASH" MERCER</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d12</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d10</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d12</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Scores a run or advances 2 bases on a Single</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Unstoppable Wheels — Takes 2 extra bases on any hit without a roll</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Scores a run or advances 2 bases on a Single</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Unstoppable Wheels — Takes 2 extra bases on any hit without a roll</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Rabbit Jump — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Rabbit Jump — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -355,29 +357,29 @@
           <div class="card-role">TITANS • RF #2 (PURE HITTER)</div>
           <div class="card-name">AARON VANCE</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits a Clean Single or Extra-Base Hit</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Laser Show — Automatically upgrades any Clean Single into a Double</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Clean Single or Extra-Base Hit</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Laser Show — Automatically upgrades any Clean Single into a Double</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Pure Barrel — +2 to roll; immune to Strikeouts</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Pure Barrel — +2 to roll; immune to Strikeouts</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -386,33 +388,33 @@
           <div class="card-role">TITANS • LF #3 (CLUTCH)</div>
           <div class="card-name">CORBIN REYES</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Drives in an RBI with 2 outs</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Clutch Engine — Adds +4 to all Contact and Power rolls</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with 2 outs</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Clutch Engine — Adds +4 to all Contact and Power rolls</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Clutch Drive — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Clutch Drive — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
 </div></div>
-<!-- PAGE 3: TITANS FINISH & SHADOW SERPENTS (START) -->
+<!-- PAGE 3: METRO TITANS LINEUP FINISH & DUGOUT TRACKERS -->
 <div class="page"><div class="card-grid">
     <div class="card titans">
       <div class="card-header">
@@ -420,29 +422,29 @@
           <div class="card-role">TITANS • 1B #4 (CLEANUP)</div>
           <div class="card-name">"COLOSSUS" STONE</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d6</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d4</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d12</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d4</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits a Home Run (Margin ≤ -5, POW 7+)</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Moonshot Frenzy — Extra-Base hits become HRs on POW 5+</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Home Run (Margin &#8804; -5, POW 7+)</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Moonshot Frenzy — Extra-Base hits become HRs on POW 5+</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Moonshot — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Moonshot — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -454,24 +456,24 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Drives in an RBI with RISP</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with RISP</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Hot Corner — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Hot Corner — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -483,21 +485,21 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Gritty AB — +2 to roll; Margin +1 out becomes a Sac Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Gritty AB — +2 to roll; Margin +1 out becomes a Sac Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -509,21 +511,21 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Gap Spark — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Gap Spark — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -535,21 +537,21 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d6</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Contact Poke — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Contact Poke — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card titans">
@@ -561,51 +563,84 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d4</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d4</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Underdog Spark — Roll an extra +d6 bonus die to your roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Underdog Spark — Roll an extra +d6 bonus die to your roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
+  <div class="card playmat-card titans">
+    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">DIAMOND & BASES</div></div><div class="card-badge">TRACK</div></div>
+    <div style="margin:auto 0; text-align:center;">
+      <div style="font-size:10px; font-weight:800; color:#b91c1c; margin-bottom:4px;">2ND BASE &#9633;</div>
+      <div style="display:flex; justify-content:space-around; font-size:10px; font-weight:800; color:#b91c1c;">
+        <span>3RD BASE &#9633;</span><span>1ST BASE &#9633;</span>
+      </div>
+      <div style="font-size:10px; font-weight:800; color:#0f172a; margin-top:4px;">HOME PLATE &#11030;</div>
+    </div>
+    <div class="ability-box">Place small wooden cubes or player markers on bases to track runners.</div>
+  </div>
+  <div class="card playmat-card titans">
+    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">COUNT & OUTS</div></div><div class="card-badge">INNING</div></div>
+    <div style="margin:auto 0; font-size:8px; line-height:1.5;">
+      <div><strong>OUTS:</strong> &#9675; 1 Out &nbsp; &#9675; 2 Outs &nbsp; &#9679; 3 Outs (Switch)</div>
+      <div><strong>BALLS:</strong> &#9675; B1 &nbsp; &#9675; B2 &nbsp; &#9675; B3 &nbsp; &#9679; B4 (Walk)</div>
+      <div><strong>STRIKES:</strong> &#9675; S1 &nbsp; &#9675; S2 &nbsp; &#9679; S3 (Strikeout)</div>
+    </div>
+    <div class="ability-box">Reset count after every plate appearance outcome.</div>
+  </div>
+  <div class="card playmat-card titans">
+    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">BULLPEN WARMUP</div></div><div class="card-badge">STAFF</div></div>
+    <div style="font-size:7px; line-height:1.3; margin:auto 0;">
+      <strong>ACTIVE SP:</strong> Place starter here.<br>
+      <strong>WARMING UP:</strong> Ready reliever in 6th.<br>
+      <strong>CLOSER:</strong> Save Tanker for 9th inning.<br><br>
+      <em>Lineup order is set by manager in slots #1 to #9.</em>
+    </div>
+    <div class="ability-box">Relievers drop 1 level if pitching a 2nd inning.</div>
+  </div>
+</div></div>
+<!-- PAGE 4: SHADOW SERPENTS PITCHING & TOP LINEUP -->
+<div class="page"><div class="card-grid">
     <div class="card serpents">
       <div class="card-header">
         <div>
           <div class="card-role">SERPENTS • SP #1 (ACE)</div>
           <div class="card-name">"PROFESSOR" WEBB</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d12</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d10</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d12</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Margin +2 called Strikeout</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Master of Black Paint — Eliminates walk window; all Walks become Groundouts</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Margin +2 called Strikeout</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Master of Black Paint — Eliminates walk window; all Walks become Groundouts</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Black Paint — +2 to roll; Margin -3 Walk is Fielded Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Black Paint — +2 to roll; Margin -3 Walk is Fielded Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -617,23 +652,23 @@
         <div class="card-badge">MID/RP (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> On any Strikeout (K)</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Tunneling — Reroll pitch die and keep higher</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Tunneling — Reroll pitch die and keep higher</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -642,61 +677,58 @@
           <div class="card-role">SERPENTS • SP #3 (VETERAN)</div>
           <div class="card-name">"COLD-EYE" CARTER</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d10</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Induces a weak Routine Out with runner on 3rd</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Veteran Poise — Downgrades any Extra-Base Hit to a Single</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Induces a weak Routine Out with runner on 3rd</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Veteran Poise — Downgrades any Extra-Base Hit to a Single</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Veteran Poise — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Veteran Poise — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
-</div></div>
-<!-- PAGE 4: SHADOW SERPENTS FINISH & BULLPEN -->
-<div class="page"><div class="card-grid">
     <div class="card serpents">
       <div class="card-header">
         <div>
           <div class="card-role">SERPENTS • RP #1 (SETUP)</div>
           <div class="card-name">"SUBMARINE" SKENES</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d10</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Induces a Fielded/Sac Out</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Rising Slider — Adds +3 to pitch roll</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Induces a Fielded/Sac Out</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Rising Slider — Adds +3 to pitch roll</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Rising Slider — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Rising Slider — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -708,20 +740,20 @@
         <div class="card-badge">MID/RP (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d10</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Fireman — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Fireman — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -730,28 +762,28 @@
           <div class="card-role">SERPENTS • CL #1 (TWO-WAY CLOSER)</div>
           <div class="card-name">SHOHEI "VIPER" CRUZ</div>
         </div>
-        <div class="card-badge badge-ace">ACE (L3 🔥)</div>
+        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 MOV</div><div class="dice-val">d12</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d12</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Dominant Closer — Claims Momentum advantage on every pitch in 9th inning</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Dominant Closer — Claims Momentum advantage on every pitch in 9th inning</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Nasty Bite — +3 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Nasty Bite — +3 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -760,29 +792,29 @@
           <div class="card-role">SERPENTS • LF #1 (DISCIPLINE)</div>
           <div class="card-name">"PROFESSOR" SOTO</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d12</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d12</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Draws a Walk on a 🔵 Blue Eye card</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Master of Strike Zone — Completely immune to Strikeouts; matches vs Blue draw BB</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Draws a Walk on a &#128309; Blue Eye card</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Master of Strike Zone — Completely immune to Strikeouts; matches vs Blue draw BB</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Eagle Eye — +2 to roll; draws Walk on Margin 0 to -3</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Eagle Eye — +2 to roll; draws Walk on Margin 0 to -3</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -791,29 +823,29 @@
           <div class="card-role">SERPENTS • DH #2 (TWO-WAY MVP)</div>
           <div class="card-name">SHOHEI "VIPER" CRUZ</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d10</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d10</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d10</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits an Extra-Base Hit or 2-out RBI hit</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Transcendent — Automatically claims Momentum advantage on every at-bat</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits an Extra-Base Hit or 2-out RBI hit</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Transcendent — Automatically claims Momentum advantage on every at-bat</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Five-Tool Genius — Automatically wins the Pitch Read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Five-Tool Genius — Automatically wins the Pitch Read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -822,60 +854,63 @@
           <div class="card-role">SERPENTS • SS #3 (ALL-STAR)</div>
           <div class="card-name">GUNNAR HENDERSON</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits a Double or Triple</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Gap Master — All Clean Singles automatically become Doubles</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Double or Triple</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Gap Master — All Clean Singles automatically become Doubles</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Gap Hunter — +2 to roll; upgrades Single to Double</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Gap Hunter — +2 to roll; upgrades Single to Double</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
+</div></div>
+<!-- PAGE 5: SHADOW SERPENTS LINEUP FINISH & DUGOUT TRACKERS -->
+<div class="page"><div class="card-grid">
     <div class="card serpents">
       <div class="card-header">
         <div>
           <div class="card-role">SERPENTS • 1B #4 (SHOWTIME)</div>
           <div class="card-name">BRYCE HARPER</div>
         </div>
-        <div class="card-badge badge-mvp">STAR (L3 🔥)</div>
+        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box">L1 READY<br>(+2)</div>
           <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 🔥<br>(+5)</div>
+          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits a Home Run or extra-base hit</div>
-        <div class="locked-in-desc">🔥 LOCKED IN: Showtime Flow — Adds +4 to all rolls; HR on POW 6+</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Home Run or extra-base hit</div>
+        <div class="locked-in-desc">&#128293; LOCKED IN: Showtime Flow — Adds +4 to all rolls; HR on POW 6+</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Showtime — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Showtime — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -887,24 +922,24 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d6</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Drives in an RBI with RISP</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with RISP</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Line Drive — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Line Drive — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
     <div class="card serpents">
@@ -916,26 +951,137 @@
         <div class="card-badge">REGULAR (L2)</div>
       </div>
       <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">🔴 POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">🔵 EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">🟢 CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">🏃 SPD</div><div class="dice-val">d8</div></div>
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
       </div>
       <div class="ladder-container">
         <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
         <div class="ladder-slots">
-          <div class="ladder-box exh">✕ EXH<br>(+0)</div>
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
           <div class="ladder-box active">L1 READY<br>(+2)</div>
           <div class="ladder-box">L2 PRIME<br>(+3)</div>
         </div>
       </div>
       <div class="surge-box">
-        <div><span class="surge-tag">⚡ SURGE:</span> Hits a Single and advances on Speed roll</div>
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Single and advances on Speed roll</div>
       </div>
       <div class="ability-box">
-        <span class="ability-title">★ Mr. Smile — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+        <span class="ability-title">&#9733; Mr. Smile — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
       </div>
     </div>
+    <div class="card serpents">
+      <div class="card-header">
+        <div>
+          <div class="card-role">SERPENTS • 2B #7 (BAT CONTROL)</div>
+          <div class="card-name">NICO HOERNER</div>
+        </div>
+        <div class="card-badge">REGULAR (L2)</div>
+      </div>
+      <div class="dice-strip">
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
+      </div>
+      <div class="ladder-container">
+        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
+        <div class="ladder-slots">
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
+          <div class="ladder-box active">L1 READY<br>(+2)</div>
+          <div class="ladder-box">L2 PRIME<br>(+3)</div>
+        </div>
+      </div>
+      <div class="surge-box">
+        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Contact Single on Green card</div>
+      </div>
+      <div class="ability-box">
+        <span class="ability-title">&#9733; Bat Control — Reroll contact die & keep higher</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+      </div>
+    </div>
+    <div class="card serpents">
+      <div class="card-header">
+        <div>
+          <div class="card-role">SERPENTS • C #8 (VETERAN C)</div>
+          <div class="card-name">AUSTIN HEDGES</div>
+        </div>
+        <div class="card-badge">REGULAR (L2)</div>
+      </div>
+      <div class="dice-strip">
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d4</div></div>
+      </div>
+      <div class="ladder-container">
+        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
+        <div class="ladder-slots">
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
+          <div class="ladder-box active">L1 READY<br>(+2)</div>
+          <div class="ladder-box">L2 PRIME<br>(+3)</div>
+        </div>
+      </div>
+      <div class="ability-box">
+        <span class="ability-title">&#9733; Veteran Eye — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+      </div>
+    </div>
+    <div class="card serpents">
+      <div class="card-header">
+        <div>
+          <div class="card-role">SERPENTS • RF #9 (THE SPARK)</div>
+          <div class="card-name">LEO "THE SPARK"</div>
+        </div>
+        <div class="card-badge">REGULAR (L2)</div>
+      </div>
+      <div class="dice-strip">
+        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
+        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
+        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d4</div></div>
+        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
+      </div>
+      <div class="ladder-container">
+        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
+        <div class="ladder-slots">
+          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
+          <div class="ladder-box active">L1 READY<br>(+2)</div>
+          <div class="ladder-box">L2 PRIME<br>(+3)</div>
+        </div>
+      </div>
+      <div class="ability-box">
+        <span class="ability-title">&#9733; Pure Hustle — Roll an extra +d6 bonus die on Batter roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
+      </div>
+    </div>
+  <div class="card playmat-card serpents">
+    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">DIAMOND & BASES</div></div><div class="card-badge">TRACK</div></div>
+    <div style="margin:auto 0; text-align:center;">
+      <div style="font-size:10px; font-weight:800; color:#047857; margin-bottom:4px;">2ND BASE &#9633;</div>
+      <div style="display:flex; justify-content:space-around; font-size:10px; font-weight:800; color:#047857;">
+        <span>3RD BASE &#9633;</span><span>1ST BASE &#9633;</span>
+      </div>
+      <div style="font-size:10px; font-weight:800; color:#0f172a; margin-top:4px;">HOME PLATE &#11030;</div>
+    </div>
+    <div class="ability-box">Place small wooden cubes or player markers on bases to track runners.</div>
+  </div>
+  <div class="card playmat-card serpents">
+    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">COUNT & OUTS</div></div><div class="card-badge">INNING</div></div>
+    <div style="margin:auto 0; font-size:8px; line-height:1.5;">
+      <div><strong>OUTS:</strong> &#9675; 1 Out &nbsp; &#9675; 2 Outs &nbsp; &#9679; 3 Outs (Switch)</div>
+      <div><strong>BALLS:</strong> &#9675; B1 &nbsp; &#9675; B2 &nbsp; &#9675; B3 &nbsp; &#9679; B4 (Walk)</div>
+      <div><strong>STRIKES:</strong> &#9675; S1 &nbsp; &#9675; S2 &nbsp; &#9679; S3 (Strikeout)</div>
+    </div>
+    <div class="ability-box">Reset count after every plate appearance outcome.</div>
+  </div>
+  <div class="card playmat-card serpents">
+    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">BULLPEN WARMUP</div></div><div class="card-badge">STAFF</div></div>
+    <div style="font-size:7px; line-height:1.3; margin:auto 0;">
+      <strong>ACTIVE SP:</strong> Place starter here.<br>
+      <strong>WARMING UP:</strong> Ready reliever in 6th.<br>
+      <strong>CLOSER:</strong> Save Cruz for 9th inning.<br><br>
+      <em>Lineup order is set by manager in slots #1 to #9.</em>
+    </div>
+    <div class="ability-box">Relievers drop 1 level if pitching a 2nd inning.</div>
+  </div>
 </div></div>
 </body>
 </html>
