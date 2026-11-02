@@ -1151,3 +1151,36 @@ Following extensive feature layering across successive playtests, the user issue
      - `proceedToBeat4()` state transition to Beat 4 placing.
      - Beat 4 execution clash layout, target showcase, and playable hand cards.
    - Full suite passes: **243 of 243 tests pass (100%)**.
+
+
+---
+
+## 2026-11-01: Full Count V5.1 — Inverted Momentum Ladder, Half-Size Cards & 11x17 Playmats
+
+### 1. Inverted Momentum Ladder (High on Left, Low on Right)
+* **Tabletop Ergonomic Realignment**: Redesigned the physical momentum ladder so that peak performance sits on the left:
+  - `[ 🔥 L3 LOCKED IN (+5) ]` ◀── `[ ★ L2 PRIME (+3) ]` ◀── `[ ⚡ L1 READY (+2) ]` ◀── `[ ✕ L0 EXH (+0) ]`
+* **Intuitive Physical Movement**:
+  - **Surge (⚡)**: Executing signature plays shifts the wooden cube 1 slot to the **LEFT** toward fiery Level 3 Locked In.
+  - **Fatigue / Ability Spend**: Pitcher fatigue (TTO) and spending fuel to activate special moves shifts the cube to the **RIGHT** toward grey exhaustion.
+* **Synchronized Across Holy Trinity**: Updated `RULEBOOK_FULL_COUNT_V5.md`, `prototype.html`, `print_sheets.html`, and `playmats.html`.
+
+### 2. Half-Size Cards (1.82" × 2.52" Mini Cards)
+* Compacted card geometry into standard tabletop mini cards (1.82" × 2.52") so that 9 player cards line up side-by-side along the bottom row of an 11×17 playmat.
+* **16 Cards per 8.5" × 11" Sheet**:
+  - **Page 1**: Complete Metro Titans Roster (9 Batters + 6 Pitchers + Dugout Card).
+  - **Page 2**: Complete Crimson Serpents Roster (9 Batters + 6 Pitchers + Dugout Card).
+  - **Page 3**: Stance Cards & Reference Decks (12 cards).
+* Every single card features printed Surge triggers, Locked-In superpowers, and the inverted momentum ladder.
+
+### 3. Official 11×17 Playmats (Letter-Printable Across 4 Sheets)
+* Designed two complete 11×17 manager playmats (`playmats.html`):
+  - **Metro Titans 11×17 Playmat**: Split into Sheet 1 (Left Half) & Sheet 2 (Right Half).
+  - **Crimson Serpents 11×17 Playmat**: Split into Sheet 3 (Left Half) & Sheet 4 (Right Half).
+* **Playmat Modules**:
+  - **Bottom Tray**: 9-card Batting Order Lineup Track (Slots #1–#5 on Left Sheet, Slots #6–#9 + Active At-Plate Batter Box on Right Sheet).
+  - **Mound Station**: Dedicated slot for active pitcher + Inverted TTO Fatigue Ladder.
+  - **Bullpen**: Reliever & Closer warming slots.
+  - **Baseball Diamond**: Bases & runner holding bays + Count Trackers (Balls, Strikes, Outs).
+  - **Universal Reference**: V5 Outcome Matrix & Stance Match/Mismatch guide printed right on the playmat.
+  - **Seam Alignment**: Precision dashed join lines and crosshairs (`✛`) for seamless taping.

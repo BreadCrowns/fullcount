@@ -2,1086 +2,1093 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Full Count (V5) — Official 5-Page Print Sheets</title>
+<title>Full Count (V5) — Official Half-Size Printable Cards Deck</title>
 <style>
   @page { size: 8.5in 11.0in; margin: 0; }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { background: #cbd5e1; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  .screen-header { background: #0f172a; color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .screen-header h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 22px; letter-spacing: 0.8px; color: #f8fafc; }
-  .screen-header p { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-  .print-btn { background: #2563eb; color: white; border: none; padding: 10px 22px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 15px; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
-  .print-btn:hover { background: #1d4ed8; }
-  .page { width: 8.5in; height: 11.0in; margin: 20px auto; background: white; padding: 0.35in 0.45in; box-shadow: 0 4px 16px rgba(0,0,0,0.2); page-break-after: always; break-after: page; overflow: hidden; }
-  @media print { body { background: white; } .screen-header { display: none !important; } .page { margin: 0 !important; box-shadow: none !important; page-break-after: always; break-after: page; } }
-  .card-grid { display: grid; grid-template-columns: 2.5in 2.5in 2.5in; grid-template-rows: 3.35in 3.35in 3.35in; gap: 0.08in 0.08in; width: 7.6in; height: 10.3in; }
-  .card { width: 2.5in; height: 3.35in; border: 1.5px solid #0f172a; border-radius: 8px; padding: 6px 7px; display: flex; flex-direction: column; justify-content: space-between; background: white; position: relative; overflow: hidden; }
-  .card.titans { border-top: 4.5px solid #b91c1c; }
-  .card.serpents { border-top: 4.5px solid #047857; }
+  body { background: #0f172a; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .screen-header { background: #0f172a; border-bottom: 2px solid #334155; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+  .screen-header h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 20px; letter-spacing: 0.8px; color: #38bdf8; }
+  .screen-header p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn { border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-print { background: #2563eb; color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
+  .btn-print:hover { background: #1d4ed8; }
+  .btn-mat { background: #059669; color: white; }
+  .page { width: 8.5in; height: 11.0in; margin: 20px auto; background: white; padding: 0.30in 0.45in; box-shadow: 0 8px 24px rgba(0,0,0,0.4); page-break-after: always; break-after: page; overflow: hidden; }
+  @media print {
+    body { background: white; }
+    .screen-header { display: none !important; }
+    .page { margin: 0 !important; box-shadow: none !important; page-break-after: always; break-after: page; }
+  }
+  .card-grid { display: grid; grid-template-columns: repeat(4, 1.82in); grid-template-rows: repeat(4, 2.52in); gap: 0.08in 0.08in; width: 7.6in; height: 10.4in; }
+  .card { width: 1.82in; height: 2.52in; border: 1.5px solid #0f172a; border-radius: 6px; padding: 5px 6px; display: flex; flex-direction: column; justify-content: space-between; background: white; position: relative; overflow: hidden; }
+  .card.titans { border-top: 3.5px solid #1e3a8a; }
+  .card.serpents { border-top: 3.5px solid #047857; }
   .card.stance-card { border: 2px solid #0f172a; }
   .card.table-card { border: 2px solid #1e293b; background: #f8fafc; }
-  .card.playmat-card { border: 2px solid #334155; background: #f8fafc; }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; }
-  .card-role { font-size: 7.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; }
-  .titans .card-role { color: #991b1b; }
-  .serpents .card-role { color: #065f46; }
-  .card-name { font-family: Impact, "Arial Black", sans-serif; font-size: 13px; line-height: 1.1; color: #0f172a; letter-spacing: 0.3px; }
-  .card-badge { font-size: 7px; font-weight: 900; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e293b; white-space: nowrap; }
-  .badge-ace { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #cbd5e1; padding-bottom: 2px; }
+  .card-role { font-size: 6.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; color: #64748b; }
+  .titans .card-role { color: #1e3a8a; }
+  .serpents .card-role { color: #047857; }
+  .card-name { font-family: Impact, "Arial Black", sans-serif; font-size: 10.5px; line-height: 1.05; color: #0f172a; letter-spacing: 0.2px; }
+  .card-badge { font-size: 6.2px; font-weight: 900; padding: 1px 3px; border-radius: 2px; text-transform: uppercase; background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e293b; white-space: nowrap; }
   .badge-mvp { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
-  .dice-strip { display: flex; gap: 3px; margin: 3px 0; }
-  .dice-box { flex: 1; padding: 3px 2px; border-radius: 4px; text-align: center; border: 1px solid transparent; }
+  .badge-ace { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+  .dice-strip { display: flex; gap: 2px; margin: 2px 0; }
+  .dice-box { flex: 1; padding: 2px 1px; border-radius: 3px; text-align: center; border: 1px solid transparent; }
   .dice-box.red { background: #fef2f2; border-color: #fca5a5; }
   .dice-box.blue { background: #eff6ff; border-color: #93c5fd; }
   .dice-box.green { background: #f0fdf4; border-color: #86efac; }
-  .dice-box.spd { background: #faf5ff; border-color: #d8b4fe; flex: 0.8; }
-  .dice-label { font-size: 6.5px; font-weight: 800; text-transform: uppercase; line-height: 1; }
+  .dice-box.spd { background: #faf5ff; border-color: #d8b4fe; flex: 0.75; }
+  .dice-label { font-size: 5.5px; font-weight: 800; text-transform: uppercase; line-height: 1; }
   .dice-box.red .dice-label { color: #b91c1c; }
   .dice-box.blue .dice-label { color: #1d4ed8; }
   .dice-box.green .dice-label { color: #15803d; }
   .dice-box.spd .dice-label { color: #7e22ce; }
-  .dice-val { font-family: Impact, sans-serif; font-size: 11.5px; color: #0f172a; line-height: 1.1; }
-  .ladder-container { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px; margin: 2px 0; }
-  .ladder-title { font-size: 6px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 2px; display: flex; justify-content: space-between; }
-  .ladder-slots { display: flex; gap: 2px; justify-content: space-between; }
-  .ladder-box { flex: 1; border: 1px dashed #94a3b8; background: white; border-radius: 3px; padding: 2px 1px; text-align: center; font-size: 6.5px; font-weight: 800; color: #475569; line-height: 1; }
-  .ladder-box.active { border: 1.5px solid #0f172a; background: #fef08a; color: #854d0e; font-weight: 900; }
-  .ladder-box.locked-in { border: 1.5px solid #dc2626; background: #fee2e2; color: #991b1b; font-weight: 900; }
+  .dice-val { font-family: Impact, sans-serif; font-size: 10px; color: #0f172a; line-height: 1.1; }
+  /* Inverted Ladder on Card: High on Left */
+  .ladder-container { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; margin: 1.5px 0; }
+  .ladder-title { font-size: 5.2px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 1.5px; display: flex; justify-content: space-between; }
+  .ladder-slots { display: flex; gap: 1.5px; justify-content: space-between; }
+  .ladder-box { flex: 1; border: 1px dashed #94a3b8; background: white; border-radius: 2.5px; padding: 1.5px 1px; text-align: center; font-size: 5.5px; font-weight: 800; color: #475569; line-height: 1; }
+  .ladder-box.active { border: 1.2px solid #0f172a; background: #fef08a; color: #854d0e; font-weight: 900; }
+  .ladder-box.locked-in { border: 1.2px solid #dc2626; background: #fee2e2; color: #991b1b; font-weight: 900; }
   .ladder-box.exh { background: #f1f5f9; color: #94a3b8; }
-  .surge-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px; padding: 3px 4px; font-size: 6.8px; line-height: 1.2; margin: 2px 0; color: #14532d; }
+  .surge-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 3px; padding: 2px 3px; font-size: 5.8px; line-height: 1.15; margin: 1px 0; color: #14532d; }
   .surge-tag { font-weight: 900; color: #15803d; }
   .locked-in-desc { color: #991b1b; font-weight: 800; margin-top: 1px; }
-  .ability-box { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 4px; font-size: 6.8px; line-height: 1.2; margin-top: 2px; }
+  .ability-box { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px 3px; font-size: 5.8px; line-height: 1.15; margin-top: 1px; }
   .ability-title { font-weight: 900; color: #0f172a; }
-  .ability-cost { font-size: 6px; color: #64748b; font-weight: 800; }
-  .outcome-table { width: 100%; border-collapse: collapse; font-size: 6.8px; margin: 3px 0; }
-  .outcome-table th, .outcome-table td { border: 1px solid #cbd5e1; padding: 2.5px 2px; text-align: center; }
-  .outcome-table th { background: #0f172a; color: white; font-weight: 800; }
-  .row-k { background: #fee2e2; color: #991b1b; font-weight: 800; }
-  .row-out { background: #f8fafc; color: #475569; }
-  .row-sac { background: #fef9c3; color: #854d0e; }
-  .row-bb { background: #eff6ff; color: #1d4ed8; font-weight: 800; }
-  .row-hit { background: #f0fdf4; color: #15803d; font-weight: 800; }
-  .row-hr { background: #fae8ff; color: #86198f; font-weight: 900; }
+  .ability-cost { font-size: 5px; color: #64748b; font-weight: 800; }
 </style>
 </head>
 <body>
 <div class="screen-header">
   <div>
-    <h1>FULL COUNT (V5) — OFFICIAL 5-PAGE TABLETOP PRINT SHEETS</h1>
-    <p>5 Letter Pages (8.5" x 11") • 45 Cards (2.5" x 3.35") • Full Rosters (#1–#9 Batters & 6 Pitchers each) • Option 1 Engine</p>
+    <h1>FULL COUNT (V5) — OFFICIAL HALF-SIZE PRINTABLE CARDS DECK</h1>
+    <p>3 Letter Sheets (8.5" x 11") • 44 Half-Size Cards (1.82" x 2.52") • Inverted Momentum Ladder • Fits 11x17 Playmat Tray</p>
   </div>
-  <button class="print-btn" onclick="window.print()">&#128424; Print 5 Sheets</button>
+  <div class="nav-actions">
+    <a class="btn btn-mat" href="playmats.html">&#128462; 11x17 Playmats</a>
+    <button class="btn btn-print" onclick="window.print()">&#128424; Print 3 Sheets</button>
+  </div>
 </div>
-<!-- PAGE 1: STANCES & PLAYMAT REFERENCE TABLES -->
-<div class="page"><div class="card-grid">
-  <div class="card stance-card" style="border-top:4px solid #dc2626;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#dc2626;">&#128308; HEAT (VELOCITY)</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#9889;</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR VEL DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Overpowers hitters with raw triple-digit fastball velocity.</div></div>
-    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128308; = Batter wins read! Mismatch vs &#128994;/&#128309; = Pitcher claims +Bonus!</div>
+<!-- PAGE 1: METRO TITANS ROSTER -->
+<div class="page">
+  <div class="card-grid">
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">LEADOFF • CF</div>
+            <div class="card-name">AXEL MERCER</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d10</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">5</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Single + Stolen Base</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Rabbit Jump: +2 roll; +1 extra base on 1B</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#2 • 2B</div>
+            <div class="card-name">LUCAS VANCE</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d10</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d8</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Clean Barrel Single (-4..-6)</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Any Strikeout becomes Routine Out</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Pure Barrel: +2 roll; K becomes Routine</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#3 • 3B</div>
+            <div class="card-name">MARCUS REYES</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d8</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Extra-Base Hit or RBI</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: +2 to Batter total roll on all at-bats</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Clutch Drive: +3 to roll with RISP</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">CLEANUP • 1B</div>
+            <div class="card-name">REX STONE</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d12</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d6</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d4</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">2</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Home Run (HR)</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Crush: Roll 2 dice on POW, choose higher</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Moonshot: +3 roll; Extra-Base is HR on 5+</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#5 • RF</div>
+            <div class="card-name">DUKE COLE</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On RBI or Line Drive</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Hot Corner: +2 to your Batter total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#6 • DH</div>
+            <div class="card-name">SILAS DAN</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Gritty 2-Strike Contact</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Gritty AB: +2 roll; Margin +1 becomes 0 Sac</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#7 • SS</div>
+            <div class="card-name">BRYAN CHEN</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Infield Single or Bunt</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Gap Spark: +2 to your Batter total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#8 • C</div>
+            <div class="card-name">"IRON" PETE</div>
+          </div>
+          <span class="card-badge">L1</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d6</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d4</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">2</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Sac/Fielded Groundout (0)</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Iron Wall: +2 to roll; blocks wild pitches</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#9 • LF</div>
+            <div class="card-name">ELI VANCE</div>
+          </div>
+          <span class="card-badge">L1</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d4</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d4</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Walk (BB) or Hit</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Underdog Spark: Roll +d6 bonus die on roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">ACE • SP1</div>
+            <div class="card-name">"APEX" GARRISON</div>
+          </div>
+          <span class="card-badge badge-ace">ACE L3</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d12</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d6</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d8</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Strikeout with Margin +3+</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Opponents roll Power with Disadvantage</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Sonic Boom: Reroll pitch die & keep higher</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">SINKER • SP2</div>
+            <div class="card-name">"BRICK" KOWALSKI</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d10</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> When inducing a Sac/Fielded Out</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Iron Sink: +2 pitch; Sac outs hold runners</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">WORKHORSE • SP3</div>
+            <div class="card-name">DAKOTA RIDGE</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d6</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On 1-2-3 Inning</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Inning Eater: +2 to your Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">FIREMAN • RP1</div>
+            <div class="card-name">TYLER MILLER</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d10</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d4</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d8</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Flamethrower: +2 to Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">ELECTRIC • RP2</div>
+            <div class="card-name">ALEXIS DIAZ</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d8</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On induding Soft Popout</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Southpaw Sweep: +2 to Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans">
+        <div class="card-header">
+          <div>
+            <div class="card-role">CLOSER • CL</div>
+            <div class="card-name">JOSH HADER</div>
+          </div>
+          <span class="card-badge badge-ace">ACE L3</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d12</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d4</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d8</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Game-Ending Out / K</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Flamethrower heat: Adds +3 to pitch roll</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Lights Out: Auto-claim Momentum & +2 roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card titans table-card">
+        <div class="card-header">
+          <div><div class="card-role">TITANS COMMAND</div><div class="card-name">DUGOUT REFERENCE</div></div>
+          <span class="card-badge">TEAM</span>
+        </div>
+        <div style="font-size:6.5px; line-height:1.2; color:#334155; margin-top:4px;">
+          <strong>INVERTED MOMENTUM LADDER:</strong><br>
+          &#128293; <strong>L3 (+5)</strong> &#9664; &#9733; <strong>L2 (+3)</strong> &#9664; &#9889; <strong>L1 (+2)</strong> &#9664; ✕ <strong>L0 (+0)</strong><br><br>
+          &#9664; <strong>SURGE:</strong> Slide cube LEFT toward L3.<br>
+          &#9654; <strong>FATIGUE / ABILITY:</strong> Slide cube RIGHT.<br><br>
+          <strong>STANCES:</strong><br>
+          &#128308; RED: VEL vs POW<br>
+          &#128309; BLUE: CMD vs CON<br>
+          &#128994; GREEN: MOV vs EYE
+        </div>
+        <div class="ability-box" style="background:#1e3a8a; color:white;">
+          <strong>TITANS SLOGAN:</strong> Raw Power & Triple-Digit Fastballs.
+        </div>
+      </div>
   </div>
-  <div class="card stance-card" style="border-top:4px solid #2563eb;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#2563eb;">&#128309; ZONE (COMMAND)</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#127919;</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR CMD DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Paints black edges, hits the catcher's mitt, limits walks.</div></div>
-    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128309; = Batter wins read! Mismatch vs &#128308;/&#128994; = Pitcher claims +Bonus!</div>
+</div>
+<!-- PAGE 2: CRIMSON SERPENTS ROSTER -->
+<div class="page">
+  <div class="card-grid">
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">LEADOFF • LF</div>
+            <div class="card-name">JUAN SOTO</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d12</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Walk (BB) on Eye</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Opponents cannot use Command to reduce walks</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Eagle Eye: +2 roll; draw Walk on Margin -2..-3</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">DH • 5-TOOL</div>
+            <div class="card-name">ELLY CRUZ</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d10</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d10</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">5</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Stolen Base or HR</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Auto-wins approach guess on 1st pitch</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; 5-Tool Genius: Auto-win guess & claim token</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#3 • SS</div>
+            <div class="card-name">GUNNAR HENDERSON</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d8</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Clean Single or Double</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: +2 to Batter total roll on all at-bats</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Gap Hunter: +2 roll; upgrade Single to 2B</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">CLEANUP • 1B</div>
+            <div class="card-name">BRYCE HARPER</div>
+          </div>
+          <span class="card-badge badge-mvp">L3 MVP</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d10</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d8</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Extra-Base Hit or HR</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Rolls 2 dice on Power, takes higher</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Showtime: Add +3 to Batter total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#5 • 3B</div>
+            <div class="card-name">MANNY MACHADO</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">3</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Hard Line Drive Single</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Line Drive: Add +2 to Batter total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#6 • 2B</div>
+            <div class="card-name">FRANCISCO LINDOR</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On inducing 2-Strike Foul/Hit</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Mr. Smile: Add +2 to Batter total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#7 • CF</div>
+            <div class="card-name">NICO HOERNER</div>
+          </div>
+          <span class="card-badge">L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On 2-Strike Contact Single</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Bat Control: Reroll highest die & keep higher</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#8 • C</div>
+            <div class="card-name">AUSTIN HEDGES</div>
+          </div>
+          <span class="card-badge">L1</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d6</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d6</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">2</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Catcher Framing / Strikeout</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Veteran Eye: Add +2 to Pitcher's CMD roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">#9 • RF</div>
+            <div class="card-name">LEO "THE SPARK"</div>
+          </div>
+          <span class="card-badge">L1</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">POW</div><div class="dice-val">d4</div></div>
+          <div class="dice-box blue"><div class="dice-label">CON</div><div class="dice-val">d4</div></div>
+          <div class="dice-box green"><div class="dice-label">EYE</div><div class="dice-val">d4</div></div>
+          <div class="dice-box spd"><div class="dice-label">SPD</div><div class="dice-val">4</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On reaching base via Walk or Hit</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Pure Hustle: Roll extra +d6 bonus die on roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">ACE • SP1</div>
+            <div class="card-name">"PROFESSOR" WEBB</div>
+          </div>
+          <span class="card-badge badge-ace">ACE L3</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d12</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d10</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Inducing Groundout on Green</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Sinkers drop: Margin 0 becomes Strikeout</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Black Paint: +2 pitch; Margin -3 becomes 0 Sac</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">POWER • SP2</div>
+            <div class="card-name">"GHOST" STRIDER</div>
+          </div>
+          <span class="card-badge badge-ace">ACE L3</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d8</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Tunneling: Pitcher adds +2 to roll on match</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Tunneling: Reroll pitch die & keep higher</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">VETERAN • SP3</div>
+            <div class="card-name">LOGAN WEBB</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d6</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> When inducing a Double Play</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Veteran Poise: +2 pitch; downgrade Extra-Base to 1B</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">RISING • RP1</div>
+            <div class="card-name">SPENCER STRIDER</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d6</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d10</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On Strikeout with Margin +3+</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Rising Slider: Add +2 to Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">FIREMAN • RP2</div>
+            <div class="card-name">FELIX BAUTISTA</div>
+          </div>
+          <span class="card-badge">P L2</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d6</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d10</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d6</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box">L2 &#9733;<br>+3</div>
+            <div class="ladder-box active">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On 1-2-3 Relief Inning</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Fireman: Add +2 to Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents">
+        <div class="card-header">
+          <div>
+            <div class="card-role">CLOSER • CL</div>
+            <div class="card-name">EMMANUEL CLASE</div>
+          </div>
+          <span class="card-badge badge-ace">ACE L3</span>
+        </div>
+        <div class="dice-strip">
+          <div class="dice-box red"><div class="dice-label">VEL</div><div class="dice-val">d8</div></div>
+          <div class="dice-box blue"><div class="dice-label">CMD</div><div class="dice-val">d8</div></div>
+          <div class="dice-box green"><div class="dice-label">MOV</div><div class="dice-val">d12</div></div>
+        </div>
+        <div class="ladder-container">
+          <div class="ladder-title"><span>&#9664; SURGE</span><span>MOMENTUM LADDER</span><span>FATIGUE &#9654;</span></div>
+          <div class="ladder-slots">
+            <div class="ladder-box locked-in">L3 &#128293;<br>+5</div>
+            <div class="ladder-box active">L2 &#9733;<br>+3</div>
+            <div class="ladder-box">L1<br>+2</div>
+            <div class="ladder-box exh">✕<br>+0</div>
+          </div>
+        </div>
+        <div class="surge-box">
+          <div><span class="surge-tag">&#9889; SURGE:</span> On 3-Pitch Strikeout or Save</div>
+          <div class="locked-in-desc">&#128293; LOCKED IN: Cutter bite: Opponents roll Contact Disadvantage</div>
+        </div>
+        <div class="ability-box">
+          <div><span class="ability-title">&#9733; Nasty Bite: Add +3 to Pitcher total roll</span> <span class="ability-cost">(-1 Lvl)</span></div>
+        </div>
+      </div>
+      <div class="card serpents table-card">
+        <div class="card-header">
+          <div><div class="card-role">SERPENTS COMMAND</div><div class="card-name">DUGOUT REFERENCE</div></div>
+          <span class="card-badge">TEAM</span>
+        </div>
+        <div style="font-size:6.5px; line-height:1.2; color:#334155; margin-top:4px;">
+          <strong>INVERTED MOMENTUM LADDER:</strong><br>
+          &#128293; <strong>L3 (+5)</strong> &#9664; &#9733; <strong>L2 (+3)</strong> &#9664; &#9889; <strong>L1 (+2)</strong> &#9664; ✕ <strong>L0 (+0)</strong><br><br>
+          &#9664; <strong>SURGE:</strong> Slide cube LEFT toward L3.<br>
+          &#9654; <strong>FATIGUE / ABILITY:</strong> Slide cube RIGHT.<br><br>
+          <strong>STANCES:</strong><br>
+          &#128308; RED: VEL vs POW<br>
+          &#128309; BLUE: CMD vs CON<br>
+          &#128994; GREEN: MOV vs EYE
+        </div>
+        <div class="ability-box" style="background:#047857; color:white;">
+          <strong>SERPENTS SLOGAN:</strong> Precision Command & Vicious Movement.
+        </div>
+      </div>
   </div>
-  <div class="card stance-card" style="border-top:4px solid #16a34a;">
-    <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name" style="color:#16a34a;">&#128994; BREAK (MOVEMENT)</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">PITCH</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#127786;</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR MOV DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Nasty sliders, sinkers, and devastating late horizontal break.</div></div>
-    <div class="ability-box"><strong>THE READ:</strong> Match vs &#128994; = Batter wins read! Mismatch vs &#128308;/&#128309; = Pitcher claims +Bonus!</div>
+</div>
+<!-- PAGE 3: STANCES & REFERENCE MAT DECK -->
+<div class="page">
+  <div class="card-grid">
+    <div class="card stance-card" style="border-color:#b91c1c;">
+      <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name">&#128308; VELOCITY</div></div><span class="card-badge" style="background:#fee2e2; color:#b91c1c;">FASTBALL</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#9889;</div><div style="font-weight:900; font-size:10px; color:#b91c1c;">ROLL VEL DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Overpowers hitters with raw triple-digit fastball velocity.</div></div>
+      <div class="ability-box" style="background:#fef2f2; border-color:#fca5a5;"><span class="ability-title" style="color:#b91c1c;">VS POWER:</span> MATCH &#9654; Batter Bonus<br><span class="ability-title" style="color:#1e293b;">VS CON/EYE:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card stance-card" style="border-color:#1d4ed8;">
+      <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name">&#128309; COMMAND</div></div><span class="card-badge" style="background:#eff6ff; color:#1d4ed8;">ZONE</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#127919;</div><div style="font-weight:900; font-size:10px; color:#1d4ed8;">ROLL CMD DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Paints black corners and forces weak, defensive swings.</div></div>
+      <div class="ability-box" style="background:#eff6ff; border-color:#93c5fd;"><span class="ability-title" style="color:#1d4ed8;">VS CONTACT:</span> MATCH &#9654; Batter Bonus<br><span class="ability-title" style="color:#1e293b;">VS POW/EYE:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card stance-card" style="border-color:#15803d;">
+      <div class="card-header"><div><div class="card-role">PITCHER STANCE</div><div class="card-name">&#128994; MOVEMENT</div></div><span class="card-badge" style="background:#f0fdf4; color:#15803d;">BREAK</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#127744;</div><div style="font-weight:900; font-size:10px; color:#15803d;">ROLL MOV DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Late sharp break that generates groundballs and swings on pitches outside.</div></div>
+      <div class="ability-box" style="background:#f0fdf4; border-color:#86efac;"><span class="ability-title" style="color:#15803d;">VS EYE:</span> MATCH &#9654; Batter Bonus<br><span class="ability-title" style="color:#1e293b;">VS POW/CON:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card stance-card" style="border-color:#b91c1c;">
+      <div class="card-header"><div><div class="card-role">BATTER STANCE</div><div class="card-name">&#128308; POWER</div></div><span class="card-badge" style="background:#fee2e2; color:#b91c1c;">PULL</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#128165;</div><div style="font-weight:900; font-size:10px; color:#b91c1c;">ROLL POW DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Anticipating heat for maximum exit velocity and distance.</div></div>
+      <div class="ability-box" style="background:#fef2f2; border-color:#fca5a5;"><span class="ability-title" style="color:#b91c1c;">VS VEL:</span> MATCH &#9654; Batter Momentum!<br><span class="ability-title" style="color:#1e293b;">VS CMD/MOV:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card stance-card" style="border-color:#1d4ed8;">
+      <div class="card-header"><div><div class="card-role">BATTER STANCE</div><div class="card-name">&#128309; CONTACT</div></div><span class="card-badge" style="background:#eff6ff; color:#1d4ed8;">BARREL</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#9918;</div><div style="font-weight:900; font-size:10px; color:#1d4ed8;">ROLL CON DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Short direct path to the ball for singles and line drives.</div></div>
+      <div class="ability-box" style="background:#eff6ff; border-color:#93c5fd;"><span class="ability-title" style="color:#1d4ed8;">VS CMD:</span> MATCH &#9654; Batter Momentum!<br><span class="ability-title" style="color:#1e293b;">VS VEL/MOV:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card stance-card" style="border-color:#15803d;">
+      <div class="card-header"><div><div class="card-role">BATTER STANCE</div><div class="card-name">&#128994; EYE</div></div><span class="card-badge" style="background:#f0fdf4; color:#15803d;">DISCIPLINE</span></div>
+      <div style="margin:auto 0; text-align:center;"><div style="font-size:20px;">&#128065;</div><div style="font-weight:900; font-size:10px; color:#15803d;">ROLL EYE DIE</div><div style="font-size:6.5px; color:#475569; margin-top:2px;">Tracking break, checking swings, and spitting on pitches out of zone.</div></div>
+      <div class="ability-box" style="background:#f0fdf4; border-color:#86efac;"><span class="ability-title" style="color:#15803d;">VS MOV:</span> MATCH &#9654; Batter Momentum!<br><span class="ability-title" style="color:#1e293b;">VS VEL/CMD:</span> MISMATCH &#9654; Pitcher Bonus!</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">REFERENCE</div><div class="card-name">OUTCOME TABLE</div></div><span class="card-badge">V5</span></div>
+      <table style="width:100%; border-collapse:collapse; font-size:5.8px; margin-top:3px;">
+        <tr style="background:#0f172a; color:white;"><th>MARGIN</th><th>RESULT</th></tr>
+        <tr style="background:#fee2e2; color:#991b1b; font-weight:800;"><td>+8+</td><td>K (SWINGING)</td></tr>
+        <tr style="background:#fef2f2; color:#b91c1c; font-weight:800;"><td>+5..+7</td><td>K (LOOKING)</td></tr>
+        <tr style="background:#f8fafc;"><td>+2..+4</td><td>ROUTINE OUT</td></tr>
+        <tr style="background:#fef9c3;"><td>+1</td><td>WEAK OUT</td></tr>
+        <tr style="background:#fefce8; font-weight:800;"><td>0 (TIE)</td><td>SAC / FIELDED</td></tr>
+        <tr style="background:#eff6ff; color:#1d4ed8; font-weight:800;"><td>-1..-3</td><td>WALK (BB)</td></tr>
+        <tr style="background:#f0fdf4; color:#15803d; font-weight:800;"><td>-4..-6</td><td>SINGLE (1B)</td></tr>
+        <tr style="background:#fae8ff; color:#86198f; font-weight:900;"><td>-7-</td><td>EXTRA-BASE (2B/3B/HR)</td></tr>
+      </table>
+      <div class="ability-box" style="font-size:5.2px;">Margin = Pitcher Total Roll - Batter Total Roll.</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">REFERENCE</div><div class="card-name">INVERTED LADDER</div></div><span class="card-badge">RULES</span></div>
+      <div style="font-size:6.2px; line-height:1.2; margin-top:3px;">
+        <strong>HIGH ON LEFT, LOW ON RIGHT:</strong><br>
+        &#128293; <strong>L3 (+5):</strong> LOCKED IN!<br>
+        &#9733; <strong>L2 (+3):</strong> PRIME (Stars start here)<br>
+        &#9889; <strong>L1 (+2):</strong> READY (Role players)<br>
+        ✕ <strong>L0 (+0):</strong> EXHAUSTED<br><br>
+        &#9664; <strong>SURGES:</strong> Slide cube 1 step LEFT.<br>
+        &#9654; <strong>FATIGUE:</strong> Slide cube 1 step RIGHT.
+      </div>
+      <div class="ability-box" style="font-size:5.5px;">Spend 1 level right to trigger special ability!</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">REFERENCE</div><div class="card-name">BASERUNNING</div></div><span class="card-badge">SPEED</span></div>
+      <div style="font-size:6.2px; line-height:1.2; margin-top:3px;">
+        <strong>RUNNER ADVANCEMENT:</strong><br>
+        • Single: R1&#9654;2B, R2/R3&#9654;Scores (SPD 4+ takes 3B).<br>
+        • Double: R2/R3&#9654;Scores, R1&#9654;3B (SPD 4+ scores!).<br>
+        • Triple / HR: All runners score.<br><br>
+        <strong>STOLEN BASE (STEAL):</strong><br>
+        Roll Runner SPD vs Catcher Arm (d6/d8). Runner &gt; Arm = SAFE!
+      </div>
+      <div class="ability-box" style="font-size:5.5px;">Tie on steal goes to the defensive catcher!</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">TACTIC</div><div class="card-name">HIT & RUN</div></div><span class="card-badge">PLAY</span></div>
+      <div style="font-size:6.5px; line-height:1.25; margin-top:4px;">Declare before pitch. Batter must choose 🔵 CONTACT. All baserunners get a +2 Speed jump on extra bases.<br><br><strong>Risk:</strong> Any Strikeout becomes a Double Play!</div>
+      <div class="ability-box" style="font-size:5.5px;">Offense tactical card</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">TACTIC</div><div class="card-name">PITCHOUT</div></div><span class="card-badge">PLAY</span></div>
+      <div style="font-size:6.5px; line-height:1.25; margin-top:4px;">Pitcher throws outside pitch to catch a steal. Adds +4 to Catcher Arm roll on any steal attempt.<br><br><strong>Risk:</strong> Batter auto-takes a Ball (+1 to Count).</div>
+      <div class="ability-box" style="font-size:5.5px;">Defense tactical card</div>
+    </div>
+    <div class="card table-card">
+      <div class="card-header"><div><div class="card-role">TACTIC</div><div class="card-name">INFIELD IN</div></div><span class="card-badge">PLAY</span></div>
+      <div style="font-size:6.5px; line-height:1.25; margin-top:4px;">Prevents runner on 3rd base from scoring on groundout (Margin 0 or +1).<br><br><strong>Risk:</strong> Clean Singles (-4..-6) roll +1 base!</div>
+      <div class="ability-box" style="font-size:5.5px;">Defense tactical card</div>
+    </div>
   </div>
-  <div class="card stance-card" style="border-top:4px solid #dc2626;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#dc2626;">&#128308; POWER SWING</div></div><div class="card-badge" style="background:#fee2e2; color:#991b1b;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128165;</div><div style="font-weight:900; font-size:11px; color:#b91c1c;">ROLL YOUR POW DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Sell out for damage! Uncapped HR ceiling; vulnerable to Ks (&#8805; +2).</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Margin &#8804; -5 triggers Extra-Base roll!</div>
-  </div>
-  <div class="card stance-card" style="border-top:4px solid #2563eb;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#2563eb;">&#128309; EYE / TAKE</div></div><div class="card-badge" style="background:#eff6ff; color:#1d4ed8;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128065;</div><div style="font-weight:900; font-size:11px; color:#1d4ed8;">ROLL YOUR EYE DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Plate discipline! Expanded walk window on margins -1 to -3.</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Working the count draws easy walks.</div>
-  </div>
-  <div class="card stance-card" style="border-top:4px solid #16a34a;">
-    <div class="card-header"><div><div class="card-role">BATTER APPROACH</div><div class="card-name" style="color:#16a34a;">&#128994; CONTACT SWING</div></div><div class="card-badge" style="background:#f0fdf4; color:#15803d;">SWING</div></div>
-    <div style="margin:auto 0; text-align:center;"><div style="font-size:26px;">&#128737;</div><div style="font-weight:900; font-size:11px; color:#15803d;">ROLL YOUR CON DIE</div><div style="font-size:7.5px; color:#475569; margin-top:2px;">Shorten up! Protected from strikeouts; high floor, capped at 1B.</div></div>
-    <div class="ability-box"><strong>MATCH:</strong> Batter claims +Bonus. Any margin &#8805; 0 is a Routine Out (No K!).</div>
-  </div>
-  <div class="card table-card">
-    <div class="card-header"><div><div class="card-role">TABLEPLAY MASTER</div><div class="card-name">UNIVERSAL OUTCOME CHART</div></div><div class="card-badge">MARGIN</div></div>
-    <div style="font-size:6.5px; font-weight:800; text-align:center; color:#64748b; margin-top:1px;">MARGIN = Pitcher Total Roll − Batter Total Roll</div>
-    <table class="outcome-table">
-      <tr><th>MARGIN</th><th>&#128308; RED (POW)</th><th>&#128994; GRN (CON)</th><th>&#128309; BLU (EYE)</th></tr>
-      <tr class="row-k"><td>&#8805; +2</td><td>STRIKEOUT (K)</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td></tr>
-      <tr class="row-out"><td>+1 .. 0</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td><td>ROUTINE OUT</td></tr>
-      <tr class="row-sac"><td>-1</td><td>SAC (R3 Scores)</td><td>SAC (R3 Scores)</td><td>WALK (BB)</td></tr>
-      <tr class="row-bb"><td>-2</td><td>WALK (BB)</td><td>WALK (BB)</td><td>WALK (BB)</td></tr>
-      <tr class="row-hit"><td>-3 .. -4</td><td>CLEAN SINGLE</td><td>CLEAN SINGLE</td><td>WALK / 1B</td></tr>
-      <tr class="row-hr"><td>&#8804; -5</td><td>EXTRA-BASE/HR</td><td>CLEAN SINGLE</td><td>CLEAN SINGLE</td></tr>
-    </table>
-    <div class="ability-box"><strong>EXTRA-BASE HIT (&#8804; -5):</strong> Roll POW die: 1-5 Double (2B), 6 Triple (3B), 7+ HOME RUN!</div>
-  </div>
-  <div class="card table-card">
-    <div class="card-header"><div><div class="card-role">CORE MECHANICS</div><div class="card-name">LADDER & FATIGUE</div></div><div class="card-badge" style="background:#fef08a;">RULES</div></div>
-    <div style="font-size:6.8px; line-height:1.25; margin:auto 0;">
-      <strong>MOMENTUM LADDER LEVELS:</strong><br>
-      • <strong>L3 &#128293; (LOCKED IN):</strong> +5 Bonus & Superpower Unlocked!<br>
-      • <strong>L2 (PRIME &#9733;):</strong> +3 Bonus (Stars start here).<br>
-      • <strong>L1 (READY):</strong> +2 Bonus (Role players start here).<br>
-      • <strong>&#10005; EXH:</strong> +0 Bonus (Abilities locked; cannot spend).<br><br>
-      <strong>PITCHER FATIGUE (TIMES THROUGH ORDER):</strong><br>
-      • 2nd time facing #1 Leadoff: Slide cube 1 step down.<br>
-      • 3rd time facing #1 Leadoff: Slide cube 1 step down.<br>
-      • 3+ runs allowed in an inning: Slide cube 1 step down immediately!
-    </div>
-    <div class="ability-box"><strong>SPENDING FUEL:</strong> Activating Special Ability drops cube 1 step left!</div>
-  </div>
-  <div class="card table-card">
-    <div class="card-header"><div><div class="card-role">TABLEPLAY MASTER</div><div class="card-name">BASERUNNING & QUICK REF</div></div><div class="card-badge">REF</div></div>
-    <div style="font-size:6.8px; line-height:1.25; margin:auto 0;">
-      <strong>SINGLES & SPEED DIE:</strong><br>
-      • Runners advance 1 base safely.<br>
-      • Runner on 2nd may attempt to score: Roll SPD die (4+ Safe at Home, 1-3 Out at Plate!).<br><br>
-      <strong>DOUBLES & TRIPLES:</strong><br>
-      • Double: Runners on 2nd and 3rd score; runner on 1st goes to 3rd.<br>
-      • Triple: All runners on base score; batter stops at 3rd base.<br><br>
-      <strong>WALKS:</strong> Only force-advance runners on base.
-    </div>
-    <div class="ability-box"><strong>SURGES:</strong> When you trigger your card's &#9889; SURGE, slide cube 1 step right!</div>
-  </div>
-</div></div>
-<!-- PAGE 2: METRO TITANS PITCHING & TOP LINEUP -->
-<div class="page"><div class="card-grid">
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • SP #1 (ACE)</div>
-          <div class="card-name">"APEX" GARRISON</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> On Strikeout with Margin +3 or more</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Opponents rolling Red Power against his fastball roll with Disadvantage</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Sonic Boom — Reroll pitch die</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • SP #2 (SINKER)</div>
-          <div class="card-name">"BRICK" KOWALSKI</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> When inducing a Sac/Fielded Groundout</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Sac outs advance zero baserunners</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Iron Sink — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • SP #3 (WORKHORSE)</div>
-          <div class="card-name">DAKOTA RIDGE</div>
-        </div>
-        <div class="card-badge">MID/RP (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Inning Eater — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • RP #1 (SETUP)</div>
-          <div class="card-name">"SPITFIRE" RAMOS</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Flamethrower heat: Adds +3 to pitch roll</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Flamethrower — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • RP #2 (MIDDLE)</div>
-          <div class="card-name">"LEFTY" VANCE</div>
-        </div>
-        <div class="card-badge">MID/RP (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Southpaw Sweep — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • CL #1 (CLOSER)</div>
-          <div class="card-name">"THE BEAST" TANKER</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Opponents cannot activate Batter Abilities while Tanker is Locked In</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Lights Out — Auto-claim Momentum read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • CF #1 (LEADOFF)</div>
-          <div class="card-name">"FLASH" MERCER</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d12</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Scores a run or advances 2 bases on a Single</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Unstoppable Wheels — Takes 2 extra bases on any hit without a roll</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Rabbit Jump — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • RF #2 (PURE HITTER)</div>
-          <div class="card-name">AARON VANCE</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Clean Single or Extra-Base Hit</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Laser Show — Automatically upgrades any Clean Single into a Double</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Pure Barrel — +2 to roll; immune to Strikeouts</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • LF #3 (CLUTCH)</div>
-          <div class="card-name">CORBIN REYES</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with 2 outs</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Clutch Engine — Adds +4 to all Contact and Power rolls</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Clutch Drive — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-</div></div>
-<!-- PAGE 3: METRO TITANS LINEUP FINISH & DUGOUT TRACKERS -->
-<div class="page"><div class="card-grid">
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • 1B #4 (CLEANUP)</div>
-          <div class="card-name">"COLOSSUS" STONE</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d12</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d4</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Home Run (Margin &#8804; -5, POW 7+)</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Moonshot Frenzy — Extra-Base hits become HRs on POW 5+</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Moonshot — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • 3B #5 (HOT CORNER)</div>
-          <div class="card-name">MARCUS COLE</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with RISP</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Hot Corner — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • C #6 (GRIT)</div>
-          <div class="card-name">"BLUE COLLAR" DAN</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Gritty AB — +2 to roll; Margin +1 out becomes a Sac Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • 2B #7 (SPARK)</div>
-          <div class="card-name">TOBY CHEN</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Gap Spark — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • SS #8 (GLOVE)</div>
-          <div class="card-name">"GLOVE-MAN" PETE</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Contact Poke — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card titans">
-      <div class="card-header">
-        <div>
-          <div class="card-role">TITANS • DH #9 (UNDERDOG)</div>
-          <div class="card-name">ELI "THE KID"</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d4</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Underdog Spark — Roll an extra +d6 bonus die to your roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-  <div class="card playmat-card titans">
-    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">DIAMOND & BASES</div></div><div class="card-badge">TRACK</div></div>
-    <div style="margin:auto 0; text-align:center;">
-      <div style="font-size:10px; font-weight:800; color:#b91c1c; margin-bottom:4px;">2ND BASE &#9633;</div>
-      <div style="display:flex; justify-content:space-around; font-size:10px; font-weight:800; color:#b91c1c;">
-        <span>3RD BASE &#9633;</span><span>1ST BASE &#9633;</span>
-      </div>
-      <div style="font-size:10px; font-weight:800; color:#0f172a; margin-top:4px;">HOME PLATE &#11030;</div>
-    </div>
-    <div class="ability-box">Place small wooden cubes or player markers on bases to track runners.</div>
-  </div>
-  <div class="card playmat-card titans">
-    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">COUNT & OUTS</div></div><div class="card-badge">INNING</div></div>
-    <div style="margin:auto 0; font-size:8px; line-height:1.5;">
-      <div><strong>OUTS:</strong> &#9675; 1 Out &nbsp; &#9675; 2 Outs &nbsp; &#9679; 3 Outs (Switch)</div>
-      <div><strong>BALLS:</strong> &#9675; B1 &nbsp; &#9675; B2 &nbsp; &#9675; B3 &nbsp; &#9679; B4 (Walk)</div>
-      <div><strong>STRIKES:</strong> &#9675; S1 &nbsp; &#9675; S2 &nbsp; &#9679; S3 (Strikeout)</div>
-    </div>
-    <div class="ability-box">Reset count after every plate appearance outcome.</div>
-  </div>
-  <div class="card playmat-card titans">
-    <div class="card-header"><div><div class="card-role">TITANS DUGOUT</div><div class="card-name">BULLPEN WARMUP</div></div><div class="card-badge">STAFF</div></div>
-    <div style="font-size:7px; line-height:1.3; margin:auto 0;">
-      <strong>ACTIVE SP:</strong> Place starter here.<br>
-      <strong>WARMING UP:</strong> Ready reliever in 6th.<br>
-      <strong>CLOSER:</strong> Save Tanker for 9th inning.<br><br>
-      <em>Lineup order is set by manager in slots #1 to #9.</em>
-    </div>
-    <div class="ability-box">Relievers drop 1 level if pitching a 2nd inning.</div>
-  </div>
-</div></div>
-<!-- PAGE 4: SHADOW SERPENTS PITCHING & TOP LINEUP -->
-<div class="page"><div class="card-grid">
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • SP #1 (ACE)</div>
-          <div class="card-name">"PROFESSOR" WEBB</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d12</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Margin +2 called Strikeout</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Master of Black Paint — Eliminates walk window; all Walks become Groundouts</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Black Paint — +2 to roll; Margin -3 Walk is Fielded Out</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • SP #2 (STRIKEOUT)</div>
-          <div class="card-name">"GHOST" STRIDER</div>
-        </div>
-        <div class="card-badge">MID/RP (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Tunneling — Reroll pitch die and keep higher</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • SP #3 (VETERAN)</div>
-          <div class="card-name">"COLD-EYE" CARTER</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Induces a weak Routine Out with runner on 3rd</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Veteran Poise — Downgrades any Extra-Base Hit to a Single</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Veteran Poise — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • RP #1 (SETUP)</div>
-          <div class="card-name">"SUBMARINE" SKENES</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d10</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Induces a Fielded/Sac Out</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Rising Slider — Adds +3 to pitch roll</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Rising Slider — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • RP #2 (FIREMAN)</div>
-          <div class="card-name">"ICEBOX" KELLER</div>
-        </div>
-        <div class="card-badge">MID/RP (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Fireman — +2 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • CL #1 (TWO-WAY CLOSER)</div>
-          <div class="card-name">SHOHEI "VIPER" CRUZ</div>
-        </div>
-        <div class="card-badge badge-ace">ACE (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; VEL</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; CMD</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; MOV</div><div class="dice-val">d12</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (TTO & Fuel)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> On any Strikeout (K)</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Dominant Closer — Claims Momentum advantage on every pitch in 9th inning</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Nasty Bite — +3 to pitch roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • LF #1 (DISCIPLINE)</div>
-          <div class="card-name">"PROFESSOR" SOTO</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d12</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Draws a Walk on a &#128309; Blue Eye card</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Master of Strike Zone — Completely immune to Strikeouts; matches vs Blue draw BB</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Eagle Eye — +2 to roll; draws Walk on Margin 0 to -3</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • DH #2 (TWO-WAY MVP)</div>
-          <div class="card-name">SHOHEI "VIPER" CRUZ</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d10</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d10</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits an Extra-Base Hit or 2-out RBI hit</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Transcendent — Automatically claims Momentum advantage on every at-bat</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Five-Tool Genius — Automatically wins the Pitch Read</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • SS #3 (ALL-STAR)</div>
-          <div class="card-name">GUNNAR HENDERSON</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Double or Triple</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Gap Master — All Clean Singles automatically become Doubles</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Gap Hunter — +2 to roll; upgrades Single to Double</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-</div></div>
-<!-- PAGE 5: SHADOW SERPENTS LINEUP FINISH & DUGOUT TRACKERS -->
-<div class="page"><div class="card-grid">
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • 1B #4 (SHOWTIME)</div>
-          <div class="card-name">BRYCE HARPER</div>
-        </div>
-        <div class="card-badge badge-mvp">STAR (L3 &#128293;)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d10</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d8</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L2</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box">L1 READY<br>(+2)</div>
-          <div class="ladder-box active">L2 PRIME<br>(+3)</div>
-          <div class="ladder-box locked-in">L3 &#128293;<br>(+5)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Home Run or extra-base hit</div>
-        <div class="locked-in-desc">&#128293; LOCKED IN: Showtime Flow — Adds +4 to all rolls; HR on POW 6+</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Showtime — +3 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • 3B #5 (HOT CORNER)</div>
-          <div class="card-name">MANNY MACHADO</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d8</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d6</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Drives in an RBI with RISP</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Line Drive — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • CF #6 (SMILE)</div>
-          <div class="card-name">FRANCISCO LINDOR</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d6</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d8</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Single and advances on Speed roll</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Mr. Smile — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • 2B #7 (BAT CONTROL)</div>
-          <div class="card-name">NICO HOERNER</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d10</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="surge-box">
-        <div><span class="surge-tag">&#9889; SURGE:</span> Hits a Contact Single on Green card</div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Bat Control — Reroll contact die & keep higher</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • C #8 (VETERAN C)</div>
-          <div class="card-name">AUSTIN HEDGES</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d6</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d6</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d4</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Veteran Eye — +2 to roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-    <div class="card serpents">
-      <div class="card-header">
-        <div>
-          <div class="card-role">SERPENTS • RF #9 (THE SPARK)</div>
-          <div class="card-name">LEO "THE SPARK"</div>
-        </div>
-        <div class="card-badge">REGULAR (L2)</div>
-      </div>
-      <div class="dice-strip">
-        <div class="dice-box red"><div class="dice-label">&#128308; POW</div><div class="dice-val">d4</div></div>
-        <div class="dice-box blue"><div class="dice-label">&#128309; EYE</div><div class="dice-val">d4</div></div>
-        <div class="dice-box green"><div class="dice-label">&#128994; CON</div><div class="dice-val">d4</div></div>
-        <div class="dice-box spd"><div class="dice-label">&#127939; SPD</div><div class="dice-val">d8</div></div>
-      </div>
-      <div class="ladder-container">
-        <div class="ladder-title"><span>MOMENTUM TRACK (8mm Cube)</span><span>Starts: L1</span></div>
-        <div class="ladder-slots">
-          <div class="ladder-box exh">&#10005; EXH<br>(+0)</div>
-          <div class="ladder-box active">L1 READY<br>(+2)</div>
-          <div class="ladder-box">L2 PRIME<br>(+3)</div>
-        </div>
-      </div>
-      <div class="ability-box">
-        <span class="ability-title">&#9733; Pure Hustle — Roll an extra +d6 bonus die on Batter roll</span> <span class="ability-cost">(Cost: Spend 1 Lvl)</span>
-      </div>
-    </div>
-  <div class="card playmat-card serpents">
-    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">DIAMOND & BASES</div></div><div class="card-badge">TRACK</div></div>
-    <div style="margin:auto 0; text-align:center;">
-      <div style="font-size:10px; font-weight:800; color:#047857; margin-bottom:4px;">2ND BASE &#9633;</div>
-      <div style="display:flex; justify-content:space-around; font-size:10px; font-weight:800; color:#047857;">
-        <span>3RD BASE &#9633;</span><span>1ST BASE &#9633;</span>
-      </div>
-      <div style="font-size:10px; font-weight:800; color:#0f172a; margin-top:4px;">HOME PLATE &#11030;</div>
-    </div>
-    <div class="ability-box">Place small wooden cubes or player markers on bases to track runners.</div>
-  </div>
-  <div class="card playmat-card serpents">
-    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">COUNT & OUTS</div></div><div class="card-badge">INNING</div></div>
-    <div style="margin:auto 0; font-size:8px; line-height:1.5;">
-      <div><strong>OUTS:</strong> &#9675; 1 Out &nbsp; &#9675; 2 Outs &nbsp; &#9679; 3 Outs (Switch)</div>
-      <div><strong>BALLS:</strong> &#9675; B1 &nbsp; &#9675; B2 &nbsp; &#9675; B3 &nbsp; &#9679; B4 (Walk)</div>
-      <div><strong>STRIKES:</strong> &#9675; S1 &nbsp; &#9675; S2 &nbsp; &#9679; S3 (Strikeout)</div>
-    </div>
-    <div class="ability-box">Reset count after every plate appearance outcome.</div>
-  </div>
-  <div class="card playmat-card serpents">
-    <div class="card-header"><div><div class="card-role">SERPENTS DUGOUT</div><div class="card-name">BULLPEN WARMUP</div></div><div class="card-badge">STAFF</div></div>
-    <div style="font-size:7px; line-height:1.3; margin:auto 0;">
-      <strong>ACTIVE SP:</strong> Place starter here.<br>
-      <strong>WARMING UP:</strong> Ready reliever in 6th.<br>
-      <strong>CLOSER:</strong> Save Cruz for 9th inning.<br><br>
-      <em>Lineup order is set by manager in slots #1 to #9.</em>
-    </div>
-    <div class="ability-box">Relievers drop 1 level if pitching a 2nd inning.</div>
-  </div>
-</div></div>
+</div>
 </body>
 </html>

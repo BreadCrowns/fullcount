@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1218,7 +1218,8 @@
       <button class="tt-btn gold" onclick="openLineupSetupModal()">📋 Manager Lineup &amp; Pitcher Setup</button>
       <button class="tt-btn" onclick="openRulesModal()">📖 Quick Rules</button>
       <button class="tt-btn" id="btn-reopen-duel" style="display:none;" onclick="openDuelOverlay()">🎲 Last Roll</button>
-      <a href="team_cards.html" target="_blank" class="tt-btn" style="text-decoration:none;">🖨️ Print 11×17 Sheets</a>
+      <a href="playmats.html" target="_blank" class="tt-btn gold" style="text-decoration:none;">🖨️ 11×17 Playmats</a>
+      <a href="print_sheets.html" target="_blank" class="tt-btn" style="text-decoration:none;">🃏 Half-Size Cards</a>
     </div>
   </header>
 
@@ -1673,7 +1674,22 @@
 
     function initGame(userTeamKey = 'titans') {
       const clone = JSON.parse(JSON.stringify(TEAMS_TEMPLATE));
-      state = {
+            ['titans', 'serpents'].forEach(tKey => {
+        const teamObj = clone[tKey];
+        teamObj.pitchers.forEach((p, idx) => {
+          if (typeof p.currentLevel !== 'number') {
+            p.maxLevel = (idx === 0 || idx === 5) ? 3 : 2;
+            p.currentLevel = (idx === 0 || idx === 5) ? 2 : (idx === 1 ? 2 : 1);
+          }
+        });
+        teamObj.batters.forEach((b, idx) => {
+          if (typeof b.currentLevel !== 'number') {
+            b.maxLevel = (idx >= 1 && idx <= 3) ? 3 : 2;
+            b.currentLevel = (idx >= 1 && idx <= 4) ? 2 : 1;
+          }
+        });
+      });
+state = {
         userTeam: userTeamKey,
         inspectedLineupTeam: userTeamKey,
         inning: 1,
@@ -1735,39 +1751,12 @@
 
     // Build the physical Momentum Cube Track HTML (with a 3D glowing cube on the active box!)
     function buildCubeTrackHTML(player, isPitcher) {
-      const cur = player.currentLevel;
-      const max = player.maxLevel;
+      if (!player) return '';
+      const cur = (typeof player.currentLevel === 'number') ? player.currentLevel : 1;
+      const max = (typeof player.maxLevel === 'number') ? player.maxLevel : 2;
       let boxesHTML = '';
 
-      // Box 0: Exhausted
-      const hasExh = (cur === 0);
-      boxesHTML += `
-        <div class="pc-cube-box ${hasExh ? 'has-cube' : ''}" style="background:#f1f5f9; color:#94a3b8;">
-          ${hasExh ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
-          <span class="pc-cube-step">✕ EXH</span>
-          <span class="pc-cube-die">+0</span>
-        </div>`;
-
-      // Box 1: Ready (+2)
-      const hasL1 = (cur === 1);
-      boxesHTML += `
-        <div class="pc-cube-box ${hasL1 ? 'has-cube start-box' : ''}">
-          ${hasL1 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
-          <span class="pc-cube-step">L1 READY</span>
-          <span class="pc-cube-die">+2</span>
-        </div>`;
-
-      // Box 2: Prime (+3)
-      if (max >= 2) {
-        const hasL2 = (cur === 2);
-        boxesHTML += `
-          <div class="pc-cube-box ${hasL2 ? 'has-cube start-box' : ''}">
-            ${hasL2 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
-            <span class="pc-cube-step">L2 PRIME</span>
-            <span class="pc-cube-die">+3</span>
-          </div>`;
-      }
-
+      // INVERTED: HIGH ON LEFT (L3 🔥), LOW ON RIGHT (✕ EXH)
       // Box 3: Locked In (+5)
       if (max >= 3) {
         const hasL3 = (cur === 3);
@@ -1779,11 +1768,43 @@
           </div>`;
       }
 
+      // Box 2: Prime (+3)
+      if (max >= 2) {
+        const hasL2 = (cur === 2);
+        boxesHTML += `
+          <div class="pc-cube-box ${hasL2 ? 'has-cube start-box' : ''}">
+            ${hasL2 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+            <span class="pc-cube-step">L2 ★</span>
+            <span class="pc-cube-die">+3</span>
+          </div>`;
+      }
+
+      // Box 1: Ready (+2)
+      const hasL1 = (cur === 1);
+      boxesHTML += `
+        <div class="pc-cube-box ${hasL1 ? 'has-cube start-box' : ''}">
+          ${hasL1 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+          <span class="pc-cube-step">L1</span>
+          <span class="pc-cube-die">+2</span>
+        </div>`;
+
+      // Box 0: Exhausted (+0)
+      const hasExh = (cur === 0);
+      boxesHTML += `
+        <div class="pc-cube-box ${hasExh ? 'has-cube out-box' : ''}" style="background:#f1f5f9; color:#94a3b8;">
+          ${hasExh ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+          <span class="pc-cube-step">✕ EXH</span>
+          <span class="pc-cube-die">+0</span>
+        </div>`;
+
       return `
         <div class="pc-cube-track" style="margin-top:6px;">
           <div class="pc-cube-track-header">
-            <span>MOMENTUM LADDER (Current: +${getLevelBonus(cur)})</span>
-            <span style="color:${cur === 3 ? '#dc2626' : '#2563eb'}; font-weight:800;">${cur === 3 ? '🔥 LOCKED IN!' : (cur === 2 ? '★ PRIME' : (cur === 1 ? 'READY' : 'EXHAUSTED'))}</span>
+            <span style="font-size:7px; color:#16a34a; font-weight:800;">◀ SURGE</span>
+            <span style="font-weight:900; color:${cur === 3 ? '#dc2626' : (cur === 2 ? '#b45309' : (cur === 1 ? '#2563eb' : '#64748b'))};">
+              ${cur === 3 ? '🔥 LOCKED IN (+5)' : (cur === 2 ? '★ PRIME (+3)' : (cur === 1 ? 'READY (+2)' : 'EXHAUSTED (+0)'))}
+            </span>
+            <span style="font-size:7px; color:#dc2626; font-weight:800;">FATIGUE ▶</span>
           </div>
           <div class="pc-cube-track-boxes">
             ${boxesHTML}
@@ -1857,7 +1878,7 @@
             </tr>
           </table>
 
-          ${buildCubeTrackHTML(player.startMom, player.mom, isPitcher)}
+          ${buildCubeTrackHTML(player, isPitcher)}
 
           <div class="pc-ability-box ${armedClass} ${exhaustedClass}" ${onClickAbility ? `onclick="${onClickAbility}"` : ''} title="Click to toggle Special Ability for this At-Bat">
             <div>

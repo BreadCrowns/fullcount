@@ -40,12 +40,12 @@ Every player card displays their **Single Core Attribute Die** for each color, t
 │ 🔴 RED: DIE          🔵 BLUE: DIE       🟢 GREEN: DIE  │
 │ SPEED: DIE (Batters)                                   │
 ├────────────────────────────────────────────────────────┤
-│ MOMENTUM LADDER:                                       │
-│ [ ✕ EXH (+0) ]  [ L1 (+2) ]  [ L2 ★ (+3) ]  [ L3 🔥 (+5) ]│
+│ MOMENTUM LADDER (Inverted: High on Left, Low on Right):│
+│ [ L3 🔥 (+5) ]  [ L2 ★ (+3) ]  [ L1 (+2) ]  [ ✕ EXH (+0) ]│
 │                                                        │
-│ ⚡ SURGE: [Personalized trigger that slides cube right] │
+│ ⚡ SURGE: [Personalized trigger that slides cube LEFT]  │
 │ 🔥 LOCKED IN: [Amplified superpower when at Level 3]   │
-│ ★ ABILITY (Spend 1 Level): [Signature tactical perk]   │
+│ ★ ABILITY (Spend 1 Level): [Slides cube RIGHT]         │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -120,24 +120,34 @@ When a Clean Single is hit with a runner on **2nd base**:
 
 ---
 
-## 5. Momentum Ladders, Surges & Locked In Status
+## 5. Inverted Momentum Ladders, Surges & Locked In Status
 
-### The 4 Ladder Levels
-* **Level 3 (`L3 🔥`): LOCKED IN** — `+5` Momentum Bonus + Player Superpower Unlocked!
-* **Level 2 (`L2 ★`): PRIME** — `+3` Momentum Bonus (Stars start here).
-* **Level 1 (`L1`): READY** — `+2` Momentum Bonus (Role players start here).
-* **Level 0 (`✕ EXH`): EXHAUSTED** — `+0` Bonus (Abilities locked; cannot spend fuel).
+The Momentum Ladder is **Inverted: High on the Left, Low on the Right**, creating a natural intuitive physical progression where climbing toward peak flow slides leftward into the fiery red Level 3 slot, while fatigue drops rightward toward grey exhaustion.
+
+### The 4 Ladder Levels (Left to Right)
+* **Level 3 (`L3 🔥`): LOCKED IN** (Far Left) — `+5` Momentum Bonus + Player Superpower Unlocked!
+* **Level 2 (`L2 ★`): PRIME** (Middle-Left) — `+3` Momentum Bonus (Stars start here).
+* **Level 1 (`L1`): READY** (Middle-Right) — `+2` Momentum Bonus (Role players start here).
+* **Level 0 (`✕ EXH`): EXHAUSTED** (Far Right) — `+0` Bonus (Abilities locked; cannot spend fuel).
 
 ### Asymmetric Ladder Tiers Across the Roster
-* **Superstars & Aces (4-Slot Ladder):** `[EXH] → [L1] → [L2 ★] → [L3 🔥]` *(Starts at L2, can achieve Locked In!)*
-* **Everyday Starters (3-Slot Ladder):** `[EXH] → [L1] → [L2 ★]` *(Starts at L2 or L1, max L2).*
-* **Role Players & Underdogs (2-Slot Ladder):** `[EXH] → [L1 ★]` *(Starts at L1, one-shot fuel).*
+* **Superstars & Aces (4-Slot Ladder):** `[L3 🔥 (+5)] ← [L2 ★ (+3)] ← [L1 (+2)] ← [✕ EXH (+0)]` *(Starts at L2, can surge LEFT into Locked In!)*
+* **Everyday Starters (3-Slot Ladder):** `[L2 ★ (+3)] ← [L1 (+2)] ← [✕ EXH (+0)]` *(Starts at L2 or L1, max L2).*
+* **Role Players & Underdogs (2-Slot Ladder):** `[L1 ★ (+2)] ← [✕ EXH (+0)]` *(Starts at L1, one-shot fuel).*
 
 ### How Surges Work (Printed on Each Player Card)
 A **`⚡ SURGE`** occurs immediately when a player executes their signature strength during play:
-* If the player is currently below their maximum ladder box, **slide their wooden cube one slot to the right**.
+* If the player is currently below their maximum ladder box, **slide their wooden cube one slot to the LEFT** (toward Level 3 🔥).
 * **Hitting Level 3 (`L3 🔥`):** When a Tier-1 superstar surges while already at Level 2, they achieve **LOCKED IN 🔥** status!
-* **Spending Fuel:** Activating a Special Ability slides the cube **one slot to the left**. A Locked In player who spends fuel drops to Level 2 (Prime), remaining dangerous.
+* **Spending Fuel / Fatigue:** Activating a Special Ability slides the cube **one slot to the RIGHT** (toward Exhaustion). A Locked In player who spends fuel drops rightward to Level 2 (Prime), remaining dangerous.
+
+---
+
+## 5.1 Component Standards: Half-Size Cards & 11x17 Playmats
+
+* **Half-Size Player Cards (1.82" × 2.52" Mini Cards):** All 30 players and reference cards are formatted as half-size mini cards, allowing entire 15-player team rosters to fit on a single 8.5" × 11" printable sheet.
+* **11×17 Playmat with 9-Card Lineup Tray:** Each team has a dedicated 11" × 17" Manager Playmat. Across the entire bottom edge sits a 9-slot batting order track where all 9 half-size player cards line up side-by-side in batting order!
+* **2-Sheet Easy Home Printing:** Each 11" × 17" playmat is split into two standard 8.5" × 11" Letter sheets (Left Half & Right Half) with overlap alignment marks (`✛`), allowing any standard home printer to produce full-size 11" × 17" tournament-grade playmats with zero trimming hassle.
 
 ---
 

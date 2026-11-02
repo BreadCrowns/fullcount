@@ -1,0 +1,384 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Full Count (V5) — Official 11x17 Playmats (Letter Printable)</title>
+<style>
+  @page { size: 8.5in 11.0in; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #0f172a; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .screen-header { background: #0f172a; border-bottom: 2px solid #334155; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+  .screen-header h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 20px; letter-spacing: 0.8px; color: #38bdf8; }
+  .screen-header p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn { border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-print { background: #2563eb; color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
+  .btn-print:hover { background: #1d4ed8; }
+  .btn-toggle { background: #334155; color: #f8fafc; }
+  .btn-toggle:hover { background: #475569; }
+  .btn-link { background: #0284c7; color: white; }
+  .instructions-banner { background: #1e293b; color: #cbd5e1; font-size: 11px; padding: 8px 24px; text-align: center; border-bottom: 1px solid #334155; }
+  .instructions-banner strong { color: #38bdf8; }
+  .playmat-container { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 24px 0; }
+  .playmat-sheet { width: 8.5in; height: 11.0in; background: white; padding: 0.25in; box-shadow: 0 8px 28px rgba(0,0,0,0.5); position: relative; overflow: hidden; page-break-after: always; break-after: page; }
+  @media print {
+    body { background: white; }
+    .screen-header, .instructions-banner { display: none !important; }
+    .playmat-container { padding: 0 !important; gap: 0 !important; }
+    .playmat-sheet { margin: 0 !important; box-shadow: none !important; page-break-after: always; break-after: page; }
+  }
+  /* Assembled 11x17 View on Screen */
+  .assembled-mode .playmat-pair { display: flex; flex-direction: row; box-shadow: 0 10px 32px rgba(0,0,0,0.6); margin-bottom: 24px; }
+  .assembled-mode .playmat-sheet { box-shadow: none; margin: 0; }
+  .assembled-mode .seam-guide { border-right: 2px dashed #94a3b8; }
+  /* Sheet Layout Grid & Modules */
+  .sheet-inner { width: 8.0in; height: 10.5in; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .header-banner { display: flex; justify-content: space-between; align-items: center; border-radius: 6px; padding: 8px 14px; margin-bottom: 8px; }
+  .titans-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; border-bottom: 3px solid #38bdf8; }
+  .serpents-bg { background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); color: white; border-bottom: 3px solid #10b981; }
+  .team-title { font-family: Impact, "Arial Black", sans-serif; font-size: 20px; letter-spacing: 1px; line-height: 1.1; }
+  .team-subtitle { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9; }
+  .sheet-tag { font-size: 9px; font-weight: 900; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase; }
+  /* Middle Sections */
+  .middle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; margin-bottom: 8px; }
+  .panel { border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between; }
+  .panel-title { font-family: Impact, sans-serif; font-size: 12px; letter-spacing: 0.5px; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 3px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  /* Card Placement Slots (1.62" x 2.45") */
+  .card-slot { width: 1.52in; height: 2.38in; border: 2px dashed #94a3b8; border-radius: 6px; background: white; display: flex; flex-direction: column; justify-content: space-between; padding: 6px; position: relative; }
+  .card-slot-badge { font-size: 8px; font-weight: 900; background: #0f172a; color: white; padding: 2px 5px; border-radius: 3px; align-self: flex-start; text-transform: uppercase; }
+  .card-slot-center { text-align: center; margin: auto 0; color: #64748b; font-size: 9px; font-weight: 800; }
+  .card-slot-footer { font-size: 7px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 2px; }
+  /* Pitcher Mound Module */
+  .mound-slot { width: 1.52in; height: 2.38in; border: 2.5px solid #0f172a; background: #eff6ff; }
+  .fatigue-track { background: white; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px; margin-top: 6px; }
+  .fatigue-row { display: flex; justify-content: space-between; gap: 3px; margin-top: 3px; }
+  .fatigue-step { flex: 1; border: 1px solid #cbd5e1; border-radius: 3px; padding: 3px 2px; text-align: center; font-size: 7.5px; font-weight: 800; background: #f8fafc; }
+  .fatigue-step.alert { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+  .fatigue-step.warn { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+  /* Inverted Momentum Ladder Tracker */
+  .ladder-track { background: white; border: 1.5px solid #0f172a; border-radius: 6px; padding: 6px; margin-top: 6px; }
+  .ladder-header { display: flex; justify-content: space-between; font-size: 7px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; }
+  .ladder-boxes { display: flex; gap: 4px; }
+  .ladder-cell { flex: 1; border: 1.5px solid #334155; border-radius: 4px; padding: 4px 2px; text-align: center; }
+  .cell-l3 { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+  .cell-l2 { background: #fef3c7; border-color: #d97706; color: #92400e; }
+  .cell-l1 { background: #eff6ff; border-color: #2563eb; color: #1d4ed8; }
+  .cell-exh { background: #f1f5f9; border-color: #94a3b8; color: #64748b; }
+  /* Bottom 9-Man Batting Order Lineup Track */
+  .lineup-tray { background: #0f172a; border-radius: 8px; padding: 6px 8px; border: 2px solid #334155; color: white; }
+  .lineup-tray-header { display: flex; justify-content: space-between; align-items: center; font-size: 8px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 5px; color: #38bdf8; }
+  .lineup-slots-grid { display: flex; gap: 6px; justify-content: space-between; }
+  .lineup-card-slot { width: 1.48in; height: 2.36in; border: 2px dashed rgba(255,255,255,0.4); border-radius: 6px; background: rgba(255,255,255,0.06); display: flex; flex-direction: column; justify-content: space-between; padding: 5px; text-align: center; }
+  .lineup-card-slot.active-at-plate { border: 2.5px solid #facc15; background: rgba(250,204,21,0.15); }
+  .slot-number { font-family: Impact, sans-serif; font-size: 16px; color: #f8fafc; line-height: 1; }
+  .slot-role { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; margin-top: 1px; }
+  /* Diamond & Bases */
+  .diamond-area { position: relative; width: 100%; height: 2.1in; background: radial-gradient(circle, #065f46 0%, #047857 70%, #064e3b 100%); border-radius: 8px; border: 2px solid #0f172a; display: flex; justify-content: center; align-items: center; }
+  .base-box { position: absolute; width: 34px; height: 34px; background: white; border: 2px solid #0f172a; transform: rotate(45deg); display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .base-box span { transform: rotate(-45deg); font-family: Impact, sans-serif; font-size: 11px; color: #0f172a; }
+  .base-hp { bottom: 12px; }
+  .base-1b { right: 32px; }
+  .base-2b { top: 12px; }
+  .base-3b { left: 32px; }
+  /* Scoreboard & Trackers */
+  .tracker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 5px; }
+  .tracker-box { background: white; border: 1.5px solid #cbd5e1; border-radius: 4px; padding: 4px; text-align: center; }
+  .tracker-box h4 { font-size: 7px; text-transform: uppercase; color: #64748b; font-weight: 800; }
+  .tracker-pills { display: flex; justify-content: center; gap: 3px; margin-top: 2px; }
+  .tracker-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #0f172a; font-size: 8px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: white; }
+  .tracker-dot.active { background: #ef4444; color: white; border-color: #991b1b; }
+  /* Outcome Table & Baserunning Table */
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 6.8px; margin-top: 4px; }
+  .mini-table th, .mini-table td { border: 1px solid #cbd5e1; padding: 2px; text-align: center; }
+  .mini-table th { background: #0f172a; color: white; font-weight: 800; }
+  /* Seam Alignment Guides */
+  .seam-marker-right { position: absolute; right: 0; top: 0; bottom: 0; width: 0.15in; border-left: 2px dashed #94a3b8; display: flex; flex-direction: column; justify-content: space-around; align-items: center; color: #64748b; font-size: 8px; font-weight: 900; writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1.5px; background: rgba(148,163,184,0.08); }
+  .seam-marker-left { position: absolute; left: 0; top: 0; bottom: 0; width: 0.15in; border-right: 2px dashed #94a3b8; display: flex; flex-direction: column; justify-content: space-around; align-items: center; color: #64748b; font-size: 8px; font-weight: 900; writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1.5px; background: rgba(148,163,184,0.08); }
+</style>
+</head>
+<body>
+<div class="screen-header">
+  <div>
+    <h1>FULL COUNT (V5) — OFFICIAL 11x17 PLAYMATS</h1>
+    <p>Two Complete Manager Mats • Split into 4 Letter Pages (8.5" x 11") • 9-Man Half-Size Lineup Track • Inverted Momentum Ladder</p>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-toggle" onclick="toggleAssembled()">&#128065; Toggle 11x17 View</button>
+    <a class="btn btn-link" href="print_sheets.html">&#127183; Half-Size Cards Deck</a>
+    <button class="btn btn-print" onclick="window.print()">&#128424; Print 4 Playmat Sheets</button>
+  </div>
+</div>
+<div class="instructions-banner">
+  <strong>PRINT & ASSEMBLE GUIDE:</strong> Print all 4 sheets on standard 8.5" x 11" Letter paper (100% scale / borderless or fit). Place <strong>Sheet 1 (Left)</strong> and <strong>Sheet 2 (Right)</strong> side-by-side along the center dashed seam to form the <strong>Titans 11x17 Mat</strong>. Repeat with Sheets 3 & 4 for the <strong>Serpents 11x17 Mat</strong>. Your 9 half-size player cards line up across the bottom tray!
+</div>
+<div class="playmat-container" id="mat-container">
+<!-- TITANS PLAYMAT: LEFT HALF -->
+<div class="playmat-sheet">
+  <div class="seam-marker-right">&#10011; TAPE / JOIN CENTER SEAM TO SHEET 2 &#10011;</div>
+  <div class="sheet-inner">
+    <div class="header-banner titans-bg">
+      <div>
+        <div class="team-title">METRO TITANS — DUGOUT & MOUND</div>
+        <div class="team-subtitle">11x17 Command Station • Left Half (Sheet 1 of 2)</div>
+      </div>
+      <div class="sheet-tag">HOME / AWAY DUGOUT</div>
+    </div>
+    <div class="middle-row">
+      <div class="panel">
+        <div class="panel-title"><span>&#9889; ACTIVE PITCHER MOUND</span> <span style="font-size:8px; color:#2563eb;">SLOT</span></div>
+        <div style="display:flex; justify-content:center;">
+          <div class="card-slot mound-slot">
+            <div class="card-slot-badge" style="background:#1e3a8a;">MOUND</div>
+            <div class="card-slot-center">PLACE ACTIVE<br>PITCHER CARD<br>(1.62" x 2.45")</div>
+            <div class="card-slot-footer">VEL / CMD / MOV</div>
+          </div>
+        </div>
+        <div class="fatigue-track">
+          <div style="font-size:7.5px; font-weight:900; text-transform:uppercase; color:#0f172a; display:flex; justify-content:space-between;">
+            <span>TIMES THROUGH ORDER (TTO) FATIGUE</span>
+            <span style="color:#dc2626;">&#9654; SHIFT RIGHT</span>
+          </div>
+          <div class="fatigue-row">
+            <div class="fatigue-step"><strong>1st TTO</strong><br>Fresh (L2/L1)</div>
+            <div class="fatigue-step warn"><strong>2nd TTO</strong><br>Drop -1 Lvl &#9654;</div>
+            <div class="fatigue-step alert"><strong>3rd TTO</strong><br>EXHAUSTED &#9654;</div>
+          </div>
+          <div style="font-size:6.8px; color:#64748b; margin-top:3px;">Drop 1 Level right on 3+ run rally or 2nd inning for RP.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span>&#128293; INVERTED MOMENTUM LADDER</span> <span style="font-size:8px; color:#b91c1c;">HIGH ON LEFT</span></div>
+        <div class="ladder-track">
+          <div class="ladder-header">
+            <span style="color:#16a34a;">&#9664; SURGE (+1 SLOT)</span>
+            <span style="color:#dc2626;">FATIGUE (-1 SLOT) &#9654;</span>
+          </div>
+          <div class="ladder-boxes">
+            <div class="ladder-cell cell-l3"><strong>L3 &#128293;</strong><br>+5 BONUS<br><span style="font-size:6px;">LOCKED IN</span></div>
+            <div class="ladder-cell cell-l2"><strong>L2 &#9733;</strong><br>+3 BONUS<br><span style="font-size:6px;">PRIME</span></div>
+            <div class="ladder-cell cell-l1"><strong>L1 &#9889;</strong><br>+2 BONUS<br><span style="font-size:6px;">READY</span></div>
+            <div class="ladder-cell cell-exh"><strong>L0 &#10005;</strong><br>+0 BONUS<br><span style="font-size:6px;">EXHAUST</span></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="font-size:8px; font-weight:900; text-transform:uppercase; color:#0f172a; margin-bottom:4px;">TITANS BULLPEN BAY</div>
+          <div style="display:flex; gap:6px;">
+            <div class="card-slot" style="width:1.6in; height:1.65in;"><div class="card-slot-badge">RP WARMUP</div><div class="card-slot-center" style="font-size:7.5px;">RELIEVER 1</div></div>
+            <div class="card-slot" style="width:1.6in; height:1.65in;"><div class="card-slot-badge" style="background:#b91c1c;">CLOSER</div><div class="card-slot-center" style="font-size:7.5px;">9th INN CL</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="lineup-tray">
+      <div class="lineup-tray-header">
+        <span>&#127380; TITANS BATTING ORDER (LINEUP SLOTS #1 TO #5)</span>
+        <span>CONTINUES ON SHEET 2 (SLOTS #6 TO #9) &#9654;</span>
+      </div>
+      <div class="lineup-slots-grid">
+        <div class="lineup-card-slot"><div class="slot-number">#1</div><div class="slot-role">LEADOFF • CF</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">MERCER</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#2</div><div class="slot-role">CONTACT • 2B</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">VANCE</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#3</div><div class="slot-role">BARREL • 3B</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">REYES</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#4</div><div class="slot-role">CLEANUP • 1B</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">STONE</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#5</div><div class="slot-role">POWER • RF</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">COLE</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- TITANS PLAYMAT: RIGHT HALF -->
+<div class="playmat-sheet">
+  <div class="seam-marker-left">&#10011; TAPE / JOIN CENTER SEAM TO SHEET 1 &#10011;</div>
+  <div class="sheet-inner" style="padding-left:0.18in;">
+    <div class="header-banner titans-bg">
+      <div>
+        <div class="team-title">METRO FIELD & DIAMOND COMMAND</div>
+        <div class="team-subtitle">11x17 Command Station • Right Half (Sheet 2 of 2)</div>
+      </div>
+      <div class="sheet-tag">SCOREBOARD & FIELD</div>
+    </div>
+    <div class="middle-row">
+      <div class="panel">
+        <div class="panel-title"><span>&#9918; BASEBALL DIAMOND & BASES</span></div>
+        <div class="diamond-area">
+          <div class="base-box base-2b"><span>2B</span></div>
+          <div class="base-box base-3b"><span>3B</span></div>
+          <div class="base-box base-1b"><span>1B</span></div>
+          <div class="base-box base-hp"><span>HP</span></div>
+        </div>
+        <div class="tracker-grid">
+          <div class="tracker-box"><h4>OUTS</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot" style="border-color:#ef4444;">&#10005;</div></div></div>
+          <div class="tracker-box"><h4>BALLS</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot">3</div><div class="tracker-dot" style="border-color:#2563eb;">BB</div></div></div>
+          <div class="tracker-box"><h4>STRIKES</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot" style="border-color:#ef4444;">K</div></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span>&#128203; UNIVERSAL OUTCOME MATRIX</span></div>
+        <table class="mini-table">
+          <tr><th>NET MARGIN</th><th>APPROACH RESULT</th></tr>
+          <tr style="background:#fee2e2; font-weight:800; color:#991b1b;"><td>+8 or more</td><td>STRIKEOUT (K) — SWING & MISS</td></tr>
+          <tr style="background:#fef2f2; font-weight:800; color:#b91c1c;"><td>+5 to +7</td><td>STRIKEOUT (K) — LOOKING</td></tr>
+          <tr style="background:#f8fafc; color:#475569;"><td>+2 to +4</td><td>ROUTINE FLYOUT / GROUNDOUT</td></tr>
+          <tr style="background:#fef9c3; color:#854d0e;"><td>+1</td><td>WEAK CONTACT / GROUNDOUT</td></tr>
+          <tr style="background:#fefce8; color:#854d0e; font-weight:800;"><td>0 (TIE)</td><td>FIELDED BALL / SAC OUT</td></tr>
+          <tr style="background:#eff6ff; color:#1d4ed8; font-weight:800;"><td>-1 to -3</td><td>WALK (BB) — ZONE / EYE</td></tr>
+          <tr style="background:#f0fdf4; color:#15803d; font-weight:800;"><td>-4 to -6</td><td>CLEAN SINGLE (1B)</td></tr>
+          <tr style="background:#fae8ff; color:#86198f; font-weight:900;"><td>-7 or less</td><td>EXTRA-BASE HIT! (Roll POW)</td></tr>
+        </table>
+        <div style="background:#eff6ff; border:1px solid #93c5fd; border-radius:4px; padding:3px 5px; font-size:6.8px; margin-top:4px;">
+          <strong>STANCE INTERACTION:</strong> <strong>MATCH</strong> (Same Color) = Batter Momentum Bonus! • <strong>MISMATCH</strong> = Pitcher Momentum Bonus!
+        </div>
+      </div>
+    </div>
+    <div class="lineup-tray">
+      <div class="lineup-tray-header">
+        <span>&#9664; CONTINUED FROM SHEET 1: SLOTS #6 TO #9</span>
+        <span style="color:#facc15;">&#9918; ACTIVE AT-PLATE BATTER BOX</span>
+      </div>
+      <div class="lineup-slots-grid">
+        <div class="lineup-card-slot"><div class="slot-number">#6</div><div class="slot-role">DH</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">DAN</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#7</div><div class="slot-role">SS</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">CHEN</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#8</div><div class="slot-role">C</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">PETE</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#9</div><div class="slot-role">LF</div><div style="font-size:7px; color:#cbd5e1; margin-top:auto;">ELI</div></div>
+        <div class="lineup-card-slot active-at-plate"><div class="slot-number" style="color:#facc15;">&#9918;</div><div class="slot-role" style="color:#fde047; font-weight:900;">AT BAT NOW</div><div style="font-size:7px; color:#fef08a; margin-top:auto;">PLACE CARD</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- SERPENTS PLAYMAT: LEFT HALF -->
+<div class="playmat-sheet">
+  <div class="seam-marker-right">&#10011; TAPE / JOIN CENTER SEAM TO SHEET 4 &#10011;</div>
+  <div class="sheet-inner">
+    <div class="header-banner serpents-bg">
+      <div>
+        <div class="team-title">CRIMSON SERPENTS — DUGOUT & MOUND</div>
+        <div class="team-subtitle">11x17 Command Station • Left Half (Sheet 1 of 2)</div>
+      </div>
+      <div class="sheet-tag">HOME / AWAY DUGOUT</div>
+    </div>
+    <div class="middle-row">
+      <div class="panel">
+        <div class="panel-title"><span>&#9889; ACTIVE PITCHER MOUND</span> <span style="font-size:8px; color:#047857;">SLOT</span></div>
+        <div style="display:flex; justify-content:center;">
+          <div class="card-slot mound-slot" style="border-color:#064e3b; background:#f0fdf4;">
+            <div class="card-slot-badge" style="background:#064e3b;">MOUND</div>
+            <div class="card-slot-center">PLACE ACTIVE<br>PITCHER CARD<br>(1.62" x 2.45")</div>
+            <div class="card-slot-footer">VEL / CMD / MOV</div>
+          </div>
+        </div>
+        <div class="fatigue-track">
+          <div style="font-size:7.5px; font-weight:900; text-transform:uppercase; color:#0f172a; display:flex; justify-content:space-between;">
+            <span>TIMES THROUGH ORDER (TTO) FATIGUE</span>
+            <span style="color:#dc2626;">&#9654; SHIFT RIGHT</span>
+          </div>
+          <div class="fatigue-row">
+            <div class="fatigue-step"><strong>1st TTO</strong><br>Fresh (L2/L1)</div>
+            <div class="fatigue-step warn"><strong>2nd TTO</strong><br>Drop -1 Lvl &#9654;</div>
+            <div class="fatigue-step alert"><strong>3rd TTO</strong><br>EXHAUSTED &#9654;</div>
+          </div>
+          <div style="font-size:6.8px; color:#64748b; margin-top:3px;">Drop 1 Level right on 3+ run rally or 2nd inning for RP.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span>&#128293; INVERTED MOMENTUM LADDER</span> <span style="font-size:8px; color:#b91c1c;">HIGH ON LEFT</span></div>
+        <div class="ladder-track">
+          <div class="ladder-header">
+            <span style="color:#16a34a;">&#9664; SURGE (+1 SLOT)</span>
+            <span style="color:#dc2626;">FATIGUE (-1 SLOT) &#9654;</span>
+          </div>
+          <div class="ladder-boxes">
+            <div class="ladder-cell cell-l3"><strong>L3 &#128293;</strong><br>+5 BONUS<br><span style="font-size:6px;">LOCKED IN</span></div>
+            <div class="ladder-cell cell-l2"><strong>L2 &#9733;</strong><br>+3 BONUS<br><span style="font-size:6px;">PRIME</span></div>
+            <div class="ladder-cell cell-l1"><strong>L1 &#9889;</strong><br>+2 BONUS<br><span style="font-size:6px;">READY</span></div>
+            <div class="ladder-cell cell-exh"><strong>L0 &#10005;</strong><br>+0 BONUS<br><span style="font-size:6px;">EXHAUST</span></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="font-size:8px; font-weight:900; text-transform:uppercase; color:#0f172a; margin-bottom:4px;">SERPENTS BULLPEN BAY</div>
+          <div style="display:flex; gap:6px;">
+            <div class="card-slot" style="width:1.6in; height:1.65in;"><div class="card-slot-badge" style="background:#064e3b;">RP WARMUP</div><div class="card-slot-center" style="font-size:7.5px;">RELIEVER 1</div></div>
+            <div class="card-slot" style="width:1.6in; height:1.65in;"><div class="card-slot-badge" style="background:#b91c1c;">CLOSER</div><div class="card-slot-center" style="font-size:7.5px;">9th INN CL</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="lineup-tray" style="background:#022c22; border-color:#064e3b;">
+      <div class="lineup-tray-header" style="color:#34d399;">
+        <span>&#127380; SERPENTS BATTING ORDER (LINEUP SLOTS #1 TO #5)</span>
+        <span>CONTINUES ON SHEET 4 (SLOTS #6 TO #9) &#9654;</span>
+      </div>
+      <div class="lineup-slots-grid">
+        <div class="lineup-card-slot"><div class="slot-number">#1</div><div class="slot-role">EYE • LF</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">SOTO</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#2</div><div class="slot-role">DH • 5-TOOL</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">CRUZ</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#3</div><div class="slot-role">SS • GAP</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">GUNNAR</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#4</div><div class="slot-role">CLEANUP • 1B</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">HARPER</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#5</div><div class="slot-role">3B • CLUTCH</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">MACHADO</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- SERPENTS PLAYMAT: RIGHT HALF -->
+<div class="playmat-sheet">
+  <div class="seam-marker-left">&#10011; TAPE / JOIN CENTER SEAM TO SHEET 3 &#10011;</div>
+  <div class="sheet-inner" style="padding-left:0.18in;">
+    <div class="header-banner serpents-bg">
+      <div>
+        <div class="team-title">SERPENTS FIELD & DIAMOND COMMAND</div>
+        <div class="team-subtitle">11x17 Command Station • Right Half (Sheet 2 of 2)</div>
+      </div>
+      <div class="sheet-tag">SCOREBOARD & FIELD</div>
+    </div>
+    <div class="middle-row">
+      <div class="panel">
+        <div class="panel-title"><span>&#9918; BASEBALL DIAMOND & BASES</span></div>
+        <div class="diamond-area">
+          <div class="base-box base-2b"><span>2B</span></div>
+          <div class="base-box base-3b"><span>3B</span></div>
+          <div class="base-box base-1b"><span>1B</span></div>
+          <div class="base-box base-hp"><span>HP</span></div>
+        </div>
+        <div class="tracker-grid">
+          <div class="tracker-box"><h4>OUTS</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot" style="border-color:#ef4444;">&#10005;</div></div></div>
+          <div class="tracker-box"><h4>BALLS</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot">3</div><div class="tracker-dot" style="border-color:#2563eb;">BB</div></div></div>
+          <div class="tracker-box"><h4>STRIKES</h4><div class="tracker-pills"><div class="tracker-dot">1</div><div class="tracker-dot">2</div><div class="tracker-dot" style="border-color:#ef4444;">K</div></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span>&#128203; UNIVERSAL OUTCOME MATRIX</span></div>
+        <table class="mini-table">
+          <tr><th>NET MARGIN</th><th>APPROACH RESULT</th></tr>
+          <tr style="background:#fee2e2; font-weight:800; color:#991b1b;"><td>+8 or more</td><td>STRIKEOUT (K) — SWING & MISS</td></tr>
+          <tr style="background:#fef2f2; font-weight:800; color:#b91c1c;"><td>+5 to +7</td><td>STRIKEOUT (K) — LOOKING</td></tr>
+          <tr style="background:#f8fafc; color:#475569;"><td>+2 to +4</td><td>ROUTINE FLYOUT / GROUNDOUT</td></tr>
+          <tr style="background:#fef9c3; color:#854d0e;"><td>+1</td><td>WEAK CONTACT / GROUNDOUT</td></tr>
+          <tr style="background:#fefce8; color:#854d0e; font-weight:800;"><td>0 (TIE)</td><td>FIELDED BALL / SAC OUT</td></tr>
+          <tr style="background:#eff6ff; color:#1d4ed8; font-weight:800;"><td>-1 to -3</td><td>WALK (BB) — ZONE / EYE</td></tr>
+          <tr style="background:#f0fdf4; color:#15803d; font-weight:800;"><td>-4 to -6</td><td>CLEAN SINGLE (1B)</td></tr>
+          <tr style="background:#fae8ff; color:#86198f; font-weight:900;"><td>-7 or less</td><td>EXTRA-BASE HIT! (Roll POW)</td></tr>
+        </table>
+        <div style="background:#eff6ff; border:1px solid #93c5fd; border-radius:4px; padding:3px 5px; font-size:6.8px; margin-top:4px;">
+          <strong>STANCE INTERACTION:</strong> <strong>MATCH</strong> (Same Color) = Batter Momentum Bonus! • <strong>MISMATCH</strong> = Pitcher Momentum Bonus!
+        </div>
+      </div>
+    </div>
+    <div class="lineup-tray" style="background:#022c22; border-color:#064e3b;">
+      <div class="lineup-tray-header" style="color:#34d399;">
+        <span>&#9664; CONTINUED FROM SHEET 3: SLOTS #6 TO #9</span>
+        <span style="color:#facc15;">&#9918; ACTIVE AT-PLATE BATTER BOX</span>
+      </div>
+      <div class="lineup-slots-grid">
+        <div class="lineup-card-slot"><div class="slot-number">#6</div><div class="slot-role">2B</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">LINDOR</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#7</div><div class="slot-role">CF</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">HOERNER</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#8</div><div class="slot-role">C</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">HEDGES</div></div>
+        <div class="lineup-card-slot"><div class="slot-number">#9</div><div class="slot-role">RF</div><div style="font-size:7px; color:#a7f3d0; margin-top:auto;">LEO</div></div>
+        <div class="lineup-card-slot active-at-plate"><div class="slot-number" style="color:#facc15;">&#9918;</div><div class="slot-role" style="color:#fde047; font-weight:900;">AT BAT NOW</div><div style="font-size:7px; color:#fef08a; margin-top:auto;">PLACE CARD</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div> <!-- /playmat-container -->
+<script>
+  function toggleAssembled() {
+    document.body.classList.toggle('assembled-mode');
+  }
+</script>
+</body>
+</html>
