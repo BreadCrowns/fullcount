@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1704,6 +1704,23 @@
       return off.batters[off.batterIdx];
     }
 
+
+    function getLevelBonus(level) {
+      if (level >= 3) return 5;
+      if (level === 2) return 3;
+      if (level === 1) return 2;
+      return 0;
+    }
+    function stepDownLevel(level) {
+      return Math.max(0, level - 1);
+    }
+    function stepUpLevel(player) {
+      if (player.currentLevel < player.maxLevel) {
+        player.currentLevel++;
+        return true;
+      }
+      return false;
+    }
     function getPitcherStanceDice(p, color) {
       if (color === 'red') return { label: 'HEAT', a1: 'Vel', d1: p.vel, a2: 'Grt', d2: p.grt };
       if (color === 'blue') return { label: 'ZONE', a1: 'Cmd', d1: p.cmd, a2: 'Grt', d2: p.grt };
@@ -1717,44 +1734,62 @@
     }
 
     // Build the physical Momentum Cube Track HTML (with a 3D glowing cube on the active box!)
-    function buildCubeTrackHTML(startMom, currentMom, isPitcher) {
-      const steps = [];
-      if (startMom === 'd12') steps.push('d12', 'd8', 'd6');
-      else if (startMom === 'd8') steps.push('d8', 'd6');
-      else steps.push('d6');
-
+    function buildCubeTrackHTML(player, isPitcher) {
+      const cur = player.currentLevel;
+      const max = player.maxLevel;
       let boxesHTML = '';
-      steps.forEach((tier, idx) => {
-        const isStart = (idx === 0);
-        const hasCube = (currentMom === tier);
-        boxesHTML += `
-          <div class="pc-cube-box ${isStart ? 'start-box' : ''} ${hasCube ? 'has-cube' : ''}">
-            ${hasCube ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
-            <span class="pc-cube-step">${isStart ? 'START' : 'STEP'}</span>
-            <span class="pc-cube-die">${tier}</span>
-          </div>
-          <span class="pc-cube-arrow">▸</span>
-        `;
-      });
 
-      const isOut = (currentMom === 'None');
+      // Box 0: Exhausted
+      const hasExh = (cur === 0);
       boxesHTML += `
-        <div class="pc-cube-box out-box ${isOut ? 'has-cube' : ''}">
-          ${isOut ? '<span class="physical-cube-marker" title="Momentum Exhausted"></span>' : ''}
-          <span class="pc-cube-step">OUT</span>
-          <span class="pc-cube-die">✕</span>
-        </div>
-      `;
+        <div class="pc-cube-box ${hasExh ? 'has-cube' : ''}" style="background:#f1f5f9; color:#94a3b8;">
+          ${hasExh ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+          <span class="pc-cube-step">✕ EXH</span>
+          <span class="pc-cube-die">+0</span>
+        </div>`;
+
+      // Box 1: Ready (+2)
+      const hasL1 = (cur === 1);
+      boxesHTML += `
+        <div class="pc-cube-box ${hasL1 ? 'has-cube start-box' : ''}">
+          ${hasL1 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+          <span class="pc-cube-step">L1 READY</span>
+          <span class="pc-cube-die">+2</span>
+        </div>`;
+
+      // Box 2: Prime (+3)
+      if (max >= 2) {
+        const hasL2 = (cur === 2);
+        boxesHTML += `
+          <div class="pc-cube-box ${hasL2 ? 'has-cube start-box' : ''}">
+            ${hasL2 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+            <span class="pc-cube-step">L2 PRIME</span>
+            <span class="pc-cube-die">+3</span>
+          </div>`;
+      }
+
+      // Box 3: Locked In (+5)
+      if (max >= 3) {
+        const hasL3 = (cur === 3);
+        boxesHTML += `
+          <div class="pc-cube-box ${hasL3 ? 'has-cube' : ''}" style="border-color:#dc2626; background:#fee2e2; color:#991b1b;">
+            ${hasL3 ? '<span class="physical-cube-marker" title="Physical Momentum Cube"></span>' : ''}
+            <span class="pc-cube-step">L3 🔥</span>
+            <span class="pc-cube-die">+5</span>
+          </div>`;
+      }
 
       return `
-        <div class="pc-cube-track">
-          <div class="pc-cube-label">⚡ ${isPitcher ? 'ENDURANCE / MOM. CUBE TRACK' : 'MOMENTUM CUBE TRACK'}</div>
-          <div class="pc-cube-row">${boxesHTML}</div>
-        </div>
-      `;
+        <div class="pc-cube-track" style="margin-top:6px;">
+          <div class="pc-cube-track-header">
+            <span>MOMENTUM LADDER (Current: +${getLevelBonus(cur)})</span>
+            <span style="color:${cur === 3 ? '#dc2626' : '#2563eb'}; font-weight:800;">${cur === 3 ? '🔥 LOCKED IN!' : (cur === 2 ? '★ PRIME' : (cur === 1 ? 'READY' : 'EXHAUSTED'))}</span>
+          </div>
+          <div class="pc-cube-track-boxes">
+            ${boxesHTML}
+          </div>
+        </div>`;
     }
-
-    // Build an authentic Portrait Half-Size Physical Card HTML (matching team_cards.html)
     function buildPhysicalCardHTML(player, teamKey, isPitcher, options = {}) {
       const team = state.teams[teamKey];
       const miniClass = options.isMini ? 'lineup-mini' : '';
@@ -2248,6 +2283,7 @@
     }
 
     function resolveOutcomeTable(margin, p, b, manualPowRoll = null) {
+      const bColor = currentDuelContext ? currentDuelContext.bColor : 'green';
       const usedBlackPaint = state.abilityArmed.pitcher && p.abilityType === 'black_paint';
       const usedIronSink   = state.abilityArmed.pitcher && p.abilityType === 'iron_sink';
       const usedVetPoise   = state.abilityArmed.pitcher && p.abilityType === 'vet_poise';
@@ -2272,117 +2308,157 @@
       let pendingSendRunner = null;
       let powRollInfo = null;
 
-      if (effectiveMargin >= 6 && !usedPureBarrel) {
-        state.lastBand = 'k';
-        outs = 1;
-        title = '🔥 STRIKEOUT (K)';
-        detail = `${b.name} strikes out swinging! Baserunners hold.`;
-      } else if (effectiveMargin >= 1) {
-        state.lastBand = 'out';
-        outs = 1;
-        title = '🧤 ROUTINE OUT';
-        detail = `${b.name} flies/pops out. Baserunners hold.`;
-      } else if (effectiveMargin >= -2 && !(usedEagleEye && effectiveMargin === -2)) {
-        state.lastBand = 'sac';
-        outs = 1;
-        title = '⚾ FIELDED / SAC OUT';
-        if (usedIronSink) {
-          detail = `${p.name}'s Iron Sink holds all baserunners! ${b.name} out at 1st.`;
-        } else if (state.outs + outs < 3) {
-          if (state.bases[2]) {
-            runs += 1;
-            state.bases[2] = null;
-            detail = `${b.name} grounded/sac out; Runner on 3rd SCORES!`;
-          } else {
-            detail = `${b.name} thrown out at 1st.`;
-          }
-          if (state.bases[1]) {
-            state.bases[2] = state.bases[1];
-            state.bases[1] = null;
-          }
-        } else {
-          detail = `${b.name} out at 1st (3rd Out of the inning).`;
-        }
-      } else if (effectiveMargin >= -3 || (usedEagleEye && effectiveMargin === -2)) {
-        if (usedBlackPaint && effectiveMargin === -3) {
+      // RESOLUTION BY BATTER CARD COLOR (OPTION 1)
+      if (bColor === 'red') {
+        // 🔴 RED: POWER SWING
+        if (effectiveMargin >= 2 && !usedPureBarrel) {
+          state.lastBand = 'k';
+          outs = 1;
+          title = '🔥 STRIKEOUT (K)';
+          detail = `${b.name} swung for the fences and struck out swinging! Baserunners hold.`;
+        } else if (effectiveMargin >= 0) {
+          state.lastBand = 'out';
+          outs = 1;
+          title = '🧤 ROUTINE OUT';
+          detail = `${b.name} hit a flyout to the outfield track. Baserunners hold.`;
+        } else if (effectiveMargin === -1) {
           state.lastBand = 'sac';
           outs = 1;
-          title = '🎨 BLACK PAINT OUT';
-          detail = `${p.name} paints the corner! Margin -3 Walk becomes a Fielded Out.`;
-        } else {
+          title = '⚾ SAC OUT';
+          if (usedIronSink) {
+            detail = `${p.name}'s Iron Sink holds all baserunners! ${b.name} out at 1st.`;
+          } else if (state.outs + outs < 3 && state.bases[2]) {
+            runs += 1;
+            state.bases[2] = null;
+            detail = `Sacrifice fly! Runner on 3rd SCORES (+1 Run)!`;
+          } else {
+            detail = `${b.name} fly out; runners hold.`;
+          }
+        } else if (effectiveMargin === -2) {
           state.lastBand = 'bb';
           title = '👁️ WALK (BB)';
-          detail = `${b.name} draws a walk to 1st base; forced runners advance.`;
-          if (state.bases[0] && state.bases[1] && state.bases[2]) runs += 1;
-          if (state.bases[0] && state.bases[1]) state.bases[2] = state.bases[1];
-          if (state.bases[0]) state.bases[1] = state.bases[0];
-          state.bases[0] = runnerObj;
-        }
-      } else if ((effectiveMargin >= -6 && !usedUpgrade1B) || (effectiveMargin <= -7 && usedVetPoise)) {
-        state.lastBand = '1b';
-        title = usedVetPoise && effectiveMargin <= -7 ? '🛡️ VETERAN POISE SINGLE' : '💥 CLEAN SINGLE (1B)';
-        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-        const r2 = state.bases[1];
-        if (r2) {
-          if (usedExtraBase) {
-            runs += 1;
-            state.bases[1] = null;
+          detail = `${b.name} draws a base on balls; forced runners advance.`;
+          runs += pushRunnerToBases(runnerObj);
+        } else if (effectiveMargin >= -4 && !usedUpgrade1B) {
+          state.lastBand = '1b';
+          title = '⚡ CLEAN SINGLE (1B)';
+          detail = `${b.name} lines a hard single into right-center!`;
+          const rRes = advanceBasesOnSingle(runnerObj, usedExtraBase);
+          runs += rRes.runs;
+          if (rRes.sendCandidate) pendingSendRunner = rRes.sendCandidate;
+        } else {
+          // Margin <= -5: EXTRA-BASE HIT / HR!
+          state.lastBand = 'xbh';
+          const powDieFaces = DIE_MAX[b.pow] || 6;
+          let actualPow = manualPowRoll;
+          if (actualPow === null) actualPow = rollDie(b.pow);
+
+          const isHR = (actualPow >= 7) || (usedMoonshot && actualPow >= 5) || (b.currentLevel === 3 && actualPow >= 6);
+          const is3B = (actualPow === 6 && !isHR);
+          const is2B = (!isHR && !is3B) || usedVetPoise;
+
+          powRollInfo = { rolled: actualPow, dieMax: powDieFaces };
+
+          if (isHR) {
+            title = '🚀 HOME RUN (450 FT)!';
+            let onBaseCount = (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+            runs += (1 + onBaseCount);
+            state.bases = [null, null, null];
+            detail = `${b.name} crushes a NO-DOUBT TAPE-MEASURE MOONSHOT (+${runs} Runs)!`;
+            // BATTER SURGE ON HR!
+            if (stepUpLevel(b)) {
+              detail += ` ⚡ SURGE! ${b.name} rises to Level ${b.currentLevel}!`;
+            }
+          } else if (is3B) {
+            title = '💨 STAND-UP TRIPLE (3B)!';
+            let onBaseCount = (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
+            runs += onBaseCount;
+            state.bases = [null, null, runnerObj];
+            detail = `${b.name} laces one down the right-field line for a TRIPLE!`;
           } else {
-            state.bases[2] = r2;
-            state.bases[1] = null;
-            pendingSendRunner = r2;
-            state.pendingSendRunner = r2;
+            title = '💥 GROUND-RULE DOUBLE (2B)!';
+            if (state.bases[2]) { runs += 1; state.bases[2] = null; }
+            if (state.bases[1]) { runs += 1; state.bases[1] = null; }
+            if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
+            state.bases[1] = runnerObj;
+            detail = `${b.name} rips a double off the wall!`;
           }
         }
-        if (state.bases[0]) {
-          if (usedExtraBase && !state.bases[2]) state.bases[2] = state.bases[0];
-          else state.bases[1] = state.bases[0];
-        }
-        state.bases[0] = runnerObj;
-        detail = pendingSendRunner
-          ? `${b.name} singles! ${pendingSendRunner.name} (${pendingSendRunner.spd}) reaches 3rd — 3rd-Base Coach decision!`
-          : `${b.name} singles to 1st! Runners advance 1 base.`;
-      } else if (effectiveMargin >= -6 && usedUpgrade1B) {
-        state.lastBand = 'xbh';
-        title = '⚡ GAP HUNTER DOUBLE (2B)!';
-        if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-        if (state.bases[1]) { runs += 1; state.bases[1] = null; }
-        if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
-        state.bases[1] = runnerObj;
-        detail = `${b.name} upgrades a Single into a Double to 2nd base!`;
-      } else {
-        // EXTRA-BASE HIT (-7 OR LESS) -> OPTION B: ROLL BATTER'S POW DIE (1-5 = 2B, 6 = 3B, 7+ = HR)
-        state.lastBand = 'xbh';
-        const powRoll = manualPowRoll !== null ? manualPowRoll : rollDie(b.pow);
-        const isHR = (powRoll >= 7) || (usedMoonshot && powRoll >= 5);
-        const is3B = (powRoll === 6) && !isHR;
-
-        if (is3B) {
-          title = '🚀 TRIPLE (3B)!';
-          runs += (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
-          state.bases = [null, null, runnerObj];
-          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) ➔ TRIPLE! All baserunners score!`;
-          powRollInfo = { die: b.pow, roll: powRoll, bandText: 'Roll 6 = TRIPLE (3B)!' };
-        } else if (isHR) {
-          title = '💣 HOME RUN (HR)!';
-          runs += 1 + (state.bases[0] ? 1 : 0) + (state.bases[1] ? 1 : 0) + (state.bases[2] ? 1 : 0);
-          state.bases = [null, null, null];
-          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) ➔ HOME RUN! ${runs} run(s) score!`;
-          powRollInfo = { die: b.pow, roll: powRoll, bandText: usedMoonshot ? 'Moonshot 5+ = HOME RUN!' : 'Roll 7+ = HOME RUN!' };
+      } else if (bColor === 'green') {
+        // 🟢 GREEN: CONTACT SWING (K-PROTECTED)
+        if (effectiveMargin >= 0) {
+          state.lastBand = 'out';
+          outs = 1;
+          title = '🧤 ROUTINE GROUNDOUT';
+          detail = `${b.name} rolls over to shortstop. Contact protected from Strikeout!`;
+        } else if (effectiveMargin === -1) {
+          state.lastBand = 'sac';
+          outs = 1;
+          title = '⚾ FIELDED / SAC OUT';
+          if (usedIronSink) {
+            detail = `${p.name}'s Iron Sink holds all baserunners!`;
+          } else if (state.outs + outs < 3 && state.bases[2]) {
+            runs += 1;
+            state.bases[2] = null;
+            detail = `Ground ball to second base; Runner on 3rd SCORES (+1 Run)!`;
+          } else {
+            detail = `${b.name} grounded out; baserunners hold.`;
+          }
+        } else if (effectiveMargin === -2) {
+          state.lastBand = 'bb';
+          title = '👁️ WALK (BB)';
+          detail = `${b.name} works the count and takes a walk to 1st base.`;
+          runs += pushRunnerToBases(runnerObj);
         } else {
-          title = '⚡ DOUBLE (2B)!';
-          if (state.bases[2]) { runs += 1; state.bases[2] = null; }
-          if (state.bases[1]) { runs += 1; state.bases[1] = null; }
-          if (state.bases[0]) { state.bases[2] = state.bases[0]; state.bases[0] = null; }
-          state.bases[1] = runnerObj;
-          detail = `${b.name} rolled ${powRoll} on POW (${b.pow}) (1–5) ➔ DOUBLE to 2nd base!`;
-          powRollInfo = { die: b.pow, roll: powRoll, bandText: 'Roll 1–5 = DOUBLE (2B)' };
+          // Margin <= -3: CLEAN SINGLE (Capped at 1B)
+          state.lastBand = '1b';
+          title = '🛡️ CONTACT SINGLE (1B)';
+          detail = `${b.name} punches a crisp line drive through the infield hole!`;
+          const rRes = advanceBasesOnSingle(runnerObj, usedExtraBase);
+          runs += rRes.runs;
+          if (rRes.sendCandidate) pendingSendRunner = rRes.sendCandidate;
+        }
+      } else {
+        // 🔵 BLUE: EYE / DISCIPLINE (EXPANDED WALK ZONE)
+        if (effectiveMargin >= 0) {
+          state.lastBand = 'out';
+          outs = 1;
+          title = '🧤 CHECKED-SWING OUT';
+          detail = `${b.name} holds back on 3-2 count but is called out on strikes.`;
+        } else if (effectiveMargin >= -3) {
+          if (usedBlackPaint && effectiveMargin === -3) {
+            state.lastBand = 'sac';
+            outs = 1;
+            title = '🎨 BLACK PAINT OUT';
+            detail = `${p.name} paints the outside black! Margin -3 Walk becomes a Fielded Out.`;
+          } else {
+            state.lastBand = 'bb';
+            title = '👁️ DISCIPLINE WALK (BB)';
+            detail = `${b.name} lays off the borderline pitch and draws a base on balls!`;
+            runs += pushRunnerToBases(runnerObj);
+            // SOTO SURGE ON BLUE WALK
+            if (b.abilityType === 'eagle_eye' && stepUpLevel(b)) {
+              detail += ` ⚡ SURGE! ${b.name} lays off ball four and surges to Level ${b.currentLevel}!`;
+            }
+          }
+        } else {
+          // Margin <= -4: SINGLE
+          state.lastBand = '1b';
+          title = '⚡ LINE-DRIVE SINGLE (1B)';
+          detail = `${b.name} pokes a single into center field!`;
+          const rRes = advanceBasesOnSingle(runnerObj, usedExtraBase);
+          runs += rRes.runs;
+          if (rRes.sendCandidate) pendingSendRunner = rRes.sendCandidate;
         }
       }
 
-      return { outsAdded: outs, runsAdded: runs, title, detail, pendingSendRunner, powRollInfo };
-    }
+      // PITCHER SURGE CHECK:
+      if (outs > 0 && effectiveMargin >= 3 && stepUpLevel(p)) {
+        detail += ` ⚡ PITCHER SURGE! ${p.name} dominates the zone and ascends to Level ${p.currentLevel}!`;
+      }
 
+      return { outs, runs, title, detail, pendingSendRunner, powRollInfo };
+    }
     function advanceLineupAndInning(outsAdded, runsAdded, postAbilityNotes) {
       const offKey = getOffenseTeamKey();
       const defKey = getDefenseTeamKey();
